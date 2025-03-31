@@ -1,0 +1,228 @@
+<!--
+  Gorstan Protocols Game
+  Version: 1.0.0
+  Last updated: 2025-03-31
+  (C) 2025 Geoff Webster. All rights reserved.
+  This code is provided freely for personal and non-commercial use.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>New Adventure: Gorstan Protocols</title>
+  <style>
+    body {
+      background-color: #111;
+      color: #eee;
+      font-family: 'Courier New', monospace;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+    }
+    header {
+      padding: 20px;
+      text-align: center;
+      background-color: #222;
+      width: 100%;
+    }
+    #game-container {
+      width: 90%;
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #1c1c1c;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(255,255,255,0.1);
+    }
+    #output {
+      white-space: pre-wrap;
+      min-height: 300px;
+      margin-bottom: 20px;
+    }
+    #input-container {
+      display: flex;
+    }
+    #command-input {
+      flex: 1;
+      padding: 10px;
+      font-size: 1em;
+      border: none;
+      border-radius: 4px 0 0 4px;
+    }
+    #submit-button {
+      padding: 10px 20px;
+      font-size: 1em;
+      border: none;
+      background-color: #4caf50;
+      color: white;
+      cursor: pointer;
+      border-radius: 0 4px 4px 0;
+    }
+    #submit-button:hover {
+      background-color: #45a049;
+    }
+    .link {
+      color: #4fa3ff;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>New Adventure: Gorstan Protocols</h1>
+    <p>Explore the multiverse. Type your commands below or use arrow keys to move.</p>
+  </header>
+  <div id="game-container">
+    <div id="output">Welcome to Gorstan Protocols.
+
+Type "help" for a list of available commands.</div>
+    <div id="input-container">
+      <input type="text" id="command-input" placeholder="Enter command..." autofocus />
+      <button id="submit-button">Enter</button>
+    </div>
+  </div>
+
+  <script>
+    const output = document.getElementById('output');
+    const input = document.getElementById('command-input');
+    const button = document.getElementById('submit-button');
+
+    let state = {
+      currentRoom: 'outcrop',
+      inventory: ['Lattice Fragment', 'Memory Stone', 'Gorstan Beacon']
+    };
+
+    const rooms = {
+      outcrop: {
+        description: 'You are standing on a rocky outcrop overlooking the multiverse fracture. The Lattice hums beneath your feet.',
+        exits: { north: 'control_room' },
+        npcs: ['Watcher']
+      },
+      control_room: {
+        description: 'You step into a dimly lit control room filled with flickering panels and humming machinery. A memory console glows faintly in the corner.',
+        exits: { south: 'outcrop', east: 'observation_deck' },
+        npcs: ['Morthos']
+      },
+      observation_deck: {
+        description: 'Through transparent alloy walls, the entire multiversal expanse unfolds before you. You feel impossibly small.',
+        exits: { west: 'control_room' },
+        npcs: []
+      }
+    };
+
+    const npcDialogues = {
+      Watcher: 'The Watcher speaks in a whisper: "You must observe before you act. The fracture listens."',
+      Morthos: 'Morthos leans in: "The lattice shift is unstable. We need the Prime signal—fast."'
+    };
+
+    function appendOutput(text) {
+      output.innerHTML += '<br><br>' + text;
+      output.scrollTop = output.scrollHeight;
+    }
+
+    function describeCurrentRoom() {
+      const room = rooms[state.currentRoom];
+      let desc = room.description + '<br>Exits: ' + Object.keys(room.exits).join(', ');
+      if (room.npcs.length > 0) {
+        desc += '<br>You see: ' + room.npcs.join(', ');
+      }
+      appendOutput(desc);
+    }
+
+    function handleCommand(command) {
+      const cmd = command.trim().toLowerCase();
+
+      if (!cmd) return;
+
+      switch(cmd) {
+        case 'help':
+          appendOutput('Available commands: look, speak, talk, inventory, save, load, north, south, east, west, help');
+          break;
+        case 'look':
+          describeCurrentRoom();
+          break;
+        case 'speak':
+        case 'talk':
+          speakToNPC();
+          break;
+        case 'inventory':
+          appendOutput('Inventory: ' + state.inventory.join(', '));
+          break;
+        case 'save':
+          localStorage.setItem('gorstanSave', JSON.stringify(state));
+          const region = navigator.language.startsWith('en-GB') ? 'co.uk' : 'com';
+          appendOutput(
+            'Game saved.<br><br>Thank you for playing! Continue the adventure by exploring the books.<br>' +
+            `Find them on Amazon: <a class="link" href="https://www.amazon.${region}/s?k=B0DQV5XQMV&ref=404_search" target="_blank">The Gorstan Chronicles</a>`
+          );
+          break;
+        case 'load':
+          const saved = localStorage.getItem('gorstanSave');
+          if (saved) {
+            state = JSON.parse(saved);
+            appendOutput('Game loaded.');
+            describeCurrentRoom();
+          } else {
+            appendOutput('No saved game found.');
+          }
+          break;
+        case 'north':
+        case 'south':
+        case 'east':
+        case 'west':
+          move(cmd);
+          break;
+        default:
+          appendOutput(`Unrecognised command: "${command}"<br>Try "help" for a list of valid commands.`);
+      }
+    }
+
+    function speakToNPC() {
+      const room = rooms[state.currentRoom];
+      if (room.npcs.length === 0) {
+        appendOutput('There is no one here to speak to.');
+      } else {
+        room.npcs.forEach(npc => {
+          appendOutput(npcDialogues[npc] || `${npc} has nothing to say right now.`);
+        });
+      }
+    }
+
+    function move(direction) {
+      const room = rooms[state.currentRoom];
+      if (room.exits[direction]) {
+        state.currentRoom = room.exits[direction];
+        describeCurrentRoom();
+      } else {
+        appendOutput('You cannot go that way.');
+      }
+    }
+
+    button.addEventListener('click', () => {
+      const command = input.value;
+      handleCommand(command);
+      input.value = '';
+    });
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        button.click();
+      } else if (e.key === 'ArrowUp') {
+        handleCommand('north');
+      } else if (e.key === 'ArrowDown') {
+        handleCommand('south');
+      } else if (e.key === 'ArrowLeft') {
+        handleCommand('west');
+      } else if (e.key === 'ArrowRight') {
+        handleCommand('east');
+      }
+    });
+  </script>
+</body>
+</html>
