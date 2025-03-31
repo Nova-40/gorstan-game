@@ -1,6 +1,6 @@
 <!--
   Gorstan Protocols Game
-  Version: 1.0.0
+  Version: 1.1.0
   Last updated: 2025-03-31
   (C) 2025 Geoff Webster. All rights reserved.
   This code is provided freely for personal and non-commercial use.
@@ -32,22 +32,33 @@
       width: 100%;
     }
     #game-container {
-      width: 90%;
-      max-width: 800px;
-      margin: 20px auto;
-      padding: 20px;
-      background-color: #1c1c1c;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(255,255,255,0.1);
-    }
+  width: 90%;
+  max-width: 800px;
+  margin: 20px auto;
+  padding-bottom: 80px; /* ensure space for input */
+  background-color: #1c1c1c;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(255,255,255,0.1);
+  position: relative;
+}
     #output {
       white-space: pre-wrap;
       min-height: 300px;
       margin-bottom: 20px;
     }
     #input-container {
-      display: flex;
-    }
+  display: flex;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: #1c1c1c;
+  padding: 10px;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.4);
+}
     #command-input {
       flex: 1;
       padding: 10px;
@@ -79,7 +90,7 @@
     <p>Explore the multiverse. Type your commands below or use arrow keys to move.</p>
   </header>
   <div id="game-container">
-    <div id="output">Welcome to Gorstan Protocols.
+    <div id="output">Welcome to Gorstan Protocols.<br><br>Start your journey beyond the screen!<br><a class="link" href="https://www.amazon.co.uk/s?k=B0DQV5XQMV&ref=404_search" target="_blank">Explore The Gorstan Chronicles on Amazon UK</a><br><br>
 
 Type "help" for a list of available commands.</div>
     <div id="input-container">
@@ -117,9 +128,21 @@ Type "help" for a list of available commands.</div>
     };
 
     const npcDialogues = {
-      Watcher: 'The Watcher speaks in a whisper: "You must observe before you act. The fracture listens."',
-      Morthos: 'Morthos leans in: "The lattice shift is unstable. We need the Prime signal—fast."'
-    };
+  Watcher: [
+    'The Watcher blinks slowly. "Do you know why the fracture formed?"',
+    '1) Yes, it was inevitable.',
+    '2) No, tell me.',
+    '3) I don’t care.',
+    'Choose: 1, 2, or 3'
+  ],
+  Morthos: [
+    'Morthos studies you. "Are you here to help us or delay the collapse?"',
+    '1) I’ll help however I can.',
+    '2) I just want answers.',
+    '3) That depends—who are you really?',
+    'Choose: 1, 2, or 3'
+  ]
+};
 
     function appendOutput(text) {
       output.innerHTML += '<br><br>' + text;
@@ -135,14 +158,25 @@ Type "help" for a list of available commands.</div>
       appendOutput(desc);
     }
 
-    function handleCommand(command) {
+    let currentDialogue = null;
+
+function handleCommand(command) {
       const cmd = command.trim().toLowerCase();
 
       if (!cmd) return;
 
-      switch(cmd) {
+      if (currentDialogue && ['1','2','3'].includes(cmd)) {
+  handleDialogueResponse(cmd);
+  return;
+}
+
+switch(cmd) {
+  case 'exit':
+  case 'quit':
+    appendOutput('Thank you for playing. You may now close the browser or tab.');
+    return;
         case 'help':
-          appendOutput('Available commands: look, speak, talk, inventory, save, load, north, south, east, west, help');
+          appendOutput('Available commands: look, speak, talk, inventory, save, load, north, south, east, west, help, exit, quit');
           break;
         case 'look':
           describeCurrentRoom();
@@ -184,17 +218,55 @@ Type "help" for a list of available commands.</div>
     }
 
     function speakToNPC() {
-      const room = rooms[state.currentRoom];
-      if (room.npcs.length === 0) {
-        appendOutput('There is no one here to speak to.');
+  const room = rooms[state.currentRoom];
+  if (room.npcs.length === 0) {
+    appendOutput('There is no one here to speak to.');
+  } else {
+    const npc = room.npcs[0];
+    const dialogue = npcDialogues[npc];
+    if (Array.isArray(dialogue)) {
+      currentDialogue = npc;
+      dialogue.forEach(line => appendOutput(line));
+    } else {
+      appendOutput(dialogue);
+    }
+  }
+} else {
+    room.npcs.forEach(npc => {
+      const dialogue = npcDialogues[npc];
+      if (Array.isArray(dialogue)) {
+        dialogue.forEach(line => appendOutput(line));
       } else {
+        appendOutput(dialogue);
+      }
+    });
+  }
+} else {
         room.npcs.forEach(npc => {
           appendOutput(npcDialogues[npc] || `${npc} has nothing to say right now.`);
         });
       }
     }
 
-    function move(direction) {
+    function handleDialogueResponse(choice) {
+  let response = '';
+  switch(currentDialogue) {
+    case 'Watcher':
+      if (choice === '1') response = 'The Watcher nods. "Then you understand."';
+      else if (choice === '2') response = 'The Watcher tilts its head. "Perhaps one day you will."';
+      else if (choice === '3') response = 'The Watcher vanishes without a sound.';
+      break;
+    case 'Morthos':
+      if (choice === '1') response = 'Morthos smiles. "Then we’ll begin immediately."';
+      else if (choice === '2') response = 'Morthos grunts. "You may not like them."';
+      else if (choice === '3') response = 'Morthos narrows his eyes. "I was about to ask you the same."';
+      break;
+  }
+  appendOutput(response);
+  currentDialogue = null;
+}
+
+$1
       const room = rooms[state.currentRoom];
       if (room.exits[direction]) {
         state.currentRoom = room.exits[direction];
