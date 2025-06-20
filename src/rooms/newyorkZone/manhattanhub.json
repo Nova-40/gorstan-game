@@ -1,0 +1,24 @@
+{
+  "id": "manhattanhub",
+  "name": "Manhattan Hub",
+  "description": [
+    "Buzz and steel."
+  ],
+  "exits": {
+    "west": "introstart"
+  },
+  "image": "manhattanhub.png",
+  "items": [],
+  "traitsRequired": [],
+  "events": {},
+  "portalExit": true,
+  "puzzleRequired": true,
+  "trap": {
+    "type": "adaptive",
+    "level": 2,
+    "disarmable": true,
+    "message": "You feel something is not right here...",
+    "lethal": false
+  },
+  "zone": "newyorkZone"
+}

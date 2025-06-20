@@ -1,0 +1,24 @@
+{
+  "id": "windingpath",
+  "name": "Winding Path",
+  "description": [
+    "Left, or right?"
+  ],
+  "exits": {
+    "west": "introstart"
+  },
+  "image": "windingpath.png",
+  "items": [],
+  "traitsRequired": [],
+  "events": {},
+  "portalExit": true,
+  "puzzleRequired": true,
+  "trap": {
+    "type": "adaptive",
+    "level": 4,
+    "disarmable": true,
+    "message": "You feel something is not right here...",
+    "lethal": true
+  },
+  "zone": "mazeZone"
+}

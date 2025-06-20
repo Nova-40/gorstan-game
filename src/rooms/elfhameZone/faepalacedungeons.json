@@ -1,0 +1,15 @@
+{
+  "id": "faepalacedungeons",
+  "name": "Fae Palace dungeons",
+  "description": [
+    "Fae Palace dungeons bears the marks of unseen hands. You are not the first to arrive \u2014 and likely not the last."
+  ],
+  "exits": {
+    "up": "faepalacemainhall"
+  },
+  "image": "storagechamber.png",
+  "items": [],
+  "traitsRequired": [],
+  "events": {},
+  "zone": "elfhameZone"
+}

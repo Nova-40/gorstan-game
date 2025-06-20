@@ -1,0 +1,17 @@
+{
+  "id": "introstart",
+  "name": "Intro Start",
+  "description": [
+    "The world waits."
+  ],
+  "exits": {
+    "west": "introstart"
+  },
+  "image": "introstart.png",
+  "items": [],
+  "traitsRequired": [],
+  "events": {},
+  "portalExit": true,
+  "puzzleRequired": true,
+  "zone": "prewelcomeZone"
+}

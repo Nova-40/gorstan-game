@@ -1,0 +1,22 @@
+{
+  "id": "faepalacerhianonsroom",
+  "name": "Fae Palace Rhianons room",
+  "description": [
+    "Fae Palace Rhianons room bears the marks of unseen hands. You are not the first to arrive \u2014 and likely not the last."
+  ],
+  "exits": {
+    "west": "faepalacemainhall",
+    "mirror": "failure"
+  },
+  "image": "rhianonschamber.png",
+  "items": [],
+  "traitsRequired": [],
+  "events": {},
+  "zone": "elfhameZone",
+  "puzzle": {
+    "id": "rhiannon_test",
+    "description": "Rhiannon's presence fills the room. Only those attuned may understand her trial.",
+    "solution": "fae harmony",
+    "traitRequired": "faeattuned"
+  }
+}

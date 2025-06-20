@@ -1,0 +1,22 @@
+{
+  "id": "faelake",
+  "name": "Fae Lake",
+  "description": [
+    "Fae Lake bears the marks of unseen hands. You are not the first to arrive \u2014 and likely not the last."
+  ],
+  "exits": {
+    "north": "faelakenorthshore",
+    "south": "elfhame"
+  },
+  "image": "faelake.png",
+  "items": [
+    "carved_stone"
+  ],
+  "traitsRequired": [],
+  "events": {},
+  "trap": true,
+  "zone": "elfhameZone",
+  "flags": [
+    "grants_vision"
+  ]
+}

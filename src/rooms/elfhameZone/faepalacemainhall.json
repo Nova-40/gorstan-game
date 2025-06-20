@@ -1,0 +1,18 @@
+{
+  "id": "faepalacemainhall",
+  "name": "Fae Palace Main Hall",
+  "description": [
+    "Fae Palace Main Hall bears the marks of unseen hands. You are not the first to arrive \u2014 and likely not the last."
+  ],
+  "exits": {
+    "west": "elfhame",
+    "south": "faelakenorthshore",
+    "east": "faepalacerhianonsroom",
+    "down": "faepalacedungeons"
+  },
+  "image": "faepalace.png",
+  "items": [],
+  "traitsRequired": [],
+  "events": {},
+  "zone": "elfhameZone"
+}

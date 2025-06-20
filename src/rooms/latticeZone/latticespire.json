@@ -1,0 +1,29 @@
+{
+  "id": "latticespire",
+  "name": "Lattice Spire",
+  "description": [
+    "You sense alignment."
+  ],
+  "exits": {
+    "west": "introstart"
+  },
+  "image": "latticespire.png",
+  "items": [],
+  "traitsRequired": [],
+  "events": {},
+  "portalExit": true,
+  "puzzleRequired": true,
+  "trap": {
+    "type": "adaptive",
+    "level": 5,
+    "disarmable": false,
+    "message": "You feel something is not right here...",
+    "lethal": true
+  },
+  "zone": "latticeZone",
+  "puzzle": {
+    "id": "vault_lock",
+    "description": "The vault hums with energy. Something complex keeps it sealed.",
+    "solution": "lattice"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "id": "datavoid",
+  "name": "Data Void",
+  "description": [
+    "Reality flickers here."
+  ],
+  "exits": {
+    "west": "introstart"
+  },
+  "image": "datavoid.png",
+  "items": [
+    "glitch_fragment"
+  ],
+  "traitsRequired": [],
+  "events": {},
+  "portalExit": true,
+  "puzzleRequired": true,
+  "trap": {
+    "type": "adaptive",
+    "level": 1,
+    "disarmable": true,
+    "message": "You feel something is not right here...",
+    "lethal": false
+  },
+  "zone": "glitchZone"
+}

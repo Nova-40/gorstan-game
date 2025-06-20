@@ -1,0 +1,29 @@
+{
+  "id": "crossing",
+  "name": "Crossing",
+  "description": [
+    "A road, a decision."
+  ],
+  "exits": {
+    "west": "introstart"
+  },
+  "image": "crossing.png",
+  "items": [],
+  "traitsRequired": [],
+  "events": {},
+  "portalExit": true,
+  "puzzleRequired": true,
+  "trap": {
+    "type": "adaptive",
+    "level": 1,
+    "disarmable": true,
+    "message": "You feel something is not right here...",
+    "lethal": false
+  },
+  "zone": "introZone",
+  "flags": [
+    "entry_mode_variation",
+    "trap_active",
+    "adaptive_intro_replay"
+  ]
+}

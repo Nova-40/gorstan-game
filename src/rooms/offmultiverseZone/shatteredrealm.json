@@ -1,0 +1,24 @@
+{
+  "id": "shatteredrealm",
+  "name": "Shattered Realm",
+  "description": [
+    "All splinters meet here."
+  ],
+  "exits": {
+    "west": "introstart"
+  },
+  "image": "shatteredrealm.png",
+  "items": [],
+  "traitsRequired": [],
+  "events": {},
+  "portalExit": true,
+  "puzzleRequired": true,
+  "trap": {
+    "type": "adaptive",
+    "level": 4,
+    "disarmable": true,
+    "message": "You feel something is not right here...",
+    "lethal": true
+  },
+  "zone": "offmultiverseZone"
+}

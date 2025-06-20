@@ -1,0 +1,24 @@
+{
+  "id": "liminalhub",
+  "name": "Liminal Hub",
+  "description": [
+    "Echoes from all zones."
+  ],
+  "exits": {
+    "west": "introstart"
+  },
+  "image": "liminalhub.png",
+  "items": [],
+  "traitsRequired": [],
+  "events": {},
+  "portalExit": true,
+  "puzzleRequired": true,
+  "trap": {
+    "type": "adaptive",
+    "level": 5,
+    "disarmable": false,
+    "message": "You feel something is not right here...",
+    "lethal": true
+  },
+  "zone": "multiZone"
+}

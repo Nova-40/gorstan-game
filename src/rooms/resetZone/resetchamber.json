@@ -1,0 +1,17 @@
+{
+  "id": "resetchamber",
+  "name": "Reset Chamber",
+  "description": [
+    "Do not push the button."
+  ],
+  "exits": {
+    "west": "introstart", "east": "controlroom"
+  },
+  "image": "resetchamber.png",
+  "items": [],
+  "traitsRequired": [],
+  "events": {},
+  "portalExit": true,
+  "puzzleRequired": true,
+  "zone": "resetZone"
+}

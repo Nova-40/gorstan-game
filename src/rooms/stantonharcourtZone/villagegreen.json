@@ -1,0 +1,13 @@
+{
+  "id": "villagegreen",
+  "name": "Village Green",
+  "description": [
+    "Peace and protest."
+  ],
+  "exits": {},
+  "image": "villagegreen.png",
+  "items": [],
+  "traitsRequired": [],
+  "events": {},
+  "zone": "stantonharcourtZone"
+}

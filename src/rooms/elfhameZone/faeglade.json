@@ -1,0 +1,19 @@
+{
+  "id": "faeglade",
+  "name": "Fae Glade",
+  "description": [
+    "Whispers ride the wind."
+  ],
+  "exits": {
+    "west": "introstart"
+  },
+  "image": "faeglade.png",
+  "items": [
+    "fae_crown_shard"
+  ],
+  "traitsRequired": [],
+  "events": {},
+  "portalExit": true,
+  "puzzleRequired": true,
+  "zone": "elfhameZone"
+}

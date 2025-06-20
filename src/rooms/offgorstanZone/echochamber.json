@@ -1,0 +1,28 @@
+{
+  "id": "echochamber",
+  "name": "Echo Chamber",
+  "description": [
+    "Reverberations of truth."
+  ],
+  "exits": {
+    "west": "introstart"
+  },
+  "image": "echochamber.png",
+  "items": [],
+  "traitsRequired": [],
+  "events": {},
+  "portalExit": true,
+  "puzzleRequired": true,
+  "trap": {
+    "type": "adaptive",
+    "level": 3,
+    "disarmable": true,
+    "message": "You feel something is not right here...",
+    "lethal": true
+  },
+  "zone": "offgorstanZone",
+  "flags": [
+    "reacts_to_reset_count",
+    "reveals_mirror_memory"
+  ]
+}
