@@ -96,3 +96,51 @@ export function disableDebugMode() {
 }
 
 
+
+
+/**
+ * Rare Easter Egg Trap: The Unexpected Inquisition
+ * 1% chance, harmless but funny, includes hidden player response detection.
+ */
+export function maybeTriggerInquisitionTrap(roomId, playerState, appendMessage) {
+  if (Math.random() < 0.01) {
+    appendMessage(`⚠️ The air thickens. Robed figures burst in!`);
+    appendMessage(`🟥 "NO ONE EXPECTS THE SPANISH INQUISITION!"`);
+    appendMessage(`They interrogate you about improper codex dusting.`);
+
+    if (playerState.command?.toLowerCase().includes("expect")) {
+      appendMessage(`😲 They’re baffled by your cleverness and award you a certificate.`);
+      playerState.score += 5;
+    } else {
+      appendMessage(`You sit in the comfy chair. Gain +1 health, lose -1 dignity.`);
+      playerState.health = Math.min(playerState.health + 1, 10);
+    }
+  }
+}
+
+
+/**
+ * Rare HHGTTG Trap: Ravenous Bugblatter Beast of Traal
+ * 1.42% chance of triggering in foggy or confusing rooms.
+ */
+export function maybeTriggerBugblatterTrap(roomId, playerState, appendMessage) {
+  if (Math.random() < 0.0142) {
+    appendMessage(`🌌 You feel a strange presence. Something *very stupid* is watching you.`);
+    appendMessage(`💥 A voice booms: "Beware the Ravenous Bugblatter Beast of Traal!"`);
+
+    const hasTowel = playerState.inventory?.includes("towel");
+
+    if (hasTowel) {
+      appendMessage(`🧼 You wrap your towel around your head. The beast assumes you can't see it... and wanders off confused.`);
+      appendMessage(`🧠 As Douglas Adams rightly pointed out, towels are invaluable for travel.`);
+      playerState.traits = playerState.traits || [];
+      if (!playerState.traits.includes("wise")) {
+        playerState.traits.push("wise");
+      }
+      playerState.score += 3;
+    } else {
+      appendMessage(`😱 The beast slobbers all over your narrative. You lose 2 health.`);
+      playerState.health -= 2;
+    }
+  }
+}

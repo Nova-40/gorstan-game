@@ -7,7 +7,7 @@ import AskAyla from '../components/AskAyla';
 
 import { applyCommand } from './commandParser';
 import { initialiseStoryProgress } from './storyProgress';
-import { seedTraps } from './trapEngine';
+import { seedTraps, maybeTriggerInquisitionTrap, maybeTriggerBugblatterTrap } from './trapEngine';
 import { seedItemsInRooms } from './itemEngine';
 import {
   handleRoomTrap,

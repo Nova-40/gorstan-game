@@ -1,8 +1,9 @@
 // src/components/MovementPanel.jsx
-// Gorstan v3.2.8 – Improved Movement Panel with Exit Validation
+// Gorstan v3.3 – Movement Panel with working green pick-up buttons and auto-removal
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
+import { getItemById } from '../engine/items';
 
 const MovementPanel = ({
   currentRoom,
@@ -17,16 +18,6 @@ const MovementPanel = ({
   onDrop,
   roomNameMap = {},
 }) => {
-  const [selectedUser, setSelectedUser] = useState(null);
-
-  useEffect(() => {
-    setSelectedUser(null);
-  }, [currentRoom]);
-
-  const handleSelectUser = (user) => {
-    setSelectedUser(user);
-  };
-
   if (!currentRoom?.exits) return null;
 
   const isGodmode = flags.godmode === true;
@@ -41,7 +32,6 @@ const MovementPanel = ({
     jump: 'Leap Boldly',
   };
 
-  // ✅ Safe filter: destination must be truthy and not a hidden/placeholder unless in godmode
   const visibleExits = Object.entries(currentRoom.exits).filter(
     ([, destination]) =>
       destination &&
@@ -49,22 +39,21 @@ const MovementPanel = ({
       (isGodmode || !destination.startsWith('_hidden'))
   );
 
-  const getRoomName = (roomId) => roomNameMap[roomId] || `Unknown (${roomId})`;
+  const getRoomName = (roomId) => roomNameMap[roomId] || roomId;
 
-  const handleMoveClick = (roomId) => {
-    if (roomId) onMove?.(roomId);
-  };
+  const isInInventory = (itemId) =>
+    inventory.some((invItem) => invItem.id === itemId || invItem.name === itemId);
 
   return (
     <div className="flex flex-col gap-4 mt-4">
-      {/* Movement Buttons */}
+      {/* Movement Buttons with tooltips */}
       <div className="flex flex-wrap justify-center gap-3">
-        {visibleExits.map(([direction, roomId]) => (
+        {visibleExits.map(([direction, destination]) => (
           <button
             key={`exit-${direction}`}
             className="bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700"
-            onClick={() => handleMoveClick(roomId)}
-            title={`${directionLabels[direction] || direction} to ${getRoomName(roomId)}`}
+            onClick={() => onMove(direction)}
+            title={`To ${getRoomName(destination)}`}
             aria-label={`Go ${directionLabels[direction] || direction}`}
           >
             {directionLabels[direction] || direction}
@@ -74,8 +63,8 @@ const MovementPanel = ({
         {currentRoom.exits.jump && currentRoom.exits.jump !== '???' && (
           <button
             className="bg-purple-600 text-white px-4 py-2 rounded-lg shadow hover:bg-purple-700"
-            onClick={() => handleMoveClick(currentRoom.exits.jump)}
-            title="Leap boldly into the unknown"
+            onClick={() => onMove('jump')}
+            title={`To ${getRoomName(currentRoom.exits.jump) || 'Unknown jump location'}`}
             aria-label="Jump into the unknown"
           >
             🚀 Jump
@@ -85,8 +74,8 @@ const MovementPanel = ({
         {previousRoomId && (
           <button
             className="bg-gray-600 text-white px-4 py-2 rounded-lg shadow hover:bg-gray-700"
-            onClick={() => handleMoveClick(previousRoomId)}
-            title="Return to previous room"
+            onClick={() => onMove('back')}
+            title={`Back to ${getRoomName(previousRoomId) || 'previous room'}`}
             aria-label="Go back"
           >
             ⬅️ Back
@@ -97,16 +86,21 @@ const MovementPanel = ({
       {/* Room Item Pickup */}
       {currentRoom.items?.length > 0 && (
         <div className="flex flex-wrap justify-center gap-2 mt-2">
-          {currentRoom.items.map((item) => (
-            <button
-              key={`item-${item.id || item.name}`}
-              className="bg-yellow-600 text-white px-3 py-1 rounded hover:bg-yellow-700"
-              onClick={() => onPickUp?.(item)}
-              title={`Pick up ${item.name || item.id}`}
-            >
-              🧺 Pick up {item.name || item.id}
-            </button>
-          ))}
+          {currentRoom.items.map((itemId) => {
+            if (isInInventory(itemId)) return null;
+            const item = getItemById(itemId);
+            if (!item) return null;
+            return (
+              <button
+                key={`item-${itemId}`}
+                className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
+                onClick={() => onPickUp?.(item)}
+                title={`Pick up ${item.name}`}
+              >
+                🧺 Pick up {item.name}
+              </button>
+            );
+          })}
         </div>
       )}
 
@@ -140,30 +134,6 @@ const MovementPanel = ({
           ))}
         </div>
       )}
-
-      {/* User Selection */}
-      <div className="mt-4">
-        <h3 className="text-lg font-semibold">Select User</h3>
-        <div className="user-list-container">
-          <ul className="user-list">
-            {currentRoom.users?.map((user) => (
-              <li
-                key={user.id}
-                className={selectedUser?.id === user.id ? 'selected' : ''}
-                onClick={() => handleSelectUser(user)}
-              >
-                {user.name}
-              </li>
-            ))}
-          </ul>
-          {selectedUser && (
-            <div className="user-details">
-              <h2>{selectedUser.name}</h2>
-              <p>Email: {selectedUser.email}</p>
-            </div>
-          )}
-        </div>
-      </div>
     </div>
   );
 };

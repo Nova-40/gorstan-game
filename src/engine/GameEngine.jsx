@@ -1,137 +1,93 @@
+// src/engine/GameEngine.jsx
+// Gorstan v3.3.1 – Engine with Trait, Flag, Score, and Ayla Ask Handling
 
-import React, { useEffect, useRef, useState } from 'react';
-import RoomRenderer from '../components/RoomRenderer';
-import CommandInput from '../components/CommandInput';
-import AylaPanel from '../components/AylaPanel';
-import MovementPanel from '../components/MovementPanel';
-import { initialiseStoryProgress } from './storyProgress';
-import { seedTraps, handleRoomTrap } from './trapEngine';
-import { seedItemsInRooms } from './itemEngine';
+import React, { useEffect, useState, useRef } from "react";
+import RoomRenderer from "../components/RoomRenderer";
+import StatusPanel from "../components/StatusPanel";
+import CommandInput from "../components/CommandInput";
+import AylaPanel from "../components/AylaPanel";
+import { initialiseStoryProgress } from "./storyProgress";
+import { seedTraps } from "./trapEngine";
+import { seedItemsInRooms } from "./itemEngine";
 
-const GameEngine = ({ rooms, setRooms, playerName, startRoomId }) => {
-  const audioRef = useRef(null);
-  const [currentRoomId, setCurrentRoomId] = useState(startRoomId || 'controlnexus');
-  const [playerState, setPlayerState] = useState({
-    inventory: [],
-    traits: [],
-    history: []
-  });
-  const [messages, setMessages] = useState([]);
+const GameEngine = ({
+  rooms,
+  setRooms,
+  playerName,
+  startRoomId,
+  entryMode,
+  extraFlags = {},
+}) => {
+  const [currentRoom, setCurrentRoom] = useState(startRoomId);
+  const [playerTraits, setPlayerTraits] = useState([]);
+  const [playerScore, setPlayerScore] = useState(0);
   const [storyFlags, setStoryFlags] = useState({});
-  const engineRef = useRef({});
-  const hasSeeded = useRef(false);
+  const messageLogRef = useRef([]);
+  const engineRef = useRef({}); // Add this line for Ayla.ask support
 
+  // Initial game setup
   useEffect(() => {
-    window.engineRef = engineRef;
-    engineRef.current.appendMessage = appendMessage;
-    engineRef.current.setPlayerState = setPlayerState;
-    engineRef.current.getCurrentRoomId = () => currentRoomId;
-    engineRef.current.movePlayer = movePlayer;
-    engineRef.current.stepBack = stepBack;
-    engineRef.current.getInventory = () => playerState.inventory;
-    engineRef.current.getTraits = () => playerState.traits;
-    engineRef.current.getStoryFlags = () => storyFlags;
-  }, [currentRoomId, playerState, storyFlags]);
+    console.log("🧠 Initialising GameEngine with:");
+    console.log("🏁 Start Room:", startRoomId);
+    console.log("📦 Extra Flags:", extraFlags);
 
-  useEffect(() => {
-    if (!rooms || rooms.length === 0 || hasSeeded.current) return;
+    const initialTraits = extraFlags.traits || [];
+    const initialScore = extraFlags.bonusScore || 0;
+    const arrivedVia = extraFlags.arrivedVia || "unknown";
 
-    initialiseStoryProgress();
+    setPlayerTraits(initialTraits);
+    setPlayerScore(initialScore);
 
-    const roomIds = rooms.map(r => r.id);
-    seedTraps(roomIds);
+    const initialFlags = initialiseStoryProgress();
+    initialFlags.arrivedVia = arrivedVia;
+    setStoryFlags(initialFlags);
 
-    if (typeof setRooms === 'function') {
-      const updatedRooms = seedItemsInRooms(rooms);
-      setRooms(updatedRooms);
-    }
+    seedTraps();
+    seedItemsInRooms();
 
-    hasSeeded.current = true;
-  }, [rooms, setRooms]);
+    messageLogRef.current = [`You awaken in ${startRoomId}...`];
+  }, []);
 
-  useEffect(() => {
-    const room = rooms.find(r => r.id === currentRoomId);
-    if (room?.ambientSound) {
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
-      const newAudio = new Audio(`/sounds/${room.ambientSound}`);
-      newAudio.loop = true;
-      newAudio.volume = 0.5;
-      newAudio.play().catch(() => {});
-      audioRef.current = newAudio;
-    }
-
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
-    };
-  }, [currentRoomId, rooms]);
-
-  const currentRoom = rooms.find((room) => room.id === currentRoomId);
+  // Optional: define Ayla's internal parser logic
+  engineRef.current.askAyla = (query) => {
+    const q = query.toLowerCase();
+    if (q.includes("coffee")) return "Ah, Gorstan coffee... smooth and radioactive.";
+    if (q.includes("reset")) return "You’ve already reset once. Careful — they’re watching.";
+    if (q.includes("dale")) return "Dale was here. That much I’m sure of.";
+    return "I’m not sure how to help with that — but I’m listening.";
+  };
 
   const appendMessage = (msg) => {
-    setMessages((prev) => [...prev, msg]);
-  };
-
-  const movePlayer = (direction) => {
-    const nextRoomId = currentRoom?.exits?.[direction];
-    if (nextRoomId) {
-      const trapResult = handleRoomTrap(nextRoomId, playerState);
-      if (trapResult?.message) appendMessage(trapResult.message);
-      if (!trapResult?.killed) {
-        setPlayerState((prev) => ({
-          ...prev,
-          history: [...prev.history, currentRoomId]
-        }));
-        setCurrentRoomId(nextRoomId);
-      }
-    } else {
-      appendMessage("You can't go that way.");
-    }
-  };
-
-  const stepBack = () => {
-    setPlayerState((prev) => {
-      const history = [...prev.history];
-      const lastRoom = history.pop();
-      if (lastRoom) {
-        setCurrentRoomId(lastRoom);
-        appendMessage("You step back cautiously.");
-      } else {
-        appendMessage("There's nowhere to step back to.");
-      }
-      return { ...prev, history };
-    });
+    messageLogRef.current.push(msg);
   };
 
   return (
-    <div className="flex flex-col space-y-4 p-4 max-w-4xl mx-auto">
-      <RoomRenderer room={currentRoom} />
-      <AylaPanel askAyla={(q) => {
-        const res = engineRef.current.askAyla?.(q);
-        if (res) appendMessage(res);
-      }} />
-      <MovementPanel
-        currentRoom={currentRoom}
-        rooms={rooms}
-        inventory={playerState.inventory}
-        movePlayer={movePlayer}
-        storyFlags={storyFlags}
-        traits={playerState.traits}
-        stepBack={stepBack}
-        onMove={movePlayer}
+    <div className="relative flex flex-col items-center justify-start min-h-screen bg-gray-900 text-white p-4">
+      <RoomRenderer room={rooms[currentRoom]} />
+      <StatusPanel traits={playerTraits} score={playerScore} />
+      
+      <AylaPanel
+        askAyla={(q) => {
+          const res = engineRef.current.askAyla?.(q);
+          if (res) appendMessage(res);
+        }}
       />
-      {messages.map((msg, idx) => (
-        <div key={`msg-${idx}`} className="text-sm text-gray-700 font-mono">
-          {msg}
-        </div>
-      ))}
+      
       <CommandInput
-        gameState={playerState}
-        setGameState={setPlayerState}
+        gameState={{
+          currentRoom,
+          playerTraits,
+          playerScore,
+          storyFlags,
+          rooms,
+        }}
+        setGameState={{
+          setCurrentRoom,
+          setPlayerTraits,
+          setPlayerScore,
+          setStoryFlags,
+          setRooms,
+        }}
         appendMessage={appendMessage}
         playerName={playerName}
       />

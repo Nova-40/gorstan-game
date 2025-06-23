@@ -1,27 +1,35 @@
+// src/engine/itemEngine.js
+// Gorstan v3.3 – Item Seeder with Full Registry Integration
+// MIT License © 2025 Geoff Webster
+
+import { getAllItems } from './items';
 
 export function seedItemsInRooms(rooms) {
   if (!Array.isArray(rooms)) return [];
 
   return rooms.map(room => {
     const newItems = generateRoomItems(room.id).filter(
-      item => !(room.items || []).some(existing => existing.id === item.id)
+      item => !(room.items || []).some(existing => existing.id === item.id || existing === item.id)
     );
 
     return {
       ...room,
-      items: [...(room.items || []), ...newItems]
+      items: [...(room.items || []), ...newItems.map(i => i.id)]
     };
   });
 }
 
 function generateRoomItems(roomId) {
-  if (Math.random() < 0.3) {
-    return [{
-      id: `item-shard-${roomId}`,
-      name: `Glowing Shard (${roomId})`,
-      value: Math.floor(Math.random() * 10) + 1,
-      description: "A faintly humming shard. You’re not sure why it calls to you."
-    }];
+  const allItems = getAllItems();
+  const count = Math.floor(Math.random() * 7); // 0–6 items
+  const selected = [];
+
+  while (selected.length < count && selected.length < allItems.length) {
+    const item = allItems[Math.floor(Math.random() * allItems.length)];
+    if (!selected.find(i => i.id === item.id)) {
+      selected.push(item);
+    }
   }
-  return [];
+
+  return selected;
 }

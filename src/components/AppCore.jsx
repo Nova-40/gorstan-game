@@ -1,6 +1,9 @@
+// src/components/AppCore.jsx
+// Gorstan v3.3.6 – AppCore with full intro logic, fixed imports, and enhanced entry flags
 
 import React, { useState, useEffect } from "react";
 import WelcomeScreen from "./WelcomeScreen";
+import FrameWrapper from "./FrameWrapper";
 import PlayerNameCapture from "./PlayerNameCapture";
 import TeletypeIntro from "./TeletypeIntro";
 import GameEngine from "../engine/GameEngine";
@@ -15,9 +18,7 @@ const AppCore = () => {
   useEffect(() => {
     loadAllRooms()
       .then(setRooms)
-      .catch((err) => {
-        console.error("❌ Error loading rooms:", err);
-      });
+      .catch((err) => console.error("❌ Error loading rooms:", err));
   }, []);
 
   const startRoomId = {
@@ -26,37 +27,56 @@ const AppCore = () => {
     wait: "introreset",
   }[entryPoint] || "controlnexus";
 
+  const entryTraits = {
+    jump: ["daring"],
+    sip: ["caffeinated"],
+    wait: ["resigned"],
+  };
+
+  const entryScore = {
+    jump: 10,
+    sip: 5,
+    wait: 0,
+  };
+
   const renderStage = () => {
     if (!rooms) {
-      return (
-        <div className="text-white text-center p-4 bg-black">
-          Loading world data...
-        </div>
-      );
+      return <div className="text-white text-center p-4 bg-black">Loading world data...</div>;
     }
 
     switch (stage) {
       case "welcome":
-        return <WelcomeScreen onBegin={() => setStage("name")} />;
+        return (
+          <FrameWrapper>
+            <WelcomeScreen onBegin={() => setStage("name")} />
+          </FrameWrapper>
+        );
+
       case "name":
         return (
-          <PlayerNameCapture
-            onNameSubmit={(name) => {
-              setPlayerName(name);
-              setStage("teletype");
-            }}
-          />
+          <FrameWrapper>
+            <PlayerNameCapture
+              onNameSubmit={(name) => {
+                setPlayerName(name);
+                setStage("teletype");
+              }}
+            />
+          </FrameWrapper>
         );
+
       case "teletype":
         return (
-          <TeletypeIntro
-            playerName={playerName}
-            onComplete={(choice) => {
-              setEntryPoint(choice);
-              setStage("game");
-            }}
-          />
+          <FrameWrapper>
+            <TeletypeIntro
+              playerName={playerName}
+              onComplete={(choice) => {
+                setEntryPoint(choice);
+                setStage("game");
+              }}
+            />
+          </FrameWrapper>
         );
+
       case "game":
         return (
           <GameEngine
@@ -65,9 +85,14 @@ const AppCore = () => {
             playerName={playerName}
             startRoomId={startRoomId}
             entryMode={entryPoint}
-            extraFlags={{}}
+            extraFlags={{
+              arrivedVia: entryPoint,
+              traits: entryTraits[entryPoint] || [],
+              bonusScore: entryScore[entryPoint] || 0,
+            }}
           />
         );
+
       default:
         return (
           <div className="text-white text-center p-4 bg-black">
@@ -81,3 +106,4 @@ const AppCore = () => {
 };
 
 export default AppCore;
+

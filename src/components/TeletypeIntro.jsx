@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-const TeletypeIntro = ({ playerName, onComplete }) => {
+  const TeletypeIntro = ({ playerName, onComplete = () => {} }) => {
   const fullStory = [
     `Good day ${playerName},`,
     "You're on your way home after a strange day. You reach for the coffee,",
@@ -17,6 +17,7 @@ const TeletypeIntro = ({ playerName, onComplete }) => {
   const [showChoices, setShowChoices] = useState(false);
   const [selectedChoice, setSelectedChoice] = useState(null);
   const [showOverlay, setShowOverlay] = useState(false);
+
 
   // Typewriter effect
   useEffect(() => {
@@ -52,14 +53,16 @@ const TeletypeIntro = ({ playerName, onComplete }) => {
   }, [charIndex, lineIndex, isSkipping]);
 
   // Transition to next stage
-  useEffect(() => {
-    if (selectedChoice) {
-      const timer = setTimeout(() => {
+useEffect(() => {
+  if (selectedChoice) {
+    const timer = setTimeout(() => {
+      if (typeof onComplete === 'function') {
         onComplete(selectedChoice);
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [selectedChoice]);
+      }
+    }, 2000);
+    return () => clearTimeout(timer);
+  }
+}, [selectedChoice, onComplete]);
 
   const handleChoice = (choice) => {
     setSelectedChoice(choice);
