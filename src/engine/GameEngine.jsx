@@ -1,98 +1,108 @@
 // src/engine/GameEngine.jsx
-// Gorstan v3.3.1 – Engine with Trait, Flag, Score, and Ayla Ask Handling
+// Gorstan v3.3.7 – Enhanced Engine with Trap Logic, NPC State, Trait Modifiers, and Audio FX
 
-import React, { useEffect, useState, useRef } from "react";
-import RoomRenderer from "../components/RoomRenderer";
-import StatusPanel from "../components/StatusPanel";
-import CommandInput from "../components/CommandInput";
-import AylaPanel from "../components/AylaPanel";
-import { initialiseStoryProgress } from "./storyProgress";
-import { seedTraps } from "./trapEngine";
-import { seedItemsInRooms } from "./itemEngine";
+import React, { useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
+import PropTypes from 'prop-types';
+import * as trapEngine from '../engine/trapEngine';
+import * as trapController from '../engine/trapController';
+import { playSound } from '../utils/soundUtils';
+import StatusPanel from '../components/StatusPanel';
+import RoomRenderer from '../components/RoomRenderer';
+import CommandInput from '../components/CommandInput';
 
-const GameEngine = ({
-  rooms,
-  setRooms,
-  playerName,
-  startRoomId,
-  entryMode,
-  extraFlags = {},
-}) => {
-  const [currentRoom, setCurrentRoom] = useState(startRoomId);
-  const [playerTraits, setPlayerTraits] = useState([]);
-  const [playerScore, setPlayerScore] = useState(0);
-  const [storyFlags, setStoryFlags] = useState({});
-  const messageLogRef = useRef([]);
-  const engineRef = useRef({}); // Add this line for Ayla.ask support
+const GameEngine = forwardRef(({ rooms, playerName, setGameState, gameState }, ref) => {
+  const engineRef = useRef();
 
-  // Initial game setup
+  useImperativeHandle(ref, () => ({
+    applyCommand,
+  }));
+
   useEffect(() => {
-    console.log("🧠 Initialising GameEngine with:");
-    console.log("🏁 Start Room:", startRoomId);
-    console.log("📦 Extra Flags:", extraFlags);
+    console.log('🧠 Initialising GameEngine with:');
+    console.log('🏁 Start Room:', gameState.currentRoom);
+    console.log('📦 Extra Flags:', gameState.flags);
 
-    const initialTraits = extraFlags.traits || [];
-    const initialScore = extraFlags.bonusScore || 0;
-    const arrivedVia = extraFlags.arrivedVia || "unknown";
+    trapEngine.seedTraps(Object.keys(rooms));
+  }, [rooms]);
 
-    setPlayerTraits(initialTraits);
-    setPlayerScore(initialScore);
+  const applyCommand = (command) => {
+    const trimmed = command.trim().toLowerCase();
+    const { currentRoom, inventory, flags, playerTraits, rooms: roomMap } = gameState;
+    const room = roomMap[currentRoom];
+    let messages = [];
+    let updates = {};
 
-    const initialFlags = initialiseStoryProgress();
-    initialFlags.arrivedVia = arrivedVia;
-    setStoryFlags(initialFlags);
+    // Trap check
+    const trapMessage = trapController.checkForTrap(currentRoom, playerTraits);
+    if (trapMessage) {
+      messages.push(trapMessage);
+      updates.flags = { ...flags, trapTriggered: true };
+      playSound('trap');
+    }
 
-    seedTraps();
-    seedItemsInRooms();
+    // Trait-based actions
+    if (trimmed === 'vanish' && playerTraits.includes('ghost')) {
+      messages.push('🌫️ You fade from sight. Nothing perceives you.');
+      updates.flags = { ...flags, invisible: true };
+      playSound('vanish');
+    }
 
-    messageLogRef.current = [`You awaken in ${startRoomId}...`];
-  }, []);
+    // NPC interaction
+    if (trimmed.startsWith('talk ')) {
+      const target = trimmed.split(' ')[1];
+      if (room.npcs?.includes(target)) {
+        messages.push(`🗣️ You start a dialogue with ${target}. They look at you cautiously.`);
+        updates.flags = { ...flags, [`talkedTo_${target}`]: true };
+        playSound('talk');
+      } else {
+        messages.push(`❌ No one named ${target} here to talk to.`);
+      }
+    }
 
-  // Optional: define Ayla's internal parser logic
-  engineRef.current.askAyla = (query) => {
-    const q = query.toLowerCase();
-    if (q.includes("coffee")) return "Ah, Gorstan coffee... smooth and radioactive.";
-    if (q.includes("reset")) return "You’ve already reset once. Careful — they’re watching.";
-    if (q.includes("dale")) return "Dale was here. That much I’m sure of.";
-    return "I’m not sure how to help with that — but I’m listening.";
-  };
+    // Jumpgate
+    if (trimmed === 'jumpgate' && playerTraits.includes('daring')) {
+      messages.push('🌌 You leap into the unknown. A gate flickers open before you...');
+      updates.currentRoom = 'jumpgatehub';
+      playSound('teleport');
+    }
 
-  const appendMessage = (msg) => {
-    messageLogRef.current.push(msg);
+    return { messages, updates };
   };
 
   return (
-    <div className="relative flex flex-col items-center justify-start min-h-screen bg-gray-900 text-white p-4">
-      <RoomRenderer room={rooms[currentRoom]} />
-      <StatusPanel traits={playerTraits} score={playerScore} />
-      
-      <AylaPanel
-        askAyla={(q) => {
-          const res = engineRef.current.askAyla?.(q);
-          if (res) appendMessage(res);
-        }}
+    <div className="game-engine">
+      <StatusPanel
+        playerName={playerName}
+        inventory={gameState.inventory}
+        flags={gameState.flags}
+        playerTraits={gameState.playerTraits}
       />
-      
+      <RoomRenderer room={rooms[gameState.currentRoom]} />
+      <div className="message-log p-4 text-green-200 font-mono bg-gray-900">
+        {(gameState.messages || []).map((msg, index) => (
+          <div key={index}>{msg}</div>
+        ))}
+      </div>
       <CommandInput
-        gameState={{
-          currentRoom,
-          playerTraits,
-          playerScore,
-          storyFlags,
-          rooms,
+        gameState={gameState}
+        setGameState={setGameState}
+        appendMessage={(msg) => {
+          const newMessages = [...(gameState.messages || []), msg];
+          setGameState({ ...gameState, messages: newMessages });
         }}
-        setGameState={{
-          setCurrentRoom,
-          setPlayerTraits,
-          setPlayerScore,
-          setStoryFlags,
-          setRooms,
-        }}
-        appendMessage={appendMessage}
         playerName={playerName}
       />
     </div>
   );
+});
+
+GameEngine.propTypes = {
+  rooms: PropTypes.object.isRequired,
+  playerName: PropTypes.string.isRequired,
+  setGameState: PropTypes.oneOfType([PropTypes.func, PropTypes.object]).isRequired,
+  gameState: PropTypes.object.isRequired,
 };
 
 export default GameEngine;
+
+

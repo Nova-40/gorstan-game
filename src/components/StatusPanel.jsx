@@ -1,65 +1,60 @@
 // src/components/StatusPanel.jsx
-
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const StatusPanel = ({ playerName, traits, inventory, score, flags }) => {
-  const inventoryLimit = inventory.length > 5 && !inventory.includes('runbag')
-    ? '⚠️ Pocket overflow risk!'
-    : inventory.length > 12
-    ? '💥 Bag burst!' : null;
+const StatusPanel = ({ playerName = 'Explorer', inventory = [], flags = {}, playerTraits = [] }) => {
+  const importantFlags = Object.entries(flags)
+    .filter(([key, value]) => value === true)
+    .map(([key]) => key);
 
   return (
-    <div className="bg-white border shadow rounded-xl p-4 text-sm w-full max-w-md">
-      <h2 className="text-lg font-bold mb-2">📊 Status</h2>
-
-      <div className="mb-1"><strong>Name:</strong> {playerName}</div>
-      <div className="mb-1"><strong>Score:</strong> {score}</div>
-
-      <div className="mt-2">
-        <strong>Traits:</strong>
-        {traits.length > 0 ? (
-          <ul className="list-disc list-inside ml-2">
-            {traits.map((trait, i) => (
-              <li key={i} title={`Trait effect: ${trait}`}>{trait}</li>
-            ))}
-          </ul>
-        ) : (
-          <div className="text-gray-500 ml-2">None</div>
-        )}
+    <div className="bg-gray-900 text-white p-3 border-b border-gray-700 text-sm font-mono">
+      <div className="flex flex-wrap justify-between gap-4">
+        <div>
+          <strong>🧑 Name:</strong> {playerName}
+        </div>
+        <div>
+          <strong>🎒 Inventory:</strong> {inventory.length > 0 ? inventory.join(', ') : 'Empty'}
+        </div>
+        <div>
+          <strong>🧬 Traits:</strong>{' '}
+          {playerTraits.length > 0 ? (
+            playerTraits.map((trait, idx) => (
+              <span
+                key={idx}
+                className="inline-block bg-indigo-600 text-white px-2 py-0.5 rounded-lg text-xs ml-1"
+              >
+                {trait}
+              </span>
+            ))
+          ) : (
+            'None'
+          )}
+        </div>
+        <div>
+          <strong>🚩 Flags:</strong>{' '}
+          {importantFlags.length > 0 ? importantFlags.join(', ') : 'None'}
+        </div>
       </div>
 
-      <div className="mt-2">
-        <strong>Inventory:</strong>
-        {inventory.length > 0 ? (
-          <>
-            <ul className="list-disc list-inside ml-2">
-              {inventory.map((item, i) => (
-                <li key={i} title={`Item: ${item}`}>{item}</li>
-              ))}
-            </ul>
-            {inventoryLimit && (
-              <div className="mt-1 text-red-600 font-medium">{inventoryLimit}</div>
-            )}
-          </>
-        ) : (
-          <div className="text-gray-500 ml-2">Empty</div>
-        )}
-      </div>
+      {flags.trapTriggered && (
+        <div className="mt-2 text-red-400 animate-pulse">
+          ⚠️ Trap triggered! You may be in danger...
+        </div>
+      )}
 
-      {flags?.godmode && (
-        <div className="mt-2 text-yellow-600 font-semibold">🛠 Godmode Active</div>
+      {flags.invisible && (
+        <div className="mt-1 text-blue-300 italic">🌫️ You are currently invisible.</div>
       )}
     </div>
   );
 };
 
 StatusPanel.propTypes = {
-  playerName: PropTypes.string.isRequired,
-  traits: PropTypes.array.isRequired,
-  inventory: PropTypes.array.isRequired,
-  score: PropTypes.number.isRequired,
-  flags: PropTypes.object.isRequired,
+  playerName: PropTypes.string,
+  inventory: PropTypes.array,
+  flags: PropTypes.object,
+  playerTraits: PropTypes.array,
 };
 
 export default StatusPanel;

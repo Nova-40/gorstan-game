@@ -1,5 +1,5 @@
 // src/components/CommandInput.jsx
-// Gorstan v3.3.6 – Tab Autocomplete, Arrow History, Click Suggest, Inline Trait Hints
+// Gorstan v3.3.7 – Fully Enhanced Command Input with Trait Locks, Inventory Logic, and Tab Completion
 
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
@@ -24,7 +24,6 @@ const CommandInput = ({ gameState, setGameState, appendMessage, playerName }) =>
 
   const traits = gameState.playerTraits || [];
 
-  // Highlight locked command, build suggestions and trait hints
   useEffect(() => {
     const firstWord = command.trim().split(' ')[0].toLowerCase();
     if (traitLocks[firstWord] && !traits.includes(traitLocks[firstWord])) {
@@ -103,6 +102,91 @@ const CommandInput = ({ gameState, setGameState, appendMessage, playerName }) =>
     if (cmdWord === '/traits') {
       appendMessage(`🧬 Your traits: ${traits.length > 0 ? traits.join(', ') : 'None'}`);
       setCommand(''); return;
+    }
+
+    const { inventory, currentRoom, rooms } = gameState;
+
+    // TAKE command
+    if (cmdWord === 'take') {
+      const item = trimmed.split(' ').slice(1).join(' ').toLowerCase();
+      const room = rooms[currentRoom];
+      const available = room.items || [];
+
+      if (!item) {
+        appendMessage('❓ Take what?');
+      } else if (!available.includes(item)) {
+        appendMessage(`❌ There's no '${item}' here.`);
+      } else {
+        const updatedItems = available.filter(i => i !== item);
+        const updatedRoom = { ...room, items: updatedItems };
+        const updatedRooms = { ...rooms, [currentRoom]: updatedRoom };
+        const updatedInventory = [...(inventory || []), item];
+
+        appendMessage(`🎒 You picked up: ${item}`);
+        setGameState.setRooms(updatedRooms);
+        setGameState.setInventory(updatedInventory);
+      }
+
+      setCommand('');
+      return;
+    }
+
+    // DROP command
+    if (cmdWord === 'drop') {
+      const item = trimmed.split(' ').slice(1).join(' ').toLowerCase();
+      if (!inventory || !inventory.includes(item)) {
+        appendMessage(`❌ You don't have '${item}' to drop.`);
+      } else {
+        const updatedInventory = inventory.filter(i => i !== item);
+        const room = rooms[currentRoom];
+        const updatedItems = [...(room.items || []), item];
+        const updatedRoom = { ...room, items: updatedItems };
+        const updatedRooms = { ...rooms, [currentRoom]: updatedRoom };
+
+        appendMessage(`🪙 You dropped: ${item}`);
+        setGameState.setInventory(updatedInventory);
+        setGameState.setRooms(updatedRooms);
+      }
+
+      setCommand('');
+      return;
+    }
+
+    // USE command
+    if (cmdWord === 'use') {
+      const item = trimmed.split(' ').slice(1).join(' ').toLowerCase();
+
+      if (!inventory || !inventory.includes(item)) {
+        appendMessage(`❌ You don't have '${item}' to use.`);
+        setCommand('');
+        return;
+      }
+
+      const room = rooms[currentRoom];
+      let result = '';
+
+      if (item === 'mirror' && currentRoom === 'throneroom') {
+        result = '🪞 You raise the mirror. The illusion shatters! The throne flickers, revealing a passage.';
+      } else if (item === 'coffee') {
+        result = '☕ You fling hot coffee wildly. Somewhere, a shriek echoes. Effective.';
+      } else {
+        result = `🧐 You use the ${item}. Nothing dramatic happens... yet.`;
+      }
+
+      appendMessage(result);
+      setCommand('');
+      return;
+    }
+
+    // INVENTORY command
+    if (trimmed === '/inventory') {
+      if (inventory?.length > 0) {
+        appendMessage(`🎒 Inventory: ${inventory.join(', ')}`);
+      } else {
+        appendMessage(`👜 You’re not carrying anything.`);
+      }
+      setCommand('');
+      return;
     }
 
     const engine = window.engineRef?.current;
@@ -186,4 +270,5 @@ CommandInput.propTypes = {
 };
 
 export default CommandInput;
+
 
