@@ -5,14 +5,15 @@
     "Findlaters Corner Coffee Shop stands skewed in time, touched by both the familiar hum of the city and something foreign \u2014 folded and spliced into place."
   ],
   "exits": {
-    "west": "caf\u00e9office",
-    "south": "dale'sapartment",
+    "west": "cafeoffice",
+    "south": "dalesapartment",
     "north": "stkatherinesdock",
     "east": "trentpark"
   },
   "image": "findlaterscornercafe.png",
-  "items": [],
+  "items": ["coffee", "tea", "cake"],
   "traitsRequired": [],
+  "npcs": ["barista"],
   "events": {},
   "trap": {
     "type": "adaptive",

@@ -1,0 +1,20 @@
+{
+  "id": "cafeoffice",
+  "name": "Caf\u00e9 Office",
+  "description": "This is just a small office area in a lovely coffee shop, and that portal to the nerve centre of the Multiverse is purely coincidental.",
+  "image": "cafeoffice.png",
+  "exits": {
+    "south": "findlaterscornercoffeeshop",
+    "portal": "controlnexus"
+  },
+  "items": [
+    "faintly glowing key"
+  ],
+  "events": {
+    "onEnter": {
+      "setFlag": {
+        "hasCafePortalKey": true
+      }
+    }
+  }
+}

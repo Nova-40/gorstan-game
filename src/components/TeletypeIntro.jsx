@@ -1,6 +1,16 @@
+/**
+ * TeletypeIntro.jsx
+ * Animated intro sequence with player-specific narration and branching choices.
+ * Ensures onComplete is only called after a user click (resolves autoplay restrictions).
+ *
+ * Version: 3.8.9
+ * Author: Geoff Webster
+ * License: MIT
+ */
+
 import React, { useEffect, useState } from 'react';
 
-  const TeletypeIntro = ({ playerName, onComplete = () => {} }) => {
+const TeletypeIntro = ({ playerName, onComplete = () => {} }) => {
   const fullStory = [
     `Good day ${playerName},`,
     "You're on your way home after a strange day. You reach for the coffee,",
@@ -17,7 +27,6 @@ import React, { useEffect, useState } from 'react';
   const [showChoices, setShowChoices] = useState(false);
   const [selectedChoice, setSelectedChoice] = useState(null);
   const [showOverlay, setShowOverlay] = useState(false);
-
 
   // Typewriter effect
   useEffect(() => {
@@ -51,18 +60,6 @@ import React, { useEffect, useState } from 'react';
       return () => clearTimeout(timer);
     }
   }, [charIndex, lineIndex, isSkipping]);
-
-  // Transition to next stage
-useEffect(() => {
-  if (selectedChoice) {
-    const timer = setTimeout(() => {
-      if (typeof onComplete === 'function') {
-        onComplete(selectedChoice);
-      }
-    }, 2000);
-    return () => clearTimeout(timer);
-  }
-}, [selectedChoice, onComplete]);
 
   const handleChoice = (choice) => {
     setSelectedChoice(choice);
@@ -117,10 +114,18 @@ useEffect(() => {
         </div>
       )}
 
-      {/* Overlay result after choice */}
+      {/* Overlay result + user-triggered continuation */}
       {showOverlay && selectedChoice && (
-        <div className="absolute inset-0 bg-black bg-opacity-90 flex items-center justify-center text-white text-2xl z-50">
-          <div className="p-8 text-center animate-pulse">{overlayMessages[selectedChoice]}</div>
+        <div className="absolute inset-0 bg-black bg-opacity-90 flex flex-col items-center justify-center text-white z-50 p-6">
+          <div className="text-2xl text-center mb-6 animate-pulse">
+            {overlayMessages[selectedChoice]}
+          </div>
+          <button
+            onClick={() => onComplete(selectedChoice)}
+            className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl"
+          >
+            ✅ Continue
+          </button>
         </div>
       )}
     </div>
@@ -128,6 +133,5 @@ useEffect(() => {
 };
 
 export default TeletypeIntro;
-
 
 
