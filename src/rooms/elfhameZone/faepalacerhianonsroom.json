@@ -1,0 +1,20 @@
+{
+  "id": "faepalacerhianonsroom",
+  "name": "Fae Palace Rhianons room",
+  "description": "Rhianon\u2019s room smells faintly of lavender and regret. Everything is pristine, preserved, untouched \u2014 as if expecting a guest who keeps being reset to zero. The wardrobe hums when you\u2019re not looking. The mirror shows a door that isn\u2019t in this room. You try not to ask questions aloud.",
+  "exits": {
+    "west": "faepalacemainhall",
+    "mirror": "failure"
+  },
+  "image": "rhianonschamber.png",
+  "items": [],
+  "traitsRequired": [],
+  "events": {},
+  "zone": "elfhameZone",
+  "puzzle": {
+    "id": "rhiannon_test",
+    "description": "Rhiannon's presence fills the room. Only those attuned may understand her trial.",
+    "solution": "fae harmony",
+    "traitRequired": "faeattuned"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "id": "danger-hiddenlab",
+  "name": "Danger - Hidden Lab",
+  "description": "Danger - Hidden Lab bears the marks of unseen hands. You are not the first to arrive \u2014 and likely not the last.",
+  "exits": {
+    "up": "resetroom",
+    "coffee": "introafter",
+    "south": "libraryofnine"
+  },
+  "image": "hiddenlab.png",
+  "items": [],
+  "traitsRequired": [],
+  "events": {},
+  "trap": {
+    "type": "generic",
+    "level": 1,
+    "disarmable": true,
+    "message": "You sense a threat nearby.",
+    "lethal": true
+  },
+  "coffeeExit": true,
+  "zone": "offmultiverseZone"
+}

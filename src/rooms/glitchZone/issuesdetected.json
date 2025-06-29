@@ -1,0 +1,24 @@
+{
+  "id": "issuesdetected",
+  "name": "Issues Detected",
+  "description": "Issues Detected bears the marks of unseen hands. You are not the first to arrive \u2014 and likely not the last.",
+  "exits": {
+    "south": "failure",
+    "north": "moreissues"
+  },
+  "image": "glitchrealm.png",
+  "items": [],
+  "traitsRequired": [],
+  "events": {},
+  "trap": {
+    "type": "adaptive",
+    "level": 1,
+    "disarmable": true,
+    "message": "You feel something is not right here...",
+    "lethal": false
+  },
+  "zone": "glitchZone",
+  "flags": [
+    "trait_resilient_reduces_damage"
+  ]
+}

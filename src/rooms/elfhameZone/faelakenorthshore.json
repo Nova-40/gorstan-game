@@ -1,0 +1,20 @@
+{
+  "id": "faelakenorthshore",
+  "name": "Fae Lake north shore",
+  "description": "The northern shore stretches in both directions farther than it should. Stones are arranged in neat spirals, as if someone tried to summon meaning \u2014 or ward it off. Every third step echoes with a tone that doesn\u2019t belong. You\u2019re not alone, but only in the architectural sense.",
+  "exits": {
+    "north": "faepalacemainhall"
+  },
+  "image": "faelake2.png",
+  "items": [],
+  "traitsRequired": [],
+  "events": {},
+  "trap": {
+    "type": "generic",
+    "level": 1,
+    "disarmable": true,
+    "message": "You sense a threat nearby.",
+    "lethal": true
+  },
+  "zone": "elfhameZone"
+}

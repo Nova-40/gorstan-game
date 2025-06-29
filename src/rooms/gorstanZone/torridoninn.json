@@ -1,0 +1,20 @@
+{
+  "id": "torridoninn",
+  "name": "Torridon Inn",
+  "description": "Torridon Inn bears the marks of unseen hands. You are not the first to arrive \u2014 and likely not the last.",
+  "exits": {
+    "west": "torridoninthepast"
+  },
+  "image": "torridoninn.png",
+  "items": [],
+  "traitsRequired": [],
+  "events": {},
+  "trap": {
+    "type": "adaptive",
+    "level": 3,
+    "disarmable": true,
+    "message": "You feel something is not right here...",
+    "lethal": true
+  },
+  "zone": "gorstanZone"
+}

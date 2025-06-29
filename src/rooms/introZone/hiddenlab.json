@@ -1,0 +1,23 @@
+{
+  "id": "hiddenlab",
+  "name": "Hidden Aevira Lab",
+  "description": "You descend into a subterranean chamber filled with decaying Aevira tech. Transparent pods line the walls \u2014 some shattered, some eerily occupied. A half-crushed terminal displays the words: *Project Prime Incomplete*.",
+  "image": "hiddenlab.png",
+  "exits": {
+    "up": "controlroom",
+    "east": "secretmazeentry"
+  },
+  "items": [
+    "primefragment",
+    "damagedjournal"
+  ],
+  "onEnter": "A whisper brushes past your ear: *You're not supposed to be here\u2026 yet.*",
+  "traps": [
+    "falsefloor"
+  ],
+  "tags": [
+    "lab",
+    "aevira",
+    "secret"
+  ]
+}

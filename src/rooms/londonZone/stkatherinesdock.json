@@ -1,0 +1,25 @@
+{
+  "id": "stkatherinesdock",
+  "name": "St Katherines Dock",
+  "description": "St Katherines Dock stands skewed in time, touched by both the familiar hum of the city and something foreign \u2014 folded and spliced into place.",
+  "exits": {
+    "portal": "centralpark",
+    "south": "findlaterscornercoffeeshop",
+    "north": "dale'sapartment",
+    "west": "trentpark"
+  },
+  "image": "stkatherinesdock.png",
+  "items": [],
+  "traitsRequired": [],
+  "events": {},
+  "npc": "Al, Morthos",
+  "portalExit": true,
+  "trap": {
+    "type": "adaptive",
+    "level": 2,
+    "disarmable": true,
+    "message": "You feel something is not right here...",
+    "lethal": false
+  },
+  "zone": "londonZone"
+}

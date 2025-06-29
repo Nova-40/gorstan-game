@@ -1,0 +1,11 @@
+{
+  "id": "villagegreen",
+  "name": "Village Green",
+  "description": "Peace and protest. But there's a glitch in the atmosphere, and a sense this location has been misremembered by the multiverse more than once.",
+  "exits": {},
+  "image": "villagegreen.png",
+  "items": [],
+  "traitsRequired": [],
+  "events": {},
+  "zone": "stantonharcourtZone"
+}

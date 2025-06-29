@@ -1,0 +1,43 @@
+<!-- Gorstan Game Module — v2.8.3
+     MIT License © 2025 Geoff Webster
+     index.html — Main HTML entry point for Gorstan Game React app.
+
+     - Uses Tailwind CSS classes for base styling.
+     - React app is mounted into #root.
+     - No unused or broken imports/scripts.
+     - All logic and structure preserved for React integration.
+     - Accessible, responsive, and robust for modern browsers.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gorstan</title>
+    <!--
+      Gorstan v2.8.3+:
+      - Tailwind CSS should be included via your build pipeline (not directly here).
+      - All meta tags and structure are minimal and robust.
+      - No dead code or unused scripts.
+      - Add favicon or manifest as needed for PWA support.
+    -->
+    <!-- Example: <link rel="icon" href="/favicon.ico" /> -->
+  </head>
+  <body class="bg-black text-green-400 font-mono min-h-screen">
+    <!--
+      #root is where the React app is mounted.
+      All UI is rendered inside this container.
+    -->
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+    <!--
+      Defensive: If JS fails to load, show a fallback message.
+    -->
+    <noscript>
+      <div class="bg-black text-red-400 font-mono text-center p-8">
+        Gorstan requires JavaScript to run. Please enable JavaScript in your browser.
+      </div>
+    </noscript>
+  </body>
+</html>

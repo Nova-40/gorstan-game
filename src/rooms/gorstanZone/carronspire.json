@@ -1,0 +1,24 @@
+{
+  "id": "carronspire",
+  "name": "Carronspire",
+  "description": "Carronspire bears the marks of unseen hands. You are not the first to arrive \u2014 and likely not the last.",
+  "exits": {
+    "portal": "resetroom",
+    "north": "torridon",
+    "coffee": "prewelcomescreen"
+  },
+  "image": "carronspire.png",
+  "items": [],
+  "traitsRequired": [],
+  "events": {},
+  "portalExit": true,
+  "coffeeExit": true,
+  "trap": {
+    "type": "adaptive",
+    "level": 3,
+    "disarmable": true,
+    "message": "You feel something is not right here...",
+    "lethal": true
+  },
+  "zone": "gorstanZone"
+}

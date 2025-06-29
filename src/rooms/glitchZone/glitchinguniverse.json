@@ -1,0 +1,28 @@
+{
+  "id": "glitchinguniverse",
+  "name": "Glitching universe",
+  "description": "Glitching universe bears the marks of unseen hands. You are not the first to arrive \u2014 and likely not the last.",
+  "exits": {
+    "solved": "torridon"
+  },
+  "image": "hallucinationroom.png",
+  "items": [],
+  "traitsRequired": [],
+  "events": {},
+  "trap": {
+    "type": "generic",
+    "level": 4,
+    "disarmable": true,
+    "message": "You sense a threat nearby.",
+    "lethal": true
+  },
+  "zone": "glitchZone",
+  "puzzle": {
+    "id": "broken_puzzle",
+    "description": "ERROR: DATA INTEGRITY COMPROMISED. {reboot?}",
+    "solution": "unreachable",
+    "flags": [
+      "requires_debug"
+    ]
+  }
+}

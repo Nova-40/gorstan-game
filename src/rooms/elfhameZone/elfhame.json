@@ -1,0 +1,19 @@
+{
+  "id": "elfhame",
+  "name": "Elfhame",
+  "description": "You step into a place that feels like a memory from a dream someone else had. The paths curve just a little too perfectly, the trees don't rustle quite right, and the sky flickers \u2014 once \u2014 then behaves. You suspect this world has been rebooted more than once, and each time, it forgets a little more.",
+  "exits": {
+    "north": "faelakenorthshore",
+    "south": "faelake",
+    "east": "faepalacemainhall"
+  },
+  "image": "elfhame.png",
+  "items": [],
+  "traitsRequired": [],
+  "events": {},
+  "trap": true,
+  "zone": "elfhameZone",
+  "flags": [
+    "trap_softens_if_curious"
+  ]
+}

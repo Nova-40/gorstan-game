@@ -1,0 +1,19 @@
+{
+  "id": "lattice",
+  "name": "Lattice",
+  "description": "Lattice bears the marks of unseen hands. You are not the first to arrive \u2014 and likely not the last.",
+  "exits": {
+    "down": "anothercontrolroom",
+    "up": "centralpark",
+    "north": "latticeobservationentrance"
+  },
+  "image": "latticeroom.png",
+  "items": [],
+  "traitsRequired": [],
+  "events": {},
+  "trap": true,
+  "zone": "latticeZone",
+  "flags": [
+    "requires_scrolls_for_exit"
+  ]
+}
