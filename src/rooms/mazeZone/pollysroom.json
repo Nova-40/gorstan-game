@@ -1,0 +1,22 @@
+{
+  "id": "polly'sroom",
+  "name": "Polly's Room",
+  "description": "Polly's Room defies memory. Each turn forgets the last, every wall slightly wrong, like a dream you can't retell.",
+  "exits": {
+    "south": "mazeroom",
+    "north": "ancientvault"
+  },
+  "image": "pollysbay.png",
+  "items": [],
+  "traitsRequired": [],
+  "events": {},
+  "trap": {
+    "type": "generic",
+    "level": 4,
+    "disarmable": true,
+    "message": "You sense a threat nearby.",
+    "lethal": true
+  },
+  "npc": "Polly",
+  "zone": "mazeZone"
+}

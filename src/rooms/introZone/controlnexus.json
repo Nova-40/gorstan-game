@@ -1,0 +1,21 @@
+{
+  "id": "controlnexus",
+  "name": "Control Nexus",
+  "description": "You stand at the heart of the simulation \u2014 the Control Nexus. Glowing runes flicker across translucent panels. A sign reads: *Do not tamper with the simulation while caffeinated.*",
+  "image": "controlnexus.png",
+  "exits": {
+    "north": "resetroom",
+    "east": "controlroom",
+    "south": "crossing"
+  },
+  "items": [
+    "strangechip"
+  ],
+  "onEnter": "You feel like someone \u2014 or something \u2014 is watching.",
+  "puzzles": [],
+  "traps": [],
+  "tags": [
+    "introZone",
+    "central"
+  ]
+}

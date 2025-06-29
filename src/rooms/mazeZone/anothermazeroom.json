@@ -1,0 +1,18 @@
+{
+  "id": "anothermazeroom",
+  "name": "Another Maze Room",
+  "description": "Another Maze Room defies memory. Each turn forgets the last, every wall slightly wrong, like a dream you can't retell.",
+  "exits": {},
+  "image": "maze2.png",
+  "items": [],
+  "traitsRequired": [],
+  "events": {},
+  "trap": {
+    "type": "adaptive",
+    "level": 4,
+    "disarmable": true,
+    "message": "You feel something is not right here...",
+    "lethal": true
+  },
+  "zone": "mazeZone"
+}

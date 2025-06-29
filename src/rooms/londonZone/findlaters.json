@@ -1,0 +1,22 @@
+{
+  "id": "findlaters",
+  "name": "Findlater\u2019s Caf\u00e9",
+  "description": "Coffee and conspiracy. With a locked door and a hidden key, Findlater's Caf\u00e9 is a place where secrets brew alongside the coffee. The air is thick with the aroma of roasted beans and the weight of unspoken truths.",
+  "exits": {
+    "west": "introstart"
+  },
+  "image": "findlaters.png",
+  "items": [],
+  "traitsRequired": [],
+  "events": {},
+  "portalExit": true,
+  "puzzleRequired": true,
+  "trap": {
+    "type": "adaptive",
+    "level": 2,
+    "disarmable": true,
+    "message": "You feel something is not right here...",
+    "lethal": false
+  },
+  "zone": "londonZone"
+}

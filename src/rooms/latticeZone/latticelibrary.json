@@ -1,0 +1,29 @@
+{
+  "id": "latticelibrary",
+  "name": "Lattice Library",
+  "description": "Lattice Library bears the marks of unseen hands. You are not the first to arrive \u2014 and likely not the last.",
+  "exits": {
+    "coffee": "libraryofnine"
+  },
+  "image": "libraryarchivist.png",
+  "items": [
+    "lore_scroll"
+  ],
+  "traitsRequired": [],
+  "events": {},
+  "trap": {
+    "type": "generic",
+    "level": 3,
+    "disarmable": true,
+    "message": "You sense a threat nearby.",
+    "lethal": true
+  },
+  "npc": "The Archivist",
+  "coffeeExit": true,
+  "zone": "latticeZone",
+  "puzzle": {
+    "id": "library_lock",
+    "description": "A sealed pedestal awaits a phrase from ancient times.",
+    "solution": "access: KEY \u21a6 DOOR"
+  }
+}

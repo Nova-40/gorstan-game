@@ -1,0 +1,26 @@
+{
+  "id": "ancientslibrary",
+  "name": "Ancients Library",
+  "description": "Ancients Library bears the marks of unseen hands. You are not the first to arrive \u2014 and likely not the last.",
+  "exits": {
+    "north": "resetroom"
+  },
+  "image": "hiddenlibrary.png",
+  "items": [
+    "quantum_dust"
+  ],
+  "traitsRequired": [],
+  "events": {},
+  "trap": {
+    "type": "generic",
+    "level": 4,
+    "disarmable": true,
+    "message": "You sense a threat nearby.",
+    "lethal": true
+  },
+  "npc": "The Archivist",
+  "zone": "offgorstanZone",
+  "flags": [
+    "visible_if_curious_or_archivist"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "id": "failure",
+  "name": "Failure",
+  "description": "Failure bears the marks of unseen hands. You are not the first to arrive \u2014 and likely not the last.",
+  "exits": {
+    "coffee": "issuesdetected"
+  },
+  "image": "fallback.png",
+  "items": [],
+  "traitsRequired": [],
+  "events": {},
+  "trap": {
+    "type": "generic",
+    "level": 3,
+    "disarmable": true,
+    "message": "You sense a threat nearby.",
+    "lethal": true
+  },
+  "coffeeExit": true,
+  "zone": "glitchZone",
+  "flags": [
+    "scrolls_seen_enables_hint"
+  ]
+}

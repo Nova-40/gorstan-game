@@ -1,0 +1,23 @@
+{
+  "id": "controlroom",
+  "name": "Control Room",
+  "description": "Banks of ancient consoles line the walls, their screens displaying flickering fragments of Earth, Gorstan, and Elfhame. A coffee-stained manual sits next to a lever labelled *Reality Override*. Behind a cracked panel, you glimpse exposed circuits\u2026 or veins?",
+  "image": "controlroom.png",
+  "exits": {
+    "west": "controlnexus",
+    "down": "hiddenlab"
+  },
+  "items": [
+    "coffee"
+  ],
+  "onSay": {
+    "override": "The lever buzzes faintly, as if waiting for something more."
+  },
+  "traps": [
+    "electroshock"
+  ],
+  "tags": [
+    "introZone",
+    "tech"
+  ]
+}

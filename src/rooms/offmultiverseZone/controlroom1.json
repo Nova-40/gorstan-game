@@ -1,0 +1,23 @@
+{
+  "id": "controlroom1",
+  "name": "Control Room 1",
+  "description": "Control Room 1 bears the marks of unseen hands. You are not the first to arrive \u2014 and likely not the last.",
+  "exits": {
+    "east": "controlroom2",
+    "west": "controlroom1",
+    "coffee": "introafter"
+  },
+  "image": "controlnexusreturned.png",
+  "items": [],
+  "traitsRequired": [],
+  "events": {},
+  "trap": {
+    "type": "generic",
+    "level": 1,
+    "disarmable": true,
+    "message": "You sense a threat nearby.",
+    "lethal": true
+  },
+  "coffeeExit": true,
+  "zone": "offmultiverseZone"
+}

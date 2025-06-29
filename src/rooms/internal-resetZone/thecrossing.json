@@ -1,0 +1,31 @@
+{
+  "id": "thecrossing",
+  "name": "The Crossing",
+  "description": "The Crossing bears the marks of unseen hands. You are not the first to arrive \u2014 and likely not the last.",
+  "exits": {
+    "north": "findlaterscornercoffeeshop",
+    "south": "carronspire",
+    "east": "torridoninn",
+    "west": "introstart"
+  },
+  "image": "crossing2.png",
+  "items": [],
+  "traitsRequired": [],
+  "events": {},
+  "portalExit": true,
+  "puzzleRequired": true,
+  "trap": {
+    "type": "adaptive",
+    "level": 5,
+    "disarmable": false,
+    "message": "You feel something is not right here...",
+    "lethal": true
+  },
+  "zone": "internal-resetZone",
+  "flags": [
+    "throw_coffee_opens_tunnel",
+    "trait_fast_avoids_splat",
+    "splat_trigger",
+    "entry_mode_variation"
+  ]
+}

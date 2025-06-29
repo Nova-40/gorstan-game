@@ -1,0 +1,20 @@
+{
+  "id": "anothercontrolroom",
+  "name": "Another Control Room",
+  "description": "Another Control Room bears the marks of unseen hands. You are not the first to arrive \u2014 and likely not the last.",
+  "exits": {
+    "east": "controlroom1"
+  },
+  "image": "controlnexus.png",
+  "items": [],
+  "traitsRequired": [],
+  "events": {},
+  "trap": {
+    "type": "adaptive",
+    "level": 4,
+    "disarmable": true,
+    "message": "You feel something is not right here...",
+    "lethal": true
+  },
+  "zone": "offmultiverseZone"
+}

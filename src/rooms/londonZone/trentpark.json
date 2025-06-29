@@ -1,0 +1,24 @@
+{
+  "id": "trentpark",
+  "name": "Trent Park",
+  "description": "Trent Park stands skewed in time, touched by both the familiar hum of the city and something foreign \u2014 folded and spliced into place.",
+  "exits": {
+    "chair": "resetroom",
+    "east": "stkatherinesdock",
+    "west": "findlaterscornercoffeeshop"
+  },
+  "image": "trentparkearth.png",
+  "items": [],
+  "traitsRequired": [],
+  "events": {},
+  "npc": "Al",
+  "chairExit": true,
+  "trap": {
+    "type": "adaptive",
+    "level": 2,
+    "disarmable": true,
+    "message": "You feel something is not right here...",
+    "lethal": false
+  },
+  "zone": "londonZone"
+}

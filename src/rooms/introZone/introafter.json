@@ -1,0 +1,13 @@
+{
+  "id": "introafter",
+  "name": "introafter",
+  "description": "introafter hums with the tension of impending choice. You sense your path diverging before your feet even move.",
+  "exits": {
+    "north": "trentpark"
+  },
+  "image": "introstreetclear.png",
+  "items": [],
+  "traitsRequired": [],
+  "events": {},
+  "zone": "introZone"
+}

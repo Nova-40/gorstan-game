@@ -1,0 +1,21 @@
+{
+  "id": "latticeobservationentrance",
+  "name": "Lattice observation entrance",
+  "description": "Lattice observation entrance bears the marks of unseen hands. You are not the first to arrive \u2014 and likely not the last.",
+  "exits": {
+    "south": "lattice",
+    "north": "latticeobservatory"
+  },
+  "image": "lucidveil.png",
+  "items": [],
+  "traitsRequired": [],
+  "events": {},
+  "trap": {
+    "type": "generic",
+    "level": 3,
+    "disarmable": true,
+    "message": "You sense a threat nearby.",
+    "lethal": true
+  },
+  "zone": "latticeZone"
+}

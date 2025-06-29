@@ -1,0 +1,26 @@
+{
+  "id": "dale'sapartment",
+  "name": "Dale's Apartment",
+  "description": "Dale's Apartment stands skewed in time, touched by both the familiar hum of the city and something foreign \u2014 folded and spliced into place. On the floor near a battered armchair lie two essential items: Dale\u2019s half-zipped runbag... and a neatly folded towel. Because Dale *always* knew the value of being prepared.",
+  "exits": {
+    "south": "trentpark",
+    "north": "findlaterscornercoffeeshop",
+    "east": "stkatherinesdock"
+  },
+  "image": "dalesapartment.png",
+  "items": [
+    "runbag",
+    "towel"
+  ],
+  "traitsRequired": [],
+  "events": {},
+  "trap": {
+    "type": "generic",
+    "level": 2,
+    "disarmable": true,
+    "message": "You sense a threat nearby.",
+    "lethal": true
+  },
+  "npc": "Polly",
+  "zone": "londonZone"
+}
