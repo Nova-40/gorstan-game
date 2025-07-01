@@ -1,11 +1,11 @@
 {
   "id": "controlroom1",
   "name": "Control Room 1",
-  "description": "Control Room 1 bears the marks of unseen hands. You are not the first to arrive \u2014 and likely not the last.",
+  "description": "Control Room 1 bears the marks of unseen hands. You are not the first to arrive — and likely not the last.",
   "exits": {
+    "coffee": "introafter",
     "east": "controlroom2",
-    "west": "controlroom1",
-    "coffee": "introafter"
+    "west": "controlroom1"
   },
   "image": "controlnexusreturned.png",
   "items": [],

@@ -1,14 +1,46 @@
 // src/engine/storyProgress.js
+// Version: 3.9.9
+// (c) 2025 Geoffrey Alan Webster
+// Licensed under the MIT License
+//
+// storyProgress utility for Gorstan game.
+// Provides a flexible flag and event system for tracking story, quest, and chapter progress.
+// Supports flag expiry, dependencies, categories, event triggers, and persistence.
 
+/**
+ * In-memory set of all active flags.
+ * Not all flags are persisted unless explicitly saved.
+ * @type {Set<string>}
+ */
 const flags = new Set();
-const flagTimestamps = {}; // Stores expiry time for flags
-const flagDependencies = {}; // Defines dependencies between flags
+
+/**
+ * Stores expiry timestamps for flags (ms since epoch).
+ * @type {Object.<string, number>}
+ */
+const flagTimestamps = {};
+
+/**
+ * Defines dependencies between flags (flag: [requiredFlags]).
+ * @type {Object.<string, string[]>}
+ */
+const flagDependencies = {};
+
+/**
+ * Categorized flag sets for quest, story event, and chapter progress.
+ * @type {Object.<string, Set<string>>}
+ */
 const categorizedFlags = {
   quest: new Set(),
   story_event: new Set(),
   chapter_progress: new Set(),
 };
-const eventTriggers = {}; // Stores event handlers for each flag
+
+/**
+ * Stores event handler functions for each flag.
+ * @type {Object.<string, Function>}
+ */
+const eventTriggers = {};
 
 /**
  * Sets a story flag, with optional expiry and category.
@@ -91,23 +123,28 @@ export function triggerEvent(flag) {
 
 /**
  * Loads flags from localStorage (for persistence across sessions).
+ * Only loads the flag names, not expiry or categories.
  */
 export function loadFlags() {
   const savedFlags = localStorage.getItem('storyFlags');
   if (savedFlags) {
     savedFlags.split(',').forEach(flag => flags.add(flag));
   }
+  // TODO: Load flagTimestamps and categorizedFlags if persistence is needed.
 }
 
 /**
  * Saves flags to localStorage (for persistence across sessions).
+ * Only saves the flag names.
  */
 export function saveFlags() {
   localStorage.setItem('storyFlags', [...flags].join(','));
+  // TODO: Save flagTimestamps and categorizedFlags if persistence is needed.
 }
 
 /**
  * Initializes the story flags to their default values.
+ * Sets a predefined list of initial flags.
  */
 export function initialiseStoryProgress() {
   const initialFlags = [
@@ -116,8 +153,6 @@ export function initialiseStoryProgress() {
     'foundArtifact',
     'questCompleted',
   ];
-
-  // Set initial flags
   initialFlags.forEach(flag => setFlag(flag));
 }
 
@@ -148,3 +183,6 @@ const StoryProgressUtils = {
 };
 
 export default StoryProgressUtils;
+
+// All functions and StoryProgressUtils object are exported for use in story, quest, and event logic.
+// TODO: Expand persistence to include expiry and categories. Add flag removal and advanced dependency logic

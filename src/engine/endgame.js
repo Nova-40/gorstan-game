@@ -1,11 +1,19 @@
 // src/engine/endgame.js
+// Version: 3.9.9
+// (c) 2025 Geoffrey Alan Webster
+// Licensed under the MIT License
+//
+// endgame utility for Gorstan game.
+// Generates the Stanton Harcourt endgame scene and handles endgame actions based on player and NPC state.
 
 import { getAllNPCStates } from './npcMemory';
 
 /**
- * Generates the Stanton Harcourt endgame scene based on player’s NPC trust levels.
- * @param {object} playerState - Full player state object
- * @returns {object} - Final narrative, room ID, score bonus, and flag
+ * generateStantonFinale
+ * Generates the Stanton Harcourt endgame scene based on player's NPC trust levels.
+ *
+ * @param {Object} playerState - Full player state object.
+ * @returns {Object} - Final narrative, room ID, score bonus, and flag.
  */
 export function generateStantonFinale(playerState) {
   const npcStates = getAllNPCStates();
@@ -52,8 +60,18 @@ export function generateStantonFinale(playerState) {
     score: bonusScore
   };
 }
+
+/**
+ * triggerEndgameAction
+ * Handles special endgame commands such as declining restart or godmode reset.
+ *
+ * @param {string} command - The command entered by the player (e.g., 'N', '/godrestart').
+ * @param {Object} playerState - The current player state.
+ * @param {Function} [dispatch] - Optional dispatch function for state updates (not used here).
+ * @returns {Object|null} - Action result object or null if no action.
+ */
 export function triggerEndgameAction(command, playerState, dispatch) {
-  // Add your logic for handling "N", "/godrestart", etc.
+  // Handle declining restart
   if (command === 'N') {
     return {
       message: 'Multiverse sulks silently... until a pigeon outside coos “Try again?”',
@@ -61,6 +79,7 @@ export function triggerEndgameAction(command, playerState, dispatch) {
     };
   }
 
+  // Handle godmode instant reset
   if (command === '/godrestart' && playerState.isGodMode) {
     return {
       message: '🌀 Divine override accepted. Resetting all timelines...',
@@ -68,8 +87,11 @@ export function triggerEndgameAction(command, playerState, dispatch) {
     };
   }
 
+  // TODO: Add more endgame actions or custom logic as needed.
   return null; // no action
 }
+
+// Exported as named exports for use in the main game engine and other modules
 
 
 

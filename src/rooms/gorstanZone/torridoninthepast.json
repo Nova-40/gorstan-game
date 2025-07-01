@@ -1,11 +1,11 @@
 {
   "id": "torridoninthepast",
   "name": "Torridon in the past",
-  "description": "Torridon in the past bears the marks of unseen hands. You are not the first to arrive \u2014 and likely not the last.",
+  "description": "Torridon in the past bears the marks of unseen hands. You are not the first to arrive — and likely not the last.",
   "exits": {
+    "east": "torridoninn",
     "north": "findlaterscornercoffeeshop",
-    "south": "carronspire",
-    "east": "torridoninn"
+    "south": "carronspire"
   },
   "image": "torridonbefore.png",
   "items": [],

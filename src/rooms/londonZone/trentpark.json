@@ -1,7 +1,7 @@
 {
   "id": "trentpark",
   "name": "Trent Park",
-  "description": "Trent Park stands skewed in time, touched by both the familiar hum of the city and something foreign \u2014 folded and spliced into place.",
+  "description": "Trent Park stands skewed in time, touched by both the familiar hum of the city and something foreign — folded and spliced into place.",
   "exits": {
     "chair": "resetroom",
     "east": "stkatherinesdock",

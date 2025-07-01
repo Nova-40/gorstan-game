@@ -1,7 +1,7 @@
 {
   "id": "latticelibrary",
   "name": "Lattice Library",
-  "description": "Lattice Library bears the marks of unseen hands. You are not the first to arrive \u2014 and likely not the last.",
+  "description": "Lattice Library bears the marks of unseen hands. You are not the first to arrive — and likely not the last.",
   "exits": {
     "coffee": "libraryofnine"
   },
@@ -24,6 +24,6 @@
   "puzzle": {
     "id": "library_lock",
     "description": "A sealed pedestal awaits a phrase from ancient times.",
-    "solution": "access: KEY \u21a6 DOOR"
+    "solution": "access: KEY ↦ DOOR"
   }
 }

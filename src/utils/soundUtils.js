@@ -1,9 +1,17 @@
 // src/utils/soundUtils.js
+// Version: 3.9.9
+// (c) 2025 Geoffrey Alan Webster
+// Licensed under the MIT License
+//
+// soundUtils utility for Gorstan game.
+// Provides functions for playing click, ambient, and contextual sound effects.
+// Handles browser autoplay restrictions and smooth fading of ambient audio.
 
 let ambientAudio = null;
 
 /**
- * Plays a click sound effect
+ * playClick
+ * Plays a click sound effect.
  */
 export const playClick = () => {
   const audio = new Audio('/sounds/click.mp3');
@@ -14,8 +22,9 @@ export const playClick = () => {
 };
 
 /**
- * Plays ambient looping audio, respecting autoplay restrictions
- * @param {boolean} enabled - Whether ambient audio is allowed
+ * playAmbient
+ * Plays ambient looping audio, respecting autoplay restrictions.
+ * @param {boolean} enabled - Whether ambient audio is allowed.
  */
 export const playAmbient = (enabled = true) => {
   if (!enabled) return;
@@ -39,8 +48,9 @@ export const playAmbient = (enabled = true) => {
 };
 
 /**
- * Smoothly fades ambient audio in or out
- * @param {boolean} enabled - Whether ambient should be audible
+ * fadeAmbient
+ * Smoothly fades ambient audio in or out.
+ * @param {boolean} enabled - Whether ambient should be audible.
  */
 export const fadeAmbient = (enabled) => {
   if (!ambientAudio) return;
@@ -64,8 +74,9 @@ export const fadeAmbient = (enabled) => {
 };
 
 /**
- * Plays a contextual sound effect if known
- * @param {string} type - e.g., "trap", "vanish", "talk"
+ * playSound
+ * Plays a contextual sound effect if known.
+ * @param {string} type - e.g., "trap", "vanish", "talk", "teleport".
  */
 export const playSound = (type) => {
   const map = {
@@ -84,6 +95,9 @@ export const playSound = (type) => {
     console.warn(`Sound (${type}) blocked:`, err);
   });
 };
+
+// All functions are exported as named exports for use in UI and game logic.
+// TODO: Add support for user volume preferences or additional sound types as needed.
 
 
 

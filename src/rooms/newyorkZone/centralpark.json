@@ -1,11 +1,11 @@
 {
   "id": "centralpark",
   "name": "Central Park",
-  "description": "Central Park bears the marks of unseen hands. You are not the first to arrive \u2014 and likely not the last.",
+  "description": "Central Park bears the marks of unseen hands. You are not the first to arrive — and likely not the last.",
   "exits": {
+    "east": "aevirawarehouse",
     "portal": "stkatherinesdock",
-    "south": "burgerjoint",
-    "east": "aevirawarehouse"
+    "south": "burgerjoint"
   },
   "image": "centralpark.png",
   "items": [],

@@ -3,9 +3,23 @@ import SoundToggle from './SoundToggle';
 import HelpModal from './HelpModal';
 import { HelpCircle, Monitor, TerminalSquare } from 'lucide-react';
 
+/**
+ * UIToolbar
+ * Renders a floating toolbar with sound toggle, help, fullscreen, and cheat/debug controls.
+ *
+ * @param {Object} props - Component props.
+ * @param {boolean} props.soundEnabled - Whether sound is currently enabled.
+ * @param {Function} props.setSoundEnabled - Setter function to toggle sound state.
+ * @returns {JSX.Element}
+ */
 const UIToolbar = ({ soundEnabled, setSoundEnabled }) => {
+  // State to control the display of the help modal
   const [showHelp, setShowHelp] = useState(false);
 
+  /**
+   * toggleFullscreen
+   * Toggles the browser's fullscreen mode for the game.
+   */
   const toggleFullscreen = () => {
     if (document.fullscreenElement) {
       document.exitFullscreen();
@@ -18,7 +32,7 @@ const UIToolbar = ({ soundEnabled, setSoundEnabled }) => {
     <>
       {/* Toolbar container */}
       <div className="fixed top-4 right-4 z-50 bg-black/70 backdrop-blur-md p-2 rounded-xl flex gap-3 items-center shadow-lg">
-        {/* Sound toggle */}
+        {/* Sound toggle button */}
         <SoundToggle
           soundEnabled={soundEnabled}
           setSoundEnabled={setSoundEnabled}
@@ -51,11 +65,12 @@ const UIToolbar = ({ soundEnabled, setSoundEnabled }) => {
         </button>
       </div>
 
-      {/* Help modal */}
+      {/* Help modal overlay */}
       {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
     </>
   );
 };
 
+// Export the UIToolbar component for use in the main application
 export default UIToolbar;
 

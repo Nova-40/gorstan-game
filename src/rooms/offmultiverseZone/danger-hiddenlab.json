@@ -1,11 +1,11 @@
 {
   "id": "danger-hiddenlab",
   "name": "Danger - Hidden Lab",
-  "description": "Danger - Hidden Lab bears the marks of unseen hands. You are not the first to arrive \u2014 and likely not the last.",
+  "description": "Danger - Hidden Lab bears the marks of unseen hands. You are not the first to arrive — and likely not the last.",
   "exits": {
-    "up": "resetroom",
     "coffee": "introafter",
-    "south": "libraryofnine"
+    "south": "libraryofnine",
+    "up": "resetroom"
   },
   "image": "hiddenlab.png",
   "items": [],

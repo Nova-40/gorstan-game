@@ -1,6 +1,16 @@
-
 // src/engine/npcEngine.js
+// Version: 3.9.9
+// (c) 2025 Geoffrey Alan Webster
+// Licensed under the MIT License
+//
+// npcEngine utility for Gorstan game.
+// Provides functions to manage NPC state, generate dialogue, and simulate unique personalities for Ayla, Morthos, and Al.
 
+/**
+ * npcStates
+ * In-memory state for each NPC, including mood, trust, memory, and response templates.
+ * Not persisted across reloads; only for the current session.
+ */
 const npcStates = {
   ayla: {
     id: 'ayla',
@@ -43,6 +53,10 @@ const npcStates = {
   }
 };
 
+/**
+ * elizaKeywords
+ * Array of keyword patterns and responses for Eliza-style fallback dialogue.
+ */
 const elizaKeywords = [
   { pattern: /i feel (.*)/i, response: "Why do you feel {1}?" },
   { pattern: /i am (.*)/i, response: "How long have you been {1}?" },
@@ -54,6 +68,12 @@ const elizaKeywords = [
   { pattern: /.*(life|death|reset|meaning|truth).*/i, response: "That's... a lot. Would you like to explore that more?" }
 ];
 
+/**
+ * elizaReflect
+ * Attempts to match input to Eliza-style patterns and returns a generated response.
+ * @param {string} input - The player's input.
+ * @returns {string|null}
+ */
 function elizaReflect(input) {
   for (const { pattern, response } of elizaKeywords) {
     const match = input.match(pattern);
@@ -64,12 +84,24 @@ function elizaReflect(input) {
   return null;
 }
 
+/**
+ * cynicalTwist
+ * Generates a cynical or sarcastic response for Morthos based on keywords.
+ * @param {string} input - The player's input.
+ * @returns {string|null}
+ */
 function cynicalTwist(input) {
   if (/hope|good|safe/i.test(input)) return "That's adorable. Let me know how that works out.";
   if (/trap|death|reset/i.test(input)) return "Ah, a classic. Death, the lazy coder's checkpoint.";
   return null;
 }
 
+/**
+ * lyricalAl
+ * Generates a poetic or musical response for Al based on keywords.
+ * @param {string} input - The player's input.
+ * @returns {string|null}
+ */
 function lyricalAl(input) {
   if (/love/i.test(input)) return "Love is all you need. Or so they sang.";
   if (/earth/i.test(input)) return "Earth... blue marble, noisy species. Still my favourite.";
@@ -77,6 +109,15 @@ function lyricalAl(input) {
   return null;
 }
 
+/**
+ * summonNPC
+ * Simulates summoning an NPC and generates a context-aware response.
+ *
+ * @param {string} npcId - The NPC's unique ID ('ayla', 'morthos', 'al').
+ * @param {string} topic - The topic or query for the NPC.
+ * @param {Object} playerState - The current player state (traits, flags, etc).
+ * @returns {string} - The NPC's response.
+ */
 export function summonNPC(npcId, topic, playerState) {
   const npc = npcStates[npcId];
   if (!npc) return "There's no response.";
@@ -117,6 +158,13 @@ export function summonNPC(npcId, topic, playerState) {
   return `${prefix}${response}`;
 }
 
+/**
+ * getNPCStatus
+ * Returns a summary of the NPC's mood and recent memory topics.
+ *
+ * @param {string} npcId - The NPC's unique ID.
+ * @returns {Object|null} - Status object or null if NPC not found.
+ */
 export function getNPCStatus(npcId) {
   const npc = npcStates[npcId];
   if (!npc) return null;
@@ -128,10 +176,13 @@ export function getNPCStatus(npcId) {
   };
 }
 
-
 /**
- * Generates Ayla’s response to a query.
- * Uses keywords, traits, and Eliza-style fallback.
+ * generateAylaResponse
+ * Generates Ayla’s response to a query using keywords, traits, and Eliza-style fallback.
+ *
+ * @param {string} query - The player's query.
+ * @param {Object} playerState - The current player state (traits, flags, etc).
+ * @returns {string} - Ayla's response.
  */
 export function generateAylaResponse(query, playerState) {
   const lc = query.toLowerCase();
@@ -163,8 +214,12 @@ export function generateAylaResponse(query, playerState) {
 }
 
 /**
- * Generates Morthos’s response.
- * Sarcastic, cynical, and scathing by default.
+ * generateMorthosResponse
+ * Generates Morthos’s response. Sarcastic, cynical, and scathing by default.
+ *
+ * @param {string} query - The player's query.
+ * @param {Object} playerState - The current player state.
+ * @returns {string} - Morthos's response.
  */
 export function generateMorthosResponse(query, playerState) {
   const lc = query.toLowerCase();
@@ -177,8 +232,12 @@ export function generateMorthosResponse(query, playerState) {
 }
 
 /**
- * Generates Al’s response.
- * Hopeful, poetic, sometimes quoting Earth songs.
+ * generateAlResponse
+ * Generates Al’s response. Hopeful, poetic, sometimes quoting Earth songs.
+ *
+ * @param {string} query - The player's query.
+ * @param {Object} playerState - The current player state.
+ * @returns {string} - Al's response.
  */
 export function generateAlResponse(query, playerState) {
   const lc = query.toLowerCase();
@@ -197,3 +256,6 @@ export function generateAlResponse(query, playerState) {
   if (lc.includes('hope') || lc.includes('future')) return 'We build futures one belief at a time. You’ve got this.';
   return npcStates.al.responses.default;
 }
+
+// All functions are exported as named exports for use in dialogue, NPC, and quest logic.
+// TODO: Add persistence for NPC state, more nuanced memory, and dynamic personality shifts.

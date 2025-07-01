@@ -1,7 +1,21 @@
-
 // src/utils/debugWorldLoader.js
+// Version: 3.9.9
+// (c) 2025 Geoffrey Alan Webster
+// Licensed under the MIT License
+//
+// debugWorldLoader utility for Gorstan game.
+// Provides a function to load all room data for debugging purposes, with console output for diagnostics.
+
 import { loadRooms } from './roomLoader.js';
 
+/**
+ * debugWorldLoader
+ * Loads all room data using the loadRooms utility and logs diagnostic information to the console.
+ * Useful for debugging world/room loading issues during development.
+ *
+ * @returns {Promise<Object>} - Resolves to the loaded rooms object.
+ * @throws {Error} - Throws if loading fails.
+ */
 export async function debugWorldLoader() {
   try {
     console.log('[DEBUG] Starting world load...');
@@ -17,3 +31,6 @@ export async function debugWorldLoader() {
     throw err;
   }
 }
+
+// Exported as a named export for use in debug and development tools.
+// TODO: Add more detailed diagnostics or validation as world

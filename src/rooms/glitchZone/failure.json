@@ -1,7 +1,7 @@
 {
   "id": "failure",
   "name": "Failure",
-  "description": "Failure bears the marks of unseen hands. You are not the first to arrive \u2014 and likely not the last.",
+  "description": "Failure bears the marks of unseen hands. You are not the first to arrive — and likely not the last.",
   "exits": {
     "coffee": "issuesdetected"
   },

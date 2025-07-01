@@ -3,8 +3,8 @@
   "name": "Polly's Room",
   "description": "Polly's Room defies memory. Each turn forgets the last, every wall slightly wrong, like a dream you can't retell.",
   "exits": {
-    "south": "mazeroom",
-    "north": "ancientvault"
+    "north": "ancientvault",
+    "south": "mazeroom"
   },
   "image": "pollysbay.png",
   "items": [],

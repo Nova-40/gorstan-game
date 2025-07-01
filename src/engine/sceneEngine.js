@@ -1,12 +1,20 @@
 // src/engine/sceneEngine.js
-// Reusable interactive scene system
+// Version: 3.9.9
+// (c) 2025 Geoffrey Alan Webster
+// Licensed under the MIT License
+//
+// sceneEngine utility for Gorstan game.
+// Reusable interactive scene system for executing narrative events and branching logic.
 
 /**
- * Executes interactive narrative scenes.
- * @param {string} sceneId
- * @param {Object} context
- * @param {function} appendMessage
- * @param {function} setGameState
+ * runScene
+ * Executes interactive narrative scenes based on a scene ID.
+ * Handles scene-specific messaging and game state updates.
+ *
+ * @param {string} sceneId - Unique identifier for the scene to run.
+ * @param {Object} context - Context object (may include player, room, or flags).
+ * @param {function} appendMessage - Function to append narrative messages to the UI.
+ * @param {function} setGameState - Function to update the game state.
  */
 export function runScene(sceneId, context, appendMessage, setGameState) {
   if (sceneId === 'goldfishEscape') {
@@ -18,4 +26,7 @@ export function runScene(sceneId, context, appendMessage, setGameState) {
       flags: { ...prev.flags, tookDominic: true }
     }));
   }
+  // TODO: Add more scenes and branching logic as narrative expands.
 }
+
+// Exported as a named export for use in event, quest, and

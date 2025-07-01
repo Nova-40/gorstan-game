@@ -1,0 +1,16 @@
+{
+  "id": "londonhub",
+  "name": "London Arrival Point",
+  "description": [
+    "You step into grey light and the buzz of traffic. The city hums with something just off-kilter.",
+    "Rain hasn\u2019t started, but it might. Somewhere behind a billboard, a raven watches you without blinking.",
+    "This is London \u2014 and your sense of reality is already shifting."
+  ],
+  "image": "londonhub.png",
+  "exits": {
+    "north": "dalesapartment",
+    "east": "findlaterscornercoffeeshop",
+    "west": "trentpark",
+    "south": "stkatherinesdock"
+  }
+}

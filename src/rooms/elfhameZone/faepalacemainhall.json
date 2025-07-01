@@ -1,12 +1,12 @@
 {
   "id": "faepalacemainhall",
   "name": "Fae Palace Main Hall",
-  "description": "You enter the Grand Hall, which is neither particularly grand nor convincingly a hall. Marble floors gleam under light from no apparent source, and thrones sit unclaimed at angles suggesting hasty redeployment. Somewhere, a fanfare loops without crescendo. You\u2019re being observed by nothing at all.",
+  "description": "You enter the Grand Hall, which is neither particularly grand nor convincingly a hall. Marble floors gleam under light from no apparent source, and thrones sit unclaimed at angles suggesting hasty redeployment. Somewhere, a fanfare loops without crescendo. You’re being observed by nothing at all.",
   "exits": {
-    "west": "elfhame",
-    "south": "faelakenorthshore",
+    "down": "faepalacedungeons",
     "east": "faepalacerhianonsroom",
-    "down": "faepalacedungeons"
+    "south": "faelakenorthshore",
+    "west": "elfhame"
   },
   "image": "faepalace.png",
   "items": [],

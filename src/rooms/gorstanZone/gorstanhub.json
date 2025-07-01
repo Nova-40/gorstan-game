@@ -1,0 +1,14 @@
+{
+  "id": "gorstanhub",
+  "name": "Gorstan Hub",
+  "description": [
+    "You're standing in what feels like a memory of a room \u2014 too symmetrical, too polished.",
+    "The walls hum faintly with voices, some familiar, some versions of yourself that never were.",
+    "A sign on the far wall reads, 'Welcome to Gorstan \u2014 Again.' It wasn\u2019t there before. Or was it?"
+  ],
+  "image": "gorstanhub.png",
+  "exits": {
+    "south": "multiversehub",
+    "east": "mazehub"
+  }
+}
