@@ -1,0 +1,24 @@
+{
+  "id": "multiversehub",
+  "name": "Multiverse Hub",
+  "description": [
+    "A gravity-defying junction suspended in nothing. Pathways branch off in impossible geometries.",
+    "You hear footsteps echo before you take them. Lights flicker like memories that aren\u2019t yours.",
+    "One portal hums differently \u2014 like it\u2019s watching you back."
+  ],
+  "image": "multiversehub.png",
+  "exits": {
+    "up": "moreissues"
+  },
+  "puzzleExits": [
+    {
+      "direction": "north",
+      "target": "gorstanhub",
+      "puzzle": {
+        "id": "echoGate",
+        "description": "You hear a voice \u2014 your own \u2014 whispering from every doorway at once. One portal pulses with that familiar doubt.",
+        "solved": false
+      }
+    }
+  ]
+}

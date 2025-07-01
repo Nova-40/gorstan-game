@@ -1,7 +1,17 @@
 // src/engine/items.js
-// Gorstan v3.3 – Full Item Registry
-// MIT License © 2025 Geoff Webster
+// Version: 3.9.9
+// (c) 2025 Geoffrey Alan Webster
+// Licensed under the MIT License
+//
+// items utility for Gorstan game.
+// Full item registry for all portable, quest, and easter egg items in the game.
+// Provides functions to retrieve items by ID or get the full item list.
 
+/**
+ * ITEMS
+ * Array of all item objects available in the Gorstan game.
+ * Each item has a unique id, display name, description, traits, and portability flag.
+ */
 export const ITEMS = [
   // Core Functional
   {
@@ -138,10 +148,26 @@ export const ITEMS = [
   }
 ];
 
+/**
+ * getItemById
+ * Retrieves an item object from the registry by its unique ID.
+ *
+ * @param {string} id - The unique item ID.
+ * @returns {Object|null} - The item object if found, otherwise null.
+ */
 export function getItemById(id) {
   return ITEMS.find(item => item.id === id) || null;
 }
 
+/**
+ * getAllItems
+ * Returns the full array of item objects in the registry.
+ *
+ * @returns {Array<Object>} - All item objects.
+ */
 export function getAllItems() {
   return ITEMS;
 }
+
+// All functions and the ITEMS array are exported as named exports for use in inventory, room, and quest logic.
+// TODO: Add item categories, rarity, or dynamic item generation as the

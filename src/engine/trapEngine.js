@@ -4,11 +4,23 @@
  * MIT License © 2025 Geoff Webster
  */
 
-let seededTraps = {}; // { roomId: true } structure to track traps
-let debugMode = false; // Toggle for debug mode (no harm from traps)
+/**
+ * Module-scoped object to track seeded traps by room ID.
+ * Structure: { [roomId]: true }
+ * Not persisted across reloads; only for the current session.
+ */
+let seededTraps = {};
 
 /**
- * Seeds traps across the game world randomly.
+ * Debug mode toggle. If true, traps do not harm the player.
+ * @type {boolean}
+ */
+let debugMode = false;
+
+/**
+ * seedTraps
+ * Seeds traps randomly across the game world.
+ *
  * @param {string[]} roomIds - Array of valid room IDs where traps will be seeded.
  * @param {number} count - Number of traps to seed. Default is 5.
  */
@@ -30,7 +42,9 @@ export function seedTraps(roomIds = [], count = 5) {
 }
 
 /**
+ * isRoomTrapped
  * Checks if the current room has a trap.
+ *
  * @param {string} roomId - The ID of the room to check.
  * @returns {boolean} - Returns true if the room is trapped, false otherwise.
  */
@@ -39,7 +53,10 @@ export function isRoomTrapped(roomId) {
 }
 
 /**
+ * handleRoomTrap
  * Handles trap activation when entering a trapped room.
+ * Applies player traits/items for disarming, and returns a result object or null.
+ *
  * @param {string} roomId - The ID of the room entered by the player.
  * @param {object} playerState - The current state of the player (inventory, traits, etc.).
  * @returns {object|null} - Returns an object with damage message if the trap is triggered, or null if no trap.
@@ -63,7 +80,10 @@ export function handleRoomTrap(roomId, playerState) {
 }
 
 /**
+ * handleTrapEscape
  * Handles trap escape when the player exits the room quickly.
+ * Disarms the trap if present.
+ *
  * @param {string} roomId - The ID of the room the player is escaping from.
  */
 export function handleTrapEscape(roomId) {
@@ -74,7 +94,9 @@ export function handleTrapEscape(roomId) {
 }
 
 /**
+ * listActiveTraps
  * Lists all active traps (for debug or god mode).
+ *
  * @returns {string[]} - Returns a list of room IDs that currently have traps.
  */
 export function listActiveTraps() {
@@ -82,6 +104,7 @@ export function listActiveTraps() {
 }
 
 /**
+ * enableDebugMode
  * Enables debug mode (traps do not harm the player).
  */
 export function enableDebugMode() {
@@ -89,18 +112,21 @@ export function enableDebugMode() {
 }
 
 /**
+ * disableDebugMode
  * Disables debug mode (traps activate normally).
  */
 export function disableDebugMode() {
   debugMode = false;
 }
 
-
-
-
 /**
- * Rare Easter Egg Trap: The Unexpected Inquisition
+ * maybeTriggerInquisitionTrap
+ * Rare Easter Egg Trap: The Unexpected Inquisition.
  * 1% chance, harmless but funny, includes hidden player response detection.
+ *
+ * @param {string} roomId - The room ID where the event may occur.
+ * @param {object} playerState - The current player state.
+ * @param {function} appendMessage - Function to append narrative messages to the UI.
  */
 export function maybeTriggerInquisitionTrap(roomId, playerState, appendMessage) {
   if (Math.random() < 0.01) {
@@ -118,10 +144,14 @@ export function maybeTriggerInquisitionTrap(roomId, playerState, appendMessage) 
   }
 }
 
-
 /**
- * Rare HHGTTG Trap: Ravenous Bugblatter Beast of Traal
+ * maybeTriggerBugblatterTrap
+ * Rare HHGTTG Trap: Ravenous Bugblatter Beast of Traal.
  * 1.42% chance of triggering in foggy or confusing rooms.
+ *
+ * @param {string} roomId - The room ID where the event may occur.
+ * @param {object} playerState - The current player state.
+ * @param {function} appendMessage - Function to append narrative messages to the UI.
  */
 export function maybeTriggerBugblatterTrap(roomId, playerState, appendMessage) {
   if (Math.random() < 0.0142) {
@@ -144,3 +174,6 @@ export function maybeTriggerBugblatterTrap(roomId, playerState, appendMessage) {
     }
   }
 }
+
+// All functions are exported as named exports for use in trap, room, and event logic.
+// TODO: Add persistence for traps, support for trap types, and more narrative trap events

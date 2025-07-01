@@ -1,0 +1,14 @@
+{
+  "id": "labyrinthbend",
+  "name": "Labyrinth Bend",
+  "description": [
+    "This corner shouldn't exist \u2014 it curves without radius and meets itself at the wrong angle.",
+    "The light bends here, but not the way it should.",
+    "Scratched into the wall is a single word: 'Turn'."
+  ],
+  "image": "labyrinthbend.png",
+  "exits": {
+    "north": "misleadchamber",
+    "west": "mazeloop"
+  }
+}

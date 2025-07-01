@@ -4,8 +4,9 @@
   "description": "This is just a small office area in a lovely coffee shop, and that portal to the nerve centre of the Multiverse is purely coincidental.",
   "image": "cafeoffice.png",
   "exits": {
+    "portal": "controlnexus",
     "south": "findlaterscornercoffeeshop",
-    "portal": "controlnexus"
+    "chair": "burgerjoint"
   },
   "items": [
     "faintly glowing key"

@@ -1,11 +1,11 @@
 {
   "id": "dale'sapartment",
   "name": "Dale's Apartment",
-  "description": "Dale's Apartment stands skewed in time, touched by both the familiar hum of the city and something foreign \u2014 folded and spliced into place. On the floor near a battered armchair lie two essential items: Dale\u2019s half-zipped runbag... and a neatly folded towel. Because Dale *always* knew the value of being prepared.",
+  "description": "Dale's Apartment stands skewed in time, touched by both the familiar hum of the city and something foreign — folded and spliced into place. On the floor near a battered armchair lie two essential items: Dale’s half-zipped runbag... and a neatly folded towel. Because Dale *always* knew the value of being prepared.",
   "exits": {
-    "south": "trentpark",
+    "east": "stkatherinesdock",
     "north": "findlaterscornercoffeeshop",
-    "east": "stkatherinesdock"
+    "south": "trentpark"
   },
   "image": "dalesapartment.png",
   "items": [

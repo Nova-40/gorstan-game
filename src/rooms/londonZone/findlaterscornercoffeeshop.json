@@ -1,12 +1,12 @@
 {
   "id": "findlaterscornercoffeeshop",
   "name": "Findlaters Corner Coffee Shop",
-  "description": "Findlaters Corner Coffee Shop stands skewed in time, touched by both the familiar hum of the city and something foreign \u2014 folded and spliced into place.",
+  "description": "Findlaters Corner Coffee Shop stands skewed in time, touched by both the familiar hum of the city and something foreign — folded and spliced into place.",
   "exits": {
-    "west": "cafeoffice",
-    "south": "dalesapartment",
+    "east": "trentpark",
     "north": "stkatherinesdock",
-    "east": "trentpark"
+    "south": "dalesapartment",
+    "west": "cafeoffice"
   },
   "image": "findlaterscornercafe.png",
   "items": [

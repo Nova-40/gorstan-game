@@ -1,5 +1,5 @@
 /**
- * roomUtils.js – Gorstan v3.2.1
+ * roomUtils.js – Gorstan v3.9.9
  * Unified utility functions for handling room metadata, logic, validation, and rendering.
  * © 2025 Geoff Webster – MIT License
  */
@@ -8,15 +8,16 @@ import { v4 as uuidv4 } from 'uuid';
 
 /**
  * @typedef {Object} Room
- * @property {string} id
- * @property {string} name
- * @property {string[]} descriptions
- * @property {Object<string, string>} exits
+ * @property {string} id - Unique room identifier.
+ * @property {string} name - Display name of the room.
+ * @property {string[]} descriptions - Array of room descriptions (for visit cycling).
+ * @property {Object<string, string>} exits - Mapping of directions to room IDs.
  */
 
 /**
  * Returns the ID of the initial room. Prefers 'controlnexus' if present.
- * @param {Room[]} rooms
+ * Falls back to the first room in the array or 'introstart' if empty.
+ * @param {Room[]} rooms - Array of room objects.
  * @returns {string} ID of the initial room.
  */
 export function getInitialRoomId(rooms) {
@@ -28,9 +29,9 @@ export function getInitialRoomId(rooms) {
 /**
  * Chooses a description based on visit count.
  * Falls back to the last description if out of bounds.
- * @param {Room} room
- * @param {number} visitCount
- * @returns {string}
+ * @param {Room} room - The room object.
+ * @param {number} visitCount - Number of times the room has been visited.
+ * @returns {string} - The selected description.
  */
 export function getRoomDescription(room, visitCount = 0) {
   if (!room || !Array.isArray(room.descriptions) || room.descriptions.length === 0) {
@@ -42,8 +43,9 @@ export function getRoomDescription(room, visitCount = 0) {
 
 /**
  * Validates if a room matches expected structure.
- * @param {Room} room
- * @returns {boolean}
+ * Checks for required fields and correct types.
+ * @param {Room} room - The room object to validate.
+ * @returns {boolean} - True if valid, false otherwise.
  */
 export function isValidRoom(room) {
   return (
@@ -60,7 +62,7 @@ export function isValidRoom(room) {
 
 /**
  * Logs a warning if room is invalid.
- * @param {Room} room
+ * @param {Room} room - The room object to check.
  */
 export function logInvalidRoom(room) {
   if (!isValidRoom(room)) {
@@ -70,8 +72,9 @@ export function logInvalidRoom(room) {
 
 /**
  * Extracts all unique exit targets from a room array.
- * @param {Room[]} rooms
- * @returns {Set<string>}
+ * Useful for validating world connectivity.
+ * @param {Room[]} rooms - Array of room objects.
+ * @returns {Set<string>} - Set of unique exit destination IDs.
  */
 export function getAllExitDestinations(rooms) {
   const destinations = new Set();
@@ -85,17 +88,17 @@ export function getAllExitDestinations(rooms) {
 
 /**
  * Gets a list of all room IDs.
- * @param {Room[]} rooms
- * @returns {string[]}
+ * @param {Room[]} rooms - Array of room objects.
+ * @returns {string[]} - Array of room IDs.
  */
 export function getRoomIds(rooms) {
   return Array.isArray(rooms) ? rooms.map(r => r.id) : [];
 }
 
 /**
- * Capitalises and formats a direction label.
- * @param {string} direction
- * @returns {string}
+ * Capitalises and formats a direction label for display.
+ * @param {string} direction - Direction string (e.g., 'north').
+ * @returns {string} - Capitalised direction label.
  */
 export function formatDirectionLabel(direction) {
   const capitalised = direction.charAt(0).toUpperCase() + direction.slice(1);
@@ -104,14 +107,14 @@ export function formatDirectionLabel(direction) {
 
 /**
  * Generates a unique ID (used for items, puzzles, tracking).
- * @returns {string}
+ * @returns {string} - A new UUID string.
  */
 export function generateUniqueId() {
   return uuidv4();
 }
 
 /**
- * Exported as grouped utility object
+ * Exported as grouped utility object for convenience import.
  */
 const RoomUtils = {
   getInitialRoomId,
@@ -125,6 +128,9 @@ const RoomUtils = {
 };
 
 export default RoomUtils;
+
+// All functions and RoomUtils object are exported for use in room logic, validation, and rendering.
+// TODO: Expand with more room utilities as world schema or logic
 
 
 

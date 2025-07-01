@@ -1,10 +1,21 @@
 {
   "id": "introreset",
   "name": "introreset",
-  "description": "introreset hums with the tension of impending choice. You sense your path diverging before your feet even move.",
-  "exits": {},
+  "description": "You stand at the roadside. The world is eerily still. A single cup of coffee sits upright beside the curb — entirely unscathed.",
+  "exits": {
+    "north": "trentpark",
+    "south": "dalesapartment",
+    "west": "findlaterscornercoffeeshop"
+  },
   "image": "introreset.png",
-  "items": [],
+  "items": [
+    {
+      "id": "coffee",
+      "name": "a cup of coffee",
+      "description": "Still warm. Was it here the whole time?",
+      "pickup": true
+    }
+  ],
   "traitsRequired": [],
   "events": {},
   "zone": "introZone"

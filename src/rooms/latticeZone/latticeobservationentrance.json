@@ -1,10 +1,10 @@
 {
   "id": "latticeobservationentrance",
   "name": "Lattice observation entrance",
-  "description": "Lattice observation entrance bears the marks of unseen hands. You are not the first to arrive \u2014 and likely not the last.",
+  "description": "Lattice observation entrance bears the marks of unseen hands. You are not the first to arrive — and likely not the last.",
   "exits": {
-    "south": "lattice",
-    "north": "latticeobservatory"
+    "north": "latticeobservatory",
+    "south": "lattice"
   },
   "image": "lucidveil.png",
   "items": [],

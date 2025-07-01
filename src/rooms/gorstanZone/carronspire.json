@@ -1,11 +1,11 @@
 {
   "id": "carronspire",
   "name": "Carronspire",
-  "description": "Carronspire bears the marks of unseen hands. You are not the first to arrive \u2014 and likely not the last.",
+  "description": "Carronspire bears the marks of unseen hands. You are not the first to arrive — and likely not the last.",
   "exits": {
-    "portal": "resetroom",
+    "coffee": "prewelcomescreen",
     "north": "torridon",
-    "coffee": "prewelcomescreen"
+    "portal": "resetroom"
   },
   "image": "carronspire.png",
   "items": [],

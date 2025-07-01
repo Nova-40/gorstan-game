@@ -1,0 +1,27 @@
+{
+  "id": "sacredFishtank",
+  "name": "Sacred Fishtank",
+  "description": [
+    "A circular room filled with warm, bioluminescent light.",
+    "In the centre, a levitating fishtank gurgles quietly \u2014 like it\u2019s waiting.",
+    "The air smells faintly of brine and judgement."
+  ],
+  "interactions": [
+    {
+      "condition": "playerState.hasDominic && !playerState.dominicAlive",
+      "text": "You lower Dominic\u2019s bowl into the sacred tank. There is a shimmer, a spark, and a flash of bubbles...",
+      "effects": [
+        "playerState.dominicAlive = true",
+        "removeInventoryItem('dominicDead')",
+        "addInventoryItem({ id: 'dominic', name: 'Dominic the Fish (Alive)', description: 'Somehow, he\u2019s back. And more sarcastic than ever.' })"
+      ]
+    },
+    {
+      "condition": "playerState.dominicAlive",
+      "text": "Dominic swims in serene circles. Occasionally, he mutters something about multiverse ethics."
+    }
+  ],
+  "exits": {
+    "west": "corridorOfReckoning"
+  }
+}

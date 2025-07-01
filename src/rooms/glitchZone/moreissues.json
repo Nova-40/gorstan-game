@@ -1,10 +1,10 @@
 {
   "id": "moreissues",
   "name": "More Issues",
-  "description": "More Issues bears the marks of unseen hands. You are not the first to arrive \u2014 and likely not the last.",
+  "description": "More Issues bears the marks of unseen hands. You are not the first to arrive — and likely not the last.",
   "exits": {
-    "south": "issuesdetected",
-    "north": "glitchinguniverse"
+    "north": "glitchinguniverse",
+    "south": "issuesdetected"
   },
   "image": "glitchroom.png",
   "items": [],

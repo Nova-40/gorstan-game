@@ -1,7 +1,26 @@
+// File: src/components/TeletypeIntro.jsx
+// Version: 3.9.9
+// (c) 2025 Geoffrey Alan Webster
+// Licensed under the MIT License
+//
+// TeletypeIntro component for Gorstan game.
+// Displays an animated typewriter-style introduction sequence with player name interpolation.
+// Presents the player with a set of narrative choices at the end of the intro.
+
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
-const TeletypeIntro = ({ playerName = 'traveller', onComplete = () => {} }) => {
+/**
+ * TeletypeIntro
+ * Renders a typewriter-style animated intro sequence and presents narrative choices.
+ *
+ * @param {Object} props - Component props.
+ * @param {string} props.playerName - The player's name to personalize the intro.
+ * @param {Function} props.onComplete - Callback invoked with the chosen route object.
+ * @returns {JSX.Element}
+ */
+const TeletypeIntro = ({ playerName, onComplete }) => {
+  // The full intro story, with player name interpolated
   const fullStory = [
     `Good day ${playerName},`,
     "You're on your way home after a strange day. You reach for the coffee,",
@@ -11,118 +30,79 @@ const TeletypeIntro = ({ playerName = 'traveller', onComplete = () => {} }) => {
     'Do something…'
   ];
 
+  // State for the currently displayed text (typewriter effect)
   const [displayedText, setDisplayedText] = useState('');
+  // State for the current line being typed
   const [lineIndex, setLineIndex] = useState(0);
+  // State for the current character index within the line
   const [charIndex, setCharIndex] = useState(0);
-  const [isSkipping, setIsSkipping] = useState(false);
+  // State to show/hide the choice buttons after the intro
   const [showChoices, setShowChoices] = useState(false);
-  const [selectedChoice, setSelectedChoice] = useState(null);
-  const [showOverlay, setShowOverlay] = useState(false);
 
-  // Teletype effect
+  /**
+   * useEffect to animate the typewriter effect for each line and character.
+   * When all lines are finished, shows the choice buttons.
+   */
   useEffect(() => {
-    if (isSkipping) {
-      setDisplayedText(fullStory.join('\n'));
-      setShowChoices(true);
-      return;
-    }
-
-    if (lineIndex < fullStory.length) {
-      const line = fullStory[lineIndex];
-
-      if (charIndex < line.length) {
-        const timer = setTimeout(() => {
-          setDisplayedText((prev) => prev + line[charIndex]);
+    if (lineIndex < fullStory.length && !showChoices) {
+      const currentLine = fullStory[lineIndex];
+      if (charIndex < currentLine.length) {
+        const timeout = setTimeout(() => {
+          setDisplayedText((prev) => prev + currentLine[charIndex]);
           setCharIndex((prev) => prev + 1);
-        }, 35);
-        return () => clearTimeout(timer);
+        }, 30);
+        return () => clearTimeout(timeout);
       } else {
-        const delayAfterLine = 500;
-        const timer = setTimeout(() => {
+        const nextTimeout = setTimeout(() => {
           setDisplayedText((prev) => prev + '\n');
           setLineIndex((prev) => prev + 1);
           setCharIndex(0);
-        }, delayAfterLine);
-        return () => clearTimeout(timer);
+        }, 600);
+        return () => clearTimeout(nextTimeout);
       }
-    } else {
-      const finalDelay = 600;
-      const timer = setTimeout(() => setShowChoices(true), finalDelay);
-      return () => clearTimeout(timer);
+    } else if (lineIndex === fullStory.length && !showChoices) {
+      // Done typing, show choices
+      setShowChoices(true);
     }
-  }, [charIndex, lineIndex, isSkipping]);
+  }, [charIndex, lineIndex, showChoices, fullStory]);
 
+  /**
+   * handleChoice
+   * Handles the player's narrative choice and calls onComplete with the route object.
+   *
+   * @param {string} choice - The chosen action ('jump', 'wait', or 'sip').
+   */
   const handleChoice = (choice) => {
-    setSelectedChoice(choice);
-    setShowOverlay(true);
-  };
-
-  const overlayMessages = {
-    jump: 'You leap without thinking — the world bends...',
-    sip: 'You raise the cup — the flavour... unreal.',
-    wait: 'You freeze. The truck does not. SPLAT.'
+    const routeMap = {
+      jump: { route: 'jump', targetRoom: 'controlnexus', inventoryBonus: ['coffee'] },
+      wait: { route: 'wait' },
+      sip: { route: 'sip' },
+    };
+    onComplete(routeMap[choice]);
   };
 
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-screen bg-black text-green-400 font-mono p-6">
-      {/* Teletype display */}
-      <div className="text-base md:text-lg mb-6 whitespace-pre-wrap border border-green-700 rounded-lg p-4 bg-black w-full max-w-2xl leading-relaxed">
-        {displayedText}
-        <span className="animate-pulse">█</span>
-      </div>
-
-      {/* Skip button */}
-      {!showChoices && (
-        <button
-          onClick={() => setIsSkipping(true)}
-          className="mt-2 text-sm bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-xl shadow"
-        >
-          ⏩ Skip Intro
-        </button>
-      )}
-
-      {/* Choice buttons */}
-      {showChoices && !selectedChoice && (
-        <div className="flex flex-col gap-4 mt-6 items-center w-full max-w-lg animate-fadeInSlow">
+    <div className="p-6 font-mono bg-black text-green-400 min-h-screen">
+      <pre className="whitespace-pre-wrap text-sm leading-relaxed">{displayedText}</pre>
+      {showChoices && (
+        <div className="mt-6 space-y-3">
           <button
-            className="bg-blue-700 hover:bg-blue-800 text-white px-6 py-3 rounded-xl w-full"
+            className="block w-full bg-green-700 text-white p-2 rounded hover:bg-green-600"
             onClick={() => handleChoice('jump')}
           >
-            🚀 Jump (with coffee)
+            You leap without thinking — the world bends
           </button>
           <button
-            className="bg-yellow-500 hover:bg-yellow-600 text-black px-6 py-3 rounded-xl w-full"
-            onClick={() => handleChoice('sip')}
-          >
-            ☕ Sip Coffee (you keep it)
-          </button>
-          <button
-            className="bg-gray-700 hover:bg-gray-800 text-white px-6 py-3 rounded-xl w-full"
+            className="block w-full bg-yellow-700 text-white p-2 rounded hover:bg-yellow-600"
             onClick={() => handleChoice('wait')}
           >
-            ⏳ Wait (you get splatted)
+            You hesitate — the air thickens…
           </button>
-        </div>
-      )}
-
-      {/* Overlay result + user-triggered continuation */}
-      {showOverlay && selectedChoice && (
-        <div className="absolute inset-0 bg-black bg-opacity-90 flex flex-col items-center justify-center text-white z-50 p-6">
-          <div className="text-2xl text-center mb-6 animate-pulse">
-            {overlayMessages[selectedChoice]}
-          </div>
           <button
-            onClick={() => {
-              console.log('Continue clicked with choice:', selectedChoice);
-              if (typeof onComplete === 'function') {
-                onComplete(selectedChoice);
-              } else {
-                console.warn('onComplete is not defined!');
-              }
-            }}
-            className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl"
+            className="block w-full bg-blue-700 text-white p-2 rounded hover:bg-blue-600"
+            onClick={() => handleChoice('sip')}
           >
-            ✅ Continue
+            You sip the coffee — warmth floods your chest
           </button>
         </div>
       )}
@@ -131,9 +111,11 @@ const TeletypeIntro = ({ playerName = 'traveller', onComplete = () => {} }) => {
 };
 
 TeletypeIntro.propTypes = {
-  playerName: PropTypes.string,
-  onComplete: PropTypes.func
+  playerName: PropTypes.string.isRequired,
+  onComplete: PropTypes.func.isRequired,
 };
 
+// Export the TeletypeIntro component for use in the main application
 export default TeletypeIntro;
+
 

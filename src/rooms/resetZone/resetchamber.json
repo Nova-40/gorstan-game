@@ -3,8 +3,8 @@
   "name": "Reset Chamber",
   "description": "Do not push the button. But there's a glitch in the atmosphere, and a sense this location has been misremembered by the multiverse more than once.",
   "exits": {
-    "west": "introstart",
-    "east": "controlroom"
+    "east": "controlroom",
+    "west": "introstart"
   },
   "image": "resetchamber.png",
   "items": [],

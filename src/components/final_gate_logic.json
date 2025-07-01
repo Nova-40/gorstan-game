@@ -1,0 +1,10 @@
+{
+  "id": "finalGate",
+  "requiredItems": [
+    "pollyToken",
+    "pollyHanky"
+  ],
+  "unlockCondition": "inventory.includes('pollyToken') || inventory.includes('pollyHanky')",
+  "successMessage": "The gate shudders, then opens. Somewhere, a fish approves.",
+  "failureMessage": "Something\u2019s missing. Possibly Dominic. Possibly dignity."
+}

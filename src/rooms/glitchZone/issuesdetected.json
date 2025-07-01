@@ -1,10 +1,10 @@
 {
   "id": "issuesdetected",
   "name": "Issues Detected",
-  "description": "Issues Detected bears the marks of unseen hands. You are not the first to arrive \u2014 and likely not the last.",
+  "description": "Issues Detected bears the marks of unseen hands. You are not the first to arrive — and likely not the last.",
   "exits": {
-    "south": "failure",
-    "north": "moreissues"
+    "north": "moreissues",
+    "south": "failure"
   },
   "image": "glitchrealm.png",
   "items": [],
