@@ -1,3 +1,8 @@
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: commandParser.js
+// Path: src/engine/commandParser.js
+
+
 // Gorstan Game v3.1.4 – commandParser.js
 // MIT License © 2025 Geoff Webster
 

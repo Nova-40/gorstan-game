@@ -1,3 +1,8 @@
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: AylaPanel.jsx
+// Path: src/components/AylaPanel.jsx
+
+
 // src/components/AylaPanel.jsx
 // Version: 3.9.9
 // (c) 2025 Geoffrey Alan Webster
@@ -147,6 +152,5 @@ AylaPanel.propTypes = {
 
 // Export the AylaPanel component for use in the main application
 export default AylaPanel;
-
 
 

@@ -1,0 +1,17 @@
+{
+  "id": "glitchStanton",
+  "zone": "stantonZone",
+  "name": "Stanton (Glitched)",
+  "description": [
+    "You stand where Stanton Harcourt should be.",
+    "The church melts into the sky. Dogs bark backwards.",
+    "Ayla flickers: 'You stayed too long. Looped too much.'",
+    "Everything loops. Everything resets. Except this."
+  ],
+  "npcs": [
+    "ayla"
+  ],
+  "flags": [
+    "ending_glitch"
+  ]
+}

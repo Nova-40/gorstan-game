@@ -3,7 +3,8 @@
   "name": "Crossing",
   "description": "A road, a decision. But there's a glitch in the atmosphere, and a sense this location has been misremembered by the multiverse more than once.",
   "exits": {
-    "west": "introstart"
+    "west": "introstart",
+    "northwest": "hiddenlab"
   },
   "image": "crossing.png",
   "items": [],

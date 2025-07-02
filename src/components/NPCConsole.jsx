@@ -1,10 +1,10 @@
-// src/components/NPCConsole.jsx
-// Version: 3.9.9
-// (c) 2025 Geoffrey Alan Webster
-// Licensed under the MIT License
-//
-// NPCConsole component for Gorstan game.
-// Displays responses from active NPCs (Ayla, Morthos, Al) based on player queries and state.
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: NPCConsole.jsx
+// Path: src/components/NPCConsole.jsx
+
+
+// File: /src/components/NPCConsole.jsx
+// Version: v4.0.0-preprod
 
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
@@ -13,70 +13,99 @@ import PropTypes from 'prop-types';
  * NPCConsole
  * Renders a console panel showing the response of the currently active NPC to a player query.
  * Uses the global npcEngine to generate responses for each NPC.
- *
- * @param {Object} props - Component props.
- * @param {string} props.activeNPC - The currently active NPC ('ayla', 'morthos', 'al').
- * @param {string} props.playerQuery - The player's query or message to the NPC.
- * @param {Object} props.playerState - The current state of the player (traits, flags, etc).
- * @param {Function} [props.onRespond] - Optional callback invoked with the NPC's response.
- * @returns {JSX.Element|null}
  */
 const NPCConsole = ({ activeNPC, playerQuery, playerState, onRespond }) => {
-  // State to hold the current NPC response
   const [response, setResponse] = useState('');
+  const [isThinking, setIsThinking] = useState(false);
 
-  /**
-   * useEffect to generate a new NPC response whenever the playerQuery, activeNPC,
-   * playerState, or onRespond callback changes.
-   */
   useEffect(() => {
-    if (!playerQuery) return;
+    if (!playerQuery || !activeNPC) return;
 
-    let npcResponse = '';
-    // Determine which NPC should respond and generate the response using npcEngine
-    switch (activeNPC) {
-      case 'ayla':
-        npcResponse = window.npcEngine.generateAylaResponse(playerQuery, playerState);
-        break;
-      case 'morthos':
-        npcResponse = window.npcEngine.generateMorthosResponse(playerQuery, playerState);
-        break;
-      case 'al':
-        npcResponse = window.npcEngine.generateAlResponse(playerQuery, playerState);
-        break;
-      default:
-        npcResponse = "There's no one here to answer that.";
-        // TODO: Handle unknown NPCs or provide a fallback NPC.
+    const engine = window.npcEngine;
+    if (!engine) {
+      setResponse('⚠️ NPC engine unavailable.');
+      return;
     }
 
-    setResponse(npcResponse);
-    if (onRespond) onRespond(npcResponse);
+    setIsThinking(true);
+    setResponse(''); // Clear previous response while thinking
+
+    const timeout = setTimeout(() => {
+      try {
+        let npcResponse = '';
+
+        switch (activeNPC) {
+          case 'ayla':
+            npcResponse = engine.generateAylaResponse(playerQuery, playerState);
+            break;
+          case 'morthos':
+            npcResponse = engine.generateMorthosResponse(playerQuery, playerState);
+            break;
+          case 'al':
+            npcResponse = engine.generateAlResponse(playerQuery, playerState);
+            break;
+          default:
+            npcResponse = "There's no one here to answer that.";
+            // TODO: Add support for Polly, Wendell, Findlater, etc.
+        }
+
+        setResponse(npcResponse);
+        if (onRespond) onRespond(npcResponse);
+      } catch (err) {
+        console.error('[NPCConsole] Error generating NPC response:', err);
+        setResponse('⚠️ Error: NPC could not respond.');
+      } finally {
+        setIsThinking(false);
+      }
+    }, 500); // Slight delay to simulate "thinking"
+
+    return () => clearTimeout(timeout);
   }, [playerQuery, activeNPC, playerState, onRespond]);
 
-  // If there is no active NPC, do not render the console
   if (!activeNPC) return null;
 
-  // Map NPC keys to display names
   const nameMap = {
     ayla: 'Ayla',
     morthos: 'Morthos',
-    al: 'Al'
+    al: 'Al',
   };
 
   return (
     <div className="border rounded-xl p-4 bg-black/70 text-green-200 shadow-lg max-w-xl mx-auto my-4">
-      <div className="text-lg font-semibold mb-1">{nameMap[activeNPC]} says:</div>
-      <div className="italic">{response}</div>
+      <div className="text-lg font-semibold mb-1">
+        {nameMap[activeNPC] || '???'} says:
+      </div>
+      <div className="italic">
+        {isThinking ? '💬 ...thinking' : response || '—'}
+      </div>
     </div>
   );
 };
 
 NPCConsole.propTypes = {
-  activeNPC: PropTypes.string, // 'ayla', 'morthos', 'al'
+  activeNPC: PropTypes.string,
   playerQuery: PropTypes.string,
   playerState: PropTypes.object.isRequired,
-  onRespond: PropTypes.func
+  onRespond: PropTypes.func,
 };
 
-// Export the NPCConsole component for use in the main application
+
+/**
+ * CSS Styling for Ayla handwriting messages
+ * Add this inline or via a global style later if needed
+ */
+const style = document.createElement('style');
+style.innerHTML = `
+  .ayla-message {
+    font-family: 'Lucida Handwriting', cursive;
+    color: #b6fcd5;
+    background-color: #000;
+    padding: 0.5rem;
+    border-left: 3px solid #6ee7b7;
+    margin: 0.5rem 0;
+    white-space: pre-wrap;
+  }
+`;
+document.head.appendChild(style);
+
 export default NPCConsole;

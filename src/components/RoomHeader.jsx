@@ -1,3 +1,8 @@
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: RoomHeader.jsx
+// Path: src/components/RoomHeader.jsx
+
+
 // src/components/RoomHeader.jsx
 // Version: 3.9.9
 // (c) 2025 Geoffrey Alan Webster

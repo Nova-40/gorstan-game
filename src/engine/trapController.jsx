@@ -1,3 +1,8 @@
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: trapController.jsx
+// Path: src/engine/trapController.jsx
+
+
 // src/engine/trapController.jsx
 // Version: 3.9.9
 // (c) 2025 Geoffrey Alan Webster
@@ -79,5 +84,4 @@ export function listActiveTraps() {
 
 // All functions are exported as named exports for use in room, event, and debug logic.
 // TODO: Add persistence for traps, support for trap types, and player-specific trap states
-
 

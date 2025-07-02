@@ -1,3 +1,8 @@
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: GameLayout.jsx
+// Path: src/components/GameLayout.jsx
+
+
 // src/components/GameLayout.jsx
 // Version: 3.9.9
 // (c) 2025 Geoffrey Alan Webster

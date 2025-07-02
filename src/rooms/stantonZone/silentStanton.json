@@ -1,0 +1,17 @@
+{
+  "id": "silentStanton",
+  "zone": "stantonZone",
+  "name": "Stanton (Collapsed)",
+  "description": [
+    "It looks like Stanton Harcourt \u2014 but no one sees you.",
+    "Polly blocks the road, arms folded. Her eyes are cold.",
+    "Dominic\u2019s bowl is empty. A gust scatters Form 42-B across the green."
+  ],
+  "npcs": [
+    "polly",
+    "dominic"
+  ],
+  "flags": [
+    "ending_bad"
+  ]
+}

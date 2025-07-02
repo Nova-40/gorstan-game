@@ -1,3 +1,8 @@
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: main.jsx
+// Path: src/main.jsx
+
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import AppCore from './components/AppCore.jsx';

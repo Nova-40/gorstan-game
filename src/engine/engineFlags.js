@@ -1,3 +1,8 @@
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: engineFlags.js
+// Path: src/engine/engineFlags.js
+
+
 // src/engine/engineFlags.js
 // Version: 3.9.9
 // (c) 2025 Geoffrey Alan Webster

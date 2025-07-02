@@ -1,0 +1,16 @@
+{
+  "id": "peacefulStanton",
+  "zone": "stantonZone",
+  "name": "Stanton (Forgiven)",
+  "description": [
+    "You arrive at the green as dawn breaks.",
+    "Polly is waiting, changed. A breeze carries Cora\u2019s voice from the library.",
+    "The village is still, at peace. And so are you."
+  ],
+  "npcs": [
+    "polly"
+  ],
+  "flags": [
+    "ending_redemption"
+  ]
+}

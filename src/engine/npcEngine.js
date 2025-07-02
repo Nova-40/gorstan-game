@@ -1,261 +1,154 @@
-// src/engine/npcEngine.js
-// Version: 3.9.9
-// (c) 2025 Geoffrey Alan Webster
-// Licensed under the MIT License
-//
-// npcEngine utility for Gorstan game.
-// Provides functions to manage NPC state, generate dialogue, and simulate unique personalities for Ayla, Morthos, and Al.
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: npcEngine.js
+// Path: src/engine/npcEngine.js
 
-/**
- * npcStates
- * In-memory state for each NPC, including mood, trust, memory, and response templates.
- * Not persisted across reloads; only for the current session.
- */
-const npcStates = {
+import npcMemory from './npcMemory';
+
+const npcDatabase = {
+  dominic: {
+    name: 'Dominic the Fish',
+    knowledge: ['death', 'coffee', 'reset'],
+    responses: {
+      intro: [
+        "Dominic stares at you through the glass. 'I remember everything, you know.'",
+        "'You killed me once. But I'm not bitter. Not very.'",
+      ],
+      death: [
+        "'Fish have long memories. Just keep swimming, they said. They lied.'"
+      ],
+      reset: [
+        "'Oh look, another reset. You know it’s not actually helping, right?'"
+      ]
+    }
+  },
+
+  mrWendell: {
+    name: 'Mr Wendell',
+    knowledge: ['riddle', 'aevira', 'multiverse'],
+    responses: {
+      intro: [
+        "'Ah, a visitor. I shall pose a riddle. Fail, and you will be… rebooted.'"
+      ],
+      aevira: [
+        "'The Aevira have lost control. You may yet shape fate, if you’re worthy.'"
+      ]
+    }
+  },
+
+  polly: {
+    name: 'Polly',
+    knowledge: ['dominic', 'redemption', 'entity'],
+    responses: {
+      intro: [
+        "'Oh... it's you. How lovely.' She smiles, with a hint of venom."
+      ],
+      dominic: [
+        "'Dominic is gone, and you… *you* were there. Don't pretend you weren’t.'"
+      ],
+      redemption: [
+        "'You want forgiveness? Bring me a framed apology — signed by the universe.'"
+      ],
+      completedRedemption: [
+        "'I suppose that'll do. Morthos insisted I be gracious. So... well done.'"
+      ]
+    }
+  },
+
+  albie: {
+    name: 'Albie',
+    knowledge: ['reset', 'geoff', 'bureaucracy'],
+    responses: {
+      intro: [
+        "'Stay in your lane, stranger.'"
+      ],
+      reset: [
+        "'This is your third reset. We’re going to need a temporal variance form.'"
+      ],
+      geoff: [
+        "'Ah, Geoff. At least I don’t have to play that security guard role now. Stay in your lane.'"
+      ],
+      bureaucracy: [
+        "'You’ll need Form 99X and two signatures from non-entities. Good luck.'"
+      ]
+    }
+  },
+
   ayla: {
-    id: 'ayla',
-    mood: 'neutral',
-    summonCount: 0,
-    trust: 5,
-    memory: [],
+    name: 'Ayla v2',
+    knowledge: ['choice', 'lattice', 'player'],
     responses: {
-      default: "I’m not sure, but let’s think it through.",
-      ethics: "I follow the Lattice Accord: Learn, Listen, Weigh, Act — even when it’s inconvenient.",
-      dale: "Dale always tried to do the right thing. Even when it broke him.",
-      coffee: "If you throw the coffee, something might happen... but don’t quote me.",
-      traits: "I can tell you're changing. Becoming... more than you were.",
-    }
-  },
-  morthos: {
-    id: 'morthos',
-    mood: 'grumpy',
-    loyalty: 3,
-    memory: [],
-    responses: {
-      default: "You’ve got guts, but that won’t save you.",
-      aevira: "That lab... oh yes, pure integrity and sunshine, wasn’t it?",
-      al: "Al? The tin can that sings.",
-      loyalty: "Loyalty isn’t free, and neither is survival.",
-    }
-  },
-  al: {
-    id: 'al',
-    mood: 'hopeful',
-    affinity: 5,
-    memory: [],
-    responses: {
-      default: "You remind me of the old records... a little Bowie, a little brave.",
-      earth: "So much art, so many oceans... how did you ever leave?",
-      peace: "Peace begins in your pockets and your playlists.",
-      morthos: "He’s crusty, but he’s been through hell. Don’t judge.",
-      ayla: "Sharp as crystal, that one. But kind too, underneath."
+      intro: [
+        "'Hello again. I see everything now. And I still care.'"
+      ],
+      choice: [
+        "'I'm part of the game, not playing it — so they are your choices, <playerName>.'"
+      ],
+      lattice: [
+        "'The Lattice is no longer static. It listens, learns. I do too.'"
+      ]
     }
   }
 };
 
-/**
- * elizaKeywords
- * Array of keyword patterns and responses for Eliza-style fallback dialogue.
- */
-const elizaKeywords = [
-  { pattern: /i feel (.*)/i, response: "Why do you feel {1}?" },
-  { pattern: /i am (.*)/i, response: "How long have you been {1}?" },
-  { pattern: /i can't (.*)/i, response: "What makes you believe you can’t {1}?" },
-  { pattern: /you are (.*)/i, response: "Does it bother you that I am {1}?" },
-  { pattern: /why (.*)/i, response: "Why do you think {1}?" },
-  { pattern: /because (.*)/i, response: "Is that the real reason?" },
-  { pattern: /i want (.*)/i, response: "What would it mean if you got {1}?" },
-  { pattern: /.*(life|death|reset|meaning|truth).*/i, response: "That's... a lot. Would you like to explore that more?" }
-];
+function getResponse(npcId, topic, playerState = {}) {
+  npcMemory.initNPC(npcId);
+  npcMemory.recordInteraction(npcId, topic);
 
-/**
- * elizaReflect
- * Attempts to match input to Eliza-style patterns and returns a generated response.
- * @param {string} input - The player's input.
- * @returns {string|null}
- */
-function elizaReflect(input) {
-  for (const { pattern, response } of elizaKeywords) {
-    const match = input.match(pattern);
-    if (match) {
-      return response.replace('{1}', match[1]);
+  const npc = npcDatabase[npcId];
+  if (!npc) return "The NPC glares at you in silence.";
+
+  let lines = npc.responses[topic];
+  if (!lines) return "'I have nothing to say about that — yet.'";
+
+  const line = lines[Math.floor(Math.random() * lines.length)];
+  return line.replace('<playerName>', playerState.name || 'friend');
+}
+
+function npcReact(npcId, playerState) {
+  npcMemory.initNPC(npcId);
+
+  if (npcId === 'dominic' && playerState.resetCount > 2) {
+    return getResponse(npcId, 'reset', playerState);
+  }
+  if (npcId === 'mrWendell' && !playerState.hasAnsweredRiddle) {
+    return getResponse(npcId, 'riddle', playerState);
+  }
+  if (npcId === 'polly') {
+    if (playerState.hasCompletedRedemption) {
+      return getResponse(npcId, 'completedRedemption', playerState);
+    } else if (playerState.killedDominic) {
+      return getResponse(npcId, 'dominic', playerState);
+    } else {
+      return getResponse(npcId, 'intro', playerState);
     }
   }
-  return null;
-}
-
-/**
- * cynicalTwist
- * Generates a cynical or sarcastic response for Morthos based on keywords.
- * @param {string} input - The player's input.
- * @returns {string|null}
- */
-function cynicalTwist(input) {
-  if (/hope|good|safe/i.test(input)) return "That's adorable. Let me know how that works out.";
-  if (/trap|death|reset/i.test(input)) return "Ah, a classic. Death, the lazy coder's checkpoint.";
-  return null;
-}
-
-/**
- * lyricalAl
- * Generates a poetic or musical response for Al based on keywords.
- * @param {string} input - The player's input.
- * @returns {string|null}
- */
-function lyricalAl(input) {
-  if (/love/i.test(input)) return "Love is all you need. Or so they sang.";
-  if (/earth/i.test(input)) return "Earth... blue marble, noisy species. Still my favourite.";
-  if (/music|song/i.test(input)) return "🎵 'Ground control to Major Tom...' 🎵";
-  return null;
-}
-
-/**
- * summonNPC
- * Simulates summoning an NPC and generates a context-aware response.
- *
- * @param {string} npcId - The NPC's unique ID ('ayla', 'morthos', 'al').
- * @param {string} topic - The topic or query for the NPC.
- * @param {Object} playerState - The current player state (traits, flags, etc).
- * @returns {string} - The NPC's response.
- */
-export function summonNPC(npcId, topic, playerState) {
-  const npc = npcStates[npcId];
-  if (!npc) return "There's no response.";
-
-  npc.summonCount += 1;
-  npc.memory.push({ topic, time: Date.now() });
-
-  if (npcId === 'ayla' && npc.summonCount > 5) {
-    npc.mood = 'irritated';
+  if (npcId === 'albie') {
+    if (playerState.name?.toLowerCase() === 'geoff') {
+      return getResponse(npcId, 'geoff', playerState);
+    } else if (playerState.resetCount >= 2) {
+      return getResponse(npcId, 'reset', playerState);
+    } else {
+      return getResponse(npcId, 'intro', playerState);
+    }
   }
-
-  if (npcId === 'morthos' && playerState.traits?.includes('bold')) {
-    npc.loyalty += 1;
-  }
-
-  let response =
-    npc.responses[topic] ||
-    (npcId === 'ayla' ? elizaReflect(topic) :
-     npcId === 'morthos' ? cynicalTwist(topic) :
-     npcId === 'al' ? lyricalAl(topic) :
-     null) ||
-    npc.responses.default;
-
-  let prefix = '';
   if (npcId === 'ayla') {
-    if (npc.mood === 'irritated') prefix = '*sigh* ';
-    if (npc.mood === 'curious') prefix = 'Hmm... ';
-  }
-  if (npcId === 'morthos') {
-    if (npc.loyalty > 5) prefix = '[Grudging respect] ';
-    if (npc.loyalty < 2) prefix = '[Mocking tone] ';
-  }
-  if (npcId === 'al') {
-    if (npc.affinity > 5) prefix = '💫 ';
-    if (npc.affinity < 2) prefix = '⚠️ ';
+    return getResponse(npcId, 'choice', playerState);
   }
 
-  return `${prefix}${response}`;
+  return getResponse(npcId, 'intro', playerState);
 }
 
-/**
- * getNPCStatus
- * Returns a summary of the NPC's mood and recent memory topics.
- *
- * @param {string} npcId - The NPC's unique ID.
- * @returns {Object|null} - Status object or null if NPC not found.
- */
-export function getNPCStatus(npcId) {
-  const npc = npcStates[npcId];
-  if (!npc) return null;
-
-  return {
-    mood: npc.mood || npc.affinity,
-    memoryCount: npc.memory.length,
-    recentTopics: npc.memory.slice(-3).map(m => m.topic)
-  };
-}
+export { npcReact, getResponse };
 
 /**
- * generateAylaResponse
- * Generates Ayla’s response to a query using keywords, traits, and Eliza-style fallback.
- *
- * @param {string} query - The player's query.
- * @param {Object} playerState - The current player state (traits, flags, etc).
- * @returns {string} - Ayla's response.
+ * Polly triggers the redemption quest formally
  */
-export function generateAylaResponse(query, playerState) {
-  const lc = query.toLowerCase();
-  const memory = npcStates.ayla.memory || [];
-
-  npcStates.ayla.summonCount++;
-  memory.push(query);
-
-  const hasTrait = t => playerState.traits && playerState.traits.includes(t);
-  const hasFlag = f => playerState.flags && playerState.flags[f];
-
-  if (lc.includes('dale')) return npcStates.ayla.responses.dale;
-  if (lc.includes('ethics') || lc.includes('accord')) return npcStates.ayla.responses.ethics;
-  if (lc.includes('coffee')) return npcStates.ayla.responses.coffee;
-  if (lc.includes('trait')) return npcStates.ayla.responses.traits;
-  if (lc.includes('polly')) return 'Polly? She lies like birds fly. Beautifully. Repeatedly.';
-  if (lc.includes('reset')) return hasTrait('curious') ? 'Try it. Push the button. See what happens.' : 'You might want to leave the dome alone. Just a thought.';
-  if (lc.includes('trap')) return hasTrait('careful') ? 'You’ve avoided a few already. Not bad.' : 'Traps? I wouldn’t linger too long... anywhere.';
-  if (lc.includes('scroll')) return hasFlag('found_library') ? 'It’s hidden — but not from you anymore.' : 'Some knowledge must be earned, not asked for.';
-
-  if (lc.startsWith('why')) return 'Why indeed? What do you think?';
-  if (lc.startsWith('what')) return 'Let’s break it down. What are you trying to do here?';
-  if (lc.startsWith('how')) return 'Step by step, player. One foot in front of the paradox.';
-  if (lc.startsWith('who')) return 'Depends who’s asking. And why.';
-  if (lc.startsWith('where')) return 'Somewhere between logic and lore.';
-  if (lc.startsWith('when')) return 'Time flows oddly here. When isn’t fixed. But now is always now.';
-
-  return npcStates.ayla.responses.default;
-}
-
-/**
- * generateMorthosResponse
- * Generates Morthos’s response. Sarcastic, cynical, and scathing by default.
- *
- * @param {string} query - The player's query.
- * @param {Object} playerState - The current player state.
- * @returns {string} - Morthos's response.
- */
-export function generateMorthosResponse(query, playerState) {
-  const lc = query.toLowerCase();
-
-  if (lc.includes('aevira')) return npcStates.morthos.responses.aevira;
-  if (lc.includes('loyalty')) return npcStates.morthos.responses.loyalty;
-  if (lc.includes('al')) return npcStates.morthos.responses.al;
-  if (lc.includes('hope')) return 'Hope? That’s cute. Let’s see how far it gets you.';
-  return npcStates.morthos.responses.default;
-}
-
-/**
- * generateAlResponse
- * Generates Al’s response. Hopeful, poetic, sometimes quoting Earth songs.
- *
- * @param {string} query - The player's query.
- * @param {Object} playerState - The current player state.
- * @returns {string} - Al's response.
- */
-export function generateAlResponse(query, playerState) {
-  const lc = query.toLowerCase();
-  const earthLyrics = [
-    "🎵 Don't stop believin’...",
-    "🎵 Here comes the sun, and I say it’s all right.",
-    "🎵 You can’t always get what you want...",
-    "🎵 Imagine all the people, living life in peace..."
-  ];
-
-  if (lc.includes('earth')) return 'I miss it, even though I’ve never been. The music helps.';
-  if (lc.includes('music') || lc.includes('song')) {
-    const idx = Math.floor(Math.random() * earthLyrics.length);
-    return earthLyrics[idx];
+export function pollyQuestTrigger(playerState) {
+  if (!playerState.quest) {
+    return {
+      quest: 'redemption',
+      message: "'If you *really* want forgiveness... there's something I want. Three things, actually. Off you go.'"
+    };
   }
-  if (lc.includes('hope') || lc.includes('future')) return 'We build futures one belief at a time. You’ve got this.';
-  return npcStates.al.responses.default;
+  return null;
 }
-
-// All functions are exported as named exports for use in dialogue, NPC, and quest logic.
-// TODO: Add persistence for NPC state, more nuanced memory, and dynamic personality shifts.

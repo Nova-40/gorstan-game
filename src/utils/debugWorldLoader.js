@@ -1,3 +1,8 @@
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: debugWorldLoader.js
+// Path: src/utils/debugWorldLoader.js
+
+
 // src/utils/debugWorldLoader.js
 // Version: 3.9.9
 // (c) 2025 Geoffrey Alan Webster

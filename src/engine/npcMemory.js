@@ -1,3 +1,8 @@
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: npcMemory.js
+// Path: src/engine/npcMemory.js
+
+
 // src/engine/npcMemory.js
 // Version: 3.9.9
 // (c) 2025 Geoffrey Alan Webster
@@ -88,4 +93,107 @@ export function getAllNPCStates() {
 }
 
 // All functions are exported as named exports for use in dialogue, endgame, and debugging logic.
-// TODO: Add persistence hooks to save/restore npcStates to/from
+// TODO: Add persistence hooks to save/restore npcStates to/from localStorage as needed.
+
+/**
+ * Tracks behavioural traits of the player
+ */
+const playerTraits = {
+  dialogueFlags: {},
+  resetCount: 0,
+  itemsCollected: [],
+  achievements: []
+};
+
+/**
+ * Log a trait event
+ * @param {string} type - The trait/event type to increment.
+ */
+export function trackTrait(type) {
+  if (type in playerTraits) {
+    playerTraits[type]++;
+  } else {
+    playerTraits[type] = 1;
+  }
+}
+
+/**
+ * Unlock an achievement
+ * @param {string} title - Achievement title to unlock.
+ */
+export function unlockAchievement(title) {
+  if (!playerTraits.achievements.includes(title)) {
+    playerTraits.achievements.push(title);
+  }
+}
+
+/**
+ * Check player state flag
+ * @param {string} flag - Flag to check.
+ * @returns {boolean}
+ */
+export function hasFlag(flag) {
+  return playerTraits.dialogueFlags[flag] === true;
+}
+
+/**
+ * Set player state flag
+ * @param {string} flag - Flag to set.
+ */
+export function setFlag(flag) {
+  playerTraits.dialogueFlags[flag] = true;
+}
+
+export const achievements = [];
+
+/**
+ * Overwrites a trait value (not increment).
+ * @param {string} key - Trait key.
+ * @param {*} value - Value to set.
+ */
+export function setTrait(key, value = true) {
+  playerTraits[key] = value;
+}
+
+/**
+ * Increments the reset count.
+ */
+export function incrementReset() {
+  playerTraits.resetCount += 1;
+}
+
+/**
+ * Adds an item to the player's memory if not already present.
+ * @param {string} item - Item to add.
+ */
+export function addItemToMemory(item) {
+  if (!playerTraits.itemsCollected.includes(item)) {
+    playerTraits.itemsCollected.push(item);
+  }
+}
+
+/**
+ * Unlocks an achievement (legacy export for compatibility).
+ * @param {string} label - Achievement label.
+ */
+export function unlockAchievementLegacy(label) {
+  if (!achievements.includes(label)) {
+    achievements.push(label);
+  }
+}
+
+/**
+ * Returns a shallow copy of all player traits.
+ * @returns {object}
+ */
+export function getAllTraits() {
+  return { ...playerTraits };
+}
+
+/**
+ * Returns a shallow copy of all achievements.
+ * @returns {array}
+ */
+export function getAchievements() {
+  return [...achievements];
+}

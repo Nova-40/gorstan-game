@@ -1,3 +1,8 @@
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: ResetScreen.jsx
+// Path: src/components/ResetScreen.jsx
+
+
 /**
  * ResetScreen.jsx
  * Simulates a terminal-style reset boot sequence with braille spinner.

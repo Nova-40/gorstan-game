@@ -1,11 +1,10 @@
-// File: src/components/QuickActions.jsx
-// Version: 3.9.9
-// (c) 2025 Geoffrey Alan Webster
-// Licensed under the MIT License
-//
-// QuickActions component for Gorstan game.
-// Provides a panel of quick-access buttons for movement and common actions.
-// Buttons are grouped into directional controls and context-sensitive actions.
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: QuickActions.jsx
+// Path: src/components/QuickActions.jsx
+
+
+// File: /src/components/QuickActions.jsx
+// Version: v4.0.0-preprod
 
 import React from 'react';
 import {
@@ -26,14 +25,6 @@ import PropTypes from 'prop-types';
 /**
  * IconButton
  * Renders a single icon button with a tooltip label.
- *
- * @param {Object} props - Component props.
- * @param {React.Component} props.Icon - Lucide icon component to render.
- * @param {string} props.label - Tooltip label for the button.
- * @param {Function} props.onClick - Click handler for the button.
- * @param {boolean} [props.active=true] - Whether the button is active.
- * @param {boolean} [props.animate=false] - Whether to animate the button.
- * @returns {JSX.Element}
  */
 const IconButton = ({ Icon, label, onClick, active = true, animate = false }) => (
   <div className={`group relative m-1 transition-opacity ${animate ? 'animate-fade-in' : ''}`}>
@@ -42,6 +33,7 @@ const IconButton = ({ Icon, label, onClick, active = true, animate = false }) =>
       className={`p-1 ${active ? 'text-green-400' : 'text-gray-500 opacity-40'} hover:scale-110 transition-transform`}
       aria-label={label}
       type="button"
+      disabled={!active}
     >
       <Icon className="w-6 h-6" />
     </button>
@@ -61,17 +53,7 @@ IconButton.propTypes = {
 
 /**
  * QuickActions
- * Renders a panel of quick-access buttons for movement and common actions.
- * Directional controls are always shown; action buttons may be context-sensitive.
- *
- * @param {Object} props - Component props.
- * @param {Function} props.onDirection - Callback for directional movement actions.
- * @param {Function} props.onQuickAction - Callback for quick toolbar actions.
- * @param {Function} props.onSlip - Callback for the "Slip" action.
- * @param {Function} props.onRewind - Callback for the "Rewind" action.
- * @param {Function} props.onSit - Callback for the "Sit Down" action.
- * @param {boolean} [props.canSit=false] - Whether the "Sit Down" action is available.
- * @returns {JSX.Element}
+ * Renders quick-access directional and context-sensitive buttons.
  */
 export default function QuickActions({
   onDirection,
@@ -80,6 +62,7 @@ export default function QuickActions({
   onRewind,
   onSit,
   canSit = false,
+  extraActions = [],
 }) {
   return (
     <div className="flex flex-col items-center justify-center gap-3 mt-4">
@@ -99,12 +82,28 @@ export default function QuickActions({
         <IconButton Icon={Eye} label="Look" onClick={() => onQuickAction('look')} />
         <IconButton Icon={Hand} label="Use" onClick={() => onQuickAction('use')} />
         <IconButton Icon={HelpCircle} label="Help" onClick={() => onQuickAction('help')} />
-        {/* Sit Down button is only shown if canSit is true */}
-        {canSit && <IconButton Icon={Armchair} label="Sit Down" onClick={onSit} animate={true} />}
+        {canSit && <IconButton Icon={Armchair} label="Sit Down" onClick={onSit} animate />}
+        {/* TODO: Add more context-sensitive actions if game design expands */}
+        {extraActions.map(({ label, icon: Icon, onClick }, idx) => (
+          <IconButton key={idx} Icon={Icon} label={label} onClick={onClick} />
+        ))}
       </div>
     </div>
   );
 }
 
-// Exported as default for use in the main application.
-// TODO: Add more context-sensitive actions if game design expands.
+QuickActions.propTypes = {
+  onDirection: PropTypes.func.isRequired,
+  onQuickAction: PropTypes.func.isRequired,
+  onSlip: PropTypes.func.isRequired,
+  onRewind: PropTypes.func.isRequired,
+  onSit: PropTypes.func.isRequired,
+  canSit: PropTypes.bool,
+  extraActions: PropTypes.arrayOf(
+    PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      icon: PropTypes.elementType.isRequired,
+      onClick: PropTypes.func.isRequired,
+    })
+  ),
+};

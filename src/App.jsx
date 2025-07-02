@@ -1,3 +1,8 @@
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: App.jsx
+// Path: src/App.jsx
+
+
 import React from 'react';
 import AppCore from './components/AppCore';
 import { GlobalErrorProvider } from './context/GlobalErrorContext';

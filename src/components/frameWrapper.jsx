@@ -1,3 +1,8 @@
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: frameWrapper.jsx
+// Path: src/components/frameWrapper.jsx
+
+
 // File: src/components/frameWrapper.jsx
 // Version: 3.9.9
 // (c) 2025 Geoffrey Alan Webster

@@ -1,3 +1,8 @@
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: rooms_index.js
+// Path: src/rooms/rooms_index.js
+
+
 // Auto-generated room registry from JSON files
 
 import elfhameZone_elfhame from './elfhameZone/elfhame.json';

@@ -1,3 +1,8 @@
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: glitchEngine.js
+// Path: src/engine/glitchEngine.js
+
+
 // src/engine/glitchEngine.js
 // Version: 3.9.9
 // (c) 2025 Geoffrey Alan Webster

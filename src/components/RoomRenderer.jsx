@@ -1,3 +1,8 @@
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: RoomRenderer.jsx
+// Path: src/components/RoomRenderer.jsx
+
+
 // File: src/components/RoomRenderer.jsx
 // Version: 3.9.9
 // (c) 2025 Geoffrey Alan Webster
@@ -88,5 +93,4 @@ RoomRenderer.propTypes = {
 
 // Export the RoomRenderer component for use in the main application
 export default RoomRenderer;
-
 

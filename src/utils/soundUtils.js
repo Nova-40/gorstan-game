@@ -1,3 +1,8 @@
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: soundUtils.js
+// Path: src/utils/soundUtils.js
+
+
 // src/utils/soundUtils.js
 // Version: 3.9.9
 // (c) 2025 Geoffrey Alan Webster
@@ -98,6 +103,5 @@ export const playSound = (type) => {
 
 // All functions are exported as named exports for use in UI and game logic.
 // TODO: Add support for user volume preferences or additional sound types as needed.
-
 
 

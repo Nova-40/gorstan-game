@@ -1,3 +1,8 @@
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: godmode.js
+// Path: src/engine/godmode.js
+
+
 // src/engine/godmode.js
 // Version: 3.9.9
 // (c) 2025 Geoffrey Alan Webster

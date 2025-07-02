@@ -1,3 +1,8 @@
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: dialogueEngine.js
+// Path: src/engine/dialogueEngine.js
+
+
 // src/engine/dialogueEngine.js
 // Version: 3.9.9
 // (c) 2025 Geoffrey Alan Webster

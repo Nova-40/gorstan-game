@@ -1,3 +1,8 @@
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: puzzleEngine.js
+// Path: src/engine/puzzleEngine.js
+
+
 // src/engine/puzzleEngine.js
 // Version: 3.9.9
 // (c) 2025 Geoffrey Alan Webster

@@ -1,3 +1,8 @@
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: sceneEngine.js
+// Path: src/engine/sceneEngine.js
+
+
 // src/engine/sceneEngine.js
 // Version: 3.9.9
 // (c) 2025 Geoffrey Alan Webster

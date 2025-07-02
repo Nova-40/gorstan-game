@@ -1,3 +1,8 @@
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: animateTeletype.js
+// Path: src/utils/animateTeletype.js
+
+
 // src/utils/animateTeletype.js
 // Version: 3.9.9
 // (c) 2025 Geoffrey Alan Webster

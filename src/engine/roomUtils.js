@@ -1,3 +1,8 @@
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: roomUtils.js
+// Path: src/engine/roomUtils.js
+
+
 /**
  * roomUtils.js – Gorstan v3.9.9
  * Unified utility functions for handling room metadata, logic, validation, and rendering.
@@ -131,6 +136,5 @@ export default RoomUtils;
 
 // All functions and RoomUtils object are exported for use in room logic, validation, and rendering.
 // TODO: Expand with more room utilities as world schema or logic
-
 
 

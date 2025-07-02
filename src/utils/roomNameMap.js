@@ -1,3 +1,8 @@
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: roomNameMap.js
+// Path: src/utils/roomNameMap.js
+
+
 // src/utils/roomNameMap.js
 // Version: 3.9.9
 // (c) 2025 Geoffrey Alan Webster

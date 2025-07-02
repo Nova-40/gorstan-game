@@ -1,3 +1,8 @@
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: inventory.js
+// Path: src/engine/inventory.js
+
+
 // src/engine/inventory.js
 // Version: 3.9.9
 // (c) 2025 Geoffrey Alan Webster

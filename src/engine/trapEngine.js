@@ -1,3 +1,8 @@
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: trapEngine.js
+// Path: src/engine/trapEngine.js
+
+
 /**
  * trapEngine.js – Gorstan Game v3.2+ 
  * Handles trap seeding, activation, disarming, and diagnostics.

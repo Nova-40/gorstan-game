@@ -1,0 +1,16 @@
+{
+  "id": "ascendantStanton",
+  "zone": "stantonZone",
+  "name": "Stanton (Ascended)",
+  "description": [
+    "Reality folds at the pond. The ground becomes code. The air, lattice.",
+    "Ayla stands beside you, solid and clear: 'You\u2019ve inherited the framework.'",
+    "'Now what will you build?'"
+  ],
+  "npcs": [
+    "ayla"
+  ],
+  "flags": [
+    "ending_architect"
+  ]
+}

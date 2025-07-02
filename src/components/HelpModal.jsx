@@ -1,3 +1,8 @@
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: HelpModal.jsx
+// Path: src/components/HelpModal.jsx
+
+
 // src/components/HelpModal.jsx
 // Version: 3.9.9
 // (c) 2025 Geoffrey Alan Webster

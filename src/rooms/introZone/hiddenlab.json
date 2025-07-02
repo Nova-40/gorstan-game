@@ -1,7 +1,7 @@
 {
   "id": "hiddenlab",
   "name": "Hidden Aevira Lab",
-  "description": "You descend into a subterranean chamber filled with decaying Aevira tech. Transparent pods line the walls — some shattered, some eerily occupied. A half-crushed terminal displays the words: *Project Prime Incomplete*.",
+  "description": "You descend into a subterranean chamber filled with decaying Aevira tech. Transparent pods line the walls \u2014 some shattered, some eerily occupied. A half-crushed terminal displays the words: *Project Prime Incomplete*.",
   "image": "hiddenlab.png",
   "exits": {
     "east": "secretmazeentry",
@@ -9,9 +9,10 @@
   },
   "items": [
     "primefragment",
-    "damagedjournal"
+    "damagedjournal",
+    "Pen of Eternal Excuses"
   ],
-  "onEnter": "A whisper brushes past your ear: *You're not supposed to be here… yet.*",
+  "onEnter": "A whisper brushes past your ear: *You're not supposed to be here\u2026 yet.*",
   "traps": [
     "falsefloor"
   ],

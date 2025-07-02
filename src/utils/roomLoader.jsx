@@ -1,3 +1,8 @@
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: roomLoader.jsx
+// Path: src/utils/roomLoader.jsx
+
+
 // File: src/utils/roomLoader.jsx
 // Version: 3.9.9
 // (c) 2025 Geoffrey Alan Webster

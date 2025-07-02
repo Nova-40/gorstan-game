@@ -1,3 +1,8 @@
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: itemEngine.js
+// Path: src/engine/itemEngine.js
+
+
 // src/engine/itemEngine.js
 // Version: 3.9.9
 // (c) 2025 Geoffrey Alan Webster

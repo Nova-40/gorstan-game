@@ -1,3 +1,8 @@
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: SoundToggle.jsx
+// Path: src/components/SoundToggle.jsx
+
+
 // src/components/SoundToggle.jsx
 // Version: 3.9.9
 // (c) 2025 Geoffrey Alan Webster

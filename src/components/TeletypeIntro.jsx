@@ -1,3 +1,8 @@
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: TeletypeIntro.jsx
+// Path: src/components/TeletypeIntro.jsx
+
+
 // File: src/components/TeletypeIntro.jsx
 // Version: 3.9.9
 // (c) 2025 Geoffrey Alan Webster
@@ -117,5 +122,4 @@ TeletypeIntro.propTypes = {
 
 // Export the TeletypeIntro component for use in the main application
 export default TeletypeIntro;
-
 

@@ -1,3 +1,8 @@
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: roomSchema.js
+// Path: src/engine/roomSchema.js
+
+
 // src/engine/roomSchema.js
 // Version: 3.9.9
 // (c) 2025 Geoffrey Alan Webster

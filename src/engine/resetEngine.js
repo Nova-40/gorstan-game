@@ -1,3 +1,8 @@
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: resetEngine.js
+// Path: src/engine/resetEngine.js
+
+
 // src/engine/resetEngine.js
 // Version: 3.9.9
 // (c) 2025 Geoffrey Alan Webster

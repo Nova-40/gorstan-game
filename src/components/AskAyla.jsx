@@ -1,98 +1,67 @@
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: AskAyla.jsx
+// Path: src/components/AskAyla.jsx
+
+
 // src/components/AskAyla.jsx
-// Version: 3.9.9
+// Version: 4.0.0-preprod
 // (c) 2025 Geoffrey Alan Webster
 // Licensed under the MIT License
-//
-// AskAyla component for Gorstan game.
-// Provides context-sensitive hints to the player based on room, traits, flags, and inventory.
 
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import { generateAylaResponse, getNPCStatus } from '@/engine/npcEngine';
 
 /**
- * AskAyla
- * Renders a button that, when clicked, provides a hint to the player.
- * The hint is determined by the player's current room, traits, flags, and inventory.
- *
- * @param {Object} props - Component props.
- * @param {Object} props.room - The current room object.
- * @param {Array} props.traits - Array of player traits.
- * @param {Object} props.flags - Object containing player flags.
- * @param {Array} props.inventory - Array of inventory items.
- * @param {Function} props.onHint - Callback to display the generated hint.
- * @returns {JSX.Element}
+ * AskAyla component — a lightweight AI-style assistant using npcEngine memory
+ * Player can enter queries, and Ayla responds with hints, context, or lore
  */
-const AskAyla = ({ room, traits, flags, inventory, onHint }) => {
-  // Mood state is reserved for future use (e.g., dynamic hint tone)
-  // eslint-disable-next-line no-unused-vars
-  const [mood, setMood] = useState('helpful');
+export default function AskAyla({ playerState }) {
+  const [query, setQuery] = useState('');
+  const [response, setResponse] = useState('');
 
-  /**
-   * generateHint
-   * Determines the most relevant hint for the player based on their current state.
-   * Calls the onHint callback with the generated hint string.
-   */
-  const generateHint = () => {
-    const { id } = room;
-
-    // Special hint for godmode players
-    if (flags?.godmode) {
-      return onHint("🛠 You're in godmode. Try /goto or /solve if you're stuck.");
-    }
-
-    // Hint for the reset room if the reset button hasn't been pressed
-    if (id === 'resetroom' && !flags.resetButtonPressed) {
-      return onHint("🔴 Try pressing the big glowing button. Worst case? Multiverse annihilation.");
-    }
-
-    // Hint for specific rooms if coffee is missing from inventory
-    if (
-      ['controlnexus', 'hiddenlab'].includes(id) &&
-      !inventory.includes('coffee')
-    ) {
-      return onHint("☕ You dropped your coffee earlier… maybe try throwing it?");
-    }
-
-    // Hint for greasy storeroom if dirty napkin is missing
-    if (id === 'greasystoreroom' && !inventory.includes('dirty napkin')) {
-      return onHint("🧻 That greasy napkin may be more than it seems.");
-    }
-
-    // Hint for intro reset room
-    if (id === 'introreset') {
-      return onHint("🌀 Strange place, isn’t it? You might need to retrace your steps.");
-    }
-
-    // Hint for maze rooms if player is curious
-    if (traits.includes('curious') && id.startsWith('maze')) {
-      return onHint("🧠 You've been here before. Look closer — something has changed.");
-    }
-
-    // Default fallback hint
-    return onHint("🤷 Honestly? I'm not sure. But I believe in you, mostly.");
+  const askAyla = () => {
+    if (!query.trim()) return;
+    const reply = generateAylaResponse(query, playerState);
+    setResponse(reply);
+    setQuery('');
   };
 
+  const recent = getNPCStatus('ayla')?.recentTopics || [];
+
   return (
-    <button
-      className="bg-purple-600 text-white px-4 py-2 rounded-xl hover:bg-purple-700 shadow w-full md:w-auto"
-      onClick={generateHint}
-      title="Click for a hint based on your location, traits, and inventory"
-      type="button"
-    >
-      💬 Ask Ayla
-    </button>
+    <div className="bg-gray-950 text-green-300 p-4 rounded-xl border border-green-700 max-w-xl mx-auto shadow-lg mt-4">
+      <div className="text-lg font-bold mb-2">Ask Ayla</div>
+
+      <input
+        className="w-full p-2 bg-black text-green-200 border border-green-600 rounded mb-2"
+        type="text"
+        value={query}
+        placeholder="Ask Ayla for help or insight..."
+        onChange={(e) => setQuery(e.target.value)}
+        onKeyDown={(e) => e.key === 'Enter' && askAyla()}
+      />
+
+      <button
+        className="bg-green-700 text-white px-3 py-1 rounded hover:bg-green-600"
+        onClick={askAyla}
+      >
+        Submit
+      </button>
+
+      {response && (
+        <div className="mt-3 text-green-400 italic">{response}</div>
+      )}
+
+      {recent.length > 0 && (
+        <div className="mt-4 text-xs text-green-500">
+          <strong>Recent topics Ayla remembers:</strong> {recent.join(', ')}
+        </div>
+      )}
+    </div>
   );
-};
+}
 
 AskAyla.propTypes = {
-  room: PropTypes.object.isRequired,
-  traits: PropTypes.array.isRequired,
-  flags: PropTypes.object.isRequired,
-  inventory: PropTypes.array.isRequired,
-  onHint: PropTypes.func.isRequired,
+  playerState: PropTypes.object.isRequired
 };
-
-// Export the AskAyla component for use in the main application
-export default AskAyla;
-
-

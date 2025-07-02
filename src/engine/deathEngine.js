@@ -1,3 +1,8 @@
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: deathEngine.js
+// Path: src/engine/deathEngine.js
+
+
 // src/engine/deathEngine.js
 // Version: 3.9.9
 // (c) 2025 Geoffrey Alan Webster

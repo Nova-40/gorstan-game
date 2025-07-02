@@ -1,3 +1,8 @@
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: endgame.js
+// Path: src/engine/endgame.js
+
+
 // src/engine/endgame.js
 // Version: 3.9.9
 // (c) 2025 Geoffrey Alan Webster
@@ -92,7 +97,6 @@ export function triggerEndgameAction(command, playerState, dispatch) {
 }
 
 // Exported as named exports for use in the main game engine and other modules
-
 
 
 

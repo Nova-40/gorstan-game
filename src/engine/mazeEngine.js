@@ -1,3 +1,8 @@
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: mazeEngine.js
+// Path: src/engine/mazeEngine.js
+
+
 // src/engine/mazeEngine.js
 // Version: 3.9.9
 // (c) 2025 Geoffrey Alan Webster

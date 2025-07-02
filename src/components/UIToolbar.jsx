@@ -1,3 +1,8 @@
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: UIToolbar.jsx
+// Path: src/components/UIToolbar.jsx
+
+
 import React, { useState } from 'react';
 import SoundToggle from './SoundToggle';
 import HelpModal from './HelpModal';
@@ -73,4 +78,3 @@ const UIToolbar = ({ soundEnabled, setSoundEnabled }) => {
 
 // Export the UIToolbar component for use in the main application
 export default UIToolbar;
-

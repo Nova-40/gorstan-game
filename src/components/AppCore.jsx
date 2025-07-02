@@ -1,12 +1,12 @@
-// File: src/components/AppCore.jsx
-// Version: 3.9.9
-// (c) 2025 Geoffrey Alan Webster
-// Licensed under the MIT License
-//
-// Main application core for Gorstan game. Handles stage transitions, player state,
-// and orchestrates the rendering of all major UI/game components.
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: AppCore.jsx
+// Path: src/components/AppCore.jsx
 
-import React, { useState } from 'react';
+
+// File: /src/components/AppCore.jsx
+// Version: v4.0.0-preprod
+
+import React, { useState, useReducer, useEffect } from 'react';
 import GameEngine from '../engine/GameEngine';
 import WelcomeScreen from './WelcomeScreen';
 import TeletypeIntro from './TeletypeIntro';
@@ -19,156 +19,191 @@ import CommandInput from './CommandInput';
 import NPCConsole from './NPCConsole';
 import { loadRoomById } from '../utils/roomLoader';
 
-/**
- * AppCore
- * Main React component for Gorstan game.
- * Manages global state, handles stage transitions, and renders the appropriate UI.
- */
-const AppCore = () => {
-  // Stage of the game: 'welcome', 'nameCapture', 'intro', 'resetting', 'game'
-  const [stage, setStage] = useState('welcome');
-  // Player's name
-  const [playerName, setPlayerName] = useState('');
-  // Room queued for reset transitions
-  const [queuedRoom, setQueuedRoom] = useState(null);
-  // Current room data object
-  const [roomData, setRoomData] = useState(null);
-  // Main game state: inventory, flags, history, etc.
-  const [gameState, setGameState] = useState({ inventory: [], flags: {}, history: [] });
-  // Sound enabled/disabled
-  const [soundEnabled, setSoundEnabled] = useState(true);
+// === Game Stage Constants ===
+const STAGES = {
+  WELCOME: 'welcome',
+  NAME_CAPTURE: 'nameCapture',
+  INTRO: 'intro',
+  RESETTING: 'resetting',
+  GAME: 'game',
+};
 
-  /**
-   * startGameAt
-   * Loads a room by ID and initializes the game state for a new session or transition.
-   * @param {string} roomId - The ID of the room to start in.
-   * @param {Array} inventory - Optional starting inventory.
-   */
+// === Game State Reducer ===
+function gameStateReducer(state, action) {
+  switch (action.type) {
+    case 'SET':
+      return { ...state, ...action.payload };
+    case 'RESET':
+      return { inventory: [], flags: {}, history: [] };
+    default:
+      return state;
+  }
+}
+
+// === LocalStorage Helpers ===
+function loadSavedGame() {
+  try {
+    const raw = localStorage.getItem('gorstanSave');
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveGame({ playerName, gameState, stage }) {
+  try {
+    localStorage.setItem(
+      'gorstanSave',
+      JSON.stringify({ playerName, state: gameState, stage })
+    );
+  } catch (e) {
+    console.warn('Unable to save game state:', e);
+  }
+}
+
+const AppCore = () => {
+  const [stage, setStage] = useState(STAGES.WELCOME);
+  const [playerName, setPlayerName] = useState('');
+  const [queuedRoom, setQueuedRoom] = useState(null);
+  const [roomData, setRoomData] = useState(null);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [gameState, dispatchGameState] = useReducer(gameStateReducer, {
+    inventory: [],
+    flags: {},
+    history: [],
+  });
+
+  // Load save game (if confirmed by player)
+  useEffect(() => {
+    const saved = loadSavedGame();
+    if (saved) {
+      const ok = window.confirm('Load saved game?');
+      if (ok) {
+        dispatchGameState({ type: 'SET', payload: saved.state });
+        setPlayerName(saved.playerName || '');
+        setStage(saved.stage || STAGES.WELCOME);
+      }
+    }
+  }, []);
+
+  // Autosave on game state change
+  useEffect(() => {
+    saveGame({ playerName, gameState, stage });
+  }, [playerName, gameState, stage]);
+
   const startGameAt = async (roomId, inventory = []) => {
     const loadedRoom = await loadRoomById(roomId);
     setRoomData(loadedRoom);
-    setGameState({
-      currentRoom: roomId,
-      inventory,
-      playerName,
-      flags: {},
-      history: [roomId],
+    dispatchGameState({
+      type: 'SET',
+      payload: {
+        currentRoom: roomId,
+        inventory,
+        playerName,
+        flags: {},
+        history: [roomId],
+      },
     });
-    setStage('game');
+    setStage(STAGES.GAME);
   };
 
-  /**
-   * handleQuickAction
-   * Handles quick toolbar actions such as toggling sound or resetting the game.
-   * @param {string} action - The action to perform.
-   */
   const handleQuickAction = (action) => {
     if (action === 'toggleSound') setSoundEnabled((prev) => !prev);
-    if (action === 'resetGame') setStage('welcome');
+    if (action === 'resetGame') setStage(STAGES.WELCOME);
   };
 
-  /**
-   * handleIntroComplete
-   * Handles the completion of the intro sequence and determines the next stage or room.
-   * @param {Object} route - Route object with route type and optional data.
-   */
   const handleIntroComplete = (route) => {
     if (route.route === 'jump') {
       startGameAt(route.targetRoom, route.inventoryBonus ?? []);
     } else if (route.route === 'wait') {
       setQueuedRoom({ room: 'introreset', inventory: ['coffee'] });
-      setStage('resetting');
+      setStage(STAGES.RESETTING);
     } else if (route.route === 'sip') {
       setQueuedRoom({ room: 'crossing', inventory: ['coffee'] });
-      setStage('resetting');
+      setStage(STAGES.RESETTING);
     }
-    // TODO: Add handling for other intro routes if needed
   };
 
-  /**
-   * handleResetComplete
-   * Handles the completion of a reset transition, starting the queued room.
-   */
-  const handleResetComplete = () => {
+  const handleResetComplete = async () => {
     if (queuedRoom) {
-      startGameAt(queuedRoom.room, queuedRoom.inventory ?? []);
+      await startGameAt(queuedRoom.room, queuedRoom.inventory || []);
       setQueuedRoom(null);
+    } else {
+      setStage(STAGES.WELCOME);
     }
   };
 
-  /**
-   * renderStage
-   * Renders the appropriate UI component(s) based on the current stage.
-   * @returns {JSX.Element|null}
-   */
-  const renderStage = () => {
-    switch (stage) {
-      case 'welcome':
-        // Welcome screen, advances to name capture
-        return <WelcomeScreen onContinue={() => setStage('nameCapture')} />;
-      case 'nameCapture':
-        // Player name input screen
-        return (
-          <PlayerNameCapture
-            onNameSubmit={(name) => {
-              setPlayerName(name);
-              setStage('intro');
-            }}
-          />
-        );
-      case 'intro':
-        // Teletype intro sequence
-        return (
-          <TeletypeIntro
-            playerName={playerName}
-            onComplete={handleIntroComplete}
-          />
-        );
-      case 'resetting':
-        // Reset transition screen
-        return <ResetScreen onComplete={handleResetComplete} />;
-      case 'game':
-        // Main game UI
-        return (
-          <>
-            <StatusPanel gameState={gameState} />
-            <RoomRenderer room={roomData} />
-            <NPCConsole gameState={gameState} />
-            <GameEngine
-              gameState={gameState}
-              setGameState={setGameState}
-              setRoomData={setRoomData}
-              onQuickAction={handleQuickAction}
-            />
-            <CommandInput
-              gameState={gameState}
-              setGameState={setGameState}
-            />
-          </>
-        );
-      default:
-        // Fallback for unknown stage
-        // FIXME: Should we show an error or fallback UI here?
-        return null;
-    }
-  };
-
-  // Main render: wraps the UI in a styled container and includes the toolbar
   return (
-    <div className="min-h-screen bg-black text-green-400">
-      <UIToolbar
-        soundEnabled={soundEnabled}
-        onToggleSound={() => setSoundEnabled((prev) => !prev)}
-      />
-      {renderStage()}
-    </div>
+    <>
+      {stage === STAGES.WELCOME && (
+        <WelcomeScreen onContinue={() => setStage(STAGES.NAME_CAPTURE)} />
+      )}
+      {stage === STAGES.NAME_CAPTURE && (
+        <PlayerNameCapture
+          onSubmit={setPlayerName}
+          onNext={() => setStage(STAGES.INTRO)}
+        />
+      )}
+      {stage === STAGES.INTRO && (
+        <TeletypeIntro onComplete={handleIntroComplete} />
+      )}
+      {stage === STAGES.RESETTING && (
+        <ResetScreen onComplete={handleResetComplete} />
+      )}
+      {stage === STAGES.GAME && (
+        <>
+          <UIToolbar
+            onQuickAction={handleQuickAction}
+            soundEnabled={soundEnabled}
+          />
+          <StatusPanel gameState={gameState} />
+          <RoomRenderer room={roomData} />
+          <CommandInput />
+          <NPCConsole />
+          <GameEngine
+            playerName={playerName}
+            gameState={gameState}
+            dispatchGameState={dispatchGameState}
+            setRoomData={setRoomData}
+            onQuickAction={handleQuickAction}
+          />
+        </>
+      )}
+    </>
   );
 };
 
-// Export the AppCore component for use in the main application
+
+import { getEndgameRoom } from '../engine/endgameRouter';
+
+/**
+ * Sends player to appropriate endgame room
+ */
+function triggerEndgame(playerState, dispatch) {
+  const roomId = getEndgameRoom(playerState);
+  dispatch({ type: 'SET_ROOM', roomId });
+}
+
+
 export default AppCore;
 
 
 
 
 
+
+
+/* TEST: Codex display */
+const debugCodex = {
+  npcs: [
+    { id: 'dominic', name: 'Dominic the Fish', description: 'Remembers past deaths and resets.' },
+    { id: 'ayla', name: 'Ayla v2', description: 'Merged with the Lattice. Warm and intelligent.' }
+  ],
+  items: [
+    { id: 'napkin', name: 'Greasy Napkin', description: 'Disgusting, but unexpectedly useful.' },
+    { id: 'form42', name: 'Form 42-B', description: 'Apology form. Signed by the universe.' }
+  ]
+};
+
+// Place this near return()
+<CodexPanel codex={debugCodex} />

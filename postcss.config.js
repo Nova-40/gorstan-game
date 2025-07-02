@@ -1,3 +1,8 @@
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: postcss.config.js
+// Path: postcss.config.js
+
+
 // MIT License © 2025 Geoff Webster
 // Gorstan v2.5
 import tailwindcss from 'tailwindcss';

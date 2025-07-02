@@ -1,3 +1,8 @@
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: aylaHintUtils.js
+// Path: src/utils/aylaHintUtils.js
+
+
 // src/utils/aylaHintUtils.js
 // Version: 3.9.9
 // (c) 2025 Geoffrey Alan Webster

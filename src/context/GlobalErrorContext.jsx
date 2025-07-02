@@ -1,3 +1,8 @@
+// Gorstan (c) Geoff Webster. Code MIT Licence
+// Module: GlobalErrorContext.jsx
+// Path: src/context/GlobalErrorContext.jsx
+
+
 import React, { createContext, useState, useContext } from "react";
 
 const GlobalErrorContext = createContext();
