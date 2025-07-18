@@ -1,0 +1,47 @@
+/* Gorstan Frame Wrapper Styles */
+
+.frame-wrapper {
+  background-color: #111827; /* dark slate */
+  border: 2px solid #374151; /* slate gray */
+  border-radius: 1rem;
+  padding: 1rem;
+  box-shadow: 0 0 12px rgba(0, 255, 153, 0.2); /* soft neon glow */
+  transition: border-color 0.3s ease, box-shadow 0.4s ease;
+}
+
+/* When waiting: red pulse around border */
+.frame-wrapper.waiting {
+  border-color: #ef4444; /* red-500 */
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.5); /* red glow */
+  animation: pulse-glow 1.5s infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 24px rgba(239, 68, 68, 0.8);
+  }
+}
+
+/* Intro frame: glowy terminal look */
+.frame-wrapper.intro {
+  background-color: #111827;
+  border-color: #374151;
+  box-shadow: 0 0 12px rgba(0, 255, 153, 0.2);
+}
+
+/* Game frame: sharper edges */
+.frame-wrapper.game {
+  background-color: #0f172a;
+  border-color: #22d3ee; /* cyan-400 */
+  box-shadow: 0 0 6px rgba(34, 211, 238, 0.3);
+}
+
+/* Optional modal/dialog style */
+.frame-wrapper.modal {
+  background-color: #1e293b;
+  border-color: #facc15; /* yellow-400 */
+  box-shadow: 0 0 16px rgba(250, 204, 21, 0.4);
+}

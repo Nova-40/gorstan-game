@@ -1,0 +1,213 @@
+import { RoomDefinition } from '../types/RoomTypes';
+
+const findlaters: RoomDefinition = {
+  id: 'findlaters',
+  zone: 'londonZone',
+  title: 'Findlater\'s Cafe - Special Instance',
+  description: [
+    'You find yourself in a version of Findlater\'s cafe that feels subtly different from the one you remember. The layout is familiar, but the atmosphere carries an otherworldly quality that makes your skin prickle with recognition.',
+    'The same warm lighting illuminates the space, but the shadows seem deeper, more meaningful. The coffee machine hisses with the same rhythm, yet each sound feels loaded with significance you can\'t quite grasp.',
+    'Other patrons sit at their tables, but they move with a dreamlike quality, their conversations creating a gentle murmur that sounds almost like distant whispers. Time itself seems to flow differently here.',
+    'This is clearly the same cafe, but existing in a moment suspended between realities - a special instance where the ordinary rules don\'t quite apply and profound encounters become possible.',
+  ],
+  image: 'londonZone_findlaters.png',
+  ambientAudio: 'dimensional_cafe_ambience.mp3',
+
+  consoleIntro: [
+    '>> FINDLATER\'S CAFE - SPECIAL DIMENSIONAL INSTANCE',
+    '>> Reality layer: ALTERED - Temporal displacement active',
+    '>> Patron behavior: SEMI-LUCID - Awareness levels variable',
+    '>> Significance detector: MAXIMUM - Important events likely',
+    '>> Time flow: NON-LINEAR - Causal relationships flexible',
+    '>> Memory integration: ENHANCED - Past/present convergence possible',
+    '>> WARNING: High probability of life-changing encounters',
+    '>> Recommend: Remain open to unusual interactions',
+    '>> Exit protocols: VARIABLE - Departure conditions uncertain',
+    '>> Status: READY FOR PROFOUND NARRATIVE MOMENTS',
+  ],
+
+  exits: {
+    // Exits may change based on story conditions
+    south: 'dalesapartment',
+    east: 'trentpark',
+    north: 'cafeoffice',
+    // Special conditional exits
+    'dimensional_door': 'crossing',
+  },
+
+  items: [
+    'meaningful_receipt',
+    'prophetic_newspaper',
+    'dimensional_coffee_cup',
+    'memory_triggering_photo',
+    'fate_altering_note',
+    'special_menu',
+  ],
+
+  interactables: {
+    'special_barista': {
+      description: 'The barista here has an knowing look in her eyes, as if she understands the true nature of this place and your role in larger events.',
+      actions: ['talk', 'ask_about_reality', 'request_special_order'],
+      requires: [],
+    },
+    'significant_table': {
+      description: 'One particular table seems to pulse with importance - this is where crucial conversations happen and destinies are decided.',
+      actions: ['examine', 'sit', 'wait_for_encounter'],
+      requires: [],
+    },
+    'reality_mirror': {
+      description: 'A mirror on the wall that doesn\'t quite reflect what you expect - sometimes showing other versions of events.',
+      actions: ['examine', 'look_into', 'question_reflection'],
+      requires: [],
+    },
+    'temporal_menu_board': {
+      description: 'The menu board displays options that seem to shift between normal cafe items and metaphysical concepts.',
+      actions: ['read', 'order_from', 'interpret_meanings'],
+      requires: [],
+    },
+    'whisper_corners': {
+      description: 'Certain corners of the cafe where conversations carry extra weight and secrets reveal themselves.',
+      actions: ['listen', 'approach', 'eavesdrop_carefully'],
+      requires: [],
+    },
+    'probability_window': {
+      description: 'A window that looks out onto multiple potential futures simultaneously.',
+      actions: ['look_through', 'focus_on_futures', 'choose_timeline'],
+      requires: [],
+    },
+  },
+
+  npcs: [
+    {
+      id: 'oracle_barista',
+      name: 'The Knowing Barista',
+      description: 'A barista who seems to understand the true nature of reality and your place in unfolding events',
+      dialogue: {
+        greeting: 'You\'ve arrived at exactly the right moment. The usual, or something... more significant?',
+        help: 'Sometimes the most important conversations happen over coffee. Are you ready for yours?',
+        farewell: 'Remember - every choice echoes across realities. Choose wisely.',
+      },
+      spawnable: false,
+    },
+    {
+      id: 'mysterious_patron',
+      name: 'The Waiting Figure',
+      description: 'Someone sits at the significant table, clearly waiting for an important meeting',
+      dialogue: {
+        greeting: 'I wondered when you\'d arrive. Please, sit. We have much to discuss.',
+        help: 'The answers you seek aren\'t always the ones you expect to hear.',
+        farewell: 'Until our paths cross again in another instance of reality.',
+      },
+      spawnable: true,
+      spawnCondition: 'story_catalyst_needed',
+    },
+  ],
+
+  events: {
+    onEnter: ['activateSpecialInstance', 'heightenAwareness', 'prepareForEncounter'],
+    onExit: ['recordChoices', 'stabilizeReality', 'updateTimeline'],
+    onInteract: {
+      significant_table: ['triggerImportantMeeting', 'activateStoryEvent'],
+      reality_mirror: ['showAlternateRealities', 'questionChoices'],
+      special_barista: ['receiveGuidance', 'gainInsight'],
+      probability_window: ['viewPossibleFutures', 'influenceOutcomes'],
+    },
+  },
+
+  flags: {
+    specialInstance: true,
+    importantMeetingAvailable: true,
+    realityAwareness: false,
+    choicesMade: false,
+    futuresSeen: false,
+    guidanceReceived: false,
+  },
+
+  quests: {
+    main: 'Navigate the Crucial Encounter',
+    optional: [
+      'Understand the Special Nature of This Place',
+      'Receive Guidance from the Oracle Barista',
+      'View Possible Futures',
+      'Make the Important Choice',
+      'Complete the Significant Meeting',
+    ],
+  },
+
+  environmental: {
+    lighting: 'ethereal_golden_glow',
+    temperature: 'perfect_comfort',
+    airQuality: 'charged_with_possibility',
+    soundscape: [
+      'meaningful_cafe_ambience',
+      'reality_harmonics',
+      'whispered_destinies',
+      'temporal_echoes',
+      'profound_silence_moments'
+    ],
+    hazards: ['reality_displacement_risk', 'timeline_alteration_possibility'],
+  },
+
+  security: {
+    level: 'transcendent',
+    accessRequirements: ['narrative_significance'],
+    alarmTriggers: ['timeline_disruption', 'reality_breach'],
+    surveillanceActive: true,
+    surveillanceType: 'multidimensional_observation',
+  },
+
+  metadata: {
+    created: '2025-07-09',
+    lastModified: '2025-07-09',
+    author: 'Geoff',
+    version: '2.0',
+    playTested: false,
+    difficulty: 'challenging',
+    estimatedPlayTime: '15-30 minutes',
+    keyFeatures: [
+      'Special dimensional instance',
+      'Crucial story encounters',
+      'Reality-altering conversations',
+      'Multiple timeline viewing',
+      'Fate-determining choices',
+    ],
+  },
+
+  secrets: {
+    true_purpose: {
+      description: 'The real reason this special instance exists and your role in cosmic events',
+      requirements: ['complete important meeting', 'receive all guidance', 'view multiple futures'],
+      rewards: ['cosmic_understanding', 'reality_manipulation_knowledge'],
+    },
+    alternate_endings: {
+      description: 'Different possible outcomes based on choices made in this instance',
+      requirements: ['examine probability_window thoroughly', 'make critical decisions'],
+      rewards: ['timeline_branching_access', 'multiple_reality_navigation'],
+    },
+    oracle_wisdom: {
+      description: 'Deep knowledge from the barista about the nature of reality and choice',
+      requirements: ['establish deep connection with oracle_barista'],
+      rewards: ['prophetic_insight', 'destiny_guidance'],
+    },
+  },
+
+  customActions: {
+    'accept_destiny': {
+      description: 'Embrace whatever role you\'re meant to play in larger events',
+      requirements: ['understand special instance', 'receive guidance'],
+      effects: ['unlock_true_path', 'gain_cosmic_purpose', 'alter_timeline'],
+    },
+    'question_reality': {
+      description: 'Challenge the nature of what you\'re experiencing',
+      requirements: ['examine reality_mirror', 'view probability_window'],
+      effects: ['gain_meta_awareness', 'unlock_hidden_options', 'transcend_limitations'],
+    },
+    'make_crucial_choice': {
+      description: 'Decide on the action that will determine your path forward',
+      requirements: ['complete all encounters', 'understand consequences'],
+      effects: ['determine_ending', 'lock_timeline', 'achieve_resolution'],
+    },
+  },
+};
+
+export default findlaters;
