@@ -7,8 +7,9 @@ import { TerminalMessage } from '../components/TerminalConsole';
 import { Room } from '../types/Room';
 import { RoomDefinition, TrapDefinition } from '../types/RoomTypes';
 import { MiniquestEngine } from './miniquestInitializer';
-import { unlockAchievement } from '../logic/achievementEngine';
-import { applyScoreForEvent } from '../state/scoreEffects';
+import { unlockAchievement, listAchievements } from '../logic/achievementEngine';
+import { applyScoreForEvent, getScoreBasedMessage, getDominicScoreComment } from '../state/scoreEffects';
+import { recordItemDiscovery, displayCodex } from '../logic/codexTracker';
 
 // Hub teleportation configuration for remote control
 const allowedHubs: Record<string, string> = {
@@ -138,8 +139,10 @@ function processCursedItem(itemId: string, gameState: LocalGameState): {
         health: Math.max(10, gameState.player.health - 20),
       };
       // Record the curse in codex
-      const { recordItemDiscovery } = require('../logic/codexTracker');
-      recordItemDiscovery(itemId, 'CURSED: Burns the user and drains health', true);
+      recordItemDiscovery(itemId, 'CURSED', {
+        description: 'Burns the user and drains health',
+        significance: 'mysterious' as const
+      });
       break;
 
     case 'cursed_mirror':
@@ -403,6 +406,11 @@ export function processCommand(
         return { messages: [{ text: 'What do you want to take?', type: 'error' as const }] };
       }
       
+      // Check if player already has this item
+      if (gameState.player.inventory.includes(noun)) {
+        return { messages: [{ text: `You already have the ${noun}.`, type: 'error' as const }] };
+      }
+      
       const roomItems = currentRoom.items || [];
       const itemIndex = roomItems.findIndex((item: any) => 
         typeof item === 'string' ? item === noun : item.name === noun
@@ -415,11 +423,9 @@ export function processCommand(
         const newPlayerInventory = [...gameState.player.inventory, itemName];
         
         // Apply scoring for item collection
-        const { applyScoreForEvent } = require('../state/scoreEffects');
         applyScoreForEvent('find.hidden.item');
         
         // Record in codex
-        const { recordItemDiscovery } = require('../logic/codexTracker');
         recordItemDiscovery(itemName, currentRoom.id);
         
         // Special item effects and achievements
@@ -478,7 +484,6 @@ export function processCommand(
         // Check for quest-critical items
         const criticalItems = ['greasy_napkin_with_plans', 'dimensional_key', 'reality_anchor'];
         if (criticalItems.includes(droppedItem)) {
-          const { applyScoreForEvent } = require('../state/scoreEffects');
           applyScoreForEvent('item.stolen'); // Apply penalty for dropping important items
           
           return {
@@ -553,7 +558,6 @@ export function processCommand(
 
     case 'score': {
       const currentScore = gameState.player.score || 0;
-      const { getScoreBasedMessage, getDominicScoreComment } = require('../state/scoreEffects');
       
       const messages: TerminalMessage[] = [
         { text: `Your current score is: ${currentScore}`, type: 'system' },
@@ -578,7 +582,6 @@ export function processCommand(
 
     case 'achievements': {
       // Display achievements using the achievement system
-      const { listAchievements } = require('../logic/achievementEngine');
       const unlockedAchievements = gameState.metadata?.achievements || [];
       
       const achievementMessages = listAchievements(unlockedAchievements);
@@ -608,7 +611,6 @@ export function processCommand(
       
       if (noun === 'greasy_napkin_with_plans' && currentRoom.id?.includes('library')) {
         messages.push({ text: 'The Librarian\'s eyes widen. "That\'s not a napkin — it\'s your pass."', type: 'lore' });
-        const { applyScoreForEvent } = require('../state/scoreEffects');
         applyScoreForEvent('npc.librarian.helpful');
         
         return {
@@ -624,13 +626,11 @@ export function processCommand(
       
       if (noun === 'dominic' || noun === 'dominic_goldfish') {
         messages.push({ text: 'You show Dominic to the room. The goldfish seems pleased with the attention.', type: 'lore' });
-        const { applyScoreForEvent } = require('../state/scoreEffects');
         applyScoreForEvent('conversation.meaningful');
       }
       
       if (noun.includes('memory') && roomNPCs.some((npc: any) => npc.id === 'polly')) {
         messages.push({ text: 'Polly looks at the memory fragment. "You kept that? Why?"', type: 'lore' });
-        const { applyScoreForEvent } = require('../state/scoreEffects');
         applyScoreForEvent('conversation.meaningful');
       }
 
@@ -670,8 +670,8 @@ export function processCommand(
             messages.push({ text: 'The dimensional key activates the portal!', type: 'system' });
             applyScoreForEvent('solve.puzzle.hard');
             // Record item usage in codex
-            const { recordItemDiscovery } = require('../logic/codexTracker');
-            recordItemDiscovery(noun, 'Successfully used dimensional key to activate portal', true);
+            
+            recordItemDiscovery(noun, 'Successfully used dimensional key to activate portal');
           } else {
             messages.push({ text: 'The key glows but has nothing to unlock here.', type: 'info' });
           }
@@ -681,8 +681,8 @@ export function processCommand(
           if (currentRoom.id?.includes('office') || currentRoom.id?.includes('safe')) {
             messages.push({ text: 'You use the combination to open the safe!', type: 'system' });
             applyScoreForEvent('solve.puzzle.simple');
-            const { recordItemDiscovery } = require('../logic/codexTracker');
-            recordItemDiscovery(noun, 'Opened safe with combination', true);
+            
+            recordItemDiscovery(noun, 'Opened safe with combination');
           } else {
             messages.push({ text: 'There\'s no safe here to use this on.', type: 'error' });
           }
@@ -692,8 +692,8 @@ export function processCommand(
           if (gameState.player.inventory.includes('dominic')) {
             messages.push({ text: 'You feed Dominic. He seems appreciative and swims happily.', type: 'lore' });
             applyScoreForEvent('npc.dominic.survives');
-            const { recordItemDiscovery } = require('../logic/codexTracker');
-            recordItemDiscovery(noun, 'Fed to Dominic the goldfish', true);
+            
+            recordItemDiscovery(noun, 'Fed to Dominic the goldfish');
           } else {
             messages.push({ text: 'You don\'t have a goldfish to feed.', type: 'error' });
           }
@@ -710,8 +710,8 @@ export function processCommand(
               inventory: gameState.player.inventory.filter((item: string) => item !== noun), // Consumable
             };
             applyScoreForEvent('item.shared'); // Bonus for self-care
-            const { recordItemDiscovery } = require('../logic/codexTracker');
-            recordItemDiscovery(noun, 'Used for healing', true);
+            
+            recordItemDiscovery(noun, 'Used for healing');
           } else {
             messages.push({ text: 'You\'re already at full health.', type: 'info' });
           }
@@ -721,8 +721,8 @@ export function processCommand(
           messages.push({ text: 'The scroll reveals arcane knowledge about dimensional travel.', type: 'lore' });
           messages.push({ text: 'You gain insight into the nature of reality!', type: 'system' });
           applyScoreForEvent('discover.lore');
-          const { recordItemDiscovery } = require('../logic/codexTracker');
-          recordItemDiscovery(noun, 'Revealed ancient knowledge about dimensional travel', true);
+          
+          recordItemDiscovery(noun, 'Revealed ancient knowledge about dimensional travel');
           break;
 
         case 'memory_crystal':
@@ -759,8 +759,8 @@ export function processCommand(
             messages.push({ text: 'Example: `teleport to control nexus`', type: 'info' });
             
             // Record codex entry for first use
-            const { recordItemDiscovery } = require('../logic/codexTracker');
-            recordItemDiscovery('remote_control', 'Activated interdimensional travel menu at the crossing', true);
+            
+            recordItemDiscovery('remote_control', 'Activated interdimensional travel menu at the crossing');
             
             // Apply score bonus for discovering the teleportation system
             applyScoreForEvent('discover.teleport.system');
@@ -772,14 +772,14 @@ export function processCommand(
           
         default:
           // Check if it's a known item category
-          const { categorizeItem } = require('../logic/codexTracker');
-          const category = categorizeItem(noun);
+          const isDimensionalTool = noun.includes('dimensional') || noun.includes('key') || noun.includes('remote');
+          const isMemoryFragment = noun.includes('memory') || noun.includes('fragment');
           
-          if (category === 'dimensional_tool') {
+          if (isDimensionalTool) {
             messages.push({ text: `The ${noun} hums with interdimensional energy but doesn't activate here.`, type: 'info' });
-          } else if (category === 'memory_fragment') {
+          } else if (isMemoryFragment) {
             messages.push({ text: `The ${noun} contains fragmented memories, but you can't access them directly.`, type: 'info' });
-          } else if (category === 'fae_artifact') {
+          } else if (noun.includes('fae') || noun.includes('artifact')) {
             messages.push({ text: `The ${noun} tingles with fae magic but remains inert.`, type: 'info' });
           } else {
             messages.push({ text: `You can't use the ${noun} here.`, type: 'error' });
@@ -790,7 +790,7 @@ export function processCommand(
     }
 
     case 'codex': {
-      const { displayCodex } = require('../logic/codexTracker');
+      
       displayCodex();
       return { messages: [{ text: 'Codex displayed in console above.', type: 'system' }] };
     }
@@ -860,8 +860,8 @@ export function processCommand(
       ];
 
       // Record usage in codex
-      const { recordItemDiscovery } = require('../logic/codexTracker');
-      recordItemDiscovery('remote_control', `Teleported to ${targetDisplayName}`, false);
+      
+      recordItemDiscovery('remote_control', `Teleported to ${targetDisplayName}`);
 
       // Apply score bonus for successful teleportation
       applyScoreForEvent('teleport.successful');
@@ -1636,8 +1636,8 @@ export function processCommand(
               
               // Record items in codex
               puzzle.rewardItems.forEach((item: string) => {
-                const { recordItemDiscovery } = require('../logic/codexTracker');
-                recordItemDiscovery(item, `Reward for solving ${puzzle.name || puzzle.id}`, true);
+                
+                recordItemDiscovery(item, `Reward for solving ${puzzle.name || puzzle.id}`);
               });
             }
 

@@ -39,6 +39,23 @@ const burgerjoint: RoomDefinition = {
     'hot_sauce_bottles',
   ],
 
+  traps: [
+    {
+      id: 'kitchen_accident',
+      type: 'damage',
+      severity: 'minor',
+      description: 'You accidentally brush against the hot grill while exploring! The searing metal burns your arm!',
+      trigger: 'enter',
+      effect: {
+        damage: 8
+      },
+      triggered: false,
+      disarmable: true,
+      disarmSkill: 'kitchen_awareness',
+      hidden: false,
+    }
+  ],
+
   interactables: {
     'burger_chef': {
       description: 'A experienced chef who takes pride in his burgers. His eyes suggest he knows more than he lets on about certain... arrangements.',

@@ -9,6 +9,7 @@ const crossing: RoomDefinition = {
     'In the center of this endless space sits a single white chair, its simple design both inviting and somehow ominous. The chair appears to be the only fixed point in this reality.',
     'All around you, countless doors rotate and shift in a mesmerizing dance. They appear and disappear, change position and orientation, creating an endless kaleidoscope of possibilities. Each door is unique - some ornate, some simple, some that seem to be made of light itself.',
     'The silence here is absolute, broken only by the whisper of shifting realities as the doors continue their eternal rotation. This place feels like the crossroads of all existence.',
+    'Strangely, if you survived a particularly dramatic arrival here, you might find a cup of impossibly intact quantum coffee steaming nearby, and perhaps even notice a familiar apartment door among the rotating possibilities.',
   ],
   image: 'introZone_crossing.png',
   ambientAudio: 'infinite_whispers.mp3',
@@ -32,6 +33,8 @@ const crossing: RoomDefinition = {
     'door1': 'controlnexus',
     'door2': 'introreset',
     'door3': 'hiddenlab',
+    // Special exit for dramatic wait survivors with apartment key
+    'apartment_door': 'dalesapartment',  // Available only with dales_apartment_key
     // Dynamic exits that change based on player state
   },
 
@@ -40,6 +43,9 @@ const crossing: RoomDefinition = {
     'reality_compass',
     'dimensional_map_fragment',
     'portal_stabilizer',
+    // Special items for dramatic wait survivors
+    'quantum_coffee',
+    'dales_apartment_key',
   ],
 
   interactables: {
@@ -67,6 +73,16 @@ const crossing: RoomDefinition = {
       description: 'Occasionally, glowing symbols appear in the air near certain doors, providing clues about their destinations.',
       actions: ['examine', 'decipher', 'memorize'],
       requires: ['reality_compass'],
+    },
+    'quantum_coffee': {
+      description: 'A steaming cup of quantum coffee that somehow survived the lorry impact. It defies several laws of physics just by existing.',
+      actions: ['examine', 'drink', 'smell', 'hold'],
+      requires: [],
+    },
+    'apartment_door': {
+      description: 'A familiar-looking door with a brass nameplate reading "Dale & Polly". This door only appears if you possess the apartment key.',
+      actions: ['examine', 'enter', 'unlock'],
+      requires: ['dales_apartment_key'],
     },
   },
 

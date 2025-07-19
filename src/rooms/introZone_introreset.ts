@@ -48,7 +48,7 @@ const introreset: RoomDefinition = {
     },
     'blue_button': {
       description: 'A large, ominous blue button sealed behind protective glass. Every instinct screams not to touch it.',
-      actions: ['examine', 'press', 'break_glass'],
+      actions: ['examine', 'break_glass'],
       requires: ['dimensional_stabilizer'],
     },
     'psychic_paper': {

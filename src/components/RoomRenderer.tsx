@@ -82,12 +82,13 @@ const RoomRenderer: React.FC = () => {
       }
       
       // Add messages to history
+      const entryTimestamp = Date.now();
       entryMessages.forEach((msg, index) => {
         const message = {
-          id: `room-entry-${room.id}-${index}`,
+          id: `room-entry-${room.id}-${entryTimestamp}-${index}`,
           text: msg.text,
           type: msg.type as any,
-          timestamp: Date.now(),
+          timestamp: entryTimestamp + index, // Slight offset to maintain ordering
         };
         dispatch({ type: 'RECORD_MESSAGE', payload: message });
       });

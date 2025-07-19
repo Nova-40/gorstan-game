@@ -23,6 +23,7 @@ import { getAllRoomsAsObject } from '../utils/roomLoader';
 import JumpTransition from './animations/JumpTransition';
 import SipTransition from './animations/SipTransition';
 import WaitTransition from './animations/WaitTransition';
+import DramaticWaitTransitionOverlay from './DramaticWaitTransitionOverlay';
 import RoomTransition from './animations/RoomTransition';
 import { useRoomTransition, getZoneDisplayName } from '../hooks/useRoomTransition';
 
@@ -336,21 +337,14 @@ const AppCore: React.FC = () => {
         applyScoreForEvent('intro.choice.wait');
       });
     }
-  }, [stage, roomMapReady]);
-
-  // Handle multiverse reboot timeout
-  useEffect(() => {
-    if (state.flags?.multiverseRebootInProgress) {
-      const timeout = setTimeout(() => {
-        // Clear the reboot flag and reset to introZone/crossroads or appropriate starting room
-        dispatch({ type: 'SET_FLAG', payload: { key: 'multiverseRebootInProgress', value: false } });
-        dispatch({ type: 'TRANSITION_TO_ROOM', payload: 'introZone/crossroads' });
-        dispatch({ type: 'LOG_MESSAGE', payload: 'Reality has been reconstructed. Welcome back to the crossroads.' });
-      }, 3000); // 3 second delay
-
-      return () => clearTimeout(timeout);
+    else if (stage === 'transition_dramatic_wait') {
+      setTransitionType('dramatic_wait');
+      // Apply special scoring for the dramatic wait
+      import('../state/scoreEffects').then(({ applyScoreForEvent }) => {
+        applyScoreForEvent('intro.choice.dramatic_wait');
+      });
     }
-  }, [state.flags?.multiverseRebootInProgress, dispatch]);
+  }, [stage, roomMapReady]);
 
   // Final guarded transition logic
   useEffect(() => {
@@ -414,6 +408,7 @@ const AppCore: React.FC = () => {
   if (transitionType === 'jump') return <JumpTransition onComplete={() => setReadyForTransition(true)} />;
   if (transitionType === 'sip') return <SipTransition onComplete={() => setReadyForTransition(true)} />;
   if (transitionType === 'wait') return <WaitTransition onComplete={() => setReadyForTransition(true)} />;
+  if (transitionType === 'dramatic_wait') return <DramaticWaitTransitionOverlay onComplete={() => setReadyForTransition(true)} />;
 
   if (stage === 'splash') {
     return (

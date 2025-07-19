@@ -45,6 +45,24 @@ const stkatherinesdock: RoomDefinition = {
     'dimensional_anchor',
   ],
 
+  traps: [
+    {
+      id: 'portal_feedback',
+      type: 'damage',
+      severity: 'major',
+      description: 'The portal suddenly discharges unstable energy! Dimensional forces tear through the air, causing reality to buckle and bend around you!',
+      trigger: 'enter',
+      effect: {
+        damage: 30,
+        flagsSet: ['portal_wounded']
+      },
+      triggered: false,
+      disarmable: true,
+      disarmSkill: 'portal_energy_detector',
+      hidden: false,
+    }
+  ],
+
   interactables: {
     'new_york_portal': {
       description: 'A shimmering gateway hovering just above the Thames water. Through it, you can see Manhattan\'s skyline, yellow cabs, and bustling New York streets.',

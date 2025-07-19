@@ -36,6 +36,23 @@ const datavoid: RoomDefinition = {
     'data_crystal',
   ],
 
+  traps: [
+    {
+      id: 'void_collapse',
+      type: 'damage',
+      severity: 'fatal',
+      description: 'The unstable data void suddenly collapses around you! Reality fragments and digital chaos tears at your very existence!',
+      trigger: 'enter',
+      effect: {
+        damage: 80,
+        flagsSet: ['void_survivor']
+      },
+      triggered: false,
+      disarmable: false,
+      hidden: true,
+    }
+  ],
+
   interactables: {
     'binary_river': {
       description: 'A flowing stream of binary code, shimmering with unstable energy.',

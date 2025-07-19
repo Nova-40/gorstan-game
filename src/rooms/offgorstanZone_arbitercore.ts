@@ -30,6 +30,24 @@ const arbitercore: Room = {
     "balance_crystal"
   ],
 
+  traps: [
+    {
+      id: 'judgment_field',
+      type: 'damage',
+      severity: 'fatal',
+      description: 'The Arbiter Core judges you unworthy! Reality-altering energy tears through your being as the universe itself weighs your soul!',
+      trigger: 'enter',
+      effect: {
+        damage: 90,
+        flagsSet: ['judged_by_arbiter']
+      },
+      triggered: false,
+      disarmable: true,
+      disarmSkill: 'judgment_token',
+      hidden: false,
+    }
+  ],
+
   interactables: {
     "central_core": {
       description: "A massive, pulsing core at the center of the chamber, radiating both order and chaos.",

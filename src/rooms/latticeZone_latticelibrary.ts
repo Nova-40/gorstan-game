@@ -32,6 +32,24 @@ const latticelibrary: Room = {
     "ancient_codex"
   ],
 
+  traps: [
+    {
+      id: 'knowledge_overload',
+      type: 'damage',
+      severity: 'major',
+      description: 'Accessing the forbidden archives overloads your mind! Ancient knowledge floods your consciousness causing severe mental strain!',
+      trigger: 'enter',
+      effect: {
+        damage: 35,
+        flagsSet: ['mind_overloaded']
+      },
+      triggered: false,
+      disarmable: true,
+      disarmSkill: 'mental_shield',
+      hidden: false,
+    }
+  ],
+
   interactables: {
     "crystal_terminal": {
       description: "A floating terminal that provides access to the library's digital archives.",

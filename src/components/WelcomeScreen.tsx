@@ -29,47 +29,64 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onBegin, onLoadGame }) =>
         A multiverse simulation of coffee, consequence, and quantum possibility. Tread carefully. The rabbit is watching.
       </p>
 
-      <div className="flex gap-4 mb-8 flex-wrap justify-center">
-        <a
-          href="https://www.buymeacoffee.com/gorstan"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="bg-yellow-400 text-black px-4 py-2 rounded-xl hover:bg-yellow-300"
-        >
-          ☕ Buy Geoff a Coffee
-        </a>
-        <a
-          href="https://www.geoffwebsterbooks.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="bg-purple-600 text-white px-4 py-2 rounded-xl hover:bg-purple-500"
-        >
-          📚 Explore the Books
-        </a>
-        <a
-          href="https://www.thegorstanchronicles.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="bg-indigo-500 text-white px-4 py-2 rounded-xl hover:bg-indigo-400"
-        >
-          🌐 Visit Gorstan Chronicles
-        </a>
-      </div>
+      {/* Button Layout - Precise alignment with grid */}
+      <div className="flex flex-col items-center">
+        {/* External Links Row */}
+        <div className="grid grid-cols-3 gap-4 mb-6">
+          <a
+            href="https://www.buymeacoffee.com/gorstan"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-yellow-400 text-black px-6 py-3 rounded-xl hover:bg-yellow-300 text-center min-w-[180px] transition-all"
+          >
+            ☕ Buy Geoff a Coffee
+          </a>
+          <a
+            href="https://www.geoffwebsterbooks.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-purple-600 text-white px-6 py-3 rounded-xl hover:bg-purple-500 text-center min-w-[180px] transition-all"
+          >
+            📚 Explore the Books
+          </a>
+          <a
+            href="https://www.thegorstanchronicles.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-indigo-500 text-white px-6 py-3 rounded-xl hover:bg-indigo-400 text-center min-w-[180px] transition-all"
+          >
+            🌐 Visit Gorstan Chronicles
+          </a>
+        </div>
 
-      <button
-        onClick={onBegin}
-        className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-2xl text-lg shadow-md transition-all"
-        type="button"
-      >
-        Enter Simulation
-      </button>
-      <button
-        onClick={onLoadGame}
-        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl text-lg shadow-md transition-all mt-4"
-        type="button"
-      >
-        Load Saved Game
-      </button>
+        {/* Grid for precise alignment - center column matches middle button above */}
+        <div className="grid grid-cols-3 gap-4 w-full max-w-[600px]">
+          {/* Empty left column for alignment */}
+          <div></div>
+          
+          {/* Center column - aligned with "Explore the Books" */}
+          <div className="flex flex-col space-y-4">
+            <button
+              onClick={onBegin}
+              className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl text-lg shadow-md transition-all min-w-[180px]"
+              type="button"
+            >
+              Enter Simulation
+            </button>
+
+            <button
+              onClick={onLoadGame}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl text-lg shadow-md transition-all min-w-[180px]"
+              type="button"
+            >
+              Load Saved Game
+            </button>
+          </div>
+          
+          {/* Empty right column for alignment */}
+          <div></div>
+        </div>
+      </div>
     </div>
   );
 };

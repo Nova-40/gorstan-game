@@ -12,14 +12,19 @@ interface RebootMessage {
 }
 
 const rebootSequence: RebootMessage[] = [
-  { text: 'Initialising reality kernel...', delay: 500, type: 'system' },
-  { text: 'Verifying loop containment... failed.', delay: 1200, type: 'error' },
-  { text: 'Deploying bootstrap entropy... OK.', delay: 1800, type: 'info' },
-  { text: '[Multiverse rebooting... please wait]', delay: 2500, type: 'warning' },
-  { text: 'Scanning dimensional matrices...', delay: 3200, type: 'system' },
-  { text: 'Restoring temporal anchors...', delay: 3800, type: 'info' },
-  { text: 'Reality stabilisation in progress...', delay: 4400, type: 'system' },
-  { text: 'Multiverse stabilised. Welcome back.', delay: 5000, type: 'info' },
+  { text: "Initialising Higgs Boson field...", delay: 500, type: 'system' },
+  { text: "Calibrating quantum foam lattice...", delay: 1000, type: 'system' },
+  { text: "Creating fundamental particles...", delay: 1500, type: 'system' },
+  { text: "Applying gravity patch (v1.0.2)...", delay: 2000, type: 'system' },
+  { text: "Generating baryonic matter...", delay: 2500, type: 'system' },
+  { text: "Constructing multiversal constants...", delay: 3000, type: 'system' },
+  { text: "Oops. Creating Spanish Inquisition...", delay: 3500, type: 'error' },
+  { text: "⚠️ Unexpected Inquisition Error", delay: 4000, type: 'warning' },
+  { text: "Removing Spanish Inquisition...", delay: 4500, type: 'system' },
+  { text: "Recompiling narrative entropy...", delay: 5000, type: 'system' },
+  { text: "Rebalancing protagonist probability...", delay: 5500, type: 'system' },
+  { text: "Restoring player state...", delay: 6000, type: 'system' },
+  { text: "Multiverse reboot complete.", delay: 6500, type: 'info' },
 ];
 
 const MultiverseRebootSequence: React.FC = () => {
@@ -27,9 +32,11 @@ const MultiverseRebootSequence: React.FC = () => {
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
   const [displayedMessages, setDisplayedMessages] = useState<RebootMessage[]>([]);
   const [isComplete, setIsComplete] = useState(false);
+  const [fadeStage, setFadeStage] = useState<'none' | 'fading' | 'black' | 'reboot'>('none');
+  const [fadeOpacity, setFadeOpacity] = useState(0);
 
   useEffect(() => {
-    if (!state.flags?.show_reset_sequence || isComplete) {
+    if (!state.flags?.show_reset_sequence || isComplete || fadeStage !== 'reboot') {
       return;
     }
 
@@ -42,17 +49,6 @@ const MultiverseRebootSequence: React.FC = () => {
         setDisplayedMessages(prev => [...prev, currentMessage]);
         setCurrentMessageIndex(prev => prev + 1);
         
-        // Add message to game history
-        dispatch({
-          type: 'ADD_MESSAGE',
-          payload: {
-            id: `reboot-${Date.now()}-${currentMessageIndex}`,
-            text: currentMessage.text,
-            type: currentMessage.type,
-            timestamp: Date.now(),
-          }
-        });
-        
         // If this is the last message, trigger the reset
         if (currentMessageIndex === rebootSequence.length - 1) {
           setTimeout(() => {
@@ -63,13 +59,13 @@ const MultiverseRebootSequence: React.FC = () => {
               unlockAchievement('multiverse_rebooter');
             });
             
-            // Reset to introreset after completion
+            // Reset to crossing after completion (not introreset)
             dispatch({
               type: 'CHANGE_ROOM',
-              payload: 'introreset'
+              payload: 'crossing'
             });
             
-            // Clear the reboot flags
+            // Clear the reboot flags and reset fade stage
             dispatch({
               type: 'SET_FLAGS',
               payload: {
@@ -80,20 +76,24 @@ const MultiverseRebootSequence: React.FC = () => {
               }
             });
             
-            // Add final completion message
+            // Reset fade stage and opacity
+            setFadeStage('none');
+            setFadeOpacity(0);
+            
+            // Add final completion message to console
             setTimeout(() => {
               dispatch({
                 type: 'ADD_MESSAGE',
                 payload: {
                   id: `reboot-complete-${Date.now()}`,
-                  text: 'The multiverse has been rebooted. You find yourself back in the Reset Chamber.',
-                  type: 'system',
+                  text: 'You awaken with a faint sense of déjà vu. The multiverse has been rebooted.',
+                  type: 'narrative',
                   timestamp: Date.now(),
                 }
               });
             }, 1000);
             
-          }, 1000);
+          }, 1500); // Slightly longer delay for better effect
         }
       }, currentMessage.delay);
     }
@@ -103,22 +103,67 @@ const MultiverseRebootSequence: React.FC = () => {
         clearTimeout(timeoutId);
       }
     };
-  }, [currentMessageIndex, state.flags?.show_reset_sequence, isComplete, dispatch, state.flags]);
+  }, [currentMessageIndex, state.flags?.show_reset_sequence, isComplete, fadeStage, dispatch, state.flags]);
 
   // Start the sequence when the flag is set
   useEffect(() => {
     if (state.flags?.multiverse_reboot_pending && !state.flags?.multiverse_reboot_active) {
-      // Delay before starting the reboot sequence
-      const startDelay = setTimeout(() => {
-        dispatch({ type: 'START_MULTIVERSE_REBOOT' });
-        dispatch({ type: 'SHOW_RESET_SEQUENCE' });
-      }, 2000);
+      // Start fade to black
+      setFadeStage('fading');
+      
+      // Trigger fade animation after a brief delay to ensure state is set
+      const initialDelay = setTimeout(() => {
+        setFadeOpacity(1);
+      }, 50);
+      
+      let fadeTimeoutId: NodeJS.Timeout;
+      let rebootTimeoutId: NodeJS.Timeout;
+      
+      // After fade completes, hold black screen for 2 seconds
+      fadeTimeoutId = setTimeout(() => {
+        setFadeStage('black');
+        
+        // After black screen hold, start the reboot sequence
+        rebootTimeoutId = setTimeout(() => {
+          setFadeStage('reboot');
+          dispatch({ type: 'START_MULTIVERSE_REBOOT' });
+          dispatch({ type: 'SHOW_RESET_SEQUENCE' });
+        }, 2000); // 2 second hold on black screen
+      }, 1000); // 1 second fade duration
 
-      return () => clearTimeout(startDelay);
+      return () => {
+        clearTimeout(initialDelay);
+        clearTimeout(fadeTimeoutId);
+        clearTimeout(rebootTimeoutId);
+      };
     }
   }, [state.flags?.multiverse_reboot_pending, state.flags?.multiverse_reboot_active, dispatch]);
 
-  if (!state.flags?.show_reset_sequence) {
+  if (!state.flags?.multiverse_reboot_pending && fadeStage === 'none') {
+    return null;
+  }
+
+  // Fade overlay styles
+  const fadeOverlayStyle: React.CSSProperties = {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background: 'black',
+    opacity: fadeOpacity,
+    transition: 'opacity 1s ease-in-out',
+    zIndex: 10000,
+    pointerEvents: 'all',
+  };
+
+  // Show fade screen during fade and black stages
+  if (fadeStage === 'fading' || fadeStage === 'black') {
+    return <div style={fadeOverlayStyle} />;
+  }
+
+  // Show reboot sequence only during reboot stage
+  if (fadeStage !== 'reboot') {
     return null;
   }
 

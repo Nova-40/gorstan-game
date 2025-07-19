@@ -40,6 +40,22 @@ const faelake: RoomDefinition = {
     'reflection_shard',
   ],
 
+  traps: [
+    {
+      id: 'drowning_current',
+      type: 'damage',
+      severity: 'minor',
+      description: 'You step too close to the lake\'s edge and magical currents pull you in! You struggle to surface, gasping for air.',
+      trigger: 'enter',
+      effect: {
+        damage: 12
+      },
+      triggered: false,
+      disarmable: false,
+      hidden: true,
+    }
+  ],
+
   interactables: {
     'crystal_lake': {
       description: 'A lake of impossible clarity that reflects not just this realm, but glimpses of countless others.',

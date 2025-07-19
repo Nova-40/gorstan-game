@@ -54,6 +54,7 @@ export type ItemCategory =
   | 'key'
   | 'document'
   | 'artifact'
+  | 'pet'
   | 'misc';
 
 export type ItemRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'unique';
@@ -197,7 +198,7 @@ This document governs the decisions of Ayla — the AI fused with the Lattice.`,
     value: 25,
     weight: 2.0,
     spawnChance: 0.5,
-    spawnRooms: ["storage", "campsite"],
+    spawnRooms: ["storage", "campsite", "dalesapartment"],
     effects: [
       { type: 'flag', target: 'hasRunbag', value: true, description: 'Inventory capacity increased' }
     ]
@@ -455,6 +456,28 @@ This document governs the decisions of Ayla — the AI fused with the Lattice.`,
 
   // Special & Endgame Items
   {
+    id: "dominic",
+    name: "Dominic the Goldfish",
+    description: "A bright orange goldfish who seems remarkably alert and intelligent for his species. He watches you with curious eyes from his portable bowl.",
+    traits: ["unique", "living", "pet", "intelligent"],
+    portable: true,
+    category: "pet",
+    rarity: "unique",
+    value: 500,
+    weight: 2.0,
+    spawnChance: 1.0,
+    spawnRooms: ["dalesapartment"],
+    requirements: [
+      { type: 'item', value: 'goldfish_food' } // Need food to safely transport
+    ],
+    effects: [
+      { type: 'trait', value: 'pet_companion', description: 'Gained an intelligent companion' },
+      { type: 'flag', target: 'has_dominic', value: true },
+      { type: 'score', value: 50 },
+      { type: 'message', value: "Dominic seems happy to travel with you, swimming contentedly in his portable bowl." }
+    ]
+  },
+  {
     id: "polly_gift",
     name: "Polly's Gift",
     description: "A small token of forgiveness and friendship.",
@@ -611,6 +634,10 @@ const ITEM_TRANSFORMATIONS: ItemTransformation[] = [
 ];
 
 // Create efficient lookup maps for performance
+const itemMap = new Map<string, Item>();
+const categoryMap = new Map<ItemCategory, Item[]>();
+const traitMap = new Map<string, Item[]>();
+const rarityMap = new Map<ItemRarity, Item[]>();
 
 // Initialize lookup maps
 function initializeLookupMaps(): void {
@@ -625,10 +652,13 @@ function initializeLookupMaps(): void {
     itemMap.set(item.id, item);
 
     // Category map
-        if (!categoryMap.has(category)) {
-      categoryMap.set(category, []);
+    if (item.category) {
+      const category = item.category;
+      if (!categoryMap.has(category)) {
+        categoryMap.set(category, []);
+      }
+      categoryMap.get(category)!.push(item);
     }
-    categoryMap.get(category)!.push(item);
 
     // Trait map
     item.traits.forEach(trait => {
@@ -639,10 +669,13 @@ function initializeLookupMaps(): void {
     });
 
     // Rarity map
-        if (!rarityMap.has(rarity)) {
-      rarityMap.set(rarity, []);
+    if (item.rarity) {
+      const rarity = item.rarity;
+      if (!rarityMap.has(rarity)) {
+        rarityMap.set(rarity, []);
+      }
+      rarityMap.get(rarity)!.push(item);
     }
-    rarityMap.get(rarity)!.push(item);
   });
 }
 
@@ -660,7 +693,8 @@ export function getItemById(id: string): Item | null {
     return null;
   }
   
-  return itemMap.get(id) || null;
+  // Fallback to direct array search if Maps aren't working
+  return ITEMS.find(item => item.id === id) || null;
 }
 
 /**
@@ -708,6 +742,9 @@ export function getItemsByRarity(rarity: ItemRarity): Item[] {
 export function validateItem(item: any): item is Item {
   if (!item || typeof item !== 'object') return false;
 
+  const hasRequiredFields = item.id && item.name && item.description && 
+                           item.traits && typeof item.portable === 'boolean';
+  
   if (!hasRequiredFields) return false;
   
   // Type validation
@@ -795,11 +832,13 @@ function processItemEffect(
       break;
       
     case 'health':
-            result.healthChange = (result.healthChange || 0) + healthValue;
+      const healthValue = typeof effect.value === 'number' ? effect.value : 0;
+      result.healthChange = (result.healthChange || 0) + healthValue;
       break;
       
     case 'score':
-            result.scoreChange = (result.scoreChange || 0) + scoreValue;
+      const scoreValue = typeof effect.value === 'number' ? effect.value : 0;
+      result.scoreChange = (result.scoreChange || 0) + scoreValue;
       break;
       
     case 'flag':
@@ -861,20 +900,23 @@ function checkRequirement(
       
     case 'flag':
       if (!requirement.target) return false;
-            return compareValues(flagValue, requirement.value, requirement.operator || 'equals');
+      const flagValue = playerState.flags?.[requirement.target];
+      return compareValues(flagValue, requirement.value, requirement.operator || 'equals');
       
     case 'item':
       return playerState.inventory?.includes(requirement.value as string) || false;
       
     case 'health':
-            return compareValues(health, requirement.value, requirement.operator || 'greater');
+      const health = playerState.health || 0;
+      return compareValues(health, requirement.value, requirement.operator || 'greater');
       
     case 'room':
       return playerState.currentRoom === requirement.value;
       
     case 'npc_trust':
       if (!requirement.target) return false;
-            return compareValues(trustLevel, requirement.value, requirement.operator || 'greater');
+      const trustLevel = playerState.npcTrust?.[requirement.target] || 0;
+      return compareValues(trustLevel, requirement.value, requirement.operator || 'greater');
       
     default:
       return false;
@@ -936,7 +978,8 @@ export function searchItems(criteria: ItemSearchCriteria | string): Item[] {
     // Simple text search for backward compatibility
     if (!criteria) return [];
     
-        return ITEMS.filter(item =>
+    const lowerQuery = criteria.toLowerCase();
+    return ITEMS.filter(item =>
       item.name.toLowerCase().includes(lowerQuery) ||
       item.description.toLowerCase().includes(lowerQuery) ||
       item.traits.some(trait => trait.toLowerCase().includes(lowerQuery))
@@ -996,7 +1039,8 @@ export function getItemValue(
     reputation?: number;
   }
 ): number {
-    if (!item) return 0;
+  const item = getItemById(itemId);
+  if (!item) return 0;
   
   let value = item.value || 0;
   
@@ -1048,10 +1092,13 @@ export function addItem(item: Item): boolean {
   // Update lookup maps
   itemMap.set(item.id, item);
   
+  if (item.category) {
+    const category = item.category;
     if (!categoryMap.has(category)) {
-    categoryMap.set(category, []);
+      categoryMap.set(category, []);
+    }
+    categoryMap.get(category)!.push(item);
   }
-  categoryMap.get(category)!.push(item);
   
   item.traits.forEach(trait => {
     if (!traitMap.has(trait)) {
@@ -1060,10 +1107,13 @@ export function addItem(item: Item): boolean {
     traitMap.get(trait)!.push(item);
   });
   
+  if (item.rarity) {
+    const rarity = item.rarity;
     if (!rarityMap.has(rarity)) {
-    rarityMap.set(rarity, []);
+      rarityMap.set(rarity, []);
+    }
+    rarityMap.get(rarity)!.push(item);
   }
-  rarityMap.get(rarity)!.push(item);
   
   console.log(`[Items] Added item: ${item.name} (${item.id})`);
   return true;
@@ -1074,7 +1124,8 @@ export function addItem(item: Item): boolean {
  * Remove an item from the registry
  */
 export function removeItem(itemId: string): boolean {
-    if (itemIndex === -1) {
+  const itemIndex = ITEMS.findIndex(item => item.id === itemId);
+  if (itemIndex === -1) {
     return false;
   }
 
@@ -1099,7 +1150,14 @@ export function transformItem(
     currentRoom?: string;
   }
 ): string | null {
-    
+  const sourceItem = getItemById(sourceId);
+  if (!sourceItem || !sourceItem.transformInto) return null;
+  
+  const transformation = {
+    targetId: sourceItem.transformInto,
+    condition: sourceItem.requirements?.[0]?.target // Simple transformation logic
+  };
+  
   if (!transformation) return null;
   
   // Check transformation conditions
@@ -1127,6 +1185,17 @@ export function getItemStatistics(): {
   readableCount: number;
   throwableCount: number;
 } {
+  const stats = {
+    totalItems: ITEMS.length,
+    byCategory: {} as Record<string, number>,
+    byRarity: {} as Record<string, number>,
+    averageValue: 0,
+    mostExpensive: null as Item | null,
+    leastExpensive: null as Item | null,
+    usableCount: 0,
+    readableCount: 0,
+    throwableCount: 0
+  };
   
   let totalValue = 0;
   let maxValue = -Infinity;
@@ -1134,13 +1203,16 @@ export function getItemStatistics(): {
 
   ITEMS.forEach(item => {
     // Category stats
-        stats.byCategory[category] = (stats.byCategory[category] || 0) + 1;
+    const category = item.category || 'misc';
+    stats.byCategory[category] = (stats.byCategory[category] || 0) + 1;
 
     // Rarity stats
-        stats.byRarity[rarity] = (stats.byRarity[rarity] || 0) + 1;
+    const rarity = item.rarity || 'common';
+    stats.byRarity[rarity] = (stats.byRarity[rarity] || 0) + 1;
 
     // Value stats
-        totalValue += value;
+    const value = item.value || 0;
+    totalValue += value;
     
     if (value > maxValue) {
       maxValue = value;
@@ -1166,8 +1238,7 @@ export function getItemStatistics(): {
 /**
  * Export utilities for external use
  */
-export 
-export default ItemEngine;
+export default ITEMS;
 
 // All functions and the ITEMS array are exported as named exports for use in inventory, room, and quest logic.
 // Enhanced with categories, rarity system, effects, transformations, and comprehensive TypeScript typing

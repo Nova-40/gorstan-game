@@ -13,5 +13,34 @@ export default defineConfig({
       '@': path.resolve(__dirname, 'src'), // ✅ ensures @ maps to /src
     },
   },
+  build: {
+    // Increase chunk size warning limit for Vercel
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Split large dependencies into separate chunks
+          'framer-motion': ['framer-motion'],
+          'lucide-react': ['lucide-react'],
+          'react-vendor': ['react', 'react-dom'],
+          // Split game engine into separate chunks
+          'game-engine': [
+            './src/engine/commandProcessor',
+            './src/engine/wanderingNPCController',
+            './src/engine/librarianController',
+            './src/engine/mrWendellController'
+          ],
+          'game-logic': [
+            './src/logic/achievementEngine',
+            './src/logic/codexTracker'
+          ],
+          'game-state': [
+            './src/state/scoreManager',
+            './src/state/scoreEffects'
+          ]
+        }
+      }
+    }
+  }
 });
 

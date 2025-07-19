@@ -526,10 +526,10 @@ export const handleBlueButtonPress = (state: LocalGameState): LocalGameState => 
   const nextCount = currentCount + 1;
 
   if (nextCount === 1) {
-    // First press - just warning
+    // First press - warning panel appears
     const warningMessage: GameMessage = {
       id: `blue-button-first-${Date.now()}`,
-      text: '🟦 You pressed the blue button. Nothing happens... yet.',
+      text: '🟦 You pressed the blue button. A small panel lights up saying: "Do NOT press this button again."',
       type: 'system',
       timestamp: Date.now(),
     };
@@ -556,32 +556,36 @@ export const handleBlueButtonPress = (state: LocalGameState): LocalGameState => 
 
     // Enhanced multiverse reboot sequence
     const rebootSteps = [
-      "Initialising Higgs Boson particle field...",
-      "Stabilising quarks and gluons...",
-      "Creating baryonic matter and irony...",
-      "Unexpected creation of the Spanish Inquisition.",
-      "Error: No one expected the Spanish Inquisition.",
-      "Removing Spanish Inquisition...", 
-      "Recompiling multiversal constants...",
-      "Resetting player context...",
-      "Restoring narrative entropy...",
-      "🌀 Multiverse reboot complete."
+      "Initialising Higgs Boson field...",
+      "Calibrating quantum foam lattice...",
+      "Creating fundamental particles...",
+      "Applying gravity patch (v1.0.2)...",
+      "Generating baryonic matter...",
+      "Constructing multiversal constants...",
+      "Oops. Creating Spanish Inquisition...",
+      "⚠️ Unexpected Inquisition Error",
+      "Removing Spanish Inquisition...",
+      "Recompiling narrative entropy...",
+      "Rebalancing protagonist probability...",
+      "Restoring player state...",
+      "Multiverse reboot complete."
     ];
 
-    // Add reboot messages with delays
+    // Add reboot messages with immediate timestamps so they display right away
+    const baseTime = Date.now();
     const rebootMessages = rebootSteps.map((step, index) => ({
-      id: `reboot-step-${index}-${Date.now()}`,
+      id: `reboot-step-${index}-${baseTime}`,
       text: step,
       type: 'system' as const,
-      timestamp: Date.now() + (500 * index),
+      timestamp: baseTime + index, // Sequential timestamps
     }));
 
     // Final message after reboot
     const finalMessage: GameMessage = {
-      id: `reboot-complete-${Date.now()}`,
+      id: `reboot-complete-${baseTime}`,
       text: "You awaken with a faint sense of déjà vu.",
       type: 'narrative',
-      timestamp: Date.now() + (500 * rebootSteps.length),
+      timestamp: baseTime + rebootSteps.length, // Sequential after all reboot messages
     };
 
     // Schedule the actual room transition
@@ -602,7 +606,7 @@ export const handleBlueButtonPress = (state: LocalGameState): LocalGameState => 
         ...state.flags,
         multiverse_reboot_pending: true,
       },
-      history: [...state.history, warningMessage, ...rebootMessages, finalMessage],
+      history: [...state.history, warningMessage], // Only add the warning, not the reboot messages
     };
   }
 };

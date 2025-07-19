@@ -36,6 +36,24 @@ const hiddenlab: RoomDefinition = {
     'failed_reset_log',
   ],
 
+  traps: [
+    {
+      id: 'reality_feedback',
+      type: 'damage',
+      severity: 'minor',
+      description: 'The broken reality core sparks with unstable energy! Temporal distortions lash out, causing minor reality burns!',
+      trigger: 'enter',
+      effect: {
+        damage: 10,
+        flagsSet: ['reality_scarred']
+      },
+      triggered: false,
+      disarmable: true,
+      disarmSkill: 'temporal_paradox_detector',
+      hidden: false,
+    }
+  ],
+
   interactables: {
     'psychic_paper_sign': {
       description: 'A large sign made of psychic paper. The text reads: "RESET LIMIT REACHED - Don\'t, whatever you do, try and reset the multiverse again." The handwriting looks disturbingly familiar - like your own.',

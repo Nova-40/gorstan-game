@@ -28,6 +28,22 @@ const mazeecho: Room = {
     "fragmented_note"
   ],
 
+  traps: [
+    {
+      id: 'echo_displacement',
+      type: 'teleport',
+      severity: 'major',
+      description: 'The echoes become overwhelming and reality shifts around you! You find yourself transported elsewhere in the maze!',
+      trigger: 'enter',
+      effect: {
+        teleportTo: 'mazeZone_misleadchamber'
+      },
+      triggered: false,
+      disarmable: false,
+      hidden: true,
+    }
+  ],
+
   interactables: {
     "echo_wall": {
       description: "A wall that seems to repeat every sound you make, sometimes with a delay.",

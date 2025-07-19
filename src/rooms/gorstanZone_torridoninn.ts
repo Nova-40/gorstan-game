@@ -33,6 +33,23 @@ const torridoninn: Room = {
     "travelers_note"
   ],
 
+  traps: [
+    {
+      id: 'loose_floorboard',
+      type: 'damage',
+      severity: 'minor',
+      description: 'You step on a loose floorboard and it gives way! Your leg plunges through, scraping against the splintered wood!',
+      trigger: 'enter',
+      effect: {
+        damage: 14
+      },
+      triggered: false,
+      disarmable: true,
+      disarmSkill: 'carpenter_tools',
+      hidden: true,
+    }
+  ],
+
   interactables: {
     "hearth": {
       description: "A large stone fireplace with a roaring fire, perfect for warming up.",

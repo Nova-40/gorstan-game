@@ -46,6 +46,7 @@ const dalesapartment: RoomDefinition = {
     'emergency_contact_list',
     'goldfish_food',
     'remote_control',
+    'dominic', // Dominic the goldfish - can be taken with goldfish_food
     // Remote control is now available in the apartment
   ],
 
@@ -216,6 +217,11 @@ const dalesapartment: RoomDefinition = {
       description: 'Search specifically for the missing remote control',
       requirements: ['examine coffee_table', 'search living_room_sofa'],
       effects: ['find_hub_remote', 'unlock_system_access', 'gain_remote_control_item'],
+    },
+    'find_runbag': {
+      description: 'Search the bedroom area for travel preparations',
+      requirements: ['explore bedroom area', 'examine travel preparations'],
+      effects: ['discover_runbag', 'add_runbag_to_room', 'set_runbagFound_flag'],
     },
   },
 };
