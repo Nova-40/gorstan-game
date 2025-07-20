@@ -1,3 +1,8 @@
+// londonZone_londonhub.ts — rooms/londonZone_londonhub.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: londonZone_londonhub
+
 import { RoomDefinition } from '../types/RoomTypes';
 
 const londonhub: RoomDefinition = {
@@ -77,18 +82,7 @@ const londonhub: RoomDefinition = {
   },
 
   npcs: [
-    {
-      id: 'station_overseer',
-      name: 'The Hub Overseer',
-      description: 'A figure in London Underground uniform who manages the interdimensional aspects of the station',
-      dialogue: {
-        greeting: 'Welcome to the London Hub. Mind the gap between realities.',
-        help: 'All destinations are possible, but not all are advisable. Check your clearance level before traveling.',
-        farewell: 'Safe travels. Remember - the escalator always leads home.',
-      },
-      spawnable: true,
-      spawnCondition: 'first_visit',
-    },
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

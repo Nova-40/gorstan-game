@@ -1,3 +1,8 @@
+// glitchZone_moreissues.ts — rooms/glitchZone_moreissues.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: glitchZone_moreissues
+
 import { Room } from '../types/RoomTypes';
 
 const moreissues: Room = {
@@ -54,18 +59,7 @@ const moreissues: Room = {
   },
 
   npcs: [
-    {
-      id: "ghost_process",
-      name: "Ghost Process",
-      description: "A spectral remnant of a process that failed to complete, looping through its last operation.",
-      dialogue: {
-        greeting: "...error... must resolve... can't finish...",
-        help: "Find the patch... break the loop... maybe then I can rest...",
-        farewell: "...resetting...",
-      },
-      spawnable: true,
-      spawnCondition: "player_attempts_stabilize",
-    }
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

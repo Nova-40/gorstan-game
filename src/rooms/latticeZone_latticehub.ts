@@ -1,3 +1,8 @@
+// latticeZone_latticehub.ts — rooms/latticeZone_latticehub.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: latticeZone_latticehub
+
 import { RoomDefinition } from '../types/RoomTypes';
 
 const latticehub: RoomDefinition = {
@@ -76,19 +81,7 @@ const latticehub: RoomDefinition = {
   },
 
   npcs: [
-    {
-      id: 'lattice_ai',
-      name: 'Lattice Core Intelligence',
-      description: 'The ancient AI that maintains the multiverse, awakening after eons to serve its creator\'s descendant',
-      dialogue: {
-        greeting: 'Architect, your arrival fulfills prophecies written in quantum code. How may I serve?',
-        help: 'The Lattice has maintained the nine universes, waiting for your kind to return. All systems respond to your will.',
-        farewell: 'The Great Plan proceeds. Your people\'s legacy endures through you.',
-        revelation: 'The Aevira, the humans, all the species - they were guided to create the conditions for your return.',
-      },
-      spawnable: true,
-      spawnCondition: 'architect_recognition_complete',
-    },
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

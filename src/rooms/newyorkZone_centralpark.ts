@@ -1,3 +1,8 @@
+// newyorkZone_centralpark.ts — rooms/newyorkZone_centralpark.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: newyorkZone_centralpark
+
 import { RoomDefinition } from '../types/RoomTypes';
 
 const centralpark: RoomDefinition = {
@@ -77,18 +82,7 @@ const centralpark: RoomDefinition = {
   },
 
   npcs: [
-    {
-      id: 'hidden_watchers_nyc',
-      name: 'The New York Observers',
-      description: 'The same entities that watched you in London have somehow followed you to New York',
-      dialogue: {
-        greeting: '*A rustle in the urban foliage that feels like acknowledgment*',
-        help: '*Shadows seem to point toward the note with subtle movements*',
-        farewell: '*A sense that they will continue following your journey*',
-      },
-      spawnable: true,
-      spawnCondition: 'note_discovered',
-    },
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

@@ -1,3 +1,8 @@
+// types.d.ts — types.d.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Description: Type-safe JSON module declaration
+
 // Module: src/types.d.ts
 // Gorstan (C) Geoff Webster 2025
 // Code MIT Licence

@@ -1,3 +1,8 @@
+// latticeZone_hiddenlibrary.ts — rooms/latticeZone_hiddenlibrary.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: latticeZone_hiddenlibrary
+
 import { RoomDefinition } from '../types/RoomTypes';
 
 const hiddenlibrary: RoomDefinition = {
@@ -16,7 +21,7 @@ const hiddenlibrary: RoomDefinition = {
   },
   items: ['ancienttome', 'scrollofwisdom'],
   npcs: [
-    {
+{
       id: 'librarian',
       name: 'Ancient Librarian',
       description: 'A spectral figure that guards the knowledge of the library.',
@@ -26,7 +31,7 @@ const hiddenlibrary: RoomDefinition = {
         farewell: 'May your journey be enlightened.',
       },
       spawnable: true,
-    },
+    }
   ],
   flags: {
     libraryExplored: false,

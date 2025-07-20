@@ -1,3 +1,8 @@
+// mazeZone_mazeecho.ts — rooms/mazeZone_mazeecho.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: mazeZone_mazeecho
+
 import { Room } from '../types/RoomTypes';
 
 const mazeecho: Room = {
@@ -58,18 +63,7 @@ const mazeecho: Room = {
   },
 
   npcs: [
-    {
-      id: "echo_wanderer",
-      name: "Echo Wanderer",
-      description: "A figure who appears and disappears with the echoes, never quite in the same place twice.",
-      dialogue: {
-        greeting: "Did you hear that? Or was it just an echo of a memory?",
-        help: "Sometimes the echoes repeat what we need to hear most.",
-        farewell: "I'll be here, or somewhere else, or nowhere at all.",
-      },
-      spawnable: true,
-      spawnCondition: "player_listens_echo_wall",
-    }
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

@@ -1,3 +1,8 @@
+// PlayerState.ts — types/PlayerState.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: PlayerState
+
 // PlayerState type definition for NPC interactions
 
 export interface PlayerInteraction {

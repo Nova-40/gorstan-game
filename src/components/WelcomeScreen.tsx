@@ -1,3 +1,8 @@
+// WelcomeScreen.tsx — components/WelcomeScreen.tsx
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Description: WelcomeScreen
+
 // Module: src/components/WelcomeScreen.tsx
 // Gorstan (C) Geoff Webster 2025
 // Code MIT Licence

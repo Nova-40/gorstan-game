@@ -1,3 +1,8 @@
+// mazeZone_secretmazeentry.ts — rooms/mazeZone_secretmazeentry.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: mazeZone_secretmazeentry
+
 import { Room } from '../types/RoomTypes';
 
 const secretmazeentry: Room = {
@@ -42,18 +47,7 @@ const secretmazeentry: Room = {
   },
 
   npcs: [
-    {
-      id: "entry_keeper",
-      name: "Entry Keeper",
-      description: "A silent guardian who watches over the secret entry, offering cryptic guidance.",
-      dialogue: {
-        greeting: "Few find this place. Fewer still understand its meaning.",
-        help: "The carvings hold the story. Trace them, and you may find your way.",
-        farewell: "The maze remembers all who enter.",
-      },
-      spawnable: true,
-      spawnCondition: "player_traces_ancient_carvings",
-    }
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

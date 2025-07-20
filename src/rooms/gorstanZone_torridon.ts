@@ -1,3 +1,8 @@
+// gorstanZone_torridon.ts — rooms/gorstanZone_torridon.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: gorstanZone_torridon
+
 import { Room } from '../types/RoomTypes';
 
 const torridon: Room = {
@@ -52,18 +57,7 @@ const torridon: Room = {
   },
 
   npcs: [
-    {
-      id: "wandering_trader",
-      name: "Wandering Trader",
-      description: "A seasoned merchant with goods and tales from across the region.",
-      dialogue: {
-        greeting: "Greetings, traveler! Care to see my wares or hear a tale?",
-        help: "I can offer supplies, maps, or information about the road ahead.",
-        farewell: "Safe travels! May fortune favor you.",
-      },
-      spawnable: true,
-      spawnCondition: "player_approaches_trader_cart",
-    }
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

@@ -1,3 +1,8 @@
+// scoreEffects.ts — state/scoreEffects.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Description: Apply score for a specific event
+
 // Filename: scoreEffects.ts
 // Location: state/
 // Version: v1 Beta

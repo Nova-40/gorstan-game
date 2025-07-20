@@ -1,3 +1,8 @@
+// main.tsx — main.tsx
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: main
+
 // Module: src/main.tsx
 // Gorstan (C) Geoff Webster 2025
 // Code MIT Licence

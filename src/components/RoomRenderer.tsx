@@ -1,3 +1,8 @@
+// RoomRenderer.tsx — components/RoomRenderer.tsx
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: RoomRenderer
+
 // Module: src/components/RoomRenderer.tsx
 // Gorstan (C) Geoff Webster 2025
 // Code MIT Licence

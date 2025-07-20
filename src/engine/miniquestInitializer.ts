@@ -1,3 +1,8 @@
+// miniquestInitializer.ts — engine/miniquestInitializer.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Description: Initialize the miniquest system with room data
+
 // miniquestInitializer.ts/Location: src/engine/Version: 1.0/Gorstan elements (c) Geoff Webster/Code licensed under the MIT License
 
 import MiniquestEngine from './miniquestEngine';

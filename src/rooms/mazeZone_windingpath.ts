@@ -1,3 +1,8 @@
+// mazeZone_windingpath.ts — rooms/mazeZone_windingpath.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: mazeZone_windingpath
+
 import { Room } from '../types/RoomTypes';
 
 const windingpath: Room = {
@@ -42,18 +47,7 @@ const windingpath: Room = {
   },
 
   npcs: [
-    {
-      id: "wandering_guide",
-      name: "Wandering Guide",
-      description: "A mysterious figure who offers cryptic advice to travelers on the path.",
-      dialogue: {
-        greeting: "The path winds for a reason. Trust your feet, not your eyes.",
-        help: "Sometimes, the shortest route is not the safest.",
-        farewell: "Keep moving. The maze rewards persistence.",
-      },
-      spawnable: true,
-      spawnCondition: "player_marks_shadow_wall",
-    }
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

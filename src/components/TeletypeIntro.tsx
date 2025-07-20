@@ -1,3 +1,8 @@
+// TeletypeIntro.tsx — components/TeletypeIntro.tsx
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: TeletypeIntro
+
 // Module: src/components/TeletypeIntro.tsx
 // Gorstan (C) Geoff Webster 2025
 // Code MIT Licence
@@ -101,9 +106,9 @@ const TeletypeIntro: React.FC<TeletypeIntroProps> = ({ playerName, onComplete })
     setTimeout(() => {
       const routeMap = {
         jump: { route: 'jump', targetRoom: 'controlnexus', inventoryBonus: ['coffee'] },
-        wait: { route: 'dramatic_wait', targetRoom: 'introZone_crossing', inventoryBonus: ['quantum_coffee', 'dales_apartment_key'] },
-        sip: { route: 'sip', targetRoom: 'introZone_crossing' },
-        dramatic_wait: { route: 'dramatic_wait', targetRoom: 'introZone_crossing', inventoryBonus: ['quantum_coffee', 'dales_apartment_key'] }
+        wait: { route: 'dramatic_wait', targetRoom: 'controlroom', inventoryBonus: ['quantum_coffee', 'dales_apartment_key'] },
+        sip: { route: 'sip', targetRoom: 'crossing' },
+        dramatic_wait: { route: 'dramatic_wait', targetRoom: 'crossing', inventoryBonus: ['quantum_coffee', 'dales_apartment_key'] }
       };
       onComplete(routeMap[choice]);
     }, 300);

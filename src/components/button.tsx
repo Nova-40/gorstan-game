@@ -1,3 +1,8 @@
+// button.tsx — components/button.tsx
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: button
+
 import React from 'react';
 
 import { ButtonHTMLAttributes, ReactNode } from 'react';

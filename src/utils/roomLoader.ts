@@ -1,3 +1,8 @@
+// roomLoader.ts — utils/roomLoader.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: roomLoader
+
 // Module: src/utils/roomLoader.ts
 // Gorstan (C) Geoff Webster 2025
 // Code MIT Licence

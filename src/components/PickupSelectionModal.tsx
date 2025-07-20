@@ -1,3 +1,8 @@
+// PickupSelectionModal.tsx — components/PickupSelectionModal.tsx
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: PickupSelectionModal
+
 import React, { useState } from 'react';
 import { X, Package, Check } from 'lucide-react';
 import { getItemById } from '../engine/items';

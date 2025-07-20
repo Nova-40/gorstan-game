@@ -1,3 +1,8 @@
+// londonZone_findlaterscornercoffeeshop.ts — rooms/londonZone_findlaterscornercoffeeshop.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: londonZone_findlaterscornercoffeeshop
+
 import { RoomDefinition } from '../types/RoomTypes';
 
 const findlaterscornercoffeeshop: RoomDefinition = {
@@ -75,34 +80,24 @@ const findlaterscornercoffeeshop: RoomDefinition = {
   },
 
   npcs: [
-    {
+{
       id: 'friendly_barista',
       name: 'Sarah the Barista',
       description: 'A warm and intuitive barista who seems to know her regular customers better than they know themselves',
       dialogue: {
-        greeting: 'Good to see you again! The usual? I\'ve already started your coffee - large flat white, extra shot, oat milk.',
+        greeting: 'Good to see you again! Coffee for Pyke! I\'ve already started your coffee - large flat white, extra shot, oat milk.',
         help: 'You know, you used to come in here every Tuesday morning. Always sat in that corner booth with a notebook.',
         farewell: 'Take care! Don\'t be a stranger - though something tells me you won\'t be.',
+        offer_coffee: 'Coffee for Pyke! Here, let me get you a fresh cup - on the house. You look like you could use it.',
+        no_coffee_needed: 'I see you\'ve already got your coffee! Enjoy it while it\'s hot.',
       },
       spawnable: false, // Always present
-    },
-    {
-      id: 'regular_customer',
-      name: 'Morning Regular',
-      description: 'Another customer who nods at you with recognition, though you can\'t place where you know them from',
-      dialogue: {
-        greeting: 'Morning! Haven\'t seen you around for a while. Everything alright?',
-        help: 'You and I used to chat about the crossword puzzle. You were always better at the cryptic clues.',
-        farewell: 'Hope to see you back to your regular routine soon.',
-      },
-      spawnable: true,
-      spawnCondition: 'morning_visit',
-    },
+    }
   ],
 
   events: {
-    onEnter: ['triggerFamiliarity', 'activateBarista', 'checkTimeOfDay'],
-    onExit: ['recordVisit', 'updateMemoryFragments'],
+    onEnter: ['triggerFamiliarity', 'activateBarista', 'checkTimeOfDay', 'offerCoffeeAutomatically'],
+    onExit: ['recordVisit', 'updateMemoryFragments', 'resetCoffeeOfferFlag'],
     onInteract: {
       barista: ['revealPastVisits', 'offerUsualOrder', 'shareMemories'],
       corner_booth: ['triggerMemoryFlash', 'feelNostalgia'],
@@ -118,6 +113,8 @@ const findlaterscornercoffeeshop: RoomDefinition = {
     memoryTriggered: false,
     cornerBoothVisited: false,
     regularRoutineRemembered: false,
+    freeCoffeeOffered: false,
+    coffeeForPykeCalled: false,
   },
 
   quests: {
@@ -192,6 +189,11 @@ const findlaterscornercoffeeshop: RoomDefinition = {
       description: 'Accept the barista\'s offer to make your usual coffee',
       requirements: ['talk with barista'],
       effects: ['receive_perfect_coffee', 'trigger_strong_memories', 'feel_belonging'],
+    },
+    'accept_free_coffee': {
+      description: 'Accept the barista\'s complimentary coffee offer',
+      requirements: [],
+      effects: ['receive_coffee', 'feel_welcomed', 'barista_kindness'],
     },
     'sit_in_usual_spot': {
       description: 'Claim the corner booth that feels like it was always yours',

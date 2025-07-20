@@ -1,3 +1,8 @@
+// CreditsScreen.tsx — components/CreditsScreen.tsx
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: CreditsScreen
+
 // Gorstan (c) Geoff Webster. Code MIT Licence
 // Module: CreditsScreen.jsx
 // Path: src/components/CreditsScreen.jsx

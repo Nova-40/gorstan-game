@@ -1,3 +1,8 @@
+// TerminalConsole.tsx — components/TerminalConsole.tsx
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: TerminalConsole
+
 // Filename: TerminalConsole.tsx
 // Location: components/
 // Version: v1 Beta

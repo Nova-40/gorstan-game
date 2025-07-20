@@ -1,3 +1,8 @@
+// offgorstanZone_ancientslibrary.ts — rooms/offgorstanZone_ancientslibrary.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: offgorstanZone_ancientslibrary
+
 import { Room } from '../types/RoomTypes';
 
 const ancientslibrary: Room = {
@@ -53,7 +58,7 @@ const ancientslibrary: Room = {
   },
 
   npcs: [
-    {
+{
       id: "omniscient_curator",
       name: "Omniscient Curator",
       description: "A timeless entity who oversees the preservation and distribution of all knowledge.",

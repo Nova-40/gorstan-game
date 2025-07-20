@@ -1,3 +1,8 @@
+// QuickActionsPanel.tsx — components/QuickActionsPanel.tsx
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: QuickActionsPanel
+
 
 import React, { useState } from 'react';
 import { useGameState } from '../state/gameState';

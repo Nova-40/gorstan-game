@@ -1,3 +1,8 @@
+// latticeZone_latticespire.ts — rooms/latticeZone_latticespire.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: latticeZone_latticespire
+
 import { Room } from '../types/RoomTypes';
 
 const latticespire: Room = {
@@ -51,18 +56,7 @@ const latticespire: Room = {
   },
 
   npcs: [
-    {
-      id: "spire_guardian",
-      name: "Spire Guardian",
-      description: "A vigilant crystalline entity that oversees the spire's control systems.",
-      dialogue: {
-        greeting: "You have reached the summit. State your purpose.",
-        help: "The control node is not to be activated lightly. Only those with the key may proceed.",
-        farewell: "Guard the lattice well, traveler.",
-      },
-      spawnable: true,
-      spawnCondition: "player_approaches_control_node",
-    }
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

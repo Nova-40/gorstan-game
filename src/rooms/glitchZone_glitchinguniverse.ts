@@ -1,3 +1,8 @@
+// glitchZone_glitchinguniverse.ts — rooms/glitchZone_glitchinguniverse.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: glitchZone_glitchinguniverse
+
 import { RoomDefinition } from '../types/RoomTypes';
 
 const glitchinguniverse: RoomDefinition = {
@@ -55,18 +60,7 @@ const glitchinguniverse: RoomDefinition = {
   },
 
   npcs: [
-    {
-      id: 'glitch_specter',
-      name: 'Glitch Specter',
-      description: 'A translucent, shifting figure that seems to be stuck between multiple realities.',
-      dialogue: {
-        greeting: '...help... lost... too many worlds... can\'t hold on...',
-        help: 'The vortex is the only way, but it is not safe. Beware the echoes—they are traps.',
-        farewell: '...fading... again...',
-      },
-      spawnable: true,
-      spawnCondition: 'player_lingers',
-    },
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

@@ -1,3 +1,8 @@
+// SplashScreen.tsx — components/SplashScreen.tsx
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Description: SplashScreen
+
 // Module: src/components/SplashScreen.tsx
 // Gorstan (C) Geoff Webster 2025
 // Code MIT Licence

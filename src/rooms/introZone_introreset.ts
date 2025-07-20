@@ -1,3 +1,8 @@
+// introZone_introreset.ts — rooms/introZone_introreset.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: introZone_introreset
+
 import { RoomDefinition } from '../types/RoomTypes';
 
 const introreset: RoomDefinition = {
@@ -74,18 +79,7 @@ const introreset: RoomDefinition = {
   },
 
   npcs: [
-    {
-      id: 'reality_guardian',
-      name: 'Guardian of Thresholds',
-      description: 'A being that exists between dimensions, watching over critical choice points',
-      dialogue: {
-        greeting: 'Traveler, you stand at a crossroads of reality itself.',
-        help: 'The chair leads to beginning anew. The button... leads to endings.',
-        farewell: 'Choose wisely. All timelines depend on your decision.',
-      },
-      spawnable: true,
-      spawnCondition: 'critical_choice_moment',
-    },
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

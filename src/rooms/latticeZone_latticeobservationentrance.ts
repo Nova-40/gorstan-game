@@ -1,3 +1,8 @@
+// latticeZone_latticeobservationentrance.ts — rooms/latticeZone_latticeobservationentrance.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: latticeZone_latticeobservationentrance
+
 import { Room } from '../types/RoomTypes';
 
 const latticeobservationentrance: Room = {
@@ -49,18 +54,7 @@ const latticeobservationentrance: Room = {
   },
 
   npcs: [
-    {
-      id: "observation_attendant",
-      name: "Observation Attendant",
-      description: "A polite, holographic attendant programmed to assist visitors.",
-      dialogue: {
-        greeting: "Welcome to the Lattice Observation Deck entrance. Please present your pass.",
-        help: "If you need information about the deck or the lattice, I am here to assist.",
-        farewell: "Enjoy your visit. The lattice awaits.",
-      },
-      spawnable: true,
-      spawnCondition: "player_scans_pass",
-    }
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

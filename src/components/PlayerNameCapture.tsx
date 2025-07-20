@@ -1,3 +1,8 @@
+// PlayerNameCapture.tsx — components/PlayerNameCapture.tsx
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: PlayerNameCapture
+
 // Module: src/components/PlayerNameCapture.tsx
 // Gorstan (C) Geoff Webster 2025
 // Code MIT Licence

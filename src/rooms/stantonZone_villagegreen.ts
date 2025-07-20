@@ -1,3 +1,8 @@
+// stantonZone_villagegreen.ts — rooms/stantonZone_villagegreen.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: stantonZone_villagegreen
+
 import { Room } from '../types/RoomTypes';
 
 export const villagegreen: Room = {

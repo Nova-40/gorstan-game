@@ -1,3 +1,8 @@
+// gorstanZone_gorstanvillage.ts — rooms/gorstanZone_gorstanvillage.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: gorstanZone_gorstanvillage
+
 import { Room } from '../types/RoomTypes';
 
 const gorstanvillage: Room = {
@@ -53,18 +58,7 @@ const gorstanvillage: Room = {
   },
 
   npcs: [
-    {
-      id: "elder_mira",
-      name: "Elder Mira",
-      description: "The wise village elder, keeper of Gorstan's stories and traditions.",
-      dialogue: {
-        greeting: "Welcome, traveler. Gorstan is always open to new friends.",
-        help: "If you seek knowledge or guidance, I am here to help.",
-        farewell: "May your journey be safe and your heart light.",
-      },
-      spawnable: true,
-      spawnCondition: "player_enters_village_green",
-    }
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

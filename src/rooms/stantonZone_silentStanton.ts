@@ -1,3 +1,8 @@
+// stantonZone_silentStanton.ts — rooms/stantonZone_silentStanton.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: stantonZone_silentStanton
+
 import { Room } from '../types/RoomTypes';
 
 export const silentStanton: Room = {

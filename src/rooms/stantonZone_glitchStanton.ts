@@ -1,3 +1,8 @@
+// stantonZone_glitchStanton.ts — rooms/stantonZone_glitchStanton.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: stantonZone_glitchStanton
+
 import { Room } from '../types/RoomTypes';
 
 export const glitchStanton: Room = {

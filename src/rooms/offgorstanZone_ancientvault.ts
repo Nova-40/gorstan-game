@@ -1,3 +1,8 @@
+// offgorstanZone_ancientvault.ts — rooms/offgorstanZone_ancientvault.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: offgorstanZone_ancientvault
+
 import { Room } from '../types/RoomTypes';
 
 const ancientvault: Room = {
@@ -49,18 +54,7 @@ const ancientvault: Room = {
   },
 
   npcs: [
-    {
-      id: "vault_keeper",
-      name: "Vault Keeper",
-      description: "A spectral guardian who watches over the treasures, appearing only when relics are disturbed.",
-      dialogue: {
-        greeting: "Few are permitted to enter the vault. Fewer still leave with its secrets.",
-        help: "Some treasures are best left untouched. Others may guide you onward.",
-        farewell: "Guard what you take, for all things have a price.",
-      },
-      spawnable: true,
-      spawnCondition: "player_opens_locked_chest",
-    }
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

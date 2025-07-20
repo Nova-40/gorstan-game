@@ -1,3 +1,8 @@
+// gameState.tsx — state/gameState.tsx
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Description: Helper function to add room description messages to game history
+
 // Module: src/state/gameState.tsx
 // Gorstan (C) Geoff Webster 2025
 // Code MIT Licence

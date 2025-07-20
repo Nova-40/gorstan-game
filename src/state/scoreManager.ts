@@ -1,3 +1,8 @@
+// scoreManager.ts — state/scoreManager.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Description: Initialize the score manager with dispatch function
+
 // Filename: scoreManager.ts
 // Location: state/
 // Version: v1 Beta

@@ -1,3 +1,8 @@
+// introZone_introstart.ts — rooms/introZone_introstart.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: introZone_introstart
+
 import { RoomDefinition } from '../types/RoomTypes';
 
 const introstart: RoomDefinition = {
@@ -68,18 +73,7 @@ const introstart: RoomDefinition = {
   },
 
   npcs: [
-    {
-      id: 'shadow_watchers',
-      name: 'The Silent Observers',
-      description: 'Beings that exist in the spaces between light and dark, watching but not interfering',
-      dialogue: {
-        greeting: '*A whisper from the shadows* You have returned... but not as you were.',
-        help: '*Rustling darkness* The paths before you lead to different truths. Choose carefully.',
-        farewell: '*Fading whispers* We will remember what you were, even if you cannot.',
-      },
-      spawnable: true,
-      spawnCondition: 'shadows_examined',
-    },
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

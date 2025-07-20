@@ -1,3 +1,8 @@
+// glitchZone_failure.ts — rooms/glitchZone_failure.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: glitchZone_failure
+
 import { RoomDefinition } from '../types/RoomTypes';
 
 const failure: RoomDefinition = {
@@ -54,18 +59,7 @@ const failure: RoomDefinition = {
   },
 
   npcs: [
-    {
-      id: 'failure_echo',
-      name: 'Echo of Failure',
-      description: 'A spectral figure that mutters about lost chances and missed opportunities.',
-      dialogue: {
-        greeting: 'Another one lost to the void of failure...',
-        help: 'Sometimes, to move forward, you must accept what cannot be fixed.',
-        farewell: 'May you find a way out where I could not.',
-      },
-      spawnable: true,
-      spawnCondition: 'player_lingers',
-    },
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

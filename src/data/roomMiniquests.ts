@@ -1,3 +1,8 @@
+// roomMiniquests.ts — data/roomMiniquests.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Description: Miniquest definitions for various rooms in Gorstan
+
 // roomMiniquests.ts/Location: src/data/Version: 1.0/Gorstan elements (c) Geoff Webster/Code licensed under the MIT License
 
 import { RoomMiniquests } from '../types/MiniquestTypes';

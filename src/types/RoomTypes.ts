@@ -1,3 +1,8 @@
+// RoomTypes.ts — types/RoomTypes.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Description: Basic room exits mapping directions to room IDs
+
 // Module: src/types/RoomTypes.ts
 // Gorstan (C) Geoff Webster 2025
 // Code MIT Licence

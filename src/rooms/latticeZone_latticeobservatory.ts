@@ -1,3 +1,8 @@
+// latticeZone_latticeobservatory.ts — rooms/latticeZone_latticeobservatory.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: latticeZone_latticeobservatory
+
 import { Room } from '../types/RoomTypes';
 
 const latticeobservatory: Room = {
@@ -51,18 +56,7 @@ const latticeobservatory: Room = {
   },
 
   npcs: [
-    {
-      id: "observatory_curator",
-      name: "Observatory Curator",
-      description: "A knowledgeable holographic guide, eager to share insights about the lattice.",
-      dialogue: {
-        greeting: "Welcome to the Lattice Observatory. The secrets of the structure await your discovery.",
-        help: "Use the observation equipment to analyze patterns and energy flows. Ask if you need guidance.",
-        farewell: "May your observations reveal new truths.",
-      },
-      spawnable: true,
-      spawnCondition: "player_accesses_data_terminal",
-    }
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

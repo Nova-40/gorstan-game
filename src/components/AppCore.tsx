@@ -1,3 +1,8 @@
+// AppCore.tsx — components/AppCore.tsx
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: AppCore
+
 // Module: src/components/AppCore.tsx
 // Gorstan (C) Geoff Webster 2025
 // Code MIT Licence
@@ -27,12 +32,26 @@ import DramaticWaitTransitionOverlay from './DramaticWaitTransitionOverlay';
 import RoomTransition from './animations/RoomTransition';
 import { useRoomTransition, getZoneDisplayName } from '../hooks/useRoomTransition';
 
+// Import optimized hooks for better performance and code organization
+import { useFlags } from '../hooks/useFlags';
+import { useModuleLoader } from '../hooks/useModuleLoader';
+import { useTimers } from '../hooks/useTimers';
+import { useOptimizedEffects } from '../hooks/useOptimizedEffects';
+
 const AppCore: React.FC = () => {
   const { state, dispatch } = useGameState();
+  
+  // Use optimized hooks for better performance
+  const { hasFlag, setFlag, clearFlag } = useFlags();
+  const { loadModule } = useModuleLoader();
+  const { setTimer, clearTimer } = useTimers();
 
   const stage = state.stage || '';
   const room = state.roomMap?.[state.currentRoomId] || null;
   const playerName = state.player?.name || 'Player';
+
+  // Apply additional optimized effects for system commands
+  useOptimizedEffects(state, dispatch, room);
 
   const [transitionType, setTransitionType] = useState<string | null>(null);
   const [hasLoaded, setHasLoaded] = useState(false);
@@ -52,61 +71,57 @@ const AppCore: React.FC = () => {
     }
   }, [room, previousRoom]);
 
-  // Handle wandering NPCs when entering rooms
+  // Handle wandering NPCs when entering rooms (OPTIMIZED)
   useEffect(() => {
-    if (room && state.flags?.evaluateWanderingNPCs) {
-      // Clear the flag
-      dispatch({ type: 'SET_FLAG', payload: { key: 'evaluateWanderingNPCs', value: false } });
-      
-      // Evaluate wandering NPCs for the current room
+    if (room && hasFlag('evaluateWanderingNPCs')) {
+      clearFlag('evaluateWanderingNPCs');
       handleRoomEntryForWanderingNPCs(room, state, dispatch);
     }
-  }, [room, state.flags?.evaluateWanderingNPCs, state, dispatch]);
+  }, [room, hasFlag('evaluateWanderingNPCs'), state, dispatch, clearFlag]);
 
-  // Handle debug commands for wandering NPCs
+  // Handle debug commands for wandering NPCs (OPTIMIZED)
   useEffect(() => {
-    if (state.flags?.debugSpawnNPC && state.flags?.debugSpawnRoom) {
-      import('../engine/wanderingNPCController').then(({ debugSpawnWanderingNPC }) => {
-        const success = debugSpawnWanderingNPC(
-          state.flags.debugSpawnNPC, 
-          state.flags.debugSpawnRoom, 
-          dispatch
-        );
+    const debugSpawnNPC = hasFlag('debugSpawnNPC');
+    const debugSpawnRoom = hasFlag('debugSpawnRoom');
+    
+    if (debugSpawnNPC && debugSpawnRoom) {
+      loadModule('../engine/wanderingNPCController').then(({ debugSpawnWanderingNPC }) => {
+        const success = debugSpawnWanderingNPC(debugSpawnNPC, debugSpawnRoom, dispatch);
         
         dispatch({ 
           type: 'ADD_MESSAGE', 
           payload: {
             text: success 
-              ? `DEBUG: Spawned NPC '${state.flags.debugSpawnNPC}' successfully.`
-              : `DEBUG: Failed to spawn NPC '${state.flags.debugSpawnNPC}'.`,
+              ? `DEBUG: Spawned NPC '${debugSpawnNPC}' successfully.`
+              : `DEBUG: Failed to spawn NPC '${debugSpawnNPC}'.`,
             type: success ? 'system' : 'error',
             timestamp: Date.now()
           }
         });
       });
       
-      // Clear the flags
-      dispatch({ type: 'SET_FLAG', payload: { key: 'debugSpawnNPC', value: false } });
-      dispatch({ type: 'SET_FLAG', payload: { key: 'debugSpawnRoom', value: false } });
+      clearFlag('debugSpawnNPC');
+      clearFlag('debugSpawnRoom');
     }
-  }, [state.flags?.debugSpawnNPC, state.flags?.debugSpawnRoom, dispatch]);
+  }, [hasFlag('debugSpawnNPC'), hasFlag('debugSpawnRoom'), dispatch, clearFlag, loadModule]);
 
+  // Handle debug list NPCs (OPTIMIZED)
   useEffect(() => {
-    if (state.flags?.debugListNPCs) {
-      import('../engine/wanderingNPCController').then(({ debugListActiveWanderingNPCs }) => {
+    if (hasFlag('debugListNPCs')) {
+      loadModule('../engine/wanderingNPCController').then(({ debugListActiveWanderingNPCs }) => {
         debugListActiveWanderingNPCs();
       });
-      
-      // Clear the flag
-      dispatch({ type: 'SET_FLAG', payload: { key: 'debugListNPCs', value: false } });
+      clearFlag('debugListNPCs');
     }
-  }, [state.flags?.debugListNPCs, dispatch]);
+  }, [hasFlag('debugListNPCs'), clearFlag, loadModule]);
 
-  // Handle pending Mr. Wendell commands
+  // Handle pending Mr. Wendell commands (OPTIMIZED)
   useEffect(() => {
-    if (state.flags?.pendingWendellCommand) {
-      import('../engine/mrWendellController').then(({ handleWendellInteraction }) => {
-        const result = handleWendellInteraction(state.flags.pendingWendellCommand, state, dispatch);
+    const pendingCommand = hasFlag('pendingWendellCommand');
+    
+    if (pendingCommand) {
+      loadModule('../engine/mrWendellController').then(({ handleWendellInteraction }) => {
+        const result = handleWendellInteraction(pendingCommand, state, dispatch);
         if (!result.handled) {
           dispatch({
             type: 'ADD_MESSAGE',
@@ -119,17 +134,17 @@ const AppCore: React.FC = () => {
           });
         }
       });
-      
-      // Clear the flag
-      dispatch({ type: 'SET_FLAG', payload: { key: 'pendingWendellCommand', value: false } });
+      clearFlag('pendingWendellCommand');
     }
-  }, [state.flags?.pendingWendellCommand, state, dispatch]);
+  }, [hasFlag('pendingWendellCommand'), state, dispatch, clearFlag, loadModule]);
 
-  // Handle pending Librarian commands
+  // Handle pending Librarian commands (OPTIMIZED)
   useEffect(() => {
-    if (state.flags?.pendingLibrarianCommand) {
-      import('../engine/librarianController').then(({ handleLibrarianInteraction }) => {
-        const result = handleLibrarianInteraction(state.flags.pendingLibrarianCommand, state, dispatch);
+    const pendingCommand = hasFlag('pendingLibrarianCommand');
+    
+    if (pendingCommand) {
+      loadModule('../engine/librarianController').then(({ handleLibrarianInteraction }) => {
+        const result = handleLibrarianInteraction(pendingCommand, state, dispatch);
         if (!result.handled) {
           dispatch({
             type: 'ADD_MESSAGE',
@@ -142,20 +157,15 @@ const AppCore: React.FC = () => {
           });
         }
       });
-      
-      // Clear the flag
-      dispatch({ type: 'SET_FLAG', payload: { key: 'pendingLibrarianCommand', value: false } });
+      clearFlag('pendingLibrarianCommand');
     }
-  }, [state.flags?.pendingLibrarianCommand, state, dispatch]);
+  }, [hasFlag('pendingLibrarianCommand'), state, dispatch, clearFlag, loadModule]);
 
-  // Handle force Mr. Wendell spawn
+  // Handle force Mr. Wendell spawn (OPTIMIZED)
   useEffect(() => {
-    if (state.flags?.forceWendellSpawn && room) {
-      import('../engine/mrWendellController').then((module) => {
-        // Force spawn by setting triggers
-        dispatch({ type: 'SET_FLAG', payload: { key: 'wasRudeToNPC', value: true } });
-        
-        // Trigger room evaluation to spawn Wendell
+    if (hasFlag('forceWendellSpawn') && room) {
+      loadModule('../engine/mrWendellController').then((module) => {
+        setFlag('wasRudeToNPC', true);
         handleRoomEntryForWanderingNPCs(room, state, dispatch);
         
         dispatch({
@@ -168,38 +178,34 @@ const AppCore: React.FC = () => {
           }
         });
       });
-      
-      // Clear the flag
-      dispatch({ type: 'SET_FLAG', payload: { key: 'forceWendellSpawn', value: false } });
+      clearFlag('forceWendellSpawn');
     }
-  }, [state.flags?.forceWendellSpawn, room, state, dispatch]);
+  }, [hasFlag('forceWendellSpawn'), room, state, dispatch, setFlag, clearFlag, loadModule]);
 
-  // Handle Mr. Wendell status check
+  // Handle Mr. Wendell status check (OPTIMIZED)
   useEffect(() => {
-    if (state.flags?.checkWendellStatus) {
-      import('../engine/mrWendellController').then(({ isWendellActive, getWendellRoom }) => {
+    if (hasFlag('checkWendellStatus')) {
+      loadModule('../engine/mrWendellController').then(({ isWendellActive, getWendellRoom }) => {
         console.log('[DEBUG] Mr. Wendell Status:');
         console.log('- Active:', isWendellActive());
         console.log('- Current Room:', getWendellRoom());
         console.log('- Player Flags:', {
-          wasRudeToNPC: state.flags?.wasRudeToNPC,
-          wasRudeRecently: state.flags?.wasRudeRecently,
-          wendellSpared: state.flags?.wendellSpared
+          wasRudeToNPC: hasFlag('wasRudeToNPC'),
+          wasRudeRecently: hasFlag('wasRudeRecently'),
+          wendellSpared: hasFlag('wendellSpared')
         });
         console.log('- Cursed Items:', state.player.inventory.filter((item: any) => 
           ['cursedcoin', 'doomedscroll', 'cursed_artifact'].includes(item.toLowerCase())
         ));
       });
-      
-      // Clear the flag
-      dispatch({ type: 'SET_FLAG', payload: { key: 'checkWendellStatus', value: false } });
+      clearFlag('checkWendellStatus');
     }
-  }, [state.flags?.checkWendellStatus, state, dispatch]);
+  }, [hasFlag('checkWendellStatus'), state.player.inventory, hasFlag, clearFlag, loadModule]);
 
-  // Handle force Librarian spawn
+  // Handle force Librarian spawn (OPTIMIZED)
   useEffect(() => {
-    if (state.flags?.forceLibrarianSpawn && room) {
-      import('../engine/librarianController').then(({ spawnLibrarian }) => {
+    if (hasFlag('forceLibrarianSpawn') && room) {
+      loadModule('../engine/librarianController').then(({ spawnLibrarian }) => {
         // Check if it's a library room
         const isLibrary = room.id?.toLowerCase().includes('library') || 
                          room.title?.toLowerCase().includes('library') ||
@@ -229,38 +235,34 @@ const AppCore: React.FC = () => {
           });
         }
       });
-      
-      // Clear the flag
-      dispatch({ type: 'SET_FLAG', payload: { key: 'forceLibrarianSpawn', value: false } });
+      clearFlag('forceLibrarianSpawn');
     }
-  }, [state.flags?.forceLibrarianSpawn, room, state, dispatch]);
+  }, [hasFlag('forceLibrarianSpawn'), room, state, dispatch, clearFlag, loadModule]);
 
-  // Handle Librarian status check
+  // Handle Librarian status check (OPTIMIZED)
   useEffect(() => {
-    if (state.flags?.checkLibrarianStatus) {
-      import('../engine/librarianController').then(({ isLibrarianActive, getLibrarianRoom, getLibrarianDebugInfo }) => {
+    if (hasFlag('checkLibrarianStatus')) {
+      loadModule('../engine/librarianController').then(({ isLibrarianActive, getLibrarianRoom, getLibrarianDebugInfo }) => {
         console.log('[DEBUG] Librarian Status:');
         console.log('- Active:', isLibrarianActive());
         console.log('- Current Room:', getLibrarianRoom());
         console.log('- Debug Info:', getLibrarianDebugInfo());
         console.log('- Player Flags:', {
-          hasUnlockedScrolls: state.flags?.hasUnlockedScrolls,
-          hasSolvedLibraryPuzzle: state.flags?.hasSolvedLibraryPuzzle
+          hasUnlockedScrolls: hasFlag('hasUnlockedScrolls'),
+          hasSolvedLibraryPuzzle: hasFlag('hasSolvedLibraryPuzzle')
         });
         console.log('- Has Greasy Napkin:', state.player.inventory.some((item: any) => 
           item.toLowerCase().includes('napkin')
         ));
       });
-      
-      // Clear the flag
-      dispatch({ type: 'SET_FLAG', payload: { key: 'checkLibrarianStatus', value: false } });
+      clearFlag('checkLibrarianStatus');
     }
-  }, [state.flags?.checkLibrarianStatus, state, dispatch]);
+  }, [hasFlag('checkLibrarianStatus'), state.player.inventory, hasFlag, clearFlag, loadModule]);
 
   // Get transition information
   const transitionInfo = useRoomTransition(previousRoom, room, lastMovementAction);
 
-  // Load room map once on first mount
+  // Load room map once on first mount (OPTIMIZED)
   useEffect(() => {
     if (!hasMounted.current) {
       hasMounted.current = true;
@@ -274,20 +276,18 @@ const AppCore: React.FC = () => {
       initializeAchievementEngine(dispatch);
       console.log('[AppCore] Achievement engine initialized.');
       
-      // Initialize score manager with dispatch function
-      import('../state/scoreManager').then(({ initializeScoreManager }) => {
+      // Initialize systems using optimized module loader
+      loadModule('../state/scoreManager').then(({ initializeScoreManager }) => {
         initializeScoreManager(dispatch);
         console.log('[AppCore] Score manager initialized.');
       });
       
-      // Initialize codex tracker with dispatch function
-      import('../logic/codexTracker').then(({ initializeCodexTracker }) => {
+      loadModule('../logic/codexTracker').then(({ initializeCodexTracker }) => {
         initializeCodexTracker(dispatch);
         console.log('[AppCore] Codex tracker initialized.');
       });
       
-      // Initialize miniquest system
-      import('../engine/miniquestInitializer').then(({ initializeMiniquests }) => {
+      loadModule('../engine/miniquestInitializer').then(({ initializeMiniquests }) => {
         initializeMiniquests();
         console.log('[AppCore] Miniquest system initialized.');
       });
@@ -301,7 +301,7 @@ const AppCore: React.FC = () => {
       setHasLoaded(true);
       console.log('[AppCore] Room loaded:', room.id);
     }
-  }, [room, hasLoaded, dispatch]);
+  }, [room, hasLoaded, dispatch, loadModule]);
 
   // Detect when roomMap is populated
   useEffect(() => {
@@ -312,39 +312,27 @@ const AppCore: React.FC = () => {
     }
   }, [state.roomMap, roomMapReady]);
 
-  // Detect stage changes — only after roomMap is ready
+  // Detect stage changes — only after roomMap is ready (OPTIMIZED)
   useEffect(() => {
     if (!roomMapReady) return;
 
-    if (stage === 'transition_jump') {
-      setTransitionType('jump');
-      // Apply intro choice scoring
-      import('../state/scoreEffects').then(({ applyScoreForEvent }) => {
-        applyScoreForEvent('intro.choice.jump');
+    const stageTransitions: Record<string, string> = {
+      'transition_jump': 'jump',
+      'transition_sip': 'sip', 
+      'transition_wait': 'wait',
+      'transition_dramatic_wait': 'dramatic_wait'
+    };
+
+    const transitionType = stageTransitions[stage];
+    if (transitionType) {
+      setTransitionType(transitionType);
+      
+      // Apply intro choice scoring using optimized module loader
+      loadModule('../state/scoreEffects').then(({ applyScoreForEvent }) => {
+        applyScoreForEvent(`intro.choice.${transitionType === 'dramatic_wait' ? 'dramatic_wait' : transitionType}`);
       });
     }
-    else if (stage === 'transition_sip') {
-      setTransitionType('sip');
-      // Apply intro choice scoring
-      import('../state/scoreEffects').then(({ applyScoreForEvent }) => {
-        applyScoreForEvent('intro.choice.sip');
-      });
-    }
-    else if (stage === 'transition_wait') {
-      setTransitionType('wait');
-      // Apply intro choice scoring
-      import('../state/scoreEffects').then(({ applyScoreForEvent }) => {
-        applyScoreForEvent('intro.choice.wait');
-      });
-    }
-    else if (stage === 'transition_dramatic_wait') {
-      setTransitionType('dramatic_wait');
-      // Apply special scoring for the dramatic wait
-      import('../state/scoreEffects').then(({ applyScoreForEvent }) => {
-        applyScoreForEvent('intro.choice.dramatic_wait');
-      });
-    }
-  }, [stage, roomMapReady]);
+  }, [stage, roomMapReady, loadModule]);
 
   // Final guarded transition logic
   useEffect(() => {

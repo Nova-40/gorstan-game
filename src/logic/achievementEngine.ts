@@ -1,3 +1,8 @@
+// achievementEngine.ts — logic/achievementEngine.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Description: Initialize the achievement engine with dispatch function
+
 
 // Filename: achievementEngine.ts
 // Location: logic/

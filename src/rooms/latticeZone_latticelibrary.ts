@@ -1,3 +1,8 @@
+// latticeZone_latticelibrary.ts — rooms/latticeZone_latticelibrary.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: latticeZone_latticelibrary
+
 import { Room } from '../types/RoomTypes';
 
 const latticelibrary: Room = {
@@ -69,18 +74,7 @@ const latticelibrary: Room = {
   },
 
   npcs: [
-    {
-      id: "librarian_echo",
-      name: "Librarian Echo",
-      description: "A spectral librarian who maintains the order of the Lattice Library.",
-      dialogue: {
-        greeting: "Welcome, seeker of knowledge. The library is open to those who respect its order.",
-        help: "Seek the hidden shelves and listen to the books. Not all knowledge is obvious.",
-        farewell: "Return what you take, and the library will remember you kindly.",
-      },
-      spawnable: true,
-      spawnCondition: "player_accesses_crystal_terminal",
-    }
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

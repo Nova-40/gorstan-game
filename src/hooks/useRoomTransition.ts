@@ -1,3 +1,8 @@
+// useRoomTransition.ts — hooks/useRoomTransition.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: useRoomTransition
+
 // Module: src/hooks/useRoomTransition.ts
 // Gorstan (C) Geoff Webster 2025
 // Code MIT Licence

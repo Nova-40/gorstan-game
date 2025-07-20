@@ -1,3 +1,8 @@
+// introZone_crossing.ts — rooms/introZone_crossing.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: introZone_crossing
+
 import { RoomDefinition } from '../types/RoomTypes';
 
 const crossing: RoomDefinition = {
@@ -7,6 +12,7 @@ const crossing: RoomDefinition = {
   description: [
     'You find yourself in a pristine white chamber that seems to stretch impossibly in all directions. The walls, floor, and ceiling are a seamless, brilliant white that somehow doesn\'t hurt your eyes.',
     'In the center of this endless space sits a single white chair, its simple design both inviting and somehow ominous. The chair appears to be the only fixed point in this reality.',
+    'Near the chair, a crystalline control panel shimmers into existence, its surface covered with glowing teleportation symbols. For those carrying navigation devices, an additional ethereal console phases in and out of reality, waiting to interface with dimensional travel tools.',
     'All around you, countless doors rotate and shift in a mesmerizing dance. They appear and disappear, change position and orientation, creating an endless kaleidoscope of possibilities. Each door is unique - some ornate, some simple, some that seem to be made of light itself.',
     'The silence here is absolute, broken only by the whisper of shifting realities as the doors continue their eternal rotation. This place feels like the crossroads of all existence.',
     'Strangely, if you survived a particularly dramatic arrival here, you might find a cup of impossibly intact quantum coffee steaming nearby, and perhaps even notice a familiar apartment door among the rotating possibilities.',
@@ -54,6 +60,16 @@ const crossing: RoomDefinition = {
       actions: ['examine', 'sit', 'touch'],
       requires: [],
     },
+    'control_panel': {
+      description: 'A sleek crystalline control panel materializes near the chair when you approach. Its surface glows with teleportation symbols and destination codes.',
+      actions: ['examine', 'press', 'activate', 'touch'],
+      requires: [],
+    },
+    'navigation_console': {
+      description: 'An ethereal console that appears to phase in and out of reality. It responds to devices that can navigate dimensional space.',
+      actions: ['examine', 'press', 'use', 'interface'],
+      requires: ['remote_control', 'navigation_crystal'],
+    },
     'rotating_doors': {
       description: 'Countless doors in constant motion, each one a gateway to a different reality. They shift and change too quickly to focus on any single one.',
       actions: ['examine', 'focus', 'reach_for'],
@@ -87,18 +103,7 @@ const crossing: RoomDefinition = {
   },
 
   npcs: [
-    {
-      id: 'crossing_guide',
-      name: 'The Pathway Guardian',
-      description: 'A shimmering figure that appears only when you\'re not looking directly at them',
-      dialogue: {
-        greeting: 'Welcome, traveler. You stand at the center of all possibilities.',
-        help: 'The chair will take you to safety. The doors... well, they lead everywhere and nowhere.',
-        farewell: 'Choose wisely. Some journeys cannot be undone.',
-      },
-      spawnable: true,
-      spawnCondition: 'doors_examined',
-    },
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

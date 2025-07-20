@@ -1,0 +1,68 @@
+# .prettierignore — Files to exclude from Prettier formatting
+# Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+# Code MIT Licence
+
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+*.min.js
+*.min.css
+
+# Generated files
+*.d.ts
+coverage/
+
+# Config files (formatted manually)
+*.config.js
+*.config.ts
+vite.config.*
+tailwind.config.*
+postcss.config.*
+
+# Documentation
+*.md
+CHANGELOG*
+LICENSE*
+
+# Assets
+public/
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.ico
+*.mp3
+*.wav
+*.ogg
+
+# IDE and system files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+.tmp/
+temp/
+*.tmp
+*.temp
+
+# Archives
+*.zip
+*.tar.gz
+*.rar
+
+# Lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml

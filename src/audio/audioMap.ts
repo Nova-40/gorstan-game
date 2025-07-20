@@ -1,3 +1,8 @@
+// audioMap.ts — audio/audioMap.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: audioMap
+
 // PATCHED: src/audio/audioMap.js
 
 export 

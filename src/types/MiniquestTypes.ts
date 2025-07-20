@@ -1,3 +1,8 @@
+// MiniquestTypes.ts — types/MiniquestTypes.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Description: Types for the miniquest system that provides optional challenges and flavor content
+
 // Module: src/types/MiniquestTypes.ts
 // Gorstan (C) Geoff Webster 2025
 // Code MIT Licence

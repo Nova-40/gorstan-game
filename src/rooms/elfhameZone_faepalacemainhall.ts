@@ -1,3 +1,8 @@
+// elfhameZone_faepalacemainhall.ts — rooms/elfhameZone_faepalacemainhall.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: elfhameZone_faepalacemainhall
+
 import { RoomDefinition } from '../types/RoomTypes';
 
 const faepalacemainhall: RoomDefinition = {
@@ -42,7 +47,7 @@ const faepalacemainhall: RoomDefinition = {
   interactables: {
     'crystal_thrones': {
       description: 'Twin thrones carved from starlight-infused crystal, radiating authority even when empty.',
-      actions: ['examine', 'approach', 'bow'],
+      actions: ['examine', 'approach', 'bow', 'sit', 'press'],
       requires: [],
     },
     'living_columns': {

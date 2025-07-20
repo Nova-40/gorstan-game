@@ -1,3 +1,8 @@
+// moralFramework.ts — components/moralFramework.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: moralFramework
+
 // src/ai/moralFramework.js
 
     if (action === 'harm' && target.isSentient) {

@@ -1,3 +1,8 @@
+// gorstanZone_carronspire.ts — rooms/gorstanZone_carronspire.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: gorstanZone_carronspire
+
 import { Room } from '../types/RoomTypes';
 
 const carronspire: Room = {
@@ -53,18 +58,7 @@ const carronspire: Room = {
   },
 
   npcs: [
-    {
-      id: "spire_keeper",
-      name: "Spire Keeper",
-      description: "A spectral guardian who appears when the runes are activated.",
-      dialogue: {
-        greeting: "Welcome, seeker. Few dare ascend Carron Spire.",
-        help: "The runes hold the key to the summit. Seek the fragments and restore their power.",
-        farewell: "May the winds guide you, traveler.",
-      },
-      spawnable: true,
-      spawnCondition: "rune_panel_activated",
-    }
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

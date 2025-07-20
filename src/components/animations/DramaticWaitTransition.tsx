@@ -1,3 +1,8 @@
+// DramaticWaitTransition.tsx — components/animations/DramaticWaitTransition.tsx
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: DramaticWaitTransition
+
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 

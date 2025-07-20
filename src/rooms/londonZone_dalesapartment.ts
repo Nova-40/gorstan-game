@@ -1,3 +1,8 @@
+// londonZone_dalesapartment.ts — rooms/londonZone_dalesapartment.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: londonZone_dalesapartment
+
 // Filename: londonZone_dalesapartment.ts
 // Location: rooms/
 // Version: v1 Beta
@@ -89,17 +94,7 @@ const dalesapartment: RoomDefinition = {
   },
 
   npcs: [
-    {
-      id: 'dominic_goldfish',
-      name: 'Dominic the Goldfish',
-      description: 'An unusually perceptive goldfish who seems to understand more than he should',
-      dialogue: {
-        greeting: '*Dominic swims to the front of the tank and stares at you with recognition*',
-        help: '*The goldfish performs a little loop, as if trying to tell you something important*',
-        farewell: '*Dominic settles near his castle, watching you with intelligent eyes*',
-      },
-      spawnable: false, // Always present in his tank
-    },
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

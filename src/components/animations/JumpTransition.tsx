@@ -1,3 +1,8 @@
+// JumpTransition.tsx — components/animations/JumpTransition.tsx
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: JumpTransition
+
 
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';

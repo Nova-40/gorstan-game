@@ -1,3 +1,8 @@
+// mazeZone_mazeroom.ts — rooms/mazeZone_mazeroom.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: mazeZone_mazeroom
+
 import { Room } from '../types/RoomTypes';
 
 const mazeroom: Room = {
@@ -44,18 +49,7 @@ const mazeroom: Room = {
   },
 
   npcs: [
-    {
-      id: "wandering_lost",
-      name: "Wandering Lost",
-      description: "A dazed traveler who seems to be searching for a way out.",
-      dialogue: {
-        greeting: "Is this the way out? Or have I been here before?",
-        help: "If you find a map, please let me see it.",
-        farewell: "I'll keep searching. Good luck.",
-      },
-      spawnable: true,
-      spawnCondition: "player_marks_wall",
-    }
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

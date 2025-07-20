@@ -1,3 +1,8 @@
+// mazeZone_forgottenchamber.ts — rooms/mazeZone_forgottenchamber.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: mazeZone_forgottenchamber
+
 import { Room } from '../types/RoomTypes';
 
 const forgottenchamber: Room = {
@@ -48,18 +53,7 @@ const forgottenchamber: Room = {
   },
 
   npcs: [
-    {
-      id: "chamber_shade",
-      name: "Chamber Shade",
-      description: "A faint, sorrowful apparition lingering in the shadows.",
-      dialogue: {
-        greeting: "Who disturbs my rest after all these years?",
-        help: "The markings hold the key. Find what was lost.",
-        farewell: "May you find your way out, as I never did.",
-      },
-      spawnable: true,
-      spawnCondition: "player_searches_cobwebbed_corner",
-    }
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

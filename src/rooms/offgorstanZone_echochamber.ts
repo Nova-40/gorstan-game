@@ -1,3 +1,8 @@
+// offgorstanZone_echochamber.ts — rooms/offgorstanZone_echochamber.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: offgorstanZone_echochamber
+
 import { Room } from '../types/RoomTypes';
 
 const echochamber: Room = {
@@ -42,18 +47,7 @@ const echochamber: Room = {
   },
 
   npcs: [
-    {
-      id: "echo_savant",
-      name: "Echo Savant",
-      description: "A figure who has mastered the art of interpreting echoes, deciphering meaning from the noise.",
-      dialogue: {
-        greeting: "Welcome to the chamber of echoes. Can you hear the truth within the noise?",
-        help: "Not all echoes are mere repetition—some carry secrets from the past.",
-        farewell: "May your words find their way back to you.",
-      },
-      spawnable: true,
-      spawnCondition: "player_stands_central_dais",
-    }
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

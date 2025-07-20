@@ -1,3 +1,8 @@
+// miniquestEngine.ts — engine/miniquestEngine.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Description: Core miniquest engine for handling optional challenges and flavor content
+
 // Module: src/engine/miniquestEngine.ts
 // Gorstan (C) Geoff Webster 2025
 // Code MIT Licence

@@ -1,3 +1,8 @@
+// introZone_controlroom.ts — rooms/introZone_controlroom.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: introZone_controlroom
+
 import { RoomDefinition } from '../types/RoomTypes';
 
 const controlroom: RoomDefinition = {
@@ -94,18 +99,7 @@ const controlroom: RoomDefinition = {
 
   // NPCs that might be encountered
   npcs: [
-    {
-      id: 'emergency_ai',
-      name: 'Emergency Response AI',
-      description: 'An artificial intelligence system managing crisis protocols',
-      dialogue: {
-        greeting: 'Operator detected. Current crisis level: MAXIMUM. Immediate action required.',
-        help: 'Multiple system failures detected. Recommend priority focus on dimensional anchor stabilization.',
-        farewell: 'Good luck, operator. The network\'s survival depends on your actions.',
-      },
-      spawnable: true,
-      spawnCondition: 'emergency_panel_activated',
-    },
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

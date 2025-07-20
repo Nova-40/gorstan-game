@@ -1,3 +1,8 @@
+// PresentNPCsPanel.tsx — components/PresentNPCsPanel.tsx
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: PresentNPCsPanel
+
 
 import React from 'react';
 import { useGameState } from '../state/gameState';

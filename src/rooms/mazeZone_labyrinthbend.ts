@@ -1,3 +1,8 @@
+// mazeZone_labyrinthbend.ts — rooms/mazeZone_labyrinthbend.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: mazeZone_labyrinthbend
+
 import { Room } from '../types/RoomTypes';
 
 const labyrinthbend: Room = {
@@ -42,18 +47,7 @@ const labyrinthbend: Room = {
   },
 
   npcs: [
-    {
-      id: "maze_whisperer",
-      name: "Maze Whisperer",
-      description: "A mysterious figure who seems to blend into the shadows, offering cryptic advice.",
-      dialogue: {
-        greeting: "Not all turns lead forward. Some lead within.",
-        help: "Mark the wall, listen to the echoes, and trust your instincts.",
-        farewell: "The labyrinth remembers every step.",
-      },
-      spawnable: true,
-      spawnCondition: "player_listens_echo_corner",
-    }
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

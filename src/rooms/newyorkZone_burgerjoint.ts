@@ -1,3 +1,8 @@
+// newyorkZone_burgerjoint.ts — rooms/newyorkZone_burgerjoint.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: newyorkZone_burgerjoint
+
 import { RoomDefinition } from '../types/RoomTypes';
 
 const burgerjoint: RoomDefinition = {
@@ -77,6 +82,11 @@ const burgerjoint: RoomDefinition = {
       actions: ['sit', 'examine', 'enjoy_atmosphere'],
       requires: [],
     },
+    'portal_booth': {
+      description: 'One particular booth in the back corner that seems to shimmer slightly. The vinyl looks newer, and sitting here feels different from the other booths.',
+      actions: ['sit', 'examine', 'press'],
+      requires: [],
+    },
     'storeroom_door': {
       description: 'A plain door behind the counter marked "Storage". The chef has offered to let you take a look inside.',
       actions: ['examine', 'request_access', 'enter'],
@@ -85,7 +95,7 @@ const burgerjoint: RoomDefinition = {
   },
 
   npcs: [
-    {
+{
       id: 'burger_chef',
       name: 'Chef Tony',
       description: 'A skilled chef who makes incredible burgers and apparently has connections in interesting places',
@@ -97,7 +107,7 @@ const burgerjoint: RoomDefinition = {
         authorized: 'Welcome back! Feel free to check out the storeroom - help yourself to anything useful.',
       },
       spawnable: false,
-    },
+    }
   ],
 
   events: {

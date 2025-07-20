@@ -1,3 +1,8 @@
+// latticeZone_libraryofnine.ts — rooms/latticeZone_libraryofnine.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: latticeZone_libraryofnine
+
 import { Room } from '../types/RoomTypes';
 
 const libraryofnine: Room = {
@@ -56,7 +61,7 @@ const libraryofnine: Room = {
   },
 
   npcs: [
-    {
+{
       id: "ninekeeper",
       name: "Ninekeeper",
       description: "A spectral librarian who oversees the Library of Nine and guards its secrets.",

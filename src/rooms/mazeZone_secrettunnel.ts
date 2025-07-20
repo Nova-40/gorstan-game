@@ -1,3 +1,8 @@
+// mazeZone_secrettunnel.ts — rooms/mazeZone_secrettunnel.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: mazeZone_secrettunnel
+
 import { Room } from '../types/RoomTypes';
 
 const secrettunnel: Room = {
@@ -49,18 +54,7 @@ const secrettunnel: Room = {
   },
 
   npcs: [
-    {
-      id: "tunnel_shadow",
-      name: "Tunnel Shadow",
-      description: "A fleeting shadow that moves just out of sight, whispering warnings.",
-      dialogue: {
-        greeting: "Careful, traveler. Not all tunnels lead where you expect.",
-        help: "The moss hides more than light. Search well.",
-        farewell: "The tunnel remembers those who linger.",
-      },
-      spawnable: true,
-      spawnCondition: "player_collects_glowing_moss",
-    }
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

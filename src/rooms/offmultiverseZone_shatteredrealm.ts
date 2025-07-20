@@ -1,3 +1,8 @@
+// offmultiverseZone_shatteredrealm.ts — rooms/offmultiverseZone_shatteredrealm.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: offmultiverseZone_shatteredrealm
+
 import { Room } from '../types/RoomTypes';
 
 const shatteredrealm: Room = {
@@ -45,18 +50,7 @@ const shatteredrealm: Room = {
   },
 
   npcs: [
-    {
-      id: "lost_wanderer",
-      name: "Lost Wanderer",
-      description: "A traveler from a forgotten world, searching for a way to restore what was lost.",
-      dialogue: {
-        greeting: "Have you seen my home? It was here, once, before the shattering.",
-        help: "The bridges are unstable. Only memory can guide you safely.",
-        farewell: "If you find a memory fragment, bring it to me. I may remember the way.",
-      },
-      spawnable: true,
-      spawnCondition: "player_collects_memory_fragment",
-    }
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

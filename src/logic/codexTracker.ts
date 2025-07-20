@@ -1,3 +1,8 @@
+// codexTracker.ts — logic/codexTracker.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Description: Initialize the codex tracker with dispatch function
+
 // Filename: codexTracker.ts
 // Location: logic/
 // Version: v1 Beta

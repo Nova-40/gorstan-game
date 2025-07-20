@@ -1,3 +1,8 @@
+// londonZone_stkatherinesdock.ts — rooms/londonZone_stkatherinesdock.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: londonZone_stkatherinesdock
+
 import { RoomDefinition } from '../types/RoomTypes';
 
 const stkatherinesdock: RoomDefinition = {
@@ -97,18 +102,7 @@ const stkatherinesdock: RoomDefinition = {
   },
 
   npcs: [
-    {
-      id: 'unaware_tourist',
-      name: 'Oblivious Visitor',
-      description: 'A tourist with a camera who seems completely unable to perceive the portal',
-      dialogue: {
-        greeting: 'Lovely day at the dock, isn\'t it? Such beautiful boats here.',
-        help: 'I\'m just taking photos of the marina. Nothing unusual to see here at all.',
-        farewell: 'Enjoy your visit to this perfectly normal historic dock!',
-      },
-      spawnable: true,
-      spawnCondition: 'daytime_visit',
-    },
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

@@ -1,3 +1,8 @@
+// londonZone_findlaters.ts — rooms/londonZone_findlaters.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: londonZone_findlaters
+
 import { RoomDefinition } from '../types/RoomTypes';
 
 const findlaters: RoomDefinition = {
@@ -55,6 +60,11 @@ const findlaters: RoomDefinition = {
       actions: ['examine', 'sit', 'wait_for_encounter'],
       requires: [],
     },
+    'dimensional_chair': {
+      description: 'A single chair in the corner that seems to exist slightly outside normal space-time. Sitting here might connect you to other realities.',
+      actions: ['examine', 'sit', 'press'],
+      requires: [],
+    },
     'reality_mirror': {
       description: 'A mirror on the wall that doesn\'t quite reflect what you expect - sometimes showing other versions of events.',
       actions: ['examine', 'look_into', 'question_reflection'],
@@ -78,29 +88,7 @@ const findlaters: RoomDefinition = {
   },
 
   npcs: [
-    {
-      id: 'oracle_barista',
-      name: 'The Knowing Barista',
-      description: 'A barista who seems to understand the true nature of reality and your place in unfolding events',
-      dialogue: {
-        greeting: 'You\'ve arrived at exactly the right moment. The usual, or something... more significant?',
-        help: 'Sometimes the most important conversations happen over coffee. Are you ready for yours?',
-        farewell: 'Remember - every choice echoes across realities. Choose wisely.',
-      },
-      spawnable: false,
-    },
-    {
-      id: 'mysterious_patron',
-      name: 'The Waiting Figure',
-      description: 'Someone sits at the significant table, clearly waiting for an important meeting',
-      dialogue: {
-        greeting: 'I wondered when you\'d arrive. Please, sit. We have much to discuss.',
-        help: 'The answers you seek aren\'t always the ones you expect to hear.',
-        farewell: 'Until our paths cross again in another instance of reality.',
-      },
-      spawnable: true,
-      spawnCondition: 'story_catalyst_needed',
-    },
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

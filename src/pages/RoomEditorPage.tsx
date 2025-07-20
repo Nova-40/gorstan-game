@@ -1,3 +1,8 @@
+// RoomEditorPage.tsx — pages/RoomEditorPage.tsx
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Description: Status message interface
+
 // Module: src/pages/RoomEditorPage.tsx
 // Gorstan (C) Geoff Webster 2025
 // Code MIT Licence

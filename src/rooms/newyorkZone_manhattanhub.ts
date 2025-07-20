@@ -1,3 +1,8 @@
+// newyorkZone_manhattanhub.ts — rooms/newyorkZone_manhattanhub.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: newyorkZone_manhattanhub
+
 import { RoomDefinition } from '../types/RoomTypes';
 
 const manhattanhub: RoomDefinition = {
@@ -75,19 +80,7 @@ const manhattanhub: RoomDefinition = {
   },
 
   npcs: [
-    {
-      id: 'albie_hub_security',
-      name: 'Albie',
-      description: 'The professional security guard who controls access to this interdimensional transit hub',
-      dialogue: {
-        greeting: 'Welcome to the Hub. I need to see your medallion before you can access the platforms.',
-        help: 'No medallion, no passage. You know the rules - solve the warehouse puzzle first.',
-        farewell: 'Safe travels. Remember, each zone has its own challenges.',
-        unauthorized: 'Stay in your lane, stranger. Come back when you\'ve got proper clearance.',
-        authorized: 'Welcome back. Your medallion checks out. Platform access granted.',
-      },
-      spawnable: false,
-    },
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

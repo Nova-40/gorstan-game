@@ -1,3 +1,8 @@
+// introZone_hiddenlab.ts — rooms/introZone_hiddenlab.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: introZone_hiddenlab
+
 import { RoomDefinition } from '../types/RoomTypes';
 
 const hiddenlab: RoomDefinition = {
@@ -88,18 +93,7 @@ const hiddenlab: RoomDefinition = {
   },
 
   npcs: [
-    {
-      id: 'reality_echo',
-      name: 'Echo of the Previous You',
-      description: 'A faint, translucent figure that looks exactly like you, but older and more worn',
-      dialogue: {
-        greeting: 'You... you\'re here again. I tried to warn you with the sign.',
-        help: 'The reset button upstairs... I pressed it. Multiple times. Each time made things worse.',
-        farewell: 'Don\'t repeat my mistakes. Some things can\'t be undone.',
-      },
-      spawnable: true,
-      spawnCondition: 'psychic_paper_sign_examined',
-    },
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

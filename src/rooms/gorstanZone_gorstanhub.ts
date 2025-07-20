@@ -1,3 +1,8 @@
+// gorstanZone_gorstanhub.ts — rooms/gorstanZone_gorstanhub.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: gorstanZone_gorstanhub
+
 import { Room } from '../types/RoomTypes';
 
 const gorstanhub: Room = {
@@ -53,18 +58,7 @@ const gorstanhub: Room = {
   },
 
   npcs: [
-    {
-      id: "hub_merchant",
-      name: "Market Merchant",
-      description: "A cheerful vendor with a keen eye for rare items and interesting stories.",
-      dialogue: {
-        greeting: "Welcome to Gorstan Hub! Looking for something special?",
-        help: "I've got trinkets, tokens, and tales. What do you need?",
-        farewell: "Safe travels, friend. Come back anytime!",
-      },
-      spawnable: true,
-      spawnCondition: "player_approaches_stall",
-    }
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

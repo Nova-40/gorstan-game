@@ -1,3 +1,8 @@
+// GameTypes.ts — types/GameTypes.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Description: Core player interface with all essential properties
+
 // Module: src/types/GameTypes.ts
 // Gorstan (C) Geoff Webster 2025
 // Code MIT Licence

@@ -1,3 +1,8 @@
+// commandProcessor.ts — engine/commandProcessor.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Description: Process traps when entering a room
+
 // Module: src/engine/commandProcessor.ts
 // Gorstan (C) Geoff Webster 2025
 // Code MIT Licence
@@ -114,6 +119,79 @@ function processRoomEntry(room: Room & Partial<RoomDefinition>, gameState: Local
       if (trapResult.updates) {
         updates = { ...updates, ...trapResult.updates };
       }
+    }
+  }
+
+  // Process room events
+  if (roomDef.events?.onEnter && Array.isArray(roomDef.events.onEnter)) {
+    const eventResult = processRoomEvents(roomDef.events.onEnter, room, gameState);
+    messages.push(...eventResult.messages);
+    if (eventResult.updates) {
+      updates = { ...updates, ...eventResult.updates };
+    }
+  }
+
+  return { messages, updates: Object.keys(updates).length > 0 ? updates : undefined };
+}
+
+/**
+ * Process room events like offerCoffeeAutomatically
+ */
+function processRoomEvents(events: string[], room: Room, gameState: LocalGameState): {
+  messages: TerminalMessage[];
+  updates?: Partial<LocalGameState>;
+} {
+  const messages: TerminalMessage[] = [];
+  let updates: Partial<LocalGameState> = {};
+
+  for (const event of events) {
+    switch (event) {
+      case 'offerCoffeeAutomatically':
+        // Only trigger if in coffee shop and player doesn't have coffee
+        if (room.id === 'findlaterscornercoffeeshop' && !gameState.player.inventory.includes('coffee')) {
+          const flags = gameState.flags || {};
+          
+          // Only offer once per visit
+          if (!flags.freeCoffeeOffered) {
+            messages.push({
+              text: '☕ "Coffee for Pyke!" Sarah the barista calls out cheerfully, already preparing a fresh cup.',
+              type: 'lore'
+            });
+            messages.push({
+              text: '"Here you go - on the house! You look like you could use it," she says with a warm smile.',
+              type: 'lore'
+            });
+            
+            // Add coffee to inventory
+            const newInventory = [...gameState.player.inventory, 'coffee'];
+            updates.player = { ...gameState.player, inventory: newInventory };
+            updates.flags = { ...flags, freeCoffeeOffered: true, coffeeForPykeCalled: true };
+            
+            messages.push({
+              text: '✨ You received: coffee',
+              type: 'info'
+            });
+          }
+        }
+        break;
+        
+      case 'resetCoffeeOfferFlag':
+        // Reset the coffee offer flag when leaving the coffee shop
+        if (room.id === 'findlaterscornercoffeeshop') {
+          const flags = gameState.flags || {};
+          updates.flags = { ...flags, freeCoffeeOffered: false };
+        }
+        break;
+        
+      case 'triggerFamiliarity':
+      case 'activateBarista':
+      case 'checkTimeOfDay':
+        // These events are handled by other systems or are purely narrative
+        break;
+        
+      default:
+        // Unhandled event - could log for debugging
+        break;
     }
   }
 
@@ -308,6 +386,19 @@ export function processCommand(
             currentRoom: targetRoomId,
           },
         };
+
+        // Process room exit events before leaving
+        const currentRoomDef = currentRoom as any;
+        if (currentRoomDef.events?.onExit && Array.isArray(currentRoomDef.events.onExit)) {
+          const exitResult = processRoomEvents(currentRoomDef.events.onExit, currentRoom, gameState);
+          messages.push(...exitResult.messages);
+          if (exitResult.updates) {
+            // Merge exit updates with movement updates
+            updates = { ...updates, ...exitResult.updates };
+            // Update gameState for entry processing
+            gameState = { ...gameState, ...exitResult.updates };
+          }
+        }
 
         // Process room entry events (traps, etc.) if target room exists
         if (targetRoom) {
@@ -819,56 +910,107 @@ export function processCommand(
         };
       }
 
-      // Handle teleport to [hub name] commands
+      // Handle teleport to [destination] commands
       if (!noun.startsWith('to ')) {
-        return { messages: [{ text: 'Usage: teleport to [hub name]', type: 'error' }] };
+        return { messages: [{ text: 'Usage: teleport to [destination]', type: 'error' }] };
       }
 
-      const targetHubName = noun.substring(3).trim(); // Remove "to " prefix
+      const targetDestination = noun.substring(3).trim(); // Remove "to " prefix
       
-      // Check if player has remote control
-      if (!gameState.player.inventory.includes('remote_control')) {
-        return { messages: [{ text: 'The remote hums quietly, but does nothing. You need the remote control to teleport.', type: 'error' }] };
+      // Check if player has either remote control or navigation crystal
+      const hasRemoteControl = gameState.player.inventory.includes('remote_control');
+      const hasNavigationCrystal = gameState.player.inventory.includes('navigation_crystal');
+      
+      if (!hasRemoteControl && !hasNavigationCrystal) {
+        return { 
+          messages: [{ 
+            text: 'You need either a remote control or navigation crystal to teleport.', 
+            type: 'error' 
+          }] 
+        };
       }
 
       // Check if player is at the crossing
-      if (gameState.currentRoomId !== 'introZone_crossing') {
-        return { messages: [{ text: 'You must be at the crossing to teleport. The remote doesn\'t respond elsewhere.', type: 'error' }] };
+      if (gameState.currentRoomId !== 'crossing') {
+        return { 
+          messages: [{ 
+            text: 'You must be at the crossing to teleport. The devices don\'t respond elsewhere.', 
+            type: 'error' 
+          }] 
+        };
       }
 
-      // Find matching hub
-      const targetHubId = allowedHubs[targetHubName.toLowerCase()];
-      if (!targetHubId) {
-        const availableHubs = Object.keys(allowedHubs).join(', ');
-        return { messages: [
-          { text: `That destination is not recognized.`, type: 'error' },
-          { text: `Available destinations: ${availableHubs}`, type: 'info' }
-        ] };
+      // Define allowed destinations
+      const remoteControlDestinations = [
+        'controlnexus', 'latticehub', 'gorstanhub', 'londonhub', 'mazehub',
+        'hiddenlab', 'controlroom', 'dalesapartment', 'findlaterscornercoffeeshop',
+        'gorstanvillage', 'lattice', 'datavoid', 'trentpark', 'stkatherinesdock',
+        'torridoninn', 'libraryofnine', 'mazeecho', 'elfhame', 'faepalacemainhall'
+      ];
+      
+      const crystalDestinations = ['trentpark', 'findlaterscornercoffeeshop'];
+      
+      // Determine available destinations based on what player has
+      let allowedDestinations: string[] = [];
+      let deviceName = '';
+      
+      if (hasRemoteControl) {
+        allowedDestinations = remoteControlDestinations;
+        deviceName = 'remote control';
+      } else if (hasNavigationCrystal) {
+        allowedDestinations = crystalDestinations;
+        deviceName = 'navigation crystal';
+      }
+
+      // Check if target destination is valid for the device
+      if (!allowedDestinations.includes(targetDestination)) {
+        const availableList = allowedDestinations.join(', ');
+        return { 
+          messages: [
+            { text: `The ${deviceName} cannot reach that destination.`, type: 'error' },
+            { text: `Available destinations: ${availableList}`, type: 'info' }
+          ] 
+        };
       }
 
       // Check if the target room exists in the game
-      if (!gameState.roomMap[targetHubId]) {
-        return { messages: [{ text: `The ${targetHubName} is currently inaccessible.`, type: 'error' }] };
+      if (!gameState.roomMap[targetDestination]) {
+        return { 
+          messages: [{ 
+            text: `The destination "${targetDestination}" is currently inaccessible.`, 
+            type: 'error' 
+          }] 
+        };
       }
 
       // Perform the teleportation
-      const targetDisplayName = hubDisplayNames[targetHubId] || targetHubName;
-      const messages: TerminalMessage[] = [
-        { text: `📱 Remote control activated. Warping to ${targetDisplayName}...`, type: 'system' },
-        { text: '🌀 Reality bends around you as the interdimensional portal opens!', type: 'system' },
-        { text: `✨ You emerge at the ${targetDisplayName}.`, type: 'system' }
-      ];
-
-      // Record usage in codex
+      const targetRoom = gameState.roomMap[targetDestination];
+      const targetDisplayName = targetRoom.title || targetDestination;
       
-      recordItemDiscovery('remote_control', `Teleported to ${targetDisplayName}`);
+      const messages: TerminalMessage[] = [];
+      
+      if (hasRemoteControl) {
+        messages.push(
+          { text: `📱 Remote control activated. Warping to ${targetDisplayName}...`, type: 'system' },
+          { text: '🌀 Reality bends around you as the interdimensional portal opens!', type: 'system' },
+          { text: `✨ You emerge at ${targetDisplayName}.`, type: 'system' }
+        );
+        recordItemDiscovery('remote_control', `Teleported to ${targetDisplayName}`);
+      } else {
+        messages.push(
+          { text: `🔮 Navigation crystal pulses with ancient energy...`, type: 'system' },
+          { text: '✨ The crystal guides you through a shimmering portal!', type: 'system' },
+          { text: `🌟 You arrive at ${targetDisplayName}.`, type: 'system' }
+        );
+        recordItemDiscovery('navigation_crystal', `Used crystal to reach ${targetDisplayName}`);
+      }
 
       // Apply score bonus for successful teleportation
       applyScoreForEvent('teleport.successful');
 
       // Update room
       const updates = {
-        currentRoomId: targetHubId,
+        currentRoomId: targetDestination,
         previousRoomId: gameState.currentRoomId,
       };
 
@@ -1023,20 +1165,22 @@ export function processCommand(
 
     case 'miniquest':
     case 'miniquests': {
-      // Show available miniquests in current room
-      const engine = MiniquestEngine.getInstance();
-      const questMessages = engine.listRoomQuests(gameState.currentRoomId, gameState as any);
-      
+      // Enhanced miniquest interface - delegate to new command system
       return {
-        messages: questMessages.map(msg => ({ text: msg, type: 'system' as const }))
+        messages: [
+          { text: '🎯 Enhanced miniquest interface available!', type: 'system' as const },
+          { text: 'The new world-class quest browser provides filtering, progress tracking, and detailed quest information.', type: 'info' as const },
+          { text: 'Use the interface to explore available quests, view requirements, and track completion.', type: 'info' as const }
+        ]
       };
     }
 
     case 'attempt': {
       if (!noun) {
-        return { messages: [{ text: 'What miniquest do you want to attempt?', type: 'error' }] };
+        return { messages: [{ text: 'What miniquest do you want to attempt? Use "miniquests" to see available options.', type: 'error' }] };
       }
 
+      // Enhanced attempt handling with better feedback
       const engine = MiniquestEngine.getInstance();
       const result = engine.attemptQuest(noun, gameState.currentRoomId, gameState as any);
       
@@ -1045,7 +1189,7 @@ export function processCommand(
       ];
 
       if (result.success && result.scoreAwarded) {
-        messages.push({ text: `Score: +${result.scoreAwarded} points!`, type: 'system' });
+        messages.push({ text: `🏆 Quest completed! +${result.scoreAwarded} points`, type: 'system' });
       }
 
       let updates: any = {};
@@ -1063,6 +1207,49 @@ export function processCommand(
         messages, 
         updates: Object.keys(updates).length > 0 ? updates : undefined 
       };
+    }
+
+    case 'quests': {
+      // Enhanced quest alias with better messaging
+      return {
+        messages: [
+          { text: '🎯 **Enhanced Quest System**', type: 'system' as const },
+          { text: 'World-class miniquest interface with filtering, progress tracking, and detailed quest information.', type: 'info' as const },
+          { text: 'Use "miniquests" to open the comprehensive quest browser.', type: 'info' as const }
+        ]
+      };
+    }
+
+    case 'objectives': {
+      // Show current objectives in this area
+      const engine = MiniquestEngine.getInstance();
+      const availableQuests = engine.getAvailableQuests(gameState.currentRoomId, gameState as any);
+      
+      if (availableQuests.length === 0) {
+        return {
+          messages: [
+            { text: '🎯 No immediate objectives in this area.', type: 'info' as const },
+            { text: 'Explore other locations or progress the main story to unlock new quests.', type: 'info' as const }
+          ]
+        };
+      }
+
+      const messages: TerminalMessage[] = [
+        { text: '🎯 **Current Objectives:**', type: 'system' as const }
+      ];
+
+      availableQuests.slice(0, 3).forEach(quest => {
+        messages.push({ text: `• ${quest.title} - ${quest.description}`, type: 'info' as const });
+        if (quest.triggerAction) {
+          messages.push({ text: `  Try: ${quest.triggerAction}`, type: 'lore' as const });
+        }
+      });
+
+      if (availableQuests.length > 3) {
+        messages.push({ text: `...and ${availableQuests.length - 3} more. Use "miniquests" to see all.`, type: 'info' as const });
+      }
+
+      return { messages };
     }
 
     case 'debug': {
@@ -1284,6 +1471,161 @@ export function processCommand(
     }
 
     case 'sit': {
+      // Special handling for Trent Park runic chair
+      if (currentRoom.id === 'trentpark' && 
+          (!noun || noun === 'chair' || noun === 'runic_chair' || noun === 'in_chair')) {
+        return {
+          messages: [
+            { text: 'You approach the mysterious runic chair and hesitate for a moment...', type: 'info' },
+            { text: 'The carved symbols around the base seem to pulse with anticipation.', type: 'lore' },
+            { text: 'As you sit, the ancient wood creaks softly, but feels surprisingly warm and inviting.', type: 'info' },
+            { text: '✨ The runes begin to glow with a soft, ethereal light.', type: 'lore' },
+            { text: '🌳 You sense the hidden watchers in the trees shifting closer, observing intently.', type: 'lore' },
+            { text: '🪑 A strange comfort settles over you - this chair has waited eons for the right person.', type: 'lore' },
+            { text: '⚡ Suddenly, a crystalline "Press" button materializes on the armrest, glowing softly.', type: 'system' },
+            { text: '💡 Type "press" to activate the chair\'s portal powers and travel to visited rooms.', type: 'info' }
+          ],
+          updates: {
+            flags: {
+              ...gameState.flags,
+              sittingInTrentParkChair: true,
+            },
+          },
+        };
+      }
+
+      // Special handling for Torridon Inn innkeeper chair
+      if (currentRoom.id === 'torridoninn' && 
+          (!noun || noun === 'chair' || noun === 'innkeeper_chair' || noun === 'in_chair')) {
+        return {
+          messages: [
+            { text: 'You carefully settle into the innkeeper\'s wooden chair behind the bar...', type: 'info' },
+            { text: '🍺 The chair creaks knowingly under your weight - it has supported many travelers before you.', type: 'info' },
+            { text: '🏰 From this position, you feel connected to the hospitality traditions of old Gorstan.', type: 'lore' },
+            { text: '✨ The chair seems to resonate with memories of countless stories shared over ale and food.', type: 'lore' },
+            { text: '🗺️ A sense of the inn\'s connection to distant places fills your awareness.', type: 'lore' },
+            { text: '⚡ Suddenly, a carved wooden "Press" panel slides out from the chair\'s armrest.', type: 'system' },
+            { text: '💡 Type "press" to access the innkeeper\'s travel network.', type: 'info' }
+          ],
+          updates: {
+            flags: {
+              ...gameState.flags,
+              sittingInTorridonInnChair: true,
+            },
+          },
+        };
+      }
+
+      // Special handling for Burger Joint portal booth
+      if (currentRoom.id === 'burgerjoint' && 
+          (!noun || noun === 'chair' || noun === 'booth' || noun === 'portal_booth' || noun === 'in_booth')) {
+        return {
+          messages: [
+            { text: 'You slide into the shimmering portal booth in the back corner...', type: 'info' },
+            { text: '🍔 The vinyl seat feels surprisingly warm and comfortable, as if infused with dimensional energy.', type: 'info' },
+            { text: '✨ The booth seems to exist slightly outside normal space - you feel connected to other realities.', type: 'lore' },
+            { text: '🌟 The air around you shimmers with a faint golden light, and distant music plays softly.', type: 'lore' },
+            { text: '🪑 Your burger joint experience is enhanced by this comfortable interdimensional seating.', type: 'lore' },
+            { text: '⚡ Suddenly, a subtle "Press" control appears on the table in front of you.', type: 'system' },
+            { text: '💡 Type "press" to activate the booth\'s reality navigation system.', type: 'info' }
+          ],
+          updates: {
+            flags: {
+              ...gameState.flags,
+              sittingInBurgerJointBooth: true,
+            },
+          },
+        };
+      }
+
+      // Special handling for Findlater's dimensional chair
+      if ((currentRoom.id === 'findlaters' || currentRoom.id === 'findlaterscornercoffeeshop') && 
+          (!noun || noun === 'chair' || noun === 'dimensional_chair' || noun === 'in_chair')) {
+        return {
+          messages: [
+            { text: 'You approach the dimensional chair tucked in the corner...', type: 'info' },
+            { text: 'As you sit, reality seems to shift slightly around you, like viewing the world through clear water.', type: 'lore' },
+            { text: '☕ The ambient cafe sounds become muffled and distant.', type: 'info' },
+            { text: '✨ The chair feels warm and comforting, as if it recognizes your dimensional travels.', type: 'lore' },
+            { text: '🌀 Space-time bends gently around you - you sense connection to other realities.', type: 'lore' },
+            { text: '⚡ A soft chime emanates from the chair as a "Press" button materializes on the armrest.', type: 'system' },
+            { text: '💡 Type "press" to activate the chair\'s interdimensional travel system.', type: 'info' }
+          ],
+          updates: {
+            flags: {
+              ...gameState.flags,
+              sittingInFindlatersChair: true,
+            },
+          },
+        };
+      }
+
+      // Special handling for crossing room chair
+      if ((currentRoom.id === 'crossing' || currentRoom.id === 'introZone_crossing') && 
+          (!noun || noun === 'chair' || noun === 'in_chair')) {
+        return {
+          messages: [
+            { text: 'You approach the white chair and slowly lower yourself into it...', type: 'info' },
+            { text: 'The chair feels strange at first - not quite designed for human anatomy.', type: 'info' },
+            { text: 'But then something remarkable happens: the chair begins to mold itself around you!', type: 'lore' },
+            { text: '✨ The surface adjusts, supporting every curve of your body perfectly.', type: 'lore' },
+            { text: '🪑 This becomes the most comfortable chair you have ever experienced in your life.', type: 'lore' },
+            { text: '⚡ A soft glow emanates from the armrest, revealing a subtle "Press" button.', type: 'system' },
+            { text: '💡 Type "press" to access the chair\'s navigation system.', type: 'info' }
+          ],
+          updates: {
+            flags: {
+              ...gameState.flags,
+              sittingInCrossingChair: true,
+            },
+          },
+        };
+      }
+
+      // Special handling for Palace main hall throne
+      if (currentRoom.id === 'faepalacemainhall' && 
+          (!noun || noun === 'throne' || noun === 'crystal_thrones' || noun === 'chair' || noun === 'in_throne')) {
+        return {
+          messages: [
+            { text: 'You approach the magnificent crystal thrones with deep reverence...', type: 'info' },
+            { text: '👑 The starlight-infused crystal feels warm against your touch as you carefully sit.', type: 'info' },
+            { text: '✨ Ancient Fae magic courses through you - you feel the weight of royal authority.', type: 'lore' },
+            { text: '🏰 From this throne, you sense the entire Fae realm and its connections to other worlds.', type: 'lore' },
+            { text: '💎 The crystal responds to your presence, glowing brighter with each breath.', type: 'lore' },
+            { text: '⚡ A regal "Press" control materializes on the throne\'s crystalline armrest.', type: 'system' },
+            { text: '💡 Type "press" to access the royal travel network through the Fae court system.', type: 'info' }
+          ],
+          updates: {
+            flags: {
+              ...gameState.flags,
+              sittingInPalaceThrone: true,
+            },
+          },
+        };
+      }
+
+      // Special handling for maze storage chamber broken chair
+      if (currentRoom.id === 'storagechamber' && 
+          (!noun || noun === 'chair' || noun === 'broken_chair' || noun === 'in_chair')) {
+        return {
+          messages: [
+            { text: 'You carefully approach the broken chair, testing its stability...', type: 'info' },
+            { text: '🪑 Despite its dilapidated appearance, the chair holds your weight - barely.', type: 'info' },
+            { text: '✨ As you sit, you feel something unexpected - a faint pulse of dormant magic.', type: 'lore' },
+            { text: '🔮 This broken chair was once something special, its power diminished but not destroyed.', type: 'lore' },
+            { text: '💫 Through the cracks and tears, you sense connections to distant places.', type: 'lore' },
+            { text: '⚡ A flickering "Press" panel emerges from beneath the torn upholstery.', type: 'system' },
+            { text: '💡 Type "press" to attempt activating the chair\'s weakened portal system.', type: 'info' }
+          ],
+          updates: {
+            flags: {
+              ...gameState.flags,
+              sittingInStorageChair: true,
+            },
+          },
+        };
+      }
+
       // Check for chair-specific teleportation exits first
       if (currentRoom.exits && currentRoom.exits.chair_portal) {
         const targetRoomId = currentRoom.exits.chair_portal;
@@ -1329,6 +1671,176 @@ export function processCommand(
       }
       
       return { messages: [{ text: "There's nowhere to sit here.", type: 'error' }] };
+    }
+
+    case 'stand':
+    case 'get_up':
+    case 'stand_up': {
+      // Handle standing up from Torridon Inn innkeeper chair
+      if (currentRoom.id === 'torridoninn' && 
+          gameState.flags.sittingInTorridonInnChair) {
+        return {
+          messages: [
+            { text: '🏰 You rise from the innkeeper\'s chair with a sense of gratitude...', type: 'info' },
+            { text: 'The wood creaks a farewell as you step away from the bar.', type: 'lore' },
+            { text: '⚡ The carved panel slides smoothly back into the armrest.', type: 'system' },
+            { text: '🍺 The chair settles back into its role as guardian of Highland hospitality.', type: 'info' },
+            { text: 'You feel blessed by the traditions of safe harbor and traveler\'s rest.', type: 'lore' }
+          ],
+          updates: {
+            flags: {
+              ...gameState.flags,
+              sittingInTorridonInnChair: false,
+            },
+          },
+        };
+      }
+
+      // Handle standing up from Burger Joint portal booth
+      if (currentRoom.id === 'burgerjoint' && 
+          gameState.flags.sittingInBurgerJointBooth) {
+        return {
+          messages: [
+            { text: '🍔 You slide out of the comfortable portal booth...', type: 'info' },
+            { text: 'The dimensional shimmer fades as you return to normal space.', type: 'lore' },
+            { text: '⚡ The press control dissolves like burger steam.', type: 'system' },
+            { text: '🌟 The golden light fades, leaving just a regular booth with slightly newer vinyl.', type: 'info' },
+            { text: 'You can still smell the faint aroma of interdimensional travel mixed with burger grease.', type: 'lore' }
+          ],
+          updates: {
+            flags: {
+              ...gameState.flags,
+              sittingInBurgerJointBooth: false,
+            },
+          },
+        };
+      }
+
+      // Handle standing up from Findlater's dimensional chair
+      if ((currentRoom.id === 'findlaters' || currentRoom.id === 'findlaterscornercoffeeshop') && 
+          gameState.flags.sittingInFindlatersChair) {
+        return {
+          messages: [
+            { text: '☕ You slowly rise from the dimensional chair...', type: 'info' },
+            { text: 'Reality gently returns to its normal flow around you.', type: 'lore' },
+            { text: '⚡ The press button fades like steam from a coffee cup.', type: 'system' },
+            { text: '🌀 The ambient cafe sounds return to their normal volume and clarity.', type: 'info' },
+            { text: 'The chair settles back into its corner, looking perfectly ordinary once again.', type: 'lore' }
+          ],
+          updates: {
+            flags: {
+              ...gameState.flags,
+              sittingInFindlatersChair: false,
+            },
+          },
+        };
+      }
+
+      // Handle standing up from Trent Park runic chair
+      if (currentRoom.id === 'trentpark' && 
+          gameState.flags.sittingInTrentParkChair) {
+        return {
+          messages: [
+            { text: '🌳 You slowly rise from the ancient runic chair...', type: 'info' },
+            { text: 'The glowing runes around the base gradually dim to their dormant state.', type: 'lore' },
+            { text: '⚡ The crystalline press button fades away like morning mist.', type: 'system' },
+            { text: '🦉 The hidden watchers seem to retreat deeper into the shadows, their vigil temporarily ended.', type: 'lore' },
+            { text: 'The chair returns to its simple wooden appearance, but you sense it remembers you.', type: 'lore' }
+          ],
+          updates: {
+            flags: {
+              ...gameState.flags,
+              sittingInTrentParkChair: false,
+            },
+          },
+        };
+      }
+
+      // Handle standing up from Palace main hall throne
+      if (currentRoom.id === 'faepalacemainhall' && 
+          gameState.flags.sittingInPalaceThrone) {
+        return {
+          messages: [
+            { text: '👑 You rise gracefully from the crystal throne with royal dignity...', type: 'info' },
+            { text: 'The starlight-infused crystal dims as the ancient magic recedes.', type: 'lore' },
+            { text: '⚡ The regal press control dissolves into sparkling motes of light.', type: 'system' },
+            { text: '✨ The throne resumes its patient wait for the next worthy ruler.', type: 'lore' },
+            { text: '🏰 You feel honored to have briefly held the seat of Fae authority.', type: 'info' }
+          ],
+          updates: {
+            flags: {
+              ...gameState.flags,
+              sittingInPalaceThrone: false,
+            },
+          },
+        };
+      }
+
+      // Handle standing up from maze storage chamber broken chair
+      if (currentRoom.id === 'storagechamber' && 
+          gameState.flags.sittingInStorageChair) {
+        return {
+          messages: [
+            { text: '🪑 You carefully rise from the creaky broken chair...', type: 'info' },
+            { text: 'The ancient wood groans with relief as you step away.', type: 'lore' },
+            { text: '⚡ The flickering press panel fades back beneath the torn fabric.', type: 'system' },
+            { text: '💫 Despite its condition, the chair\'s hidden power retreats into dormancy.', type: 'lore' },
+            { text: 'You\'re surprised it held together - such hidden strength in broken things.', type: 'info' }
+          ],
+          updates: {
+            flags: {
+              ...gameState.flags,
+              sittingInStorageChair: false,
+            },
+          },
+        };
+      }
+
+      // Handle standing up from crossing chair
+      if ((currentRoom.id === 'crossing' || currentRoom.id === 'introZone_crossing') && 
+          gameState.flags.sittingInCrossingChair) {
+        return {
+          messages: [
+            { text: '🪑 You slowly rise from the incredibly comfortable chair...', type: 'info' },
+            { text: 'The chair gracefully returns to its original simple white form.', type: 'info' },
+            { text: '⚡ The glowing press button fades away as you step back.', type: 'system' },
+            { text: 'You find yourself missing the perfect comfort already.', type: 'lore' }
+          ],
+          updates: {
+            flags: {
+              ...gameState.flags,
+              sittingInCrossingChair: false,
+            },
+          },
+        };
+      }
+      
+      // Default stand response for any remaining sitting states
+      if (gameState.flags.sittingInCrossingChair || 
+          gameState.flags.sittingInTrentParkChair || 
+          gameState.flags.sittingInFindlatersChair ||
+          gameState.flags.sittingInBurgerJointBooth ||
+          gameState.flags.sittingInTorridonInnChair ||
+          gameState.flags.sittingInPalaceThrone ||
+          gameState.flags.sittingInStorageChair) {
+        return {
+          messages: [{ text: 'You stand up.', type: 'info' }],
+          updates: {
+            flags: {
+              ...gameState.flags,
+              sittingInCrossingChair: false,
+              sittingInTrentParkChair: false,
+              sittingInFindlatersChair: false,
+              sittingInBurgerJointBooth: false,
+              sittingInTorridonInnChair: false,
+              sittingInPalaceThrone: false,
+              sittingInStorageChair: false,
+            },
+          },
+        };
+      }
+      
+      return { messages: [{ text: "You're already standing.", type: 'info' }] };
     }
 
     case 'jump': {
@@ -1410,42 +1922,9 @@ export function processCommand(
           { text: 'You drink the rich, aromatic coffee...', type: 'info' },
           { text: 'Your senses sharpen and reality seems to shift around you.', type: 'lore' },
           { text: 'Hidden pathways begin to shimmer into view!', type: 'system' },
+          { text: '🌟 A travel menu materializes showing all the places you\'ve been!', type: 'system' },
           { text: `Score: +${coffeeScore} points`, type: 'system' }
         ];
-
-        // Generate random hidden exit if we have visited rooms to connect to
-        let updatedRoom = currentRoom;
-        if (availableDestinations.length > 0) {
-          // Pick a random previously visited room
-          const randomDestination = availableDestinations[Math.floor(Math.random() * availableDestinations.length)];
-          
-          // Create a temporary hidden exit
-          const hiddenExitNames = ['secret', 'hidden', 'shimmer', 'phase', 'dimensional_rift', 'coffee_portal'];
-          const exitName = hiddenExitNames[Math.floor(Math.random() * hiddenExitNames.length)];
-          
-          // Add the hidden exit to the current room
-          updatedRoom = {
-            ...currentRoom,
-            exits: {
-              ...currentRoom.exits,
-              [exitName]: randomDestination
-            }
-          };
-
-          messages.push({ 
-            text: `A ${exitName.replace('_', ' ')} passage materializes, leading to a familiar place...`, 
-            type: 'system' 
-          });
-          messages.push({ 
-            text: `You can now go ${exitName} to return to a previously visited location.`, 
-            type: 'info' 
-          });
-        } else {
-          messages.push({ 
-            text: 'You sense hidden possibilities, but no new paths reveal themselves yet.', 
-            type: 'lore' 
-          });
-        }
 
         return {
           messages,
@@ -1455,14 +1934,63 @@ export function processCommand(
               inventory: newInventory,
               score: newScore,
             },
-            roomMap: {
-              ...gameState.roomMap,
-              [currentRoom.id]: updatedRoom,
+            flags: {
+              ...gameState.flags,
+              showTravelMenu: true,
+              travelMenuTitle: '☕ Coffee-Enhanced Navigation',
+              travelMenuSubtitle: 'Dimensional pathways revealed through caffeine enlightenment',
+              travelDestinations: availableDestinations,
             },
           },
         };
       }
       return { messages: [{ text: `You can't drink ${noun || 'that'}.`, type: 'error' }] };
+    }
+
+    case 'throw': {
+      if (noun === 'coffee') {
+        if (!gameState.player.inventory.includes('coffee')) {
+          return { messages: [{ text: "You don't have any coffee to throw.", type: 'error' }] };
+        }
+
+        // Remove coffee from inventory
+        const newInventory = gameState.player.inventory.filter(item => item !== 'coffee');
+        
+        // Award fewer points than drinking (waste of coffee!)
+        const throwScore = 10;
+        const newScore = (gameState.player.score || 0) + throwScore;
+        
+        // Get list of previously visited rooms (excluding current room)
+        const visitedRooms = gameState.player.visitedRooms || [gameState.currentRoomId];
+        const availableDestinations = visitedRooms.filter((roomId: string) => roomId !== gameState.currentRoomId);
+        
+        const messages: TerminalMessage[] = [
+          { text: 'You angrily throw the coffee across the room!', type: 'info' },
+          { text: 'The liquid arcs through the air, splashing dramatically...', type: 'info' },
+          { text: 'As the coffee impacts, reality ripples and dimensional tears appear!', type: 'lore' },
+          { text: '🌟 A chaotic travel menu erupts from the coffee stains!', type: 'system' },
+          { text: `Score: +${throwScore} points (coffee wasted, but dramatically effective)`, type: 'system' }
+        ];
+
+        return {
+          messages,
+          updates: {
+            player: {
+              ...gameState.player,
+              inventory: newInventory,
+              score: newScore,
+            },
+            flags: {
+              ...gameState.flags,
+              showTravelMenu: true,
+              travelMenuTitle: '☕💥 Chaotic Coffee Navigation',
+              travelMenuSubtitle: 'Dimensional rifts created through caffeinated violence',
+              travelDestinations: availableDestinations,
+            },
+          },
+        };
+      }
+      return { messages: [{ text: `You can't throw ${noun || 'that'}.`, type: 'error' }] };
     }
 
     case 'return':
@@ -1743,6 +2271,19 @@ export function processCommand(
           },
         };
 
+        // Process room exit events before leaving
+        const currentRoomDef = currentRoom as any;
+        if (currentRoomDef.events?.onExit && Array.isArray(currentRoomDef.events.onExit)) {
+          const exitResult = processRoomEvents(currentRoomDef.events.onExit, currentRoom, gameState);
+          messages.push(...exitResult.messages);
+          if (exitResult.updates) {
+            // Merge exit updates with movement updates
+            updates = { ...updates, ...exitResult.updates };
+            // Update gameState for entry processing
+            gameState = { ...gameState, ...exitResult.updates };
+          }
+        }
+
         // Process room entry events (traps, etc.) if target room exists
         if (targetRoom) {
           const entryResult = processRoomEntry(targetRoom as any, gameState);
@@ -1862,6 +2403,305 @@ export function processCommand(
             },
           },
         };
+      }
+
+      // Handle chair press button in Torridon Inn (when sitting in innkeeper chair)
+      if (currentRoom.id === 'torridoninn' && 
+          gameState.flags.sittingInTorridonInnChair && 
+          (!noun || noun === 'button' || noun === 'press_button' || noun === 'panel' || noun === 'wooden_panel')) {
+        
+        // Get visited rooms for travel menu
+        const visitedRooms = gameState.player.visitedRooms || [];
+        
+        const title = '🏰 Innkeeper\'s Travel Network';
+        const subtitle = 'Highland hospitality connects all roads - safe passage to known lands';
+        
+        // Store destinations in game state for travel menu
+        return {
+          messages: [
+            { text: '✨ You press the carved wooden panel that emerged from the armrest...', type: 'info' },
+            { text: '🏰 The chair hums with the warm energy of Highland hospitality and ancient trade routes!', type: 'lore' },
+            { text: '🍺 You sense the connections between inns, taverns, and safe houses across many realms.', type: 'lore' },
+            { text: '⚡ A travel interface appears, showing the network of places where travelers are welcome...', type: 'system' }
+          ],
+          updates: {
+            flags: {
+              ...gameState.flags,
+              showTravelMenu: true,
+              travelMenuTitle: title,
+              travelMenuSubtitle: subtitle,
+              travelDestinations: visitedRooms,
+            },
+          },
+        };
+      }
+
+      // Handle booth press button in Burger Joint (when sitting in portal booth)
+      if (currentRoom.id === 'burgerjoint' && 
+          gameState.flags.sittingInBurgerJointBooth && 
+          (!noun || noun === 'button' || noun === 'press_button' || noun === 'control' || noun === 'controls')) {
+        
+        // Get visited rooms for travel menu
+        const visitedRooms = gameState.player.visitedRooms || [];
+        
+        const title = '🍔 Burger Joint Portal System';
+        const subtitle = 'NYC neighborhood dimensional travel - comfort food style';
+        
+        // Store destinations in game state for travel menu
+        return {
+          messages: [
+            { text: '✨ You press the subtle control that appeared on the table...', type: 'info' },
+            { text: '🍔 The booth fills with the warm aroma of perfectly grilled burgers and the hum of interdimensional energy!', type: 'lore' },
+            { text: '🌟 Golden light surrounds you as the portal booth activates its navigation protocols.', type: 'lore' },
+            { text: '⚡ A travel interface materializes, showing destinations accessible through this friendly neighborhood portal...', type: 'system' }
+          ],
+          updates: {
+            flags: {
+              ...gameState.flags,
+              showTravelMenu: true,
+              travelMenuTitle: title,
+              travelMenuSubtitle: subtitle,
+              travelDestinations: visitedRooms,
+            },
+          },
+        };
+      }
+
+      // Handle chair press button in Findlater's cafe (when sitting in dimensional chair)
+      if ((currentRoom.id === 'findlaters' || currentRoom.id === 'findlaterscornercoffeeshop') && 
+          gameState.flags.sittingInFindlatersChair && 
+          (!noun || noun === 'button' || noun === 'press_button' || noun === 'chair_button')) {
+        
+        // Get visited rooms for travel menu
+        const visitedRooms = gameState.player.visitedRooms || [];
+        
+        const title = '☕ Cafe Dimensional Gateway';
+        const subtitle = 'Coffee-powered interdimensional travel - all realities welcome';
+        
+        // Store destinations in game state for travel menu
+        return {
+          messages: [
+            { text: '✨ You press the ethereal button that has appeared on the chair\'s armrest...', type: 'info' },
+            { text: '☕ The aroma of coffee intensifies as dimensional pathways open!', type: 'lore' },
+            { text: '🌀 The chair pulses with comfortable warmth as reality bends around you.', type: 'lore' },
+            { text: '⚡ A travel interface manifests, showing places touched by your consciousness...', type: 'system' }
+          ],
+          updates: {
+            flags: {
+              ...gameState.flags,
+              showTravelMenu: true,
+              travelMenuTitle: title,
+              travelMenuSubtitle: subtitle,
+              travelDestinations: visitedRooms,
+            },
+          },
+        };
+      }
+
+      // Handle chair press button in Trent Park (when sitting in runic chair)
+      if (currentRoom.id === 'trentpark' && 
+          gameState.flags.sittingInTrentParkChair && 
+          (!noun || noun === 'button' || noun === 'press_button' || noun === 'chair_button')) {
+        
+        // Get visited rooms for travel menu
+        const visitedRooms = gameState.player.visitedRooms || [];
+        
+        const title = '🌳 Runic Chair Portal System';
+        const subtitle = 'Ancient magic activated - travel to places you have been';
+        
+        // Store destinations in game state for travel menu
+        return {
+          messages: [
+            { text: '✨ You press the crystalline button that materialized on the armrest...', type: 'info' },
+            { text: '🌳 The ancient runes around the chair flare with brilliant light!', type: 'lore' },
+            { text: '🪑 The chair pulses with magical energy as hidden watchers approve your choice.', type: 'lore' },
+            { text: '⚡ A portal navigation interface appears, showing places your spirit has touched...', type: 'system' }
+          ],
+          updates: {
+            flags: {
+              ...gameState.flags,
+              showTravelMenu: true,
+              travelMenuTitle: title,
+              travelMenuSubtitle: subtitle,
+              travelDestinations: visitedRooms,
+            },
+          },
+        };
+      }
+
+      // Handle chair press button in crossing room (when sitting)
+      if ((currentRoom.id === 'crossing' || currentRoom.id === 'introZone_crossing') && 
+          gameState.flags.sittingInCrossingChair && 
+          (!noun || noun === 'button' || noun === 'press_button' || noun === 'chair_button')) {
+        
+        const hasRemoteControl = gameState.player.inventory.includes('remote_control');
+        
+        // Get visited rooms for coffee-triggered travel menu or use predefined lists
+        const visitedRooms = gameState.player.visitedRooms || [];
+        
+        let destinationList: string[];
+        let title: string;
+        let subtitle: string;
+        
+        if (hasRemoteControl) {
+          // Full access to all hub rooms excluding Stanton Harcourt rooms
+          destinationList = [
+            'controlnexus', 'latticehub', 'gorstanhub', 'londonhub', 'mazehub',
+            'hiddenlab', 'controlroom', 'dalesapartment', 'gorstanvillage',
+            'lattice', 'datavoid', 'trentpark', 'stkatherinesdock', 'torridoninn',
+            'libraryofnine', 'mazeecho', 'elfhame', 'faepalacemainhall',
+            'newyorkhub', 'centralpark', 'manhattanhub', 'burgerjoint', 'mazestorage'
+          ];
+          title = '📱 Remote Control Navigation';
+          subtitle = 'Full dimensional access granted - all realities available';
+        } else {
+          // Limited access to coffee shop and Trent Park
+          destinationList = ['findlaterscornercoffeeshop', 'trentpark'];
+          title = '🪑 Chair Navigation System';
+          subtitle = 'Limited access - basic navigation only';
+        }
+        
+        // Store destinations in game state for travel menu
+        return {
+          messages: [
+            { text: '✨ You press the glowing button on the chair\'s armrest...', type: 'info' },
+            { text: '🪑 The chair hums softly and activates its navigation system!', type: 'system' },
+            { text: '� A travel menu interface materializes before you...', type: 'system' }
+          ],
+          updates: {
+            flags: {
+              ...gameState.flags,
+              showTravelMenu: true,
+              travelMenuTitle: title,
+              travelMenuSubtitle: subtitle,
+              travelDestinations: destinationList,
+            },
+          },
+        };
+      }
+
+      // Handle throne press button in Palace main hall (when sitting in crystal throne)
+      if (currentRoom.id === 'faepalacemainhall' && 
+          gameState.flags.sittingInPalaceThrone && 
+          (!noun || noun === 'button' || noun === 'press_button' || noun === 'control' || noun === 'regal_control')) {
+        
+        // Get visited rooms for travel menu
+        const visitedRooms = gameState.player.visitedRooms || [];
+        
+        const title = '👑 Royal Fae Court Network';
+        const subtitle = 'Throne magic activated - travel through the royal realms';
+        
+        // Store destinations in game state for travel menu
+        return {
+          messages: [
+            { text: '✨ You press the regal crystalline control that materialized...', type: 'info' },
+            { text: '👑 The starlight-infused crystal throne pulses with ancient royal authority!', type: 'lore' },
+            { text: '🏰 You feel the weight of Fae sovereignty as dimensional gateways awaken.', type: 'lore' },
+            { text: '⚡ A royal travel interface appears, showing realms under Fae protection...', type: 'system' }
+          ],
+          updates: {
+            flags: {
+              ...gameState.flags,
+              showTravelMenu: true,
+              travelMenuTitle: title,
+              travelMenuSubtitle: subtitle,
+              travelDestinations: visitedRooms,
+            },
+          },
+        };
+      }
+
+      // Handle broken chair press button in maze storage chamber (when sitting in broken chair)
+      if (currentRoom.id === 'storagechamber' && 
+          gameState.flags.sittingInStorageChair && 
+          (!noun || noun === 'button' || noun === 'press_button' || noun === 'panel' || noun === 'flickering_panel')) {
+        
+        // Get visited rooms for travel menu
+        const visitedRooms = gameState.player.visitedRooms || [];
+        
+        const title = '🪑 Broken Chair Portal System';
+        const subtitle = 'Damaged but functional - unstable pathways to familiar places';
+        
+        // Store destinations in game state for travel menu
+        return {
+          messages: [
+            { text: '✨ You carefully press the flickering panel that emerged...', type: 'info' },
+            { text: '🪑 The broken chair creaks ominously but responds with surprising power!', type: 'lore' },
+            { text: '💫 Despite its damage, ancient portal magic still flows through the worn wood.', type: 'lore' },
+            { text: '⚡ A unstable travel interface flickers into view, showing accessible destinations...', type: 'system' }
+          ],
+          updates: {
+            flags: {
+              ...gameState.flags,
+              showTravelMenu: true,
+              travelMenuTitle: title,
+              travelMenuSubtitle: subtitle,
+              travelDestinations: visitedRooms,
+            },
+          },
+        };
+      }
+
+      // Handle control panel and navigation console in crossing room
+      if ((currentRoom.id === 'crossing' || currentRoom.id === 'introZone_crossing') && 
+          (noun === 'control_panel' || noun === 'panel' || noun === 'control' || noun === 'controls')) {
+        const messages: TerminalMessage[] = [];
+        
+        // Check if player has required navigation devices
+        const hasRemoteControl = gameState.player.inventory.includes('remote_control');
+        const hasNavigationCrystal = gameState.player.inventory.includes('navigation_crystal');
+        
+        if (hasRemoteControl) {
+          messages.push(
+            { text: '✨ You press the crystalline control panel...', type: 'info' },
+            { text: '📱 Your remote control interfaces with the panel, downloading destination coordinates!', type: 'system' },
+            { text: '🌟 The panel displays: "FULL DIMENSIONAL ACCESS GRANTED - ALL REALITIES AVAILABLE"', type: 'system' },
+            { text: '⚡ Type "teleport" to access the complete destination matrix!', type: 'info' }
+          );
+        } else if (hasNavigationCrystal) {
+          messages.push(
+            { text: '✨ You press the crystalline control panel...', type: 'info' },
+            { text: '🔮 Your navigation crystal resonates with the panel, but access is limited!', type: 'info' },
+            { text: '⚠️ The panel displays: "LIMITED ACCESS - BASIC NAVIGATION ONLY"', type: 'system' },
+            { text: '⚡ Type "teleport" to see available destinations!', type: 'info' }
+          );
+        } else {
+          messages.push(
+            { text: '✨ You press the crystalline control panel...', type: 'info' },
+            { text: '❌ The panel flickers but remains inactive.', type: 'error' },
+            { text: '💡 A message appears: "NAVIGATION DEVICE REQUIRED - REMOTE CONTROL OR NAVIGATION CRYSTAL"', type: 'system' },
+            { text: '🔍 You need to find a navigation device to access the dimensional transport system.', type: 'info' }
+          );
+        }
+        
+        return { messages };
+      }
+
+      // Handle navigation console specifically
+      if ((currentRoom.id === 'crossing' || currentRoom.id === 'introZone_crossing') && 
+          (noun === 'navigation_console' || noun === 'console' || noun === 'navigation' || noun === 'interface')) {
+        const messages: TerminalMessage[] = [];
+        
+        const hasRemoteControl = gameState.player.inventory.includes('remote_control');
+        const hasNavigationCrystal = gameState.player.inventory.includes('navigation_crystal');
+        
+        if (hasRemoteControl || hasNavigationCrystal) {
+          messages.push(
+            { text: '🌀 You interface with the ethereal navigation console...', type: 'info' },
+            { text: '✨ The console phases into full reality, responding to your navigation device!', type: 'system' },
+            { text: '🎯 Dimensional coordinates are now accessible through the teleport system.', type: 'system' },
+            { text: '⚡ Type "teleport" to begin your journey through the multiverse!', type: 'info' }
+          );
+        } else {
+          messages.push(
+            { text: '🌀 You try to interface with the ethereal navigation console...', type: 'info' },
+            { text: '👻 Your hand passes through the console - it remains incorporeal.', type: 'error' },
+            { text: '💫 The console whispers: "A navigation device must anchor this interface..."', type: 'system' },
+            { text: '🔮 Find a remote control or navigation crystal to access this system.', type: 'info' }
+          );
+        }
+        
+        return { messages };
       }
 
       // Generic press for other objects

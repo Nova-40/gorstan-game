@@ -1,3 +1,8 @@
+// latticeZone_lattice.ts — rooms/latticeZone_lattice.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: latticeZone_lattice
+
 import { Room } from '../types/RoomTypes';
 
 const lattice: Room = {
@@ -51,18 +56,7 @@ const lattice: Room = {
   },
 
   npcs: [
-    {
-      id: "lattice_echo",
-      name: "Lattice Echo",
-      description: "A shimmering projection of a long-lost consciousness, flickering in and out of phase.",
-      dialogue: {
-        greeting: "Welcome, traveler. The Lattice remembers all.",
-        help: "Patterns hold the key. Listen, and you may understand.",
-        farewell: "The resonance fades, but the memory remains.",
-      },
-      spawnable: true,
-      spawnCondition: "player_activates_facet_panel",
-    }
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

@@ -33,3 +33,6 @@ Thumbs.db
 # Game-specific
 rooms/**/*.bak
 public.zip  # Optional redundancy, already caught by *.zip
+
+# Backup directories
+src-backup*

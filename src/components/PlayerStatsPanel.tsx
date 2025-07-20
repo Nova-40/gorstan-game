@@ -1,3 +1,8 @@
+// PlayerStatsPanel.tsx — components/PlayerStatsPanel.tsx
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: PlayerStatsPanel
+
 import React from 'react';
 import { useGameState } from '../state/gameState';
 import { Heart, Star, Trophy } from 'lucide-react';

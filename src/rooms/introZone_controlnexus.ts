@@ -1,3 +1,8 @@
+// introZone_controlnexus.ts — rooms/introZone_controlnexus.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: introZone_controlnexus
+
 import { RoomDefinition } from '../types/RoomTypes';
 
 const controlnexus: RoomDefinition = {
@@ -58,18 +63,7 @@ items: [],
 
   // Enhanced NPCs for potential encounters
   npcs: [
-    {
-      id: 'hologram_assistant',
-      name: 'System Assistant',
-      description: 'A flickering holographic projection of the previous operator',
-      dialogue: {
-        greeting: 'Greetings, new operator. I am what remains of Dr. Chen\'s neural imprint.',
-        help: 'The multiverse is collapsing. You must stabilize the anchor points before it\'s too late.',
-        farewell: 'Good luck. The fate of all realities rests in your hands.',
-      },
-      spawnable: true,
-      spawnCondition: 'consoleActivated',
-    },
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

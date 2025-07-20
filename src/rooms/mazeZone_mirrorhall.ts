@@ -1,3 +1,8 @@
+// mazeZone_mirrorhall.ts — rooms/mazeZone_mirrorhall.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: mazeZone_mirrorhall
+
 import { Room } from '../types/RoomTypes';
 
 const mirrorhall: Room = {
@@ -43,18 +48,7 @@ const mirrorhall: Room = {
   },
 
   npcs: [
-    {
-      id: "mirror_shade",
-      name: "Mirror Shade",
-      description: "A silent figure that appears only in certain reflections, watching your every move.",
-      dialogue: {
-        greeting: "Which of us is real, and which is the echo?",
-        help: "Sometimes, the path forward is found by stepping back.",
-        farewell: "We will meet again, in another reflection.",
-      },
-      spawnable: true,
-      spawnCondition: "player_mimics_distorted_reflection",
-    }
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

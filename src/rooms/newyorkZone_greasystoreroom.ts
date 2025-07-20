@@ -1,3 +1,8 @@
+// newyorkZone_greasystoreroom.ts — rooms/newyorkZone_greasystoreroom.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: newyorkZone_greasystoreroom
+
 import { RoomDefinition } from '../types/RoomTypes';
 
 const greasystoreroom: RoomDefinition = {
@@ -74,7 +79,7 @@ const greasystoreroom: RoomDefinition = {
   },
 
   npcs: [
-    {
+{
       id: 'chef_tony_storeroom',
       name: 'Chef Tony',
       description: 'The generous chef from the burger joint, checking on his storeroom and making sure you find everything you need',
@@ -86,7 +91,7 @@ const greasystoreroom: RoomDefinition = {
       },
       spawnable: true,
       spawnCondition: 'chef_authorization_received',
-    },
+    }
   ],
 
   events: {

@@ -1,3 +1,8 @@
+// RoomTransition.tsx — components/animations/RoomTransition.tsx
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: RoomTransition
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 

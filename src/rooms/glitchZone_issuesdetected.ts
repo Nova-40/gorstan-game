@@ -1,3 +1,8 @@
+// glitchZone_issuesdetected.ts — rooms/glitchZone_issuesdetected.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: glitchZone_issuesdetected
+
 import { RoomDefinition } from '../types/RoomTypes';
 
 const issuesdetected: RoomDefinition = {
@@ -65,19 +70,7 @@ const issuesdetected: RoomDefinition = {
   },
 
   npcs: [
-    {
-      id: "system_ai_fragment",
-      name: "Diagnostic AI",
-      description: "A fragmented artificial intelligence trying to coordinate repairs while slowly losing coherence.",
-      dialogue: {
-        greeting: "USER DETECTED - ASSISTANCE REQUIRED - SYSTEMS FAILING - HELP ME",
-        help: "PRIORITY ONE: Stabilize quantum anchors - PRIORITY TWO: Repair reality matrix - PRIORITY THREE: Prevent cascade failure",
-        farewell: "PROCEED WITH CAUTION - SYSTEM INSTABILITY INCREASING - GOOD LUCK",
-        malfunction: "ERROR ERROR ERROR - CANNOT PROCESS - REALITY CORRUPTED - HELP"
-      },
-      spawnable: true,
-      spawnCondition: "diagnostic_terminal_accessed"
-    }
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

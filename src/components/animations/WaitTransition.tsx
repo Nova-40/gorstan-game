@@ -1,3 +1,8 @@
+// WaitTransition.tsx — components/animations/WaitTransition.tsx
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: WaitTransition
+
 
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';

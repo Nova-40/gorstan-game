@@ -1,3 +1,8 @@
+// elfhameZone_elfhame.ts — rooms/elfhameZone_elfhame.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: elfhameZone_elfhame
+
 import { RoomDefinition } from '../types/RoomTypes';
 
 const elfhame: RoomDefinition = {

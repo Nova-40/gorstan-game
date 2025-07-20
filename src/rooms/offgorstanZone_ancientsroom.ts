@@ -1,3 +1,8 @@
+// offgorstanZone_ancientsroom.ts — rooms/offgorstanZone_ancientsroom.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: offgorstanZone_ancientsroom
+
 import { Room } from '../types/RoomTypes';
 
 const ancientsroom: Room = {
@@ -42,18 +47,7 @@ const ancientsroom: Room = {
   },
 
   npcs: [
-    {
-      id: "ancient_attendant",
-      name: "Ancient Attendant",
-      description: "A silent figure who watches over the chamber, offering guidance only when needed.",
-      dialogue: {
-        greeting: "You have entered the sanctum of the Ancients.",
-        help: "The artifact holds memories of all who have come before.",
-        farewell: "May your understanding deepen with each visit.",
-      },
-      spawnable: true,
-      spawnCondition: "player_examines_artifact_pedestal",
-    }
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

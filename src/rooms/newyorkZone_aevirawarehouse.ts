@@ -1,3 +1,8 @@
+// newyorkZone_aevirawarehouse.ts — rooms/newyorkZone_aevirawarehouse.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: newyorkZone_aevirawarehouse
+
 import { RoomDefinition } from '../types/RoomTypes';
 
 const aevirawarehouse: RoomDefinition = {
@@ -75,18 +80,7 @@ const aevirawarehouse: RoomDefinition = {
   },
 
   npcs: [
-    {
-      id: 'albie_security_guard',
-      name: 'Albie',
-      description: 'A no-nonsense security guard who controls access to the warehouse with professional efficiency',
-      dialogue: {
-        greeting: 'Hold up there. This is a private facility. You got clearance to be here?',
-        help: 'You need to talk to the chef first. Come back when you\'ve got proper authorization.',
-        farewell: 'Stay in your lane, stranger.',
-        authorized: 'Welcome. The chef said to expect you. Come on in.',
-      },
-      spawnable: false,
-    },
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

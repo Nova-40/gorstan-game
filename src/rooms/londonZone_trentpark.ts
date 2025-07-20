@@ -1,3 +1,8 @@
+// londonZone_trentpark.ts — rooms/londonZone_trentpark.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: londonZone_trentpark
+
 import { RoomDefinition } from '../types/RoomTypes';
 
 const trentpark: RoomDefinition = {
@@ -30,6 +35,7 @@ const trentpark: RoomDefinition = {
     east: 'stkatherinesdock',
     west: 'dalesapartment', 
     south: 'findlaterscornercoffeeshop',
+    sit: 'introreset',  // Sitting in the runic chair returns you to the reset room
     // Special conditional exit when sitting in chair
     'chair_portal': 'introreset',
   },
@@ -46,7 +52,7 @@ const trentpark: RoomDefinition = {
   interactables: {
     'runic_chair': {
       description: 'A simple wooden chair that radiates an aura of significance. Carved runes circle its base, their meaning lost to time but their power undeniable.',
-      actions: ['examine', 'sit', 'touch_runes', 'study_symbols'],
+      actions: ['examine', 'sit', 'touch_runes', 'study_symbols', 'press'],
       requires: [],
     },
     'carved_runes': {
@@ -77,18 +83,7 @@ const trentpark: RoomDefinition = {
   },
 
   npcs: [
-    {
-      id: 'hidden_watchers',
-      name: 'The Unseen Observers',
-      description: 'Entities that watch from the shadows, never fully revealing themselves but making their presence unmistakably felt',
-      dialogue: {
-        greeting: '*A rustle in the leaves that might be acknowledgment*',
-        help: '*The shadows seem to point toward the chair with subtle movements*',
-        farewell: '*A sense of approval or warning, depending on your choices*',
-      },
-      spawnable: true,
-      spawnCondition: 'chair_approached',
-    },
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

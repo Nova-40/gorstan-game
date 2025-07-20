@@ -70,6 +70,188 @@ export function initializeWanderingNPCs(dispatch: React.Dispatch<GameAction>): v
 }
 
 /**
+ * Generate a deterministic pseudo-random number based on room ID and game seed
+ */
+function getDeterministicRandom(roomId: string, gameState: LocalGameState): number {
+  // Create a simple hash from room ID and game state for deterministic randomness
+  const seed = gameState.player.name + roomId + (gameState.player.visitedRooms?.length || 0);
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    const char = seed.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  // Convert hash to number between 0 and 1
+  return Math.abs(hash) / 2147483647;
+}
+
+/**
+ * Evaluate NPC hierarchy and encounter sequences
+ */
+function evaluateNPCEncounter(
+  room: Room,
+  gameState: LocalGameState,
+  random: number
+): { npcs: WanderingNPC[]; isMultiNPC: boolean; encounterType: string } {
+  
+  // Ayla owns the game - highest priority
+  const aylaChance = 0.15; // 15% base chance for Ayla
+  if (random < aylaChance) {
+    const ayla = wanderingNPCs.find(npc => npc.id === 'ayla');
+    if (ayla) {
+      return { npcs: [ayla], isMultiNPC: false, encounterType: 'ayla_dominant' };
+    }
+  }
+  
+  // Multi-NPC encounter sequences (10% chance)
+  const multiNPCChance = 0.10;
+  if (random >= aylaChance && random < aylaChance + multiNPCChance) {
+    return evaluateMultiNPCEncounter(room, gameState, random);
+  }
+  
+  // Single NPC encounters - evaluate by priority
+  const availableNPCs = wanderingNPCs
+    .filter(npc => npc.id !== 'ayla') // Ayla handled separately
+    .filter(npc => npc.id !== 'mr_wendell' && npc.id !== 'librarian') // Special NPCs handled separately
+    .sort((a, b) => b.personality.priority - a.personality.priority); // Sort by priority descending
+  
+  for (const npc of availableNPCs) {
+    // Check spawn conditions and zone preferences
+    if (evaluateNPCSpawnConditions(npc, room, gameState)) {
+      return { npcs: [npc], isMultiNPC: false, encounterType: 'single_npc' };
+    }
+  }
+  
+  return { npcs: [], isMultiNPC: false, encounterType: 'none' };
+}
+
+/**
+ * Evaluate multi-NPC encounter sequences
+ */
+function evaluateMultiNPCEncounter(
+  room: Room,
+  gameState: LocalGameState,
+  random: number
+): { npcs: WanderingNPC[]; isMultiNPC: boolean; encounterType: string } {
+  
+  // Define encounter sequences based on narrative tension
+  const encounterSequences = [
+    {
+      type: 'tension_trio',
+      npcs: ['morthos', 'polly', 'albie'],
+      condition: () => gameState.flags?.emotional_trigger === true,
+      chance: 0.3
+    },
+    {
+      type: 'helper_duo',
+      npcs: ['al_escape_artist', 'albie'],
+      condition: () => (gameState.player.visitedRooms?.length || 0) > 10,
+      chance: 0.4
+    },
+    {
+      type: 'philosophical_pair',
+      npcs: ['dominic_wandering', 'morthos'],
+      condition: () => gameState.flags?.moral_choice_made === true,
+      chance: 0.25
+    },
+    {
+      type: 'wildcard_chaos',
+      npcs: ['polly', 'dominic_wandering'],
+      condition: () => gameState.flags?.dominic_taken === false,
+      chance: 0.15
+    }
+  ];
+  
+  // Select an encounter sequence that meets conditions
+  for (const sequence of encounterSequences) {
+    if (sequence.condition() && random < sequence.chance) {
+      const npcs = sequence.npcs
+        .map(id => wanderingNPCs.find(npc => npc.id === id))
+        .filter(npc => npc !== undefined) as WanderingNPC[];
+      
+      if (npcs.length >= 2) {
+        return { npcs, isMultiNPC: true, encounterType: sequence.type };
+      }
+    }
+  }
+  
+  return { npcs: [], isMultiNPC: false, encounterType: 'none' };
+}
+
+/**
+ * Check if an NPC meets spawn conditions for the current room/state
+ */
+function evaluateNPCSpawnConditions(
+  npc: WanderingNPC,
+  room: Room,
+  gameState: LocalGameState
+): boolean {
+  
+  // Check zone preferences
+  const roomZone = determineRoomZone(room.id);
+  if (npc.zonePreferences.length > 0 && !npc.zonePreferences.includes(roomZone)) {
+    return false;
+  }
+  
+  // Check spawn conditions
+  for (const condition of npc.spawnConditions) {
+    if (!evaluateSpawnCondition(condition, room, gameState)) {
+      return false;
+    }
+  }
+  
+  return true;
+}
+
+/**
+ * Determine which zone a room belongs to based on its ID
+ */
+function determineRoomZone(roomId: string): string {
+  if (roomId.includes('lattice')) return 'lattice';
+  if (roomId.includes('london')) return 'london';
+  if (roomId.includes('intro')) return 'intro';
+  if (roomId.includes('glitch')) return 'glitch';
+  if (roomId.includes('stanton')) return 'stanton';
+  if (roomId.includes('elfhame')) return 'elfhame';
+  if (roomId.includes('library')) return 'library_rooms';
+  if (roomId.includes('hub')) return 'hub';
+  return 'other';
+}
+
+/**
+ * Evaluate a single spawn condition
+ */
+function evaluateSpawnCondition(
+  condition: any,
+  room: Room,
+  gameState: LocalGameState
+): boolean {
+  
+  switch (condition.type) {
+    case 'flag':
+      return gameState.flags?.[condition.key] === condition.value;
+    
+    case 'inventory':
+      const hasItem = gameState.player.inventory.includes(condition.key);
+      return condition.operator === 'not_contains' ? !hasItem : hasItem;
+    
+    case 'room_count':
+      const visitedCount = gameState.player.visitedRooms?.length || 0;
+      return condition.operator === 'greater' ? visitedCount > condition.value : visitedCount === condition.value;
+    
+    case 'zone':
+      const roomZone = determineRoomZone(room.id);
+      return roomZone === condition.value;
+    
+    case 'random':
+      return true; // Always passes for random spawns
+    
+    default:
+      return true;
+  }
+}
+
+/**
  * Main evaluation function for spawning/managing wandering NPCs
  */
 function evaluateWanderingNPCs(dispatch: React.Dispatch<GameAction>): void {
@@ -85,6 +267,7 @@ function evaluateWanderingNPCs(dispatch: React.Dispatch<GameAction>): void {
 
 /**
  * Handle NPC spawning when player enters a room
+ * Implements 45% chance for NPC encounters with hierarchical spawning
  */
 export function handleRoomEntryForWanderingNPCs(
   room: Room,
@@ -97,7 +280,24 @@ export function handleRoomEntryForWanderingNPCs(
   // Handle Mr. Wendell's room transition tracking
   onRoomTransition(room, gameState);
   
-  // Check for Mr. Wendell spawn first (highest priority)
+  // Rate limiting - only check every 2 seconds
+  if (now - wanderingNPCState.lastRoomCheck < 2000) {
+    return;
+  }
+  wanderingNPCState.lastRoomCheck = now;
+  
+  // Clear cooldowns that have expired
+  for (const [npcId, cooldownTime] of Object.entries(wanderingNPCState.globalCooldowns)) {
+    if (now >= cooldownTime) {
+      delete wanderingNPCState.globalCooldowns[npcId];
+    }
+  }
+  
+  // Remove any existing wandering NPCs from this room first
+  wanderingNPCState.activeNPCs = wanderingNPCState.activeNPCs
+    .filter(active => active.roomId !== room.id);
+  
+  // Check for Mr. Wendell spawn first (highest priority, overrides 45% system)
   if (!isWendellActive()) {
     const wendellEval = evaluateWendellSpawn(room, gameState, globalTransitionCount);
     
@@ -106,7 +306,6 @@ export function handleRoomEntryForWanderingNPCs(
       if (wendellNPC) {
         spawnWanderingNPC(wendellNPC, room.id, dispatch);
         
-        // Add context message about the spawn reason
         dispatch({
           type: 'ADD_MESSAGE',
           payload: {
@@ -124,21 +323,18 @@ export function handleRoomEntryForWanderingNPCs(
   
   // If Mr. Wendell is active, don't spawn other NPCs unless it's the Librarian in a library
   if (isWendellActive()) {
-    // Check if this is a library room and allow Librarian to displace Wendell there
     const librarianEval = evaluateLibrarianSpawn(room, gameState);
     if (librarianEval.shouldSpawn) {
-      // Force despawn Wendell temporarily
       const wendellNPC = wanderingNPCs.find(npc => npc.id === 'mr_wendell');
       if (wendellNPC) {
         despawnWanderingNPC('mr_wendell', room.id, dispatch);
       }
-      
       spawnLibrarian(room, gameState, dispatch);
     }
     return;
   }
   
-  // Check for Librarian spawn (high priority in library rooms)
+  // Check for Librarian spawn (high priority in library rooms, overrides 45% system)
   if (!isLibrarianActive()) {
     const librarianEval = evaluateLibrarianSpawn(room, gameState);
     
@@ -148,38 +344,34 @@ export function handleRoomEntryForWanderingNPCs(
     }
   }
   
-  // Create player state from game state
-  const playerState: PlayerState = {
-    name: gameState.player.name || 'Player',
-    currentRoom: room.id,
-    inventory: gameState.player.inventory,
-    flags: gameState.flags || {},
-    visitedRooms: gameState.player.visitedRooms || [],
-    achievements: [] // TODO: Add achievements when available
-  };
+  // Main 45% NPC encounter system
+  const random = getDeterministicRandom(room.id, gameState);
+  const encounterChance = 0.45; // 45% chance for NPC encounter
   
-  // Evaluate spawning using the existing spawner (excluding special NPCs)
-  const result = evaluateNPCSpawning(room.id, room, playerState, {});
-  
-  if (result.spawn && result.spawn.id !== 'mr_wendell' && result.spawn.id !== 'librarian') {
-    spawnWanderingNPC(result.spawn, room.id, dispatch);
-  }
-  
-  if (result.despawn) {
-    despawnWanderingNPC(result.despawn, room.id, dispatch);
-  }
-  
-  // Send any messages from the evaluation
-  for (const message of result.messages) {
-    dispatch({
-      type: 'ADD_MESSAGE',
-      payload: {
-        id: Date.now().toString(),
-        text: message,
-        type: 'narrative',
-        timestamp: now
+  if (random < encounterChance) {
+    // Normalize random for encounter evaluation (0-1 within the 45% range)
+    const encounterRandom = random / encounterChance;
+    const encounter = evaluateNPCEncounter(room, gameState, encounterRandom);
+    
+    if (encounter.npcs.length > 0) {
+      // Spawn the NPC(s)
+      for (const npc of encounter.npcs) {
+        spawnWanderingNPC(npc, room.id, dispatch);
       }
-    });
+      
+      // Add encounter message
+      if (encounter.isMultiNPC) {
+        dispatch({
+          type: 'ADD_MESSAGE',
+          payload: {
+            id: Date.now().toString(),
+            text: `Multiple figures emerge from the shadows - a ${encounter.encounterType} unfolds.`,
+            type: 'narrative',
+            timestamp: now
+          }
+        });
+      }
+    }
   }
 }
 

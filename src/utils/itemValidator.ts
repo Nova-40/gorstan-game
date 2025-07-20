@@ -1,3 +1,8 @@
+// itemValidator.ts — utils/itemValidator.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Description: Item validation result interface
+
 // Filename: itemValidator.ts
 // Location: utils/
 // Version: v1 Beta

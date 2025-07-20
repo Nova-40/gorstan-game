@@ -1,3 +1,8 @@
+// multiZone_liminalhub.ts — rooms/multiZone_liminalhub.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Description: The Liminal Hub is a special, futuristic zone that acts as a central travel nexus.
+
 import { Room } from '../types/RoomTypes';
 
 /**
@@ -18,24 +23,7 @@ export const liminalhub: Room = {
   exits: {}, // No standard exits; travel is handled by the remote.
   items: [], // The remote is found elsewhere.
   npcs: [
-    // NPCs can be dynamically added here by the engine.
-    // These are potential spawns as per the request.
-    {
-      id: 'polly',
-      name: 'Polly',
-      description: 'Polly looks even more out of place here than usual, nervously checking a data slate.',
-      dialogue: {
-        greeting: '"Right then. Don\'t touch anything. This place gives me the creeps."',
-      },
-    },
-    {
-      id: 'mr_wendell',
-      name: 'Mr. Wendell',
-      description: 'Mr. Wendell is sniffing the air curiously, his tail giving a slow, cautious wag.',
-      dialogue: {
-        greeting: '"Woof! (The air here tastes like lightning!)"',
-      },
-    },
+    // NPCs managed dynamically by wanderingNPCController
   ],
   // events: [
   //   {

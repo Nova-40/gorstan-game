@@ -1,3 +1,8 @@
+// gorstanZone_torridoninthepast.ts — rooms/gorstanZone_torridoninthepast.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: gorstanZone_torridoninthepast
+
 import { Room } from '../types/RoomTypes';
 
 const torridoninthepast: Room = {
@@ -53,18 +58,7 @@ const torridoninthepast: Room = {
   },
 
   npcs: [
-    {
-      id: "elder_iona",
-      name: "Elder Iona",
-      description: "A wise elder who remembers the earliest days of Torridon.",
-      dialogue: {
-        greeting: "Welcome, traveler. The past holds many lessons.",
-        help: "If you seek knowledge of our ways, I am here to share.",
-        farewell: "May you carry our stories into the future.",
-      },
-      spawnable: true,
-      spawnCondition: "player_approaches_fire_pit",
-    }
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

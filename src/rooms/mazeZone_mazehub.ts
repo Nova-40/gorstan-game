@@ -1,3 +1,8 @@
+// mazeZone_mazehub.ts — rooms/mazeZone_mazehub.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: mazeZone_mazehub
+
 import { Room } from '../types/RoomTypes';
 
 const mazehub: Room = {
@@ -45,18 +50,7 @@ const mazehub: Room = {
   },
 
   npcs: [
-    {
-      id: "maze_cartographer",
-      name: "Maze Cartographer",
-      description: "A weary explorer mapping the maze, eager to trade information.",
-      dialogue: {
-        greeting: "Welcome to the hub. Every explorer passes through here eventually.",
-        help: "If you find any map fragments, I'll gladly trade for them.",
-        farewell: "Good luck. The maze changes, but the hub remains.",
-      },
-      spawnable: true,
-      spawnCondition: "player_traces_central_marker",
-    }
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

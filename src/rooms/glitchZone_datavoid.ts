@@ -1,3 +1,8 @@
+// glitchZone_datavoid.ts — rooms/glitchZone_datavoid.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: glitchZone_datavoid
+
 import { RoomDefinition } from '../types/RoomTypes';
 
 const datavoid: RoomDefinition = {
@@ -72,18 +77,7 @@ const datavoid: RoomDefinition = {
   },
 
   npcs: [
-    {
-      id: 'data_wraith',
-      name: 'Data Wraith',
-      description: 'A ghostly figure composed of flickering code, endlessly searching for lost information.',
-      dialogue: {
-        greeting: '...lost... searching... must restore...',
-        help: 'Fragments... bring me fragments... maybe I can remember...',
-        farewell: '...fading... into the void...',
-      },
-      spawnable: true,
-      spawnCondition: 'player_collects_fragmented_code',
-    },
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

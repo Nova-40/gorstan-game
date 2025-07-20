@@ -1,3 +1,8 @@
+// offgorstanZone_arbitercore.ts — rooms/offgorstanZone_arbitercore.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: offgorstanZone_arbitercore
+
 import { Room } from '../types/RoomTypes';
 
 const arbitercore: Room = {
@@ -67,18 +72,7 @@ const arbitercore: Room = {
   },
 
   npcs: [
-    {
-      id: "arbiter_entity",
-      name: "The Arbiter",
-      description: "A being of pure balance, neither law nor chaos, who oversees the fate of all universes.",
-      dialogue: {
-        greeting: "You have entered the Core. State your purpose.",
-        help: "Balance is not found, it is forged. The core will test your resolve.",
-        farewell: "Return when you are ready to accept the consequences of your choices.",
-      },
-      spawnable: true,
-      spawnCondition: "player_activates_central_core",
-    }
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

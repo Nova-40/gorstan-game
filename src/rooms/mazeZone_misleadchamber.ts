@@ -1,3 +1,8 @@
+// mazeZone_misleadchamber.ts — rooms/mazeZone_misleadchamber.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: mazeZone_misleadchamber
+
 import { Room } from '../types/RoomTypes';
 
 const misleadchamber: Room = {
@@ -44,18 +49,7 @@ const misleadchamber: Room = {
   },
 
   npcs: [
-    {
-      id: "mislead_illusionist",
-      name: "Mislead Illusionist",
-      description: "A trickster figure who delights in confusing travelers.",
-      dialogue: {
-        greeting: "Welcome to my chamber of misdirection. Can you find the real path?",
-        help: "Not all exits are as they appear. Sometimes, the answer is behind you.",
-        farewell: "Perhaps you'll find your way... or perhaps you'll wander forever.",
-      },
-      spawnable: true,
-      spawnCondition: "player_marks_mirrored_wall",
-    }
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

@@ -1,3 +1,8 @@
+// gorstanZone_torridoninn.ts — rooms/gorstanZone_torridoninn.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: gorstanZone_torridoninn
+
 import { Room } from '../types/RoomTypes';
 
 const torridoninn: Room = {
@@ -56,6 +61,11 @@ const torridoninn: Room = {
       actions: ["sit", "warm_up", "listen_to_stories"],
       requires: [],
     },
+    "innkeeper_chair": {
+      description: "A sturdy wooden chair behind the bar where the innkeeper takes his rare moments of rest. It has an air of authority and connection to the wider world.",
+      actions: ["sit", "examine", "press"],
+      requires: [],
+    },
     "bar": {
       description: "A polished wooden bar where the innkeeper serves drinks and food.",
       actions: ["order_drink", "order_food", "talk_to_innkeeper"],
@@ -69,7 +79,7 @@ const torridoninn: Room = {
   },
 
   npcs: [
-    {
+{
       id: "innkeeper_bram",
       name: "Innkeeper Bram",
       description: "A burly, cheerful man with a booming laugh and a knack for remembering faces.",

@@ -1,3 +1,8 @@
+// stantonZone_ascendantStanton.ts — rooms/stantonZone_ascendantStanton.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: stantonZone_ascendantStanton
+
 import { Room } from '../types/RoomTypes';
 
 export const ascendantStanton: Room = {

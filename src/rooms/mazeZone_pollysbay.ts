@@ -1,3 +1,8 @@
+// mazeZone_pollysbay.ts — rooms/mazeZone_pollysbay.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: mazeZone_pollysbay
+
 import { Room } from '../types/RoomTypes';
 
 const pollysbay: Room = {
@@ -48,18 +53,7 @@ const pollysbay: Room = {
   },
 
   npcs: [
-    {
-      id: "polly_the_hermit",
-      name: "Polly the Hermit",
-      description: "A reclusive figure who has made the bay their home, offering cryptic wisdom to travelers.",
-      dialogue: {
-        greeting: "Welcome to my bay. Few find it, fewer still understand its peace.",
-        help: "The water remembers every secret cast into its depths.",
-        farewell: "May the tides guide you safely onward.",
-      },
-      spawnable: true,
-      spawnCondition: "player_searches_hidden_cove",
-    }
+    // NPCs managed dynamically by wanderingNPCController
   ],
 
   events: {

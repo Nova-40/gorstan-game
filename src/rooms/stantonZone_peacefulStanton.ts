@@ -1,3 +1,8 @@
+// stantonZone_peacefulStanton.ts — rooms/stantonZone_peacefulStanton.ts
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: stantonZone_peacefulStanton
+
 import { Room } from '../types/RoomTypes';
 
 export const peacefulStanton: Room = {
