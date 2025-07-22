@@ -1,9 +1,12 @@
+import { RoomDefinition } from '../types/RoomTypes';
+
+
+
 // londonZone_cafeoffice.ts — rooms/londonZone_cafeoffice.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: londonZone_cafeoffice
 
-import { RoomDefinition } from '../types/RoomTypes';
 
 const cafeoffice: RoomDefinition = {
   id: 'cafeoffice',

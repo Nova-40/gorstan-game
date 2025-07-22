@@ -1,3 +1,5 @@
+
+
 // audioMap.ts — audio/audioMap.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
@@ -5,7 +7,7 @@
 
 // PATCHED: src/audio/audioMap.js
 
-export 
+export
 export function playNpcAudio(npcName) {
     if (audioFile) {
         audio.volume = 0.4;

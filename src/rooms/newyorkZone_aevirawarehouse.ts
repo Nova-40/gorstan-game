@@ -1,9 +1,14 @@
+import { Puzzle } from './GameTypes';
+
+import { RoomDefinition } from '../types/RoomTypes';
+
+
+
 // newyorkZone_aevirawarehouse.ts — rooms/newyorkZone_aevirawarehouse.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: newyorkZone_aevirawarehouse
 
-import { RoomDefinition } from '../types/RoomTypes';
 
 const aevirawarehouse: RoomDefinition = {
   id: 'aevirawarehouse',

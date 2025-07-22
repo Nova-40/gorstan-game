@@ -1,9 +1,18 @@
+import React, { useState, useCallback, useEffect } from 'react';
+
+import { NPC } from './NPCTypes';
+
+import { Room } from './RoomTypes';
+
+import { Trap } from './GameTypes';
+
+
+
 // src/components/RoomEditor.tsx
 // Gorstan Room Editor (v2.0)
 // Enhanced TypeScript-based room editor with full field support and validation
 // (c) 2025 Geoffrey Alan Webster
 
-import React, { useState, useCallback, useEffect } from 'react';
 
 // --- Types ---
 type NPC = {

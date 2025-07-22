@@ -1,11 +1,18 @@
+import PuzzleController, { PuzzleControllerResult } from '../engine/puzzleController';
+
+import { GameAction, GameMessage } from '../types/GameTypes';
+
+import { LocalGameState } from '../state/gameState';
+
+import { Puzzle } from './GameTypes';
+
+
+
 // puzzleCommands.ts — engine/puzzleCommands.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Description: Enhanced puzzle commands integration for the command processor
 
-import { LocalGameState } from '../state/gameState';
-import { GameAction, GameMessage } from '../types/GameTypes';
-import PuzzleController, { PuzzleControllerResult } from '../engine/puzzleController';
 
 /**
  * Enhanced puzzle commands integration for the command processor
@@ -21,7 +28,7 @@ export interface PuzzleCommandResult {
  * Create a properly formatted GameMessage
  */
 function createGameMessage(
-  text: string, 
+  text: string,
   type: GameMessage['type'] = 'system',
   speaker?: string
 ): GameMessage {
@@ -103,7 +110,7 @@ export async function processPuzzleCommand(
     case 'hint': {
       // Contextual hints - could be expanded to include puzzle-specific hints
       const puzzles = puzzleController.listRoomPuzzles(currentRoomId, gameState);
-      
+
       if (puzzles.length > 1) { // More than just the "no puzzles" message
         return {
           messages: [
@@ -136,7 +143,7 @@ async function handlePuzzleSolve(
 ): Promise<PuzzleCommandResult> {
   // Check if puzzle can be started
   const canStart = puzzleController.canStartPuzzle(puzzleId, currentRoomId, gameState);
-  
+
   if (!canStart.canStart) {
     return {
       messages: [
@@ -148,7 +155,7 @@ async function handlePuzzleSolve(
   try {
     // Start the puzzle session
     const puzzleSession = await puzzleController.startPuzzle(puzzleId, currentRoomId, gameState);
-    
+
     if (!puzzleSession.showPuzzleModal || !puzzleSession.puzzle) {
       return {
         messages: [
@@ -183,7 +190,7 @@ async function handlePuzzleSolve(
 export function isPuzzleCommand(command: string): boolean {
   const commandWords = command.toLowerCase().trim().split(/\s+/);
   const verb = commandWords[0];
-  
+
   return ['puzzle', 'puzzles', 'solve'].includes(verb);
 }
 
@@ -193,19 +200,19 @@ export function isPuzzleCommand(command: string): boolean {
 export function getPuzzleContextualInfo(roomId: string, gameState: LocalGameState): string[] {
   const puzzleController = PuzzleController.getInstance();
   const progress = puzzleController.getRoomPuzzleProgress(roomId, gameState);
-  
+
   const messages: string[] = [];
-  
+
   if (progress.total > 0) {
     if (progress.available > 0) {
       messages.push(`🧩 ${progress.available} puzzle${progress.available !== 1 ? 's' : ''} available (type "puzzle list" to see them)`);
     }
-    
+
     if (progress.solved > 0) {
       messages.push(`✅ ${progress.solved}/${progress.total} puzzles completed in this area`);
     }
   }
-  
+
   return messages;
 }
 

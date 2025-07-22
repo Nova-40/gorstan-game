@@ -1,3 +1,7 @@
+import { NPC } from './NPCTypes';
+
+
+
 // Version: 6.0.0
 // (c) 2025 Geoffrey Alan Webster
 // Licensed under the MIT License
@@ -132,7 +136,7 @@ const npcIdleConfigs: Record<string, NPCIdleConfig> = {
     },
     frequency: 15000 // 15 seconds
   },
-  
+
   'dominic': {
     baseLines: [
       { text: "*blub* You wouldn't understand.", weight: 3 },
@@ -164,7 +168,7 @@ const npcIdleConfigs: Record<string, NPCIdleConfig> = {
     },
     frequency: 20000 // 20 seconds
   },
-  
+
   'morthos': {
     baseLines: [
       { text: "The lattice sighs.", weight: 3 },
@@ -199,7 +203,7 @@ const npcIdleConfigs: Record<string, NPCIdleConfig> = {
     },
     frequency: 25000 // 25 seconds
   },
-  
+
   'polly': {
     baseLines: [
       { text: "I remember everything. That's the problem.", weight: 3 },
@@ -231,7 +235,7 @@ const npcIdleConfigs: Record<string, NPCIdleConfig> = {
     },
     frequency: 18000 // 18 seconds
   },
-  
+
   'mr wendell': {
     baseLines: [
       { text: "What did you call me?", weight: 3 },
@@ -321,7 +325,7 @@ export function getRandomIdleLine(npcName: string): string | null {
       console.warn(`[NPCIdleLines] No idle lines found for NPC: ${npcName}`);
       return null;
     }
-    
+
         return lines[randomIndex];
   } catch (error) {
     console.error('[NPCIdleLines] Error getting random idle line:', error);
@@ -350,60 +354,60 @@ export async function getContextualIdleLine(context: IdleLineContext): Promise<s
     }
 
     // Enhanced context with NPC memory integration
-    
+
     // Collect eligible lines
     const eligibleLines: IdleLine[] = [];
-    
+
     // Add base lines
     eligibleLines.push(...config.baseLines);
-    
+
     // Add mood-specific lines
     if (config.moodLines && enhancedContext.npcState?.mood) {
             if (moodLines) {
         eligibleLines.push(...moodLines);
       }
     }
-    
+
     // Add relationship-specific lines
     if (config.relationshipLines && enhancedContext.npcState?.relationship) {
             if (relationshipLines) {
         eligibleLines.push(...relationshipLines);
       }
     }
-    
+
     // Add context-specific lines
     if (config.contextLines) {
       Object.values(config.contextLines).forEach(contextLineArray => {
                 eligibleLines.push(...validContextLines);
       });
     }
-    
+
     // Filter out recently used lines
-            
+
     // If all lines were recently used, clear the recent set
     if (availableLines.length === 0 && eligibleLines.length > 0) {
       recentlyUsedLines.set(npcName, new Set());
       availableLines.push(...eligibleLines);
     }
-    
+
     if (availableLines.length === 0) {
       return null;
     }
-    
+
     // Select line based on weight
-        
+
     // Track usage
     if (!recentlyUsedLines.has(npcName)) {
       recentlyUsedLines.set(npcName, new Set());
     }
     recentlyUsedLines.get(npcName)!.add(selectedLine.text);
     lastIdleTime.set(npcName, now);
-    
+
     // Limit recent set size for memory management
         if (recentSet2.size > 5) {
             recentSet2.delete(oldestLine);
     }
-    
+
     return selectedLine.text;
   } catch (error) {
     console.error('[NPCIdleLines] Error getting contextual idle line:', error);
@@ -416,7 +420,7 @@ export async function getContextualIdleLine(context: IdleLineContext): Promise<s
  */
 async function buildEnhancedContext(context: IdleLineContext): Promise<IdleLineContext> {
   try {
-        
+
     return {
       ...context,
       npcState: npcState ? {
@@ -450,14 +454,14 @@ function checkLineConditions(line: IdleLine, context: IdleLineContext): boolean 
         return false;
       }
     }
-    
+
     // Check relationship conditions
     if (conditions.relationship && context.npcState?.relationship) {
       if (!conditions.relationship.includes(context.npcState.relationship)) {
         return false;
       }
     }
-    
+
     // Check flag conditions
     if (conditions.flags && context.playerState?.flags) {
       for (const flag of conditions.flags) {
@@ -466,7 +470,7 @@ function checkLineConditions(line: IdleLine, context: IdleLineContext): boolean 
         }
       }
     }
-    
+
     // Check trait conditions
     if (conditions.traits && context.playerState?.traits) {
       for (const trait of conditions.traits) {
@@ -475,7 +479,7 @@ function checkLineConditions(line: IdleLine, context: IdleLineContext): boolean 
         }
       }
     }
-    
+
     // Check inventory conditions
     if (conditions.inventory && context.playerState?.inventory) {
       for (const item of conditions.inventory) {
@@ -484,7 +488,7 @@ function checkLineConditions(line: IdleLine, context: IdleLineContext): boolean 
         }
       }
     }
-    
+
     // Check trust level conditions
     if (context.npcState?.trustLevel !== undefined) {
       if (conditions.minTrust && context.npcState.trustLevel < conditions.minTrust) {
@@ -494,7 +498,7 @@ function checkLineConditions(line: IdleLine, context: IdleLineContext): boolean 
         return false;
       }
     }
-    
+
     return true;
   } catch (error) {
     console.error('[NPCIdleLines] Error checking line conditions:', error);
@@ -512,14 +516,14 @@ function selectWeightedLine(lines: IdleLine[]): IdleLine {
     }
 
         let random = Math.random() * totalWeight;
-    
+
     for (const line of lines) {
       random -= (line.weight || 1);
       if (random <= 0) {
         return line;
       }
     }
-    
+
     // Fallback to last line
     return lines[lines.length - 1];
   } catch (error) {
@@ -557,7 +561,7 @@ export function addIdleLine(npcName: string, line: string): void {
         if (!npcIdleLines[lowerName]) {
       npcIdleLines[lowerName] = [];
     }
-    
+
     if (!npcIdleLines[lowerName].includes(line)) {
       npcIdleLines[lowerName].push(line);
       console.log(`[NPCIdleLines] Added line for ${npcName}: ${line}`);
@@ -672,7 +676,7 @@ export function validateIdleConfig(config: NPCIdleConfig): boolean {
   try {
     return Array.isArray(config.baseLines) &&
            config.baseLines.length > 0 &&
-           config.baseLines.every(line => 
+           config.baseLines.every(line =>
              typeof line.text === 'string' && line.text.length > 0
            );
   } catch (error) {
@@ -684,5 +688,5 @@ export function validateIdleConfig(config: NPCIdleConfig): boolean {
 /**
  * Export utilities for external use
  */
-export 
+export
 export default NPCIdleLinesEngine;

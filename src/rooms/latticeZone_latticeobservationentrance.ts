@@ -1,9 +1,16 @@
+import { NPC } from './NPCTypes';
+
+import { Room } from '../types/RoomTypes';
+
+import { Room } from './RoomTypes';
+
+
+
 // latticeZone_latticeobservationentrance.ts — rooms/latticeZone_latticeobservationentrance.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: latticeZone_latticeobservationentrance
 
-import { Room } from '../types/RoomTypes';
 
 const latticeobservationentrance: Room = {
   id: "latticeobservationentrance",

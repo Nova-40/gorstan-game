@@ -1,9 +1,12 @@
+import { RoomDefinition } from '../types/RoomTypes';
+
+
+
 // elfhameZone_faelakenorthshore.ts — rooms/elfhameZone_faelakenorthshore.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: elfhameZone_faelakenorthshore
 
-import { RoomDefinition } from '../types/RoomTypes';
 
 const faelakenorthshore: RoomDefinition = {
   id: 'faelakenorthshore',

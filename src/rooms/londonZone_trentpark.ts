@@ -1,9 +1,12 @@
+import { RoomDefinition } from '../types/RoomTypes';
+
+
+
 // londonZone_trentpark.ts — rooms/londonZone_trentpark.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: londonZone_trentpark
 
-import { RoomDefinition } from '../types/RoomTypes';
 
 const trentpark: RoomDefinition = {
   id: 'trentpark',
@@ -33,7 +36,7 @@ const trentpark: RoomDefinition = {
 
   exits: {
     east: 'stkatherinesdock',
-    west: 'dalesapartment', 
+    west: 'dalesapartment',
     south: 'findlaterscornercoffeeshop',
     sit: 'introreset',  // Sitting in the runic chair returns you to the reset room
     // Special conditional exit when sitting in chair

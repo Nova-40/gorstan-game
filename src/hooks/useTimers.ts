@@ -1,10 +1,13 @@
+import { useCallback, useRef, useEffect } from 'react';
+
+
+
 // Version: 6.1.0
 // (c) 2025 Geoffrey Alan Webster
 // Licensed under the MIT License
 // Module: useTimers.ts
 // Description: Unified timer management hook for Gorstan game
 
-import { useCallback, useRef, useEffect } from 'react';
 
 interface TimerConfig {
   id: string;
@@ -29,27 +32,27 @@ interface TimerInstance {
  */
 export const useTimers = () => {
   const timersRef = useRef<Map<string, TimerInstance>>(new Map());
-  
+
   /**
    * Set a timer with automatic cleanup
    */
   const setTimer = useCallback((config: TimerConfig) => {
     const { id, callback, delay, repeat = false, immediate = false } = config;
-    
+
     // Clear existing timer with same ID
     clearTimer(id);
-    
+
     // Execute immediately if requested
     if (immediate) {
       callback();
       if (!repeat) return; // If not repeating and immediate, we're done
     }
-    
+
     const startTime = Date.now();
-    
+
     const timerCallback = () => {
       callback();
-      
+
       if (repeat) {
         // For repeating timers, reschedule
         const newTimerId = window.setTimeout(timerCallback, delay);
@@ -63,9 +66,9 @@ export const useTimers = () => {
         timersRef.current.delete(id);
       }
     };
-    
+
     const timerId = window.setTimeout(timerCallback, delay);
-    
+
     const timerInstance: TimerInstance = {
       id,
       timerId,
@@ -74,10 +77,10 @@ export const useTimers = () => {
       repeat,
       callback
     };
-    
+
     timersRef.current.set(id, timerInstance);
   }, []);
-  
+
   /**
    * Clear a specific timer
    */
@@ -88,7 +91,7 @@ export const useTimers = () => {
       timersRef.current.delete(id);
     }
   }, []);
-  
+
   /**
    * Clear all timers
    */
@@ -98,33 +101,33 @@ export const useTimers = () => {
     });
     timersRef.current.clear();
   }, []);
-  
+
   /**
    * Check if a timer exists
    */
   const hasTimer = useCallback((id: string): boolean => {
     return timersRef.current.has(id);
   }, []);
-  
+
   /**
    * Get remaining time for a timer
    */
   const getRemainingTime = useCallback((id: string): number => {
     const timer = timersRef.current.get(id);
     if (!timer) return 0;
-    
+
     const elapsed = Date.now() - timer.startTime;
     const remaining = Math.max(0, timer.delay - elapsed);
     return remaining;
   }, []);
-  
+
   /**
    * Get all active timer IDs
    */
   const getActiveTimers = useCallback((): string[] => {
     return Array.from(timersRef.current.keys());
   }, []);
-  
+
   /**
    * Get timer statistics for debugging
    */
@@ -143,7 +146,7 @@ export const useTimers = () => {
       }))
     };
   }, [getRemainingTime]);
-  
+
   /**
    * Convenience method for delays
    */
@@ -157,7 +160,7 @@ export const useTimers = () => {
       });
     });
   }, [setTimer]);
-  
+
   /**
    * Convenience method for debouncing
    */
@@ -168,7 +171,7 @@ export const useTimers = () => {
       delay
     });
   }, [setTimer]);
-  
+
   /**
    * Convenience method for intervals
    */
@@ -180,14 +183,14 @@ export const useTimers = () => {
       repeat: true
     });
   }, [setTimer]);
-  
+
   // Auto-cleanup on unmount
   useEffect(() => {
     return () => {
       clearAllTimers();
     };
   }, [clearAllTimers]);
-  
+
   return {
     setTimer,
     clearTimer,

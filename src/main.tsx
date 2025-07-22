@@ -1,3 +1,13 @@
+import './tailwind.css';
+
+import App from './App';
+
+import React from 'react';
+
+import { createRoot } from 'react-dom/client';
+
+
+
 // main.tsx — main.tsx
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
@@ -7,10 +17,6 @@
 // Gorstan (C) Geoff Webster 2025
 // Code MIT Licence
 
-import React from 'react';
-import { createRoot } from 'react-dom/client';
-import App from './App';
-import './tailwind.css';
 
 console.log("🔥 Gorstan main.tsx executing...");
 

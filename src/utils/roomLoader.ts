@@ -1,3 +1,11 @@
+import roomRegistry from '../rooms/roomRegistry';
+
+import { Room } from '../types';
+
+import { Room } from './RoomTypes';
+
+
+
 // roomLoader.ts — utils/roomLoader.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
@@ -21,8 +29,6 @@ interface RoomDefinition {
 }
 
 // Import the actual roomRegistry from `src/rooms/roomRegistry.ts`
-import roomRegistry from '../rooms/roomRegistry';
-import { Room } from '../types';
 
 // Room map to store validated rooms
 const roomMap = new Map<RoomId, RoomDefinition>();
@@ -81,7 +87,11 @@ function initializeRooms(): void {
 initializeRooms();
 
 export function loadRoomById(id: string): RoomDefinition | null {
-  return roomMap.get(id as RoomId) || null;
+  const room = roomMap.get(id as RoomId) || null;
+  if (!room) {
+    console.warn(`[roomLoader] Room transition failed: Room '${id}' does not exist. Falling back to 'controlnexus'.`);
+  }
+  return room;
 }
 
 export function validateRooms(): string[] {

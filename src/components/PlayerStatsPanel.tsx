@@ -1,25 +1,31 @@
+import './PlayerStatsPanel.css';
+
+import React from 'react';
+
+import { Heart, Star, Trophy } from 'lucide-react';
+
+import { useGameState } from '../state/gameState';
+
+
+
 // PlayerStatsPanel.tsx — components/PlayerStatsPanel.tsx
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: PlayerStatsPanel
 
-import React from 'react';
-import { useGameState } from '../state/gameState';
-import { Heart, Star, Trophy } from 'lucide-react';
-import './PlayerStatsPanel.css';
 
 const PlayerStatsPanel: React.FC = () => {
   const { state } = useGameState();
   const { player } = state;
 
   const healthPercentage = (player.health / (player.maxHealth || 100)) * 100;
-  const healthColor = healthPercentage > 70 ? '#00ff00' : 
+  const healthColor = healthPercentage > 70 ? '#00ff00' :
                      healthPercentage > 30 ? '#ffff00' : '#ff0000';
 
   return (
     <div className="player-stats-panel">
       <div className="stats-header">Player Stats</div>
-      
+
       <div className="stat-item">
         <Heart size={16} style={{ color: healthColor }} />
         <span className="stat-label">Health:</span>
@@ -27,11 +33,11 @@ const PlayerStatsPanel: React.FC = () => {
           {player.health}/{player.maxHealth || 100}
         </span>
         <div className="health-bar">
-          <div 
-            className="health-fill" 
-            style={{ 
+          <div
+            className="health-fill"
+            style={{
               width: `${healthPercentage}%`,
-              backgroundColor: healthColor 
+              backgroundColor: healthColor
             }}
           />
         </div>

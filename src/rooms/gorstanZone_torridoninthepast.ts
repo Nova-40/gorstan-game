@@ -1,9 +1,16 @@
+import { NPC } from './NPCTypes';
+
+import { Room } from '../types/RoomTypes';
+
+import { Room } from './RoomTypes';
+
+
+
 // gorstanZone_torridoninthepast.ts — rooms/gorstanZone_torridoninthepast.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: gorstanZone_torridoninthepast
 
-import { Room } from '../types/RoomTypes';
 
 const torridoninthepast: Room = {
   id: "torridoninthepast",

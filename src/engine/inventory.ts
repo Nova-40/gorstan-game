@@ -1,3 +1,5 @@
+
+
 // Version: 6.0.0
 // (c) 2025 Geoffrey Alan Webster
 // Licensed under the MIT License
@@ -82,7 +84,7 @@ const ITEM_DATABASE: Record<string, Omit<InventoryItem, 'id'>> = {
       { type: 'boost', value: 1, duration: 300000, description: 'Increased alertness' }
     ]
   },
-  
+
   runbag: {
     name: 'Run Bag',
     description: 'A practical bag that increases your carrying capacity.',
@@ -95,7 +97,7 @@ const ITEM_DATABASE: Record<string, Omit<InventoryItem, 'id'>> = {
       { type: 'special', description: 'Increases inventory capacity' }
     ]
   },
-  
+
   key: {
     name: 'Ancient Key',
     description: 'An ornate key that pulses with mysterious energy.',
@@ -108,7 +110,7 @@ const ITEM_DATABASE: Record<string, Omit<InventoryItem, 'id'>> = {
       { type: 'unlock', description: 'Opens locked passages' }
     ]
   },
-  
+
   map: {
     name: 'Detailed Map',
     description: 'A map of the local area with cryptic markings.',
@@ -118,7 +120,7 @@ const ITEM_DATABASE: Record<string, Omit<InventoryItem, 'id'>> = {
     value: 25,
     rarity: 'common'
   },
-  
+
   constitution_scroll: {
     name: 'Constitution Scroll',
     description: 'An ancient document containing fundamental truths.',
@@ -131,7 +133,7 @@ const ITEM_DATABASE: Record<string, Omit<InventoryItem, 'id'>> = {
       { type: 'quest', description: 'Reveals cosmic truths' }
     ]
   },
-  
+
   polly_gift: {
     name: 'Polly\'s Gift',
     description: 'A small token of forgiveness and friendship.',
@@ -144,7 +146,7 @@ const ITEM_DATABASE: Record<string, Omit<InventoryItem, 'id'>> = {
       { type: 'special', description: 'Symbol of redemption' }
     ]
   },
-  
+
   temporal_device: {
     name: 'Temporal Device',
     description: 'A device that seems to exist in multiple timelines simultaneously.',
@@ -170,13 +172,13 @@ const ITEM_DATABASE: Record<string, Omit<InventoryItem, 'id'>> = {
  * @returns InventoryOperation result
  */
 export function addItem(
-  item: string | InventoryItem, 
+  item: string | InventoryItem,
   context?: InventoryContext,
   quantity: number = 1
 ): InventoryOperation {
   try {
     // Convert string to InventoryItem if needed
-        
+
     if (!itemObj) {
       return {
         type: 'add',
@@ -188,7 +190,7 @@ export function addItem(
 
     // Check capacity
     if (!context?.allowOverflow) {
-            
+
       if (inventory.length >= capacity && !canStackItem(itemObj.id)) {
         return {
           type: 'add',
@@ -230,7 +232,7 @@ export function addItem(
     }
 
     inventory.push(newItem);
-    
+
     return {
       type: 'add',
       item: newItem,
@@ -238,7 +240,7 @@ export function addItem(
       success: true,
       message: `Added ${itemObj.name} to inventory`
     };
-    
+
   } catch (error) {
     console.error('[Inventory] Error adding item:', error);
     return {
@@ -262,7 +264,7 @@ export function addItem(
 export function hasItem(item: string, minQuantity: number = 1): boolean {
   try {
         if (!inventoryItem) return false;
-    
+
         return quantity >= minQuantity;
   } catch (error) {
     console.error('[Inventory] Error checking item:', error);
@@ -285,12 +287,12 @@ export function getInventory(
 ): InventoryItem[] {
   try {
     let result = [...inventory];
-    
+
     // Filter by category
     if (category) {
       result = result.filter(item => item.category === category);
     }
-    
+
     // Sort by criteria
     if (sortBy) {
       result.sort((a, b) => {
@@ -310,7 +312,7 @@ export function getInventory(
         }
       });
     }
-    
+
     return result;
   } catch (error) {
     console.error('[Inventory] Error getting inventory:', error);
@@ -329,7 +331,7 @@ export function getInventory(
  */
 export function removeItem(item: string, quantity: number = 1): InventoryOperation {
   try {
-        
+
     if (itemIndex === -1) {
       return {
         type: 'remove',
@@ -400,7 +402,7 @@ export function clearInventory(category?: ItemCategory): void {
  */
 export function useItem(itemId: string, context?: InventoryContext): InventoryOperation {
   try {
-        
+
     if (!item) {
       return {
         type: 'use',
@@ -411,7 +413,7 @@ export function useItem(itemId: string, context?: InventoryContext): InventoryOp
     }
 
     // Apply item effects
-        
+
     // Remove consumable items after use
     if (item.category === 'consumable') {
             if (!removeResult.success) {
@@ -521,8 +523,8 @@ export function findItems(criteria: {
  */
 export function getItemValue(itemIds?: string[]): number {
   try {
-          
-    return items.reduce((total, item) => 
+
+    return items.reduce((total, item) =>
       total + ((item.value || 0) * (item.quantity || 1)), 0
     );
   } catch (error) {
@@ -534,7 +536,7 @@ export function getItemValue(itemIds?: string[]): number {
 // Helper functions
 function createItemFromId(itemId: string): InventoryItem | null {
     if (!itemData) return null;
-  
+
   return {
     id: itemId,
     ...itemData
@@ -591,7 +593,7 @@ export function getInventoryAsStringArray(): string[] {
 /**
  * Export utilities for external use
  */
-export 
+export
 export default InventoryEngine;
 
 // All functions are exported as named exports for use in game logic and UI.

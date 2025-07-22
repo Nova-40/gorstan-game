@@ -1,9 +1,12 @@
+import { RoomDefinition } from '../types/RoomTypes';
+
+
+
 // elfhameZone_faeglade.ts — rooms/elfhameZone_faeglade.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: elfhameZone_faeglade
 
-import { RoomDefinition } from '../types/RoomTypes';
 
 const faeglade: RoomDefinition = {
   id: 'faeglade',

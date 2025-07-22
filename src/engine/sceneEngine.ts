@@ -1,3 +1,7 @@
+import { Room } from './RoomTypes';
+
+
+
 // Version: 6.2.0
 // (c) 2025 Geoffrey Alan Webster
 // Licensed under the MIT License
@@ -72,17 +76,17 @@ export interface SceneChoice {
  * An effect triggered by a scene (e.g., setting a flag, updating inventory).
  */
 export interface SceneAction {
-  readonly type: 
-    | 'message' 
-    | 'setFlag' 
-    | 'updateInventory' 
-    | 'updateHealth' 
+  readonly type:
+    | 'message'
+    | 'setFlag'
+    | 'updateInventory'
+    | 'updateHealth'
     | 'updateScore'
-    | 'removeItem' 
-    | 'addTrait' 
-    | 'removeTrait' 
-    | 'teleport' 
-    | 'triggerScene' 
+    | 'removeItem'
+    | 'addTrait'
+    | 'removeTrait'
+    | 'teleport'
+    | 'triggerScene'
     | 'delay'
     | 'addExperience'
     | 'levelUp'
@@ -100,15 +104,15 @@ export interface SceneAction {
  * May use direct field checks or a custom logic function.
  */
 export interface SceneCondition {
-  readonly type: 
-    | 'hasFlag' 
-    | 'hasItem' 
-    | 'healthAbove' 
-    | 'scoreAbove' 
+  readonly type:
+    | 'hasFlag'
+    | 'hasItem'
+    | 'healthAbove'
+    | 'scoreAbove'
     | 'hasTrait'
-    | 'inRoom' 
-    | 'timeElapsed' 
-    | 'visitCount' 
+    | 'inRoom'
+    | 'timeElapsed'
+    | 'visitCount'
     | 'levelAbove'
     | 'experienceAbove'
     | 'questCompleted'
@@ -302,7 +306,7 @@ export class SceneFlowAnalyzer {
   ) {}
 
   analyzeSceneProgression(): SceneFlowReport {
-            
+
     return {
       totalScenes,
       completionRate,
@@ -318,7 +322,7 @@ export class SceneFlowAnalyzer {
     const bottlenecks: SceneBottleneck[] = [];
 
     for (const [sceneId, scene] of this.sceneRegistry) {
-            
+
       // Check for choice overload
       if (scene.choices && scene.choices.length > 5) {
         bottlenecks.push({
@@ -333,7 +337,7 @@ export class SceneFlowAnalyzer {
 
       // Check for requirement blocks
       if (scene.choices) {
-                
+
         if (blockedChoices.length > 0) {
           bottlenecks.push({
             sceneId,
@@ -351,7 +355,7 @@ export class SceneFlowAnalyzer {
   }
 
   optimizeSceneOrder(): SceneOrderOptimization {
-        
+
     return {
       currentOrder,
       optimizedOrder,
@@ -392,7 +396,7 @@ export class SceneFlowAnalyzer {
   }
 
   private calculateAveragePathLength(): number {
-        
+
     return totalExecutions > 0 ? this.executionHistory.size / totalExecutions * 3 : 0;
   }
 
@@ -412,7 +416,7 @@ export class SceneFlowAnalyzer {
       combat: 5,
       ending: 6
     };
-    
+
     return [...currentOrder].sort((a, b) => {
 
       return priorityA - priorityB;
@@ -588,9 +592,9 @@ export class ScenePerformanceMonitor {
     if (!this.performanceData.has(sceneId)) {
       this.performanceData.set(sceneId, []);
     }
-    
+
         data.push({ timestamp: Date.now(), duration: time });
-    
+
     // Keep only recent data (last 100 executions)
     if (data.length > 100) {
       data.splice(0, data.length - 100);
@@ -609,7 +613,7 @@ export class ScenePerformanceMonitor {
           averageExecutionTime: averageTime,
           slowOperations: this.identifySlowOperations(sceneId),
           recommendedOptimizations: this.generateOptimizationRecommendations(sceneId, averageTime),
-          severity: averageTime > PERFORMANCE_THRESHOLD * 3 ? 'high' : 
+          severity: averageTime > PERFORMANCE_THRESHOLD * 3 ? 'high' :
                    averageTime > PERFORMANCE_THRESHOLD * 2 ? 'medium' : 'low'
         });
       }
@@ -619,10 +623,10 @@ export class ScenePerformanceMonitor {
   }
 
   optimizeSceneExecution(): OptimizationReport {
-        
+
     return {
       totalOptimizations: slowScenes.length,
-      performanceGain: slowScenes.reduce((sum, issue) => 
+      performanceGain: slowScenes.reduce((sum, issue) =>
         sum + Math.max(0, issue.averageExecutionTime - PERFORMANCE_THRESHOLD), 0
       ),
       optimizedScenes: slowScenes.map(issue => issue.sceneId),
@@ -694,9 +698,9 @@ function initializeDefaultScenes(): void {
           context.setGameState(prev => ({
             ...prev,
             inventory: [...(prev.inventory || []), 'dominic_in_tank'],
-            flags: { 
-              ...prev.flags, 
-              tookDominic: true, 
+            flags: {
+              ...prev.flags,
+              tookDominic: true,
               pollyWillBeUpset: true,
               moral_weight: ((prev.flags?.moral_weight as number) || 0) + 1
             }
@@ -710,9 +714,9 @@ function initializeDefaultScenes(): void {
           context.appendMessage('🐟 You decide to leave Dominic in peace. He seems grateful.');
           context.setGameState(prev => ({
             ...prev,
-            flags: { 
-              ...prev.flags, 
-              leftDominic: true, 
+            flags: {
+              ...prev.flags,
+              leftDominic: true,
               showedMercy: true,
               karma_points: ((prev.flags?.karma_points as number) || 0) + 1
             }
@@ -730,8 +734,8 @@ function initializeDefaultScenes(): void {
           context.appendMessage('💭 "Help... me..." you hear in your mind. Dominic is asking for rescue!');
           context.setGameState(prev => ({
             ...prev,
-            flags: { 
-              ...prev.flags, 
+            flags: {
+              ...prev.flags,
               spokeWithDominic: true,
               understands_animal_suffering: true
             }
@@ -820,8 +824,8 @@ function initializeDefaultScenes(): void {
           context.appendMessage('🤝 You promise Dominic you\'ll find a way to get him to natural water.');
           context.setGameState(prev => ({
             ...prev,
-            flags: { 
-              ...prev.flags, 
+            flags: {
+              ...prev.flags,
               promisedDominicFreedom: true,
               active_quest_dominic_rescue: true
             }
@@ -835,8 +839,8 @@ function initializeDefaultScenes(): void {
           context.appendMessage('🏠 Dominic considers this... "Better than here, but still not home."');
           context.setGameState(prev => ({
             ...prev,
-            flags: { 
-              ...prev.flags, 
+            flags: {
+              ...prev.flags,
               suggestedBiggerTank: true
             }
           }));
@@ -936,7 +940,7 @@ export function runScene(
     if (scene.actions && scene.actions.length > 0) {
             actionsExecuted = actionsResult.executed;
       stateChanges = { ...stateChanges, ...actionsResult.stateChanges };
-      
+
       if (actionsResult.errors.length > 0) {
         result = { ...result, warnings: [...(result.warnings || []), ...actionsResult.errors] };
       }
@@ -985,7 +989,7 @@ export function runScene(
 
   } catch (error) {
         updateSceneStats(false, executionTime);
-    
+
     console.error(`[SceneEngine] Error running scene ${sceneId}:`, error);
     result = {
       ...result,
@@ -1019,13 +1023,13 @@ function getSceneWithCache(sceneId: string): Scene | null {
     // Check cache first
         if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
       sceneStats.cacheHits++;
-      
+
       // Update access count efficiently
       sceneCache.set(sceneId, {
         ...cached,
         accessCount: cached.accessCount + 1
       });
-      
+
       return cached.scene;
     }
 
@@ -1039,9 +1043,9 @@ function getSceneWithCache(sceneId: string): Scene | null {
           sceneCache.delete(oldestKey);
         }
       }
-      
-      sceneCache.set(sceneId, { 
-        scene, 
+
+      sceneCache.set(sceneId, {
+        scene,
         timestamp: Date.now(),
         accessCount: 1
       });
@@ -1060,7 +1064,7 @@ function getSceneWithCache(sceneId: string): Scene | null {
  */
 function canExecuteScene(sceneId: string, scene: Scene): boolean {
   try {
-        
+
     // Check if scene is repeatable
     if (!scene.repeatable && executionData && executionData.count > 0) {
       return false;
@@ -1085,9 +1089,9 @@ function canExecuteScene(sceneId: string, scene: Scene): boolean {
 function checkSceneDependencies(dependencies: readonly string[], context: SceneContext): boolean {
   try {
     if (!context.sceneHistory) return false;
-    
-    return dependencies.every(dep => 
-      context.sceneHistory!.includes(dep) || 
+
+    return dependencies.every(dep =>
+      context.sceneHistory!.includes(dep) ||
       context.flags?.[`scene_${dep}_completed`] ||
       context.player?.flags?.[`scene_${dep}_completed`]
     );
@@ -1108,47 +1112,47 @@ function checkSceneConditions(conditions: readonly SceneCondition[], context: Sc
         case 'hasFlag':
                     result = evaluateCondition(flagValue, true, condition.operator || 'equals');
           break;
-        
+
         case 'hasItem':
                     result = evaluateCondition(hasItem, true, condition.operator || 'equals');
           break;
-        
+
         case 'hasTrait':
                     result = evaluateCondition(hasTrait, true, condition.operator || 'equals');
           break;
-        
+
         case 'healthAbove':
                     result = evaluateCondition(health, condition.value as number, condition.operator || 'greater');
           break;
-        
+
         case 'scoreAbove':
                     result = evaluateCondition(score, condition.value as number, condition.operator || 'greater');
           break;
-        
+
         case 'levelAbove':
                     result = evaluateCondition(level, condition.value as number, condition.operator || 'greater');
           break;
-        
+
         case 'experienceAbove':
                     result = evaluateCondition(experience, condition.value as number, condition.operator || 'greater');
           break;
-        
+
         case 'inRoom':
                     result = evaluateCondition(currentRoom, condition.value as string, condition.operator || 'equals');
           break;
-        
+
         case 'timeElapsed':
                     result = evaluateCondition(gameTime, condition.value as number, condition.operator || 'greater');
           break;
-        
+
         case 'visitCount':
                     result = evaluateCondition(visitCount, 1, condition.operator || 'greaterEqual');
           break;
-        
+
         case 'custom':
           result = condition.custom ? condition.custom(context) : true;
           break;
-        
+
         default:
           console.warn(`[SceneEngine] Unknown condition type: ${condition.type}`);
           result = true;
@@ -1188,7 +1192,7 @@ function evaluateCondition(actual: unknown, expected: unknown, operator: string)
  * Enhanced scene actions execution with comprehensive state tracking
  */
 function executeSceneActions(
-  actions: readonly SceneAction[], 
+  actions: readonly SceneAction[],
   context: SceneContext
 ): { executed: number; errors: string[]; stateChanges: Record<string, unknown> } {
   const result: { executed: number; errors: string[]; stateChanges: Record<string, unknown> } = { executed: 0, errors: [], stateChanges: {} };
@@ -1206,7 +1210,7 @@ function executeSceneActions(
             context.appendMessage(action.value as string, 'action');
             result.executed++;
             break;
-          
+
           case 'setFlag':
             if (action.target) {
               context.setGameState(prev => ({
@@ -1217,7 +1221,7 @@ function executeSceneActions(
               result.executed++;
             }
             break;
-          
+
           case 'updateInventory':
             context.setGameState(prev => ({
               ...prev,
@@ -1226,7 +1230,7 @@ function executeSceneActions(
             result.stateChanges[`inventory_add`] = action.value;
             result.executed++;
             break;
-          
+
           case 'removeItem':
             if (action.target) {
               context.setGameState(prev => ({
@@ -1237,7 +1241,7 @@ function executeSceneActions(
               result.executed++;
             }
             break;
-          
+
           case 'addTrait':
             context.setGameState(prev => ({
               ...prev,
@@ -1246,7 +1250,7 @@ function executeSceneActions(
             result.stateChanges[`trait_add`] = action.value;
             result.executed++;
             break;
-          
+
           case 'removeTrait':
             context.setGameState(prev => ({
               ...prev,
@@ -1255,7 +1259,7 @@ function executeSceneActions(
             result.stateChanges[`trait_remove`] = action.value;
             result.executed++;
             break;
-          
+
           case 'updateHealth':
             context.setGameState(prev => {
                             return { ...prev, health: newHealth };
@@ -1263,7 +1267,7 @@ function executeSceneActions(
             result.stateChanges[`health`] = action.value;
             result.executed++;
             break;
-          
+
           case 'updateScore':
             context.setGameState(prev => ({
               ...prev,
@@ -1281,7 +1285,7 @@ function executeSceneActions(
             result.stateChanges[`experience`] = action.value;
             result.executed++;
             break;
-          
+
           case 'teleport':
             if (action.target) {
               context.setGameState(prev => ({
@@ -1293,21 +1297,21 @@ function executeSceneActions(
               result.executed++;
             }
             break;
-          
+
           case 'triggerScene':
             if (action.target) {
               result.stateChanges[`trigger_scene`] = action.target;
               result.executed++;
             }
             break;
-          
+
           case 'delay':
             if (action.delay && action.delay > 0) {
               result.stateChanges[`delay`] = action.delay;
               result.executed++;
             }
             break;
-          
+
           default:
             result.errors.push(`Unknown action type: ${action.type} at index ${index}`);
         }
@@ -1336,29 +1340,29 @@ function evaluateActionCondition(action: SceneAction, context: SceneContext): bo
  * Enhanced choice display with filtering and requirements checking - FIXED SYNTAX
  */
 function displaySceneChoices(
-  choices: readonly SceneChoice[], 
+  choices: readonly SceneChoice[],
   context: SceneContext
 ): { available: number; messagesAdded: number; nextScenes: string[] } {
-  const result: { available: number; messagesAdded: number; nextScenes: string[] } = { 
-    available: 0, 
-    messagesAdded: 0, 
-    nextScenes: [] 
+  const result: { available: number; messagesAdded: number; nextScenes: string[] } = {
+    available: 0,
+    messagesAdded: 0,
+    nextScenes: []
   };
 
   try {
-          
+
       // Check if choice is disabled
       if (choice.disabled) return false;
-      
+
       // Check choice condition
       if (choice.condition && !choice.condition(context)) return false;
-      
+
       // Check choice requirements
       if (choice.requirements && !checkChoiceRequirements(choice.requirements, context)) return false;
-      
+
       // Check choice cooldown
       if (choice.cooldown && isChoiceOnCooldown(choice.id, choice.cooldown)) return false;
-      
+
       return true;
     });
 
@@ -1373,17 +1377,17 @@ function displaySceneChoices(
 
     availableChoices.forEach((choice, index) => {
       let choiceText = `${index + 1}. ${choice.text}`;
-      
+
       // Add requirement hints
       if (choice.requirements) {
                 if (missingReqs.length > 0) {
           choiceText += ` [Requires: ${missingReqs.join(', ')}]`;
         }
       }
-      
+
       context.appendMessage(choiceText, 'choice');
       result.messagesAdded++;
-      
+
       // Track potential next scenes
       if (choice.nextScene) {
         result.nextScenes.push(choice.nextScene);
@@ -1406,17 +1410,17 @@ function checkChoiceRequirements(requirements: SceneChoice['requirements'], cont
     if (!requirements) return true;
 
     // Check flags
-    if (requirements.flags && !requirements.flags.every(flag => 
+    if (requirements.flags && !requirements.flags.every(flag =>
       context.flags?.[flag] || context.player?.flags?.[flag]
     )) return false;
 
     // Check items
-    if (requirements.items && !requirements.items.every(item => 
+    if (requirements.items && !requirements.items.every(item =>
       context.player?.inventory?.includes(item)
     )) return false;
 
     // Check traits
-    if (requirements.traits && !requirements.traits.every(trait => 
+    if (requirements.traits && !requirements.traits.every(trait =>
       context.player?.traits?.includes(trait)
     )) return false;
 
@@ -1653,7 +1657,7 @@ export function executeChoice(
         messagesAdded: result.messagesAdded + nextSceneResult.messagesAdded,
         actionsExecuted: result.actionsExecuted + nextSceneResult.actionsExecuted
       };
-      
+
       if (!nextSceneResult.success) {
         result = {
           ...result,
@@ -1666,9 +1670,9 @@ export function executeChoice(
     return { ...result, success: true };
   } catch (error) {
     console.error('[SceneEngine] Error executing choice:', error);
-    return { 
-      ...result, 
-      errors: [`Choice execution failed: ${error instanceof Error ? error.message : 'Unknown error'}`] 
+    return {
+      ...result,
+      errors: [`Choice execution failed: ${error instanceof Error ? error.message : 'Unknown error'}`]
     };
   }
 }
@@ -1709,7 +1713,7 @@ function validateSceneStructure(scene: Scene): boolean {
   try {
     if (!scene.id || typeof scene.id !== 'string') return false;
     if (!Array.isArray(scene.messages)) return false;
-    
+
     if (scene.choices) {
       if (!Array.isArray(scene.choices)) return false;
       for (const choice of scene.choices) {
@@ -1743,17 +1747,17 @@ export function getAvailableScenes(filter?: {
 
     if (filter) {
       sceneIds = sceneIds.filter(id => {
-                
+
         if (filter.category && scene.category !== filter.category) {
           return false;
         }
-        
+
         if (filter.tags && filter.tags.length > 0) {
           if (!scene.tags || !filter.tags.some(tag => scene.tags!.includes(tag))) {
             return false;
           }
         }
-        
+
         return true;
       });
     }
@@ -1871,7 +1875,7 @@ initializeDefaultScenes();
 /**
  * Enhanced scene utilities for external use
  */
-export 
+export
 export default SceneEngine;
 
 // Add scene flow analytics

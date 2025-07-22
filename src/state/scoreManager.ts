@@ -1,3 +1,7 @@
+import { GameAction } from '../types/GameTypes';
+
+
+
 // scoreManager.ts — state/scoreManager.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
@@ -9,7 +13,6 @@
 // Gorstan elements (c) Geoff Webster
 // Code licensed under the MIT License
 
-import { GameAction } from '../types/GameTypes';
 
 // Global dispatch reference for score updates
 let globalDispatch: React.Dispatch<GameAction> | null = null;
@@ -27,7 +30,7 @@ export function initializeScoreManager(dispatch: React.Dispatch<GameAction>): vo
 export function updateScore(delta: number): void {
   if (globalDispatch) {
     globalDispatch({ type: 'UPDATE_SCORE', payload: delta });
-    
+
     // Log score changes to console for feedback
     if (delta > 0) {
       globalDispatch({

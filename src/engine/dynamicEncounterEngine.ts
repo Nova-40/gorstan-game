@@ -1,12 +1,21 @@
+import { GameAction } from '../types/GameTypes';
+
+import { LocalGameState } from '../state/gameState';
+
+import { NPC } from './NPCTypes';
+
+import { Room } from '../types/Room';
+
+import { Room } from './RoomTypes';
+
+
+
 // Version: 6.1.0
 // (c) 2025 Geoffrey Alan Webster
 // Licensed under the MIT License
 // Module: dynamicEncounterEngine.ts
 // Description: Advanced NPC encounter system with hierarchy and tension management
 
-import { LocalGameState } from '../state/gameState';
-import { GameAction } from '../types/GameTypes';
-import { Room } from '../types/Room';
 
 /**
  * NPC Hierarchy and Power Structure
@@ -26,12 +35,12 @@ export const NPC_HIERARCHY = {
 /**
  * NPC Encounter Types
  */
-export type EncounterType = 
-  | 'standoff' 
-  | 'intervention' 
-  | 'argument' 
-  | 'threat' 
-  | 'silence' 
+export type EncounterType =
+  | 'standoff'
+  | 'intervention'
+  | 'argument'
+  | 'threat'
+  | 'silence'
   | 'dominance_display'
   | 'tension_building'
   | 'ayla_control';
@@ -127,10 +136,10 @@ export class DynamicEncounterEngine {
 
     // Mr. Wendell with others (tension based on player behavior)
     if (npcs.includes('mr_wendell')) {
-      const hasCursedItems = playerInventory.some(item => 
+      const hasCursedItems = playerInventory.some(item =>
         ['cursedcoin', 'doomedscroll', 'cursed_artifact'].includes(item.toLowerCase())
       );
-      
+
       if (hasCursedItems || flags.wasRudeToNPC) {
         return 'threat';
       }
@@ -158,8 +167,8 @@ export class DynamicEncounterEngine {
    * Create encounter configuration
    */
   private createEncounter(
-    type: EncounterType, 
-    participants: string[], 
+    type: EncounterType,
+    participants: string[],
     gameState: LocalGameState
   ): EncounterConfig {
     const baseConfig: EncounterConfig = {
@@ -267,7 +276,7 @@ export class DynamicEncounterEngine {
     dispatch: React.Dispatch<GameAction>
   ): void {
     const sequences = this.getEncounterSequences(encounter.type, participants);
-    
+
     sequences.forEach((message, index) => {
       setTimeout(() => {
         dispatch({
@@ -291,19 +300,19 @@ export class DynamicEncounterEngine {
     switch (type) {
       case 'ayla_control':
         return `⚡ The room suddenly falls silent as Ayla enters. ${participantList.replace('Ayla, ', '')} immediately defer to her presence.`;
-      
+
       case 'standoff':
         return `🌩️ Tension crackles in the air as ${participantList} face each other. This could escalate quickly...`;
-      
+
       case 'intervention':
         return `🛡️ Albie steps forward with quiet authority. The situation is about to be handled.`;
-      
+
       case 'threat':
         return `⚠️ Mr. Wendell's eyes narrow dangerously. The air grows thick with menace.`;
-      
+
       case 'argument':
         return `🔥 Voices rise as ${participantList} engage in heated discussion. You can feel the conflict building.`;
-      
+
       default:
         return `👁️ Multiple NPCs are present: ${participantList}. The dynamics in the room shift noticeably.`;
     }
@@ -369,7 +378,7 @@ export class DynamicEncounterEngine {
         payload: effects.healthChange
       });
 
-      const healthMessage = effects.healthChange > 0 
+      const healthMessage = effects.healthChange > 0
         ? `💚 You feel energized by the encounter (+${effects.healthChange} health)`
         : `💔 The tension takes its toll on you (${effects.healthChange} health)`;
 
@@ -433,16 +442,16 @@ export class DynamicEncounterEngine {
     switch (type) {
       case 'ayla_control':
         return "✨ Ayla's presence lingers even as the moment passes. Order has been established.";
-      
+
       case 'standoff':
         return "🌩️ The tension slowly dissipates, but the memory of this moment will linger.";
-      
+
       case 'intervention':
         return "🛡️ Albie's intervention was swift and effective. The situation is under control.";
-      
+
       case 'threat':
         return "💀 Mr. Wendell's warning echoes in your mind. Some lines should not be crossed.";
-      
+
       default:
         return "👁️ The encounter concludes, leaving you with much to consider.";
     }

@@ -1,13 +1,23 @@
+import CommandInput from '../components/CommandInput';
+
+import QuickActions from '../components/QuickActions';
+
+import React from 'react';
+
+import TerminalConsole from '../components/TerminalConsole';
+
+import type { Room } from '../types/Room';
+
+import { Room } from './RoomTypes';
+
+import { useGameState } from '../state/gameState';
+
+
+
 // GameEngine.tsx
 // Gorstan (c) 2025 Geoffrey Alan Webster. MIT Licence
 // Version: 6.1.0
 
-import React from 'react';
-import { useGameState } from '../state/gameState';
-import TerminalConsole from '../components/TerminalConsole';
-import CommandInput from '../components/CommandInput';
-import QuickActions from '../components/QuickActions';
-import type { Room } from '../types/Room';
 
 const GameEngine: React.FC = () => {
   const { state, dispatch } = useGameState();
@@ -75,7 +85,6 @@ const GameEngine: React.FC = () => {
 };
 
 export default GameEngine;
-
 
 
 

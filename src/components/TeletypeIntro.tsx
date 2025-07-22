@@ -1,3 +1,7 @@
+import React, { useState, useEffect } from 'react';
+
+
+
 // TeletypeIntro.tsx — components/TeletypeIntro.tsx
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
@@ -7,7 +11,6 @@
 // Gorstan (C) Geoff Webster 2025
 // Code MIT Licence
 
-import React, { useState, useEffect } from 'react';
 
 type TeletypeIntroProps = {
   playerName: string;
@@ -33,7 +36,7 @@ const TeletypeIntro: React.FC<TeletypeIntroProps> = ({ playerName, onComplete })
   const [selectedChoice, setSelectedChoice] = useState<string | null>(null);
   const [waitTimer, setWaitTimer] = useState<NodeJS.Timeout | null>(null);
   const [timeRemaining, setTimeRemaining] = useState<number>(300); // 5 minutes in seconds
-  
+
   const skipToChoices = () => {
     // Show the complete story immediately
     const fullText = fullStory.join('\n');
@@ -99,9 +102,9 @@ const TeletypeIntro: React.FC<TeletypeIntroProps> = ({ playerName, onComplete })
       clearInterval(waitTimer);
       setWaitTimer(null);
     }
-    
+
     setSelectedChoice(choice);
-    
+
     // Add a brief visual feedback delay before starting the transition
     setTimeout(() => {
       const routeMap = {
@@ -125,7 +128,7 @@ const TeletypeIntro: React.FC<TeletypeIntroProps> = ({ playerName, onComplete })
           Skip to Choices
         </button>
       )}
-      
+
       {/* Timer display - only visible when choices are shown */}
       {showChoices && !selectedChoice && (
         <div className="absolute top-4 right-4 bg-red-900 text-red-300 px-4 py-2 rounded border border-red-500">
@@ -134,14 +137,14 @@ const TeletypeIntro: React.FC<TeletypeIntroProps> = ({ playerName, onComplete })
           <div className="text-xs opacity-75">Auto-wait at 0:00</div>
         </div>
       )}
-      
+
       <pre className="whitespace-pre-wrap text-sm leading-relaxed">{displayedText}</pre>
       {showChoices && (
         <div className={`mt-6 space-y-3 transition-opacity duration-300 ${selectedChoice ? 'opacity-50' : 'opacity-100'}`}>
           <button
             className={`block w-full p-2 rounded transition-all duration-200 ${
-              selectedChoice === 'jump' 
-                ? 'bg-green-600 text-white transform scale-95' 
+              selectedChoice === 'jump'
+                ? 'bg-green-600 text-white transform scale-95'
                 : 'bg-green-700 text-white hover:bg-green-600'
             }`}
             onClick={() => handleChoice('jump')}
@@ -153,24 +156,24 @@ const TeletypeIntro: React.FC<TeletypeIntroProps> = ({ playerName, onComplete })
           <button
             className={`block w-full p-2 rounded transition-all duration-200 ${
               selectedChoice === 'wait' || selectedChoice === 'dramatic_wait'
-                ? 'bg-yellow-600 text-white transform scale-95' 
-                : timeRemaining <= 30 
-                  ? 'bg-red-700 text-white hover:bg-red-600 animate-pulse' 
+                ? 'bg-yellow-600 text-white transform scale-95'
+                : timeRemaining <= 30
+                  ? 'bg-red-700 text-white hover:bg-red-600 animate-pulse'
                   : 'bg-yellow-700 text-white hover:bg-yellow-600'
             }`}
             onClick={() => handleChoice('wait')}
             type="button"
             disabled={!!selectedChoice}
           >
-            {timeRemaining <= 30 
-              ? '⚠️ You hesitate — time is running out...' 
+            {timeRemaining <= 30
+              ? '⚠️ You hesitate — time is running out...'
               : 'You hesitate — the air thickens…'
             }
           </button>
           <button
             className={`block w-full p-2 rounded transition-all duration-200 ${
-              selectedChoice === 'sip' 
-                ? 'bg-blue-600 text-white transform scale-95' 
+              selectedChoice === 'sip'
+                ? 'bg-blue-600 text-white transform scale-95'
                 : 'bg-blue-700 text-white hover:bg-blue-600'
             }`}
             onClick={() => handleChoice('sip')}
@@ -179,7 +182,7 @@ const TeletypeIntro: React.FC<TeletypeIntroProps> = ({ playerName, onComplete })
           >
             You sip the coffee — warmth floods your chest
           </button>
-          
+
           {/* Timer warning messages */}
           {timeRemaining <= 60 && timeRemaining > 30 && !selectedChoice && (
             <div className="text-center text-yellow-400 text-sm animate-pulse">

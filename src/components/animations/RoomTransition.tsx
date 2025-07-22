@@ -1,10 +1,14 @@
+import React, { useState, useEffect } from 'react';
+
+import { motion, AnimatePresence } from 'framer-motion';
+
+
+
 // RoomTransition.tsx — components/animations/RoomTransition.tsx
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: RoomTransition
 
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 
 interface RoomTransitionProps {
   isActive: boolean;
@@ -65,7 +69,7 @@ const RoomTransition: React.FC<RoomTransitionProps> = ({
       case 'zone_change':
         return {
           start: { opacity: 1, scale: 1 },
-          transition: { 
+          transition: {
             opacity: 0.3,
             scale: 1.1,
             rotateY: 180,
@@ -73,7 +77,7 @@ const RoomTransition: React.FC<RoomTransitionProps> = ({
           },
           arrival: { opacity: 1, scale: 1, rotateY: 0 }
         };
-      
+
       case 'portal':
         return {
           start: { opacity: 1, scale: 1 },
@@ -85,7 +89,7 @@ const RoomTransition: React.FC<RoomTransitionProps> = ({
           },
           arrival: { opacity: 1, scale: 1, rotate: 0 }
         };
-      
+
       case 'chair_portal':
         return {
           start: { opacity: 1, scale: 1 },
@@ -97,7 +101,7 @@ const RoomTransition: React.FC<RoomTransitionProps> = ({
           },
           arrival: { opacity: 1, scale: 1, y: 0 }
         };
-      
+
       default:
         return {
           start: { opacity: 1 },
@@ -111,7 +115,7 @@ const RoomTransition: React.FC<RoomTransitionProps> = ({
     if (transitionType === 'zone_change' && fromZone && toZone) {
       return `Transitioning from ${fromZone} to ${toZone}...`;
     }
-    
+
     switch (transitionType) {
       case 'portal': return 'Stepping through the portal...';
       case 'chair_portal': return 'Reality shifts around you...';
@@ -131,7 +135,7 @@ const RoomTransition: React.FC<RoomTransitionProps> = ({
             transition={{ duration: 0.5 }}
           />
         );
-      
+
       case 'portal':
         return (
           <motion.div
@@ -140,14 +144,14 @@ const RoomTransition: React.FC<RoomTransitionProps> = ({
               background: 'radial-gradient(circle at center, rgba(74,0,224,0.8), rgba(142,45,226,0.6), rgba(218,0,255,0.4))'
             }}
             initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ 
+            animate={{
               opacity: phase === 'transition' ? 1 : 0,
               scale: phase === 'transition' ? 1.5 : 0.5
             }}
             transition={{ duration: 0.8 }}
           />
         );
-      
+
       case 'chair_portal':
         return (
           <motion.div
@@ -156,14 +160,14 @@ const RoomTransition: React.FC<RoomTransitionProps> = ({
               background: 'conic-gradient(from 0deg, rgba(0,212,170,0.8), rgba(0,160,176,0.6), rgba(0,95,115,0.4), rgba(0,18,25,0.6))'
             }}
             initial={{ opacity: 0, rotate: 0 }}
-            animate={{ 
+            animate={{
               opacity: phase === 'transition' ? 0.9 : 0,
               rotate: phase === 'transition' ? 360 : 0
             }}
             transition={{ duration: 1.5 }}
           />
         );
-      
+
       default:
         return (
           <motion.div
@@ -225,13 +229,13 @@ const RoomTransition: React.FC<RoomTransitionProps> = ({
       >
         {getBackgroundEffect()}
         {getParticleEffect()}
-        
+
         <motion.div
           className="relative z-10 text-center text-white font-mono"
           variants={variants}
           initial="start"
           animate={phase}
-          transition={{ 
+          transition={{
             duration: phase === 'transition' ? getTransitionDuration() / 1000 : 0.3,
             ease: "easeInOut"
           }}
@@ -244,7 +248,7 @@ const RoomTransition: React.FC<RoomTransitionProps> = ({
           >
             {getTransitionText()}
           </motion.h2>
-          
+
           {(transitionType === 'zone_change' || transitionType === 'portal' || transitionType === 'chair_portal') && (
             <motion.div
               className="w-16 h-1 bg-white mx-auto rounded-full overflow-hidden"

@@ -1,3 +1,7 @@
+import { Trap } from './GameTypes';
+
+
+
 // Version: 6.0.0
 // (c) 2025 Geoffrey Alan Webster
 // Licensed under the MIT License
@@ -238,7 +242,7 @@ export function seedTraps(roomKeys: string[], config?: Partial<TrapSeedConfig>):
 
         // Random seeding based on probability
         if (Math.random() < seedConfig.probability) {
-                                        
+
           activeTraps[roomId] = trapData;
           trapsSeeded++;
         }
@@ -246,10 +250,10 @@ export function seedTraps(roomKeys: string[], config?: Partial<TrapSeedConfig>):
         console.error(`[TrapController] Error seeding trap in room ${roomId}:`, error);
       }
     });
-    
+
     // Clear trap cache after seeding
     trapCache.clear();
-    
+
     console.log(`[TrapController] Traps seeded: ${trapsSeeded} out of ${roomKeys.length} rooms`);
     console.log('[TrapController] Active traps:', Object.keys(activeTraps));
   } catch (error) {
@@ -262,7 +266,7 @@ export function seedTraps(roomKeys: string[], config?: Partial<TrapSeedConfig>):
  */
 function createTrap(roomId: string, trapData: Partial<TrapData>): TrapData {
   try {
-            
+
     const fullTrapData: TrapData = {
       id: `trap_${roomId}_${Date.now()}`,
       roomId,
@@ -415,7 +419,7 @@ export function triggerTrap(roomName: string, context: TrapTriggerContext): Trap
     }
 
     // Apply trap effects
-    
+
     // Clear cache for this room
     trapCache.delete(roomName);
 
@@ -451,10 +455,10 @@ export function disarmTrap(roomName: string, method: string = 'unknown'): boolea
 
     trap.disarmedBy = method;
     delete activeTraps[roomName];
-    
+
     // Clear cache
     trapCache.delete(roomName);
-    
+
     console.log(`[TrapController] Trap disarmed in ${roomName} using ${method}`);
     return true;
   } catch (error) {
@@ -527,7 +531,7 @@ export function isRoomTrapped(roomName: string): boolean {
  */
 export function getTrapCount(filter?: { active?: boolean; severity?: string; type?: string }): number {
   try {
-        
+
     if (!filter) {
       return traps.length;
     }
@@ -562,7 +566,7 @@ export function clearAllTraps(confirm: boolean = false): boolean {
         Object.keys(activeTraps).forEach(key => delete activeTraps[key]);
     trapCooldowns.clear();
     trapCache.clear();
-    
+
     console.log(`[TrapController] ${count} traps cleared`);
     return true;
   } catch (error) {
@@ -586,13 +590,13 @@ export function resetTrap(roomName: string): boolean {
     trap.triggered = false;
     delete trap.triggeredAt;
     delete trap.disarmedBy;
-    
+
     // Clear cooldown
     trapCooldowns.delete(trap.id);
-    
+
     // Clear cache
     trapCache.delete(roomName);
-    
+
     console.log(`[TrapController] Trap reset in ${roomName}`);
     return true;
   } catch (error) {
@@ -607,27 +611,27 @@ export function resetTrap(roomName: string): boolean {
 
 function getWeightedRandomSeverity(weights: Record<string, number>): 'light' | 'moderate' | 'severe' | 'lethal' {
     let cumulative = 0;
-  
+
   for (const [severity, weight] of Object.entries(weights)) {
     cumulative += weight;
     if (rand <= cumulative) {
       return severity as 'light' | 'moderate' | 'severe' | 'lethal';
     }
   }
-  
+
   return 'light'; // Fallback
 }
 
 function getWeightedRandomType(weights: Record<string, number>): 'environmental' | 'magical' | 'mechanical' | 'cursed' {
     let cumulative = 0;
-  
+
   for (const [type, weight] of Object.entries(weights)) {
     cumulative += weight;
     if (rand <= cumulative) {
       return type as 'environmental' | 'magical' | 'mechanical' | 'cursed';
     }
   }
-  
+
   return 'environmental'; // Fallback
 }
 
@@ -681,12 +685,12 @@ function getCooldownForSeverity(severity: string): number {
 
 function isOnCooldown(trapId: string): boolean {
     if (!cooldownEnd) return false;
-  
+
   if (Date.now() >= cooldownEnd) {
     trapCooldowns.delete(trapId);
     return false;
   }
-  
+
   return true;
 }
 
@@ -721,7 +725,7 @@ function checkDisarmAbility(trap: TrapData, context: TrapTriggerContext): {
   message: string;
 } {
   try {
-        
+
     // Auto-disarm traps
     if (trap.autoDisarm) {
       return {
@@ -835,7 +839,7 @@ function applyTrapEffects(trap: TrapData, context: TrapTriggerContext): Record<s
  */
 export function getTrapStatistics(): TrapStatistics {
   try {
-                
+
           return acc;
     }, {} as Record<string, number>);
 
@@ -907,9 +911,9 @@ export function batchTrapOperations(operations: Array<{
     });
   } catch (error) {
     console.error('[TrapController] Error in batch operations:', error);
-    return operations.map(() => ({ 
-      success: false, 
-      error: 'Batch operation failed' 
+    return operations.map(() => ({
+      success: false,
+      error: 'Batch operation failed'
     }));
   }
 }
@@ -919,7 +923,7 @@ export function batchTrapOperations(operations: Array<{
  */
 export function saveTrapState(): boolean {
   try {
-        
+
     localStorage.setItem('gorstan_trap_state', JSON.stringify(state));
     console.log('[TrapController] Trap state saved');
     return true;
@@ -941,7 +945,7 @@ export function loadTrapState(): boolean {
 
     // Restore active traps
     Object.assign(activeTraps, state.activeTraps || {});
-    
+
     // Restore cooldowns
     if (state.trapCooldowns) {
       Object.entries(state.trapCooldowns).forEach(([key, value]) => {
@@ -967,5 +971,5 @@ export function loadTrapState(): boolean {
 /**
  * Enhanced exports with comprehensive utilities
  */
-export 
+export
 export default TrapController;

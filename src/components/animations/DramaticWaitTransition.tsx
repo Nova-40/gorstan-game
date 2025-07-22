@@ -1,10 +1,14 @@
+import React, { useEffect, useState } from 'react';
+
+import { motion, AnimatePresence } from 'framer-motion';
+
+
+
 // DramaticWaitTransition.tsx — components/animations/DramaticWaitTransition.tsx
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: DramaticWaitTransition
 
-import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 
 interface DramaticWaitTransitionProps {
   onComplete: () => void;
@@ -35,9 +39,9 @@ const DramaticWaitTransition: React.FC<DramaticWaitTransitionProps> = ({ onCompl
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         style={{
-          background: phase === 'void' 
-            ? '#000000' 
-            : phase === 'reconstruction' 
+          background: phase === 'void'
+            ? '#000000'
+            : phase === 'reconstruction'
               ? 'linear-gradient(45deg, #001122, #003366, #001122)'
               : phase === 'awakening'
                 ? 'linear-gradient(180deg, #003366, #0066cc)'
@@ -62,14 +66,14 @@ const DramaticWaitTransition: React.FC<DramaticWaitTransitionProps> = ({ onCompl
                 key={i}
                 className="absolute inset-0"
                 initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ 
+                animate={{
                   opacity: [0, 0.3, 0],
                   scale: [0.8, 1.2, 0.8]
                 }}
-                transition={{ 
-                  duration: 1.5, 
+                transition={{
+                  duration: 1.5,
                   delay: i * 0.5,
-                  repeat: Infinity 
+                  repeat: Infinity
                 }}
                 style={{
                   background: `radial-gradient(circle at ${80 + i * 5}% ${20 + i * 10}%, #660000 0%, transparent 50%)`,
@@ -92,15 +96,15 @@ const DramaticWaitTransition: React.FC<DramaticWaitTransitionProps> = ({ onCompl
                 background: 'radial-gradient(ellipse at 80% 50%, #990000 0%, #440000 50%, transparent 80%)',
               }}
             />
-            
+
             {/* Multiple headlight beams */}
             {[...Array(2)].map((_, i) => (
               <motion.div
                 key={i}
                 className="absolute inset-0"
                 initial={{ opacity: 0, scale: 0.3 }}
-                animate={{ 
-                  opacity: [0, 1, 1], 
+                animate={{
+                  opacity: [0, 1, 1],
                   scale: [0.3, 1.5, 2],
                   rotate: [0, i * 5, i * 10]
                 }}
@@ -155,7 +159,7 @@ const DramaticWaitTransition: React.FC<DramaticWaitTransitionProps> = ({ onCompl
                 background: '#ffffff',
               }}
             />
-            
+
             {/* Shockwave effect */}
             <motion.div
               className="absolute inset-0"
@@ -181,7 +185,7 @@ const DramaticWaitTransition: React.FC<DramaticWaitTransitionProps> = ({ onCompl
                 background: 'radial-gradient(circle at 85% 50%, #330000 0%, #110000 50%, #000000 100%)',
               }}
             />
-            
+
             {/* Debris particles */}
             {[...Array(12)].map((_, i) => (
               <motion.div
@@ -194,7 +198,7 @@ const DramaticWaitTransition: React.FC<DramaticWaitTransitionProps> = ({ onCompl
                   top: 40 + Math.random() * 20 + '%',
                 }}
                 initial={{ scale: 0, rotate: 0 }}
-                animate={{ 
+                animate={{
                   scale: [0, 1, 0.5],
                   rotate: [0, Math.random() * 360],
                   x: [0, (Math.random() - 0.5) * 200],
@@ -220,7 +224,7 @@ const DramaticWaitTransition: React.FC<DramaticWaitTransitionProps> = ({ onCompl
                 transformOrigin: '85% 50%',
               }}
             />
-            
+
             {/* Splat tendrils */}
             {[...Array(8)].map((_, i) => {
               const angle = (i * 45) + Math.random() * 30;
@@ -255,13 +259,13 @@ const DramaticWaitTransition: React.FC<DramaticWaitTransitionProps> = ({ onCompl
                   top: 45 + Math.random() * 10 + '%',
                 }}
                 initial={{ scale: 0, x: 0, y: 0 }}
-                animate={{ 
+                animate={{
                   scale: [0, 1, 0.8],
                   x: (Math.random() - 0.5) * 300,
                   y: (Math.random() - 0.5) * 300,
                 }}
-                transition={{ 
-                  duration: 2, 
+                transition={{
+                  duration: 2,
                   delay: i * 0.05,
                   ease: "easeOut"
                 }}
@@ -459,8 +463,8 @@ const DramaticWaitTransition: React.FC<DramaticWaitTransitionProps> = ({ onCompl
               <motion.div
                 className="text-4xl text-red-300"
                 initial={{ scale: 0, rotate: 0 }}
-                animate={{ 
-                  scale: [0, 1.5, 1.2], 
+                animate={{
+                  scale: [0, 1.5, 1.2],
                   rotate: [0, 10, -5, 0],
                   y: [0, -20, 0]
                 }}

@@ -1,11 +1,19 @@
+import { FlagRegistry } from '../state/flagRegistry';
+
+import { NPC } from './NPCTypes';
+
+import { useCallback } from 'react';
+
+import { useGameState } from '../state/gameState';
+
+
+
 // Version: 6.1.0
 // (c) 2025 Geoffrey Alan Webster
 // Licensed under the MIT License
 // Module: useFlags.ts
 // Description: Unified flag management hook for Gorstan game
 
-import { useCallback } from 'react';
-import { useGameState } from '../state/gameState';
 
 /**
  * Unified flag management hook that consolidates all flag operations
@@ -13,75 +21,79 @@ import { useGameState } from '../state/gameState';
  */
 export const useFlags = () => {
   const { state, dispatch } = useGameState();
-  
+
   /**
    * Set a flag to a specific value
    */
-  const setFlag = useCallback((key: string, value: boolean | string | number) => {
-    dispatch({ type: 'SET_FLAG', payload: { key, value } });
+  // Accepts either a registry key or a string, but prefers registry
+  const setFlag = useCallback((key: keyof typeof FlagRegistry[keyof typeof FlagRegistry] | string, value: boolean | string | number) => {
+    const flagKey = typeof key === 'string' ? key : key;
+    dispatch({ type: 'SET_FLAG', payload: { key: flagKey, value } });
   }, [dispatch]);
-  
+
   /**
    * Clear a flag (set to false)
    */
-  const clearFlag = useCallback((key: string) => {
+  const clearFlag = useCallback((key: keyof typeof FlagRegistry[keyof typeof FlagRegistry] | string) => {
     setFlag(key, false);
   }, [setFlag]);
-  
+
   /**
    * Clear multiple flags at once
    */
-  const clearFlags = useCallback((keys: string[]) => {
+  const clearFlags = useCallback((keys: Array<keyof typeof FlagRegistry[keyof typeof FlagRegistry] | string>) => {
     keys.forEach(key => clearFlag(key));
   }, [clearFlag]);
-  
+
   /**
    * Get a flag value with optional default
    */
   const getFlag = useCallback(<T = boolean | string | number>(
-    key: string, 
+    key: keyof typeof FlagRegistry[keyof typeof FlagRegistry] | string,
     defaultValue: T
   ): T => {
-    return (state.flags?.[key] as T) ?? defaultValue;
+    const flagKey = typeof key === 'string' ? key : key;
+    return (state.flags?.[flagKey] as T) ?? defaultValue;
   }, [state.flags]);
-  
+
   /**
    * Check if a flag exists and is truthy
    */
-  const hasFlag = useCallback((key: string): boolean => {
-    return Boolean(state.flags?.[key]);
+  const hasFlag = useCallback((key: keyof typeof FlagRegistry[keyof typeof FlagRegistry] | string): boolean => {
+    const flagKey = typeof key === 'string' ? key : key;
+    return Boolean(state.flags?.[flagKey]);
   }, [state.flags]);
-  
+
   /**
    * Check if any of the provided flags are truthy
    */
-  const hasAnyFlag = useCallback((keys: string[]): boolean => {
+  const hasAnyFlag = useCallback((keys: Array<keyof typeof FlagRegistry[keyof typeof FlagRegistry] | string>): boolean => {
     return keys.some(key => hasFlag(key));
   }, [hasFlag]);
-  
+
   /**
    * Check if all of the provided flags are truthy
    */
-  const hasAllFlags = useCallback((keys: string[]): boolean => {
+  const hasAllFlags = useCallback((keys: Array<keyof typeof FlagRegistry[keyof typeof FlagRegistry] | string>): boolean => {
     return keys.every(key => hasFlag(key));
   }, [hasFlag]);
-  
+
   /**
    * Toggle a boolean flag
    */
-  const toggleFlag = useCallback((key: string) => {
+  const toggleFlag = useCallback((key: keyof typeof FlagRegistry[keyof typeof FlagRegistry] | string) => {
     const currentValue = Boolean(getFlag(key, false));
     setFlag(key, !currentValue);
   }, [getFlag, setFlag]);
-  
+
   /**
    * Increment a numeric flag
    */
-  const incrementFlag = useCallback((key: string, amount: number = 1) => {
+  const incrementFlag = useCallback((key: keyof typeof FlagRegistry[keyof typeof FlagRegistry] | string, amount: number = 1) => {
     const currentValue = Number(getFlag(key, 0));
     setFlag(key, currentValue + amount);
   }, [getFlag, setFlag]);
-  
+
   /**
    * Get all flags that match a pattern
    */
@@ -94,7 +106,7 @@ export const useFlags = () => {
     });
     return matchingFlags;
   }, [state.flags]);
-  
+
   return {
     setFlag,
     clearFlag,

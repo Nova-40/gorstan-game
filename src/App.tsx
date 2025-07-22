@@ -1,3 +1,11 @@
+import AppCore from './components/AppCore';
+
+import React from 'react';
+
+import { GameStateProvider } from './state/gameState'; // ✅ adjust path if needed
+
+
+
 // App.tsx — App.tsx
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
@@ -7,9 +15,6 @@
 // Gorstan (C) Geoff Webster 2025
 // Code MIT Licence
 
-import React from 'react';
-import AppCore from './components/AppCore';
-import { GameStateProvider } from './state/gameState'; // ✅ adjust path if needed
 
 const App: React.FC = () => {
   return (

@@ -1,11 +1,15 @@
+
+import type { Room } from '../types/Room.d.ts';
+
+
+
 // londonZone_findlaters.ts — rooms/londonZone_findlaters.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: londonZone_findlaters
 
-import { RoomDefinition } from '../types/RoomTypes';
 
-const findlaters: RoomDefinition = {
+const findlaters: Room = {
   id: 'findlaters',
   zone: 'londonZone',
   title: 'Findlater\'s Cafe - Special Instance',
@@ -14,9 +18,8 @@ const findlaters: RoomDefinition = {
     'The same warm lighting illuminates the space, but the shadows seem deeper, more meaningful. The coffee machine hisses with the same rhythm, yet each sound feels loaded with significance you can\'t quite grasp.',
     'Other patrons sit at their tables, but they move with a dreamlike quality, their conversations creating a gentle murmur that sounds almost like distant whispers. Time itself seems to flow differently here.',
     'This is clearly the same cafe, but existing in a moment suspended between realities - a special instance where the ordinary rules don\'t quite apply and profound encounters become possible.',
-  ],
+  ].join('\n'),
   image: 'londonZone_findlaters.png',
-  ambientAudio: 'dimensional_cafe_ambience.mp3',
 
   consoleIntro: [
     '>> FINDLATER\'S CAFE - SPECIAL DIMENSIONAL INSTANCE',
@@ -41,12 +44,12 @@ const findlaters: RoomDefinition = {
   },
 
   items: [
-    'meaningful_receipt',
-    'prophetic_newspaper',
-    'dimensional_coffee_cup',
-    'memory_triggering_photo',
-    'fate_altering_note',
-    'special_menu',
+    { id: 'meaningful_receipt', name: 'Meaningful Receipt' },
+    { id: 'prophetic_newspaper', name: 'Prophetic Newspaper' },
+    { id: 'dimensional_coffee_cup', name: 'Dimensional Coffee Cup' },
+    { id: 'memory_triggering_photo', name: 'Memory Triggering Photo' },
+    { id: 'fate_altering_note', name: 'Fate Altering Note' },
+    { id: 'special_menu', name: 'Special Menu' },
   ],
 
   interactables: {
@@ -104,7 +107,6 @@ const findlaters: RoomDefinition = {
 
   flags: {
     specialInstance: true,
-    importantMeetingAvailable: true,
     realityAwareness: false,
     choicesMade: false,
     futuresSeen: false,
@@ -139,13 +141,6 @@ const findlaters: RoomDefinition = {
   security: {
     level: 'transcendent',
     accessRequirements: ['narrative_significance'],
-    alarmTriggers: ['timeline_disruption', 'reality_breach'],
-    surveillanceActive: true,
-    surveillanceType: 'multidimensional_observation',
-  },
-
-  metadata: {
-    created: '2025-07-09',
     lastModified: '2025-07-09',
     author: 'Geoff',
     version: '2.0',

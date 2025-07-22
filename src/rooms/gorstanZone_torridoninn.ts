@@ -1,9 +1,16 @@
+import { NPC } from './NPCTypes';
+
+import { Room } from '../types/RoomTypes';
+
+import { Room } from './RoomTypes';
+
+
+
 // gorstanZone_torridoninn.ts — rooms/gorstanZone_torridoninn.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: gorstanZone_torridoninn
 
-import { Room } from '../types/RoomTypes';
 
 const torridoninn: Room = {
   id: "torridoninn",

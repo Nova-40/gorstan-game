@@ -1,18 +1,14 @@
-// PuzzleInterface.tsx — components/PuzzleInterface.tsx
-// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
-// Code MIT Licence
-// Module: PuzzleInterface
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Brain, 
-  Lightbulb, 
-  Clock, 
-  CheckCircle, 
-  XCircle, 
-  Star, 
-  Zap, 
+import {
+  Brain,
+  Lightbulb,
+  Clock,
+  CheckCircle,
+  XCircle,
+  Star,
+  Zap,
   Target,
   HelpCircle,
   RotateCw,
@@ -25,6 +21,14 @@ import {
   ChevronUp,
   Sparkles
 } from 'lucide-react';
+
+
+
+
+// PuzzleInterface.tsx — components/PuzzleInterface.tsx
+// Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
+// Code MIT Licence
+// Module: PuzzleInterface
 
 export interface PuzzleData {
   id: string;
@@ -146,14 +150,14 @@ const PuzzleInterface: React.FC<PuzzleInterfaceProps> = ({
   // Submit solution
   const handleSubmit = async () => {
     if (isSubmitting) return;
-    
+
     setIsSubmitting(true);
     setPulseEffect(true);
-    
+
     try {
       const result = await onSubmit(solution);
       setFeedback(result.feedback);
-      
+
       if (result.success) {
         // Success animation
         setTimeout(() => {
@@ -241,7 +245,7 @@ const PuzzleInterface: React.FC<PuzzleInterfaceProps> = ({
                   blue: 'bg-blue-500 hover:bg-blue-600 border-blue-600',
                   green: 'bg-green-500 hover:bg-green-600 border-green-600'
                 };
-                
+
                 return (
                   <motion.button
                     key={index}
@@ -250,8 +254,8 @@ const PuzzleInterface: React.FC<PuzzleInterfaceProps> = ({
                     onClick={() => handleComponentChange(component.id, option)}
                     className={`
                       relative p-6 rounded-lg border-2 transition-all duration-200
-                      ${isSelected 
-                        ? `${colorClasses[doorColors[index] as keyof typeof colorClasses]} text-white shadow-lg` 
+                      ${isSelected
+                        ? `${colorClasses[doorColors[index] as keyof typeof colorClasses]} text-white shadow-lg`
                         : 'bg-gray-100 hover:bg-gray-200 border-gray-300 text-gray-700'
                       }
                     `}
@@ -286,7 +290,7 @@ const PuzzleInterface: React.FC<PuzzleInterfaceProps> = ({
                 {component.label}
               </label>
             )}
-            <div 
+            <div
               className="grid gap-2 w-fit mx-auto p-4 bg-gray-50 rounded-lg"
               style={{ gridTemplateColumns: `repeat(${gridSize.cols}, 1fr)` }}
             >
@@ -298,15 +302,15 @@ const PuzzleInterface: React.FC<PuzzleInterfaceProps> = ({
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={() => {
-                      const newValue = isActive 
+                      const newValue = isActive
                         ? gridValue.filter((v: number) => v !== index)
                         : [...gridValue, index];
                       handleComponentChange(component.id, newValue);
                     }}
                     className={`
                       w-12 h-12 rounded-lg border-2 transition-all duration-200
-                      ${isActive 
-                        ? 'bg-blue-500 border-blue-600 text-white shadow-md' 
+                      ${isActive
+                        ? 'bg-blue-500 border-blue-600 text-white shadow-md'
                         : 'bg-white border-gray-300 hover:border-gray-400'
                       }
                     `}
@@ -326,7 +330,7 @@ const PuzzleInterface: React.FC<PuzzleInterfaceProps> = ({
 
   if (!isOpen) return null;
 
-  const canSubmit = puzzle.components?.every(comp => 
+  const canSubmit = puzzle.components?.every(comp =>
     !comp.required || solution[comp.id] !== undefined && solution[comp.id] !== ''
   ) ?? true;
 
@@ -396,7 +400,7 @@ const PuzzleInterface: React.FC<PuzzleInterfaceProps> = ({
                 {showDetails ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                 <span className="font-medium">Puzzle Details</span>
               </button>
-              
+
               <AnimatePresence>
                 {showDetails && (
                   <motion.div
@@ -444,7 +448,7 @@ const PuzzleInterface: React.FC<PuzzleInterfaceProps> = ({
                       </div>
                     </div>
                   )}
-                  
+
                   {puzzle.requiredTraits?.length && (
                     <div>
                       <h5 className="text-sm font-medium text-gray-600 mb-2">Required Traits:</h5>
@@ -487,8 +491,8 @@ const PuzzleInterface: React.FC<PuzzleInterfaceProps> = ({
                 className="p-6 border-t border-gray-100"
               >
                 <div className={`p-4 rounded-lg border ${
-                  feedback.includes('success') || feedback.includes('correct') 
-                    ? 'bg-green-50 border-green-200 text-green-800' 
+                  feedback.includes('success') || feedback.includes('correct')
+                    ? 'bg-green-50 border-green-200 text-green-800'
                     : 'bg-red-50 border-red-200 text-red-800'
                 }`}>
                   <p className="font-medium">{feedback}</p>
@@ -509,7 +513,7 @@ const PuzzleInterface: React.FC<PuzzleInterfaceProps> = ({
                   <span>Hints ({usedHints.length}/{puzzle.hints.length})</span>
                 </button>
               )}
-              
+
               {showHints && puzzle.hints && (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}

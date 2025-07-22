@@ -1,3 +1,15 @@
+import React, { useState, useEffect } from 'react';
+
+import TeleportTransition from './animations/TeleportTransition';
+
+import { Button } from './button';
+
+import { GameStateContext } from '../state/gameState';
+
+import { Room } from './RoomTypes';
+
+
+
 // TravelMenu.tsx — components/TravelMenu.tsx
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
@@ -8,9 +20,6 @@
 // Gorstan (C) Geoff Webster 2025
 // Code MIT Licence
 
-import React, { useState, useEffect } from 'react';
-import { Button } from './button';
-import { GameStateContext } from '../state/gameState';
 
 interface TravelMenuProps {
   destinations: string[];
@@ -36,39 +45,39 @@ const roomDisplayNames: Record<string, RoomInfo> = {
   'stkatherinesdock': { id: 'stkatherinesdock', name: 'St Katherine\'s Dock', zone: 'London' },
   'londonhub': { id: 'londonhub', name: 'London Hub', zone: 'London' },
   'cafeoffice': { id: 'cafeoffice', name: 'Cafe Office', zone: 'London' },
-  
+
   // Intro Zone
   'crossing': { id: 'crossing', name: 'The Infinite Crossing', zone: 'Intro' },
   'controlnexus': { id: 'controlnexus', name: 'Control Nexus', zone: 'Intro' },
   'controlroom': { id: 'controlroom', name: 'Control Room', zone: 'Intro' },
   'hiddenlab': { id: 'hiddenlab', name: 'Hidden Laboratory', zone: 'Intro' },
   'introreset': { id: 'introreset', name: 'Reset Room', zone: 'Intro' },
-  
+
   // Gorstan Zone
   'gorstanhub': { id: 'gorstanhub', name: 'Gorstan Hub', zone: 'Gorstan' },
   'gorstanvillage': { id: 'gorstanvillage', name: 'Gorstan Village', zone: 'Gorstan' },
   'torridon': { id: 'torridon', name: 'Torridon', zone: 'Gorstan' },
   'torridoninn': { id: 'torridoninn', name: 'Torridon Inn', zone: 'Gorstan' },
-  
+
   // Lattice Zone
   'latticehub': { id: 'latticehub', name: 'Lattice Hub', zone: 'Lattice' },
   'lattice': { id: 'lattice', name: 'The Lattice', zone: 'Lattice' },
   'libraryofnine': { id: 'libraryofnine', name: 'Library of Nine', zone: 'Lattice' },
-  
+
   // Maze Zone
   'mazehub': { id: 'mazehub', name: 'Maze Hub', zone: 'Maze' },
   'mazeecho': { id: 'mazeecho', name: 'Maze Echo', zone: 'Maze' },
   'mazestorage': { id: 'mazestorage', name: 'Maze Storage', zone: 'Maze' },
-  
+
   // New York Zone
   'newyorkhub': { id: 'newyorkhub', name: 'New York Hub', zone: 'New York' },
   'centralpark': { id: 'centralpark', name: 'Central Park', zone: 'New York' },
   'burgerjoint': { id: 'burgerjoint', name: 'Burger Joint', zone: 'New York' },
-  
+
   // Elfhame Zone
   'elfhame': { id: 'elfhame', name: 'Elfhame', zone: 'Elfhame' },
   'faepalacemainhall': { id: 'faepalacemainhall', name: 'Fae Palace Main Hall', zone: 'Elfhame' },
-  
+
   // Glitch Zone
   'datavoid': { id: 'datavoid', name: 'Data Void', zone: 'Glitch' },
 };
@@ -82,12 +91,21 @@ const TravelMenu: React.FC<TravelMenuProps> = ({
   roomsPerPage = 6
 }) => {
   const [currentPage, setCurrentPage] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+  // Store selected room ID (not name)
+  const [selectedDestinationId, setSelectedDestinationId] = useState<string | null>(null);
   const game = React.useContext(GameStateContext);
 
   const totalPages = Math.ceil(destinations.length / roomsPerPage);
   const startIndex = currentPage * roomsPerPage;
   const endIndex = Math.min(startIndex + roomsPerPage, destinations.length);
-  const currentDestinations = destinations.slice(startIndex, endIndex);
+  // Deduplicate currentDestinations by room ID after pagination
+  const currentDestinationsRaw = destinations.slice(startIndex, endIndex);
+  const currentDestinations = Array.isArray(currentDestinationsRaw)
+    ? currentDestinationsRaw.filter((dest, i, arr) =>
+        arr.findIndex(x => x === dest) === i
+      )
+    : currentDestinationsRaw;
 
   // Handle arrow key navigation
   useEffect(() => {
@@ -106,8 +124,17 @@ const TravelMenu: React.FC<TravelMenuProps> = ({
   }, [currentPage, totalPages, onClose]);
 
   const handleTeleport = (destinationId: string) => {
-    onTeleport(destinationId);
-    onClose();
+    setSelectedDestinationId(destinationId);
+    setIsAnimating(true);
+  };
+
+  const onAnimationComplete = () => {
+    if (selectedDestinationId) {
+      onTeleport(selectedDestinationId);
+      onClose();
+    }
+    setIsAnimating(false);
+    setSelectedDestinationId(null);
   };
 
   const getRoomInfo = (roomId: string): RoomInfo => {
@@ -124,15 +151,24 @@ const TravelMenu: React.FC<TravelMenuProps> = ({
   }, {} as Record<string, RoomInfo[]>);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+    <>
+      <TeleportTransition
+        isActive={isAnimating}
+        destinationName={selectedDestinationId ? getRoomInfo(selectedDestinationId).name : undefined}
+        onComplete={onAnimationComplete}
+      />
+      <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
       <div className="bg-gray-900 border border-cyan-400 rounded-lg p-6 max-w-5xl max-h-[80vh] overflow-hidden">
         <div className="flex justify-between items-center mb-4">
           <div>
             <h2 className="text-xl font-bold text-cyan-300">{title}</h2>
             {subtitle && <p className="text-gray-300 text-sm">{subtitle}</p>}
           </div>
-          <Button onClick={onClose} className="text-red-400 hover:text-red-300">
-            ✕ Close
+          <Button onClick={() => {
+            console.log('[TravelMenu] Close button clicked');
+            onClose();
+          }} className="text-red-400 hover:text-red-300 bg-red-900 hover:bg-red-800">
+            ✕ Close Menu
           </Button>
         </div>
 
@@ -176,11 +212,11 @@ const TravelMenu: React.FC<TravelMenuProps> = ({
             >
               ← Previous
             </Button>
-            
+
             <div className="text-sm text-gray-400">
               {destinations.length} destinations total
             </div>
-            
+
             <Button
               onClick={() => setCurrentPage(Math.min(totalPages - 1, currentPage + 1))}
               disabled={currentPage === totalPages - 1}
@@ -191,7 +227,8 @@ const TravelMenu: React.FC<TravelMenuProps> = ({
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 

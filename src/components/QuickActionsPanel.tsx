@@ -1,13 +1,23 @@
+import PickupSelectionModal from './PickupSelectionModal';
+
+import React, { useState, useEffect } from 'react';
+
+import TravelMenu from './TravelMenu';
+
+import { Coffee, Hand, Eye, MessageCircle, ArrowLeft, Bug, Square, AlertOctagon, Backpack, Armchair } from 'lucide-react';
+
+import { Room } from './RoomTypes';
+
+import { useGameState } from '../state/gameState';
+
+
+
 // QuickActionsPanel.tsx — components/QuickActionsPanel.tsx
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: QuickActionsPanel
 
 
-import React, { useState } from 'react';
-import { useGameState } from '../state/gameState';
-import { Coffee, Hand, Eye, MessageCircle, ArrowLeft, Bug, Square, AlertOctagon, Backpack } from 'lucide-react';
-import PickupSelectionModal from './PickupSelectionModal';
 
 const quickActions = [
   { key: 'backpack', label: 'Show Inventory', icon: <Backpack /> },
@@ -16,6 +26,7 @@ const quickActions = [
   { key: 'return', label: 'Return', icon: <ArrowLeft /> },
   { key: 'coffee', label: 'Drink Coffee', icon: <Coffee /> },
   { key: 'pickup', label: 'Pick Up', icon: <Hand /> },
+  { key: 'sit', label: 'Sit in Chair', icon: <Armchair /> },
   { key: 'press', label: 'Press', icon: <Square /> },
   { key: 'debug', label: 'Debug', icon: <Bug /> },
   { key: 'bluebutton', label: 'Press Blue Button', icon: <AlertOctagon style={{ color: 'white' }} /> }
@@ -26,6 +37,54 @@ const QuickActionsPanel: React.FC = () => {
   const currentRoom = state.roomMap?.[state.currentRoomId];
   const inventory = state.player?.inventory || [];
   const [showPickupModal, setShowPickupModal] = useState(false);
+  const [forceTravelMenuClosed, setForceTravelMenuClosed] = useState(false);
+
+  const closeTravelMenu = () => {
+    // Only update state, do not dispatch debug commands or log to console
+    setForceTravelMenuClosed(true);
+    dispatch({ type: 'COMMAND_INPUT', payload: 'stand' });
+    dispatch({
+      type: 'UPDATE_GAME_STATE',
+      payload: {
+        flags: {
+          ...state.flags,
+          showTravelMenu: false,
+          travelMenuTitle: undefined,
+          travelMenuSubtitle: undefined,
+          travelDestinations: undefined,
+        }
+      }
+    });
+  };
+
+  // Emergency escape mechanism for travel menu
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && state.flags?.showTravelMenu) {
+        console.log('[QuickActionsPanel] Emergency escape - Escape key pressed');
+        closeTravelMenu();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [state.flags?.showTravelMenu]);
+
+
+  // Only reset forceTravelMenuClosed when entering 'crossing' and travel menu is actually open
+  useEffect(() => {
+    if (state.currentRoomId === 'crossing' && state.flags?.showTravelMenu) {
+      setForceTravelMenuClosed(false);
+    }
+  }, [state.currentRoomId, state.flags?.showTravelMenu]);
+
+  // Reset force close when player sits in chair (to allow new travel menu to appear)
+  useEffect(() => {
+    if (state.flags?.sittingInCrossingChair) {
+      console.log('[QuickActionsPanel] Player sat in chair, resetting force close flag');
+      setForceTravelMenuClosed(false);
+    }
+  }, [state.flags?.sittingInCrossingChair]);
 
   const isActionActive = (key: string) => {
     switch (key) {
@@ -50,6 +109,9 @@ const QuickActionsPanel: React.FC = () => {
       case 'bluebutton':
         // Only show the blue button action when in the reset room
         return Boolean(state.currentRoomId === 'introreset');
+      case 'sit':
+        // Show sit button only in crossing room when not already sitting
+        return Boolean(state.currentRoomId === 'crossing' && !state.flags?.sittingInCrossingChair);
       default:
         return false;
     }
@@ -57,7 +119,7 @@ const QuickActionsPanel: React.FC = () => {
 
   const handleAction = (key: string) => {
     if (!isActionActive(key)) return;
-    
+
     // Dispatch the command as if typed in the command input
     switch (key) {
       case 'backpack':
@@ -93,12 +155,15 @@ const QuickActionsPanel: React.FC = () => {
       case 'bluebutton':
         dispatch({ type: 'PRESS_BLUE_BUTTON' });
         break;
+      case 'sit':
+        dispatch({ type: 'COMMAND_INPUT', payload: 'sit' });
+        break;
     }
   };
 
   const getAvailableItems = (): string[] => {
     if (!currentRoom?.items) return [];
-    return currentRoom.items.map(item => 
+    return currentRoom.items.map(item =>
       typeof item === 'string' ? item : item.id || item.name || String(item)
     );
   };
@@ -109,6 +174,39 @@ const QuickActionsPanel: React.FC = () => {
       dispatch({ type: 'COMMAND_INPUT', payload: `get ${itemId}` });
     });
   };
+
+  const handleTravelMenuTeleport = (destinationId: string) => {
+    // Clear the travel menu flag and teleport
+    dispatch({
+      type: 'UPDATE_GAME_STATE',
+      payload: {
+        flags: {
+          ...state.flags,
+          showTravelMenu: false,
+          travelMenuTitle: undefined,
+          travelMenuSubtitle: undefined,
+          travelDestinations: undefined,
+        }
+      }
+    });
+    dispatch({ type: 'COMMAND_INPUT', payload: `teleport to ${destinationId}` });
+  };
+
+  // Deduplicate destinations for TravelMenu
+  const travelDestinationsRaw = state.flags?.travelDestinations || state.player?.visitedRooms || [];
+  const travelDestinations = Array.isArray(travelDestinationsRaw)
+    ? travelDestinationsRaw.filter((d, i, arr) =>
+        typeof d === 'object' && d !== null && 'id' in d
+          ? arr.findIndex(x => typeof x === 'object' && x !== null && 'id' in x && x.id === d.id) === i
+          : arr.indexOf(d) === i
+      )
+    : travelDestinationsRaw;
+
+  // Deduplicate availableItems for PickupSelectionModal
+  const availableItemsRaw = getAvailableItems();
+  const availableItems = Array.isArray(availableItemsRaw)
+    ? availableItemsRaw.filter((item, i, arr) => arr.indexOf(item) === i)
+    : availableItemsRaw;
 
   return (
     <div className="quick-actions-panel">
@@ -127,14 +225,14 @@ const QuickActionsPanel: React.FC = () => {
         .map(({ key, label, icon }) => {
         const active = isActionActive(key);
         const isBlueButton = key === 'bluebutton';
-        
+
         return (
           <div
             key={key}
             className={`quick-action ${active ? 'active' : 'inactive'} ${isBlueButton ? 'blue-button' : ''}`}
             title={active ? label : `${label} (unavailable)`}
             onClick={() => handleAction(key)}
-            style={{ 
+            style={{
               cursor: active ? 'pointer' : 'default',
               ...(isBlueButton && active ? {
                 backgroundColor: '#3b82f6',
@@ -149,11 +247,22 @@ const QuickActionsPanel: React.FC = () => {
           </div>
         );
       })}
-      
+
+      {/* Travel Menu */}
+      {state.flags?.showTravelMenu && !forceTravelMenuClosed && (
+        <TravelMenu
+          title={state.flags.travelMenuTitle || "Travel Menu"}
+          subtitle={state.flags.travelMenuSubtitle || "Select your destination"}
+          destinations={travelDestinations}
+          onTeleport={handleTravelMenuTeleport}
+          onClose={closeTravelMenu}
+        />
+      )}
+
       <PickupSelectionModal
         isOpen={showPickupModal}
         onClose={() => setShowPickupModal(false)}
-        availableItems={getAvailableItems()}
+        availableItems={availableItems}
         onPickupSelected={handlePickupSelected}
         roomTitle={currentRoom?.title || 'Current Room'}
       />

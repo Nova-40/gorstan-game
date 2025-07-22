@@ -1,9 +1,12 @@
+import { RoomDefinition } from '../types/RoomTypes';
+
+
+
 // newyorkZone_burgerjoint.ts — rooms/newyorkZone_burgerjoint.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: newyorkZone_burgerjoint
 
-import { RoomDefinition } from '../types/RoomTypes';
 
 const burgerjoint: RoomDefinition = {
   id: 'burgerjoint',

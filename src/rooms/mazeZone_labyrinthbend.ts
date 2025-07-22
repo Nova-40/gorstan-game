@@ -1,9 +1,16 @@
+import { NPC } from './NPCTypes';
+
+import { Room } from '../types/RoomTypes';
+
+import { Room } from './RoomTypes';
+
+
+
 // mazeZone_labyrinthbend.ts — rooms/mazeZone_labyrinthbend.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: mazeZone_labyrinthbend
 
-import { Room } from '../types/RoomTypes';
 
 const labyrinthbend: Room = {
   id: "labyrinthbend",

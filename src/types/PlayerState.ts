@@ -1,3 +1,7 @@
+import { NPC } from './NPCTypes';
+
+
+
 // PlayerState.ts — types/PlayerState.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence

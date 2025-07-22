@@ -1,3 +1,5 @@
+
+
 // Gorstan (c) Geoffrey Alan Webster. Code MIT Licence
 // Module: VisualEffectsManager.ts
 // Version: 6.1.0
@@ -11,7 +13,7 @@
 /**
  * Available visual effect types in the Gorstan game engine
  */
-export type VisualEffectType = 
+export type VisualEffectType =
   | 'fog'           // Atmospheric fog effect
   | 'glitch'        // Digital corruption/glitch effect
   | 'fadein'        // Fade-in transition effect
@@ -284,7 +286,7 @@ class VisualEffectsManagerClass {
    */
   private isValidEffect(effectName: VisualEffectType): boolean {
     const knownEffects: Set<string> = new Set([
-      'fog', 'glitch', 'fadein', 'vhs', 'rain', 'snow', 
+      'fog', 'glitch', 'fadein', 'vhs', 'rain', 'snow',
       'lightning', 'static', 'scanlines', 'chromatic'
     ]);
 
@@ -374,10 +376,10 @@ export function clearAllVisualEffects(preservePersistent: boolean = true): void 
  * Apply room-specific visual effects based on room data
  * Integrates with the Gorstan room engine
  */
-export function applyRoomVisualEffects(roomData: { 
-  moodTag?: string; 
-  special?: Record<string, unknown>; 
-  anomalies?: unknown[] 
+export function applyRoomVisualEffects(roomData: {
+  moodTag?: string;
+  special?: Record<string, unknown>;
+  anomalies?: unknown[]
 }): void {
   VisualEffectsManager.applyRoomEffects(roomData);
 }
@@ -399,10 +401,10 @@ export function isVisualEffectActive(effectName: VisualEffectType): boolean {
 /**
  * Apply a sequence of effects with timing
  */
-export function applyVisualEffectSequence(effects: Array<{ 
-  name: VisualEffectType; 
-  delay: number; 
-  config?: Partial<EffectConfig> 
+export function applyVisualEffectSequence(effects: Array<{
+  name: VisualEffectType;
+  delay: number;
+  config?: Partial<EffectConfig>
 }>): void {
   VisualEffectsManager.applyEffectSequence(effects);
 }

@@ -1,3 +1,13 @@
+import { Achievement } from './GameTypes';
+
+import { Dispatch } from 'react';
+
+import { GameAction } from '../types/GameTypes';
+
+import { Room } from './RoomTypes';
+
+
+
 // achievementEngine.ts — logic/achievementEngine.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
@@ -10,8 +20,6 @@
 // Gorstan elements (c) Geoff Webster
 // Code licensed under the MIT License
 
-import { GameAction } from '../types/GameTypes';
-import { Dispatch } from 'react';
 
 interface Achievement {
   id: string;
@@ -60,13 +68,13 @@ export function unlockAchievement(id: string): void {
   // Dispatch to game state for persistent storage
   if (globalDispatch) {
     globalDispatch({ type: 'UNLOCK_ACHIEVEMENT', payload: id });
-    
+
     // Apply achievement score bonus
     globalDispatch({ type: 'UPDATE_SCORE', payload: 50 });
-    
+
     // Also record the achievement message in the game history
-    globalDispatch({ 
-      type: 'RECORD_MESSAGE', 
+    globalDispatch({
+      type: 'RECORD_MESSAGE',
       payload: {
         id: `achievement-${Date.now()}`,
         text: `🏆 Achievement Unlocked: ${achievement.label}`,
@@ -74,10 +82,10 @@ export function unlockAchievement(id: string): void {
         timestamp: Date.now(),
       }
     });
-    
+
     // Score bonus message
-    globalDispatch({ 
-      type: 'RECORD_MESSAGE', 
+    globalDispatch({
+      type: 'RECORD_MESSAGE',
       payload: {
         id: `achievement-score-${Date.now()}`,
         text: '+50 points',
@@ -85,10 +93,10 @@ export function unlockAchievement(id: string): void {
         timestamp: Date.now(),
       }
     });
-    
+
     if (achievement.description) {
-      globalDispatch({ 
-        type: 'RECORD_MESSAGE', 
+      globalDispatch({
+        type: 'RECORD_MESSAGE',
         payload: {
           id: `achievement-desc-${Date.now()}`,
           text: achievement.description,
@@ -106,7 +114,7 @@ export function unlockAchievement(id: string): void {
 export function listAchievements(unlockedIds: string[] = []): string[] {
   const messages: string[] = [];
   messages.push("🏆 Achievements:");
-  
+
   achievementDefinitions.forEach(achievement => {
     const isUnlocked = unlockedIds.includes(achievement.id);
     const status = isUnlocked ? "✓" : " ";
@@ -115,7 +123,7 @@ export function listAchievements(unlockedIds: string[] = []): string[] {
       messages.push(`    ${achievement.description}`);
     }
   });
-  
+
   return messages;
 }
 
@@ -126,8 +134,8 @@ export function displayAchievements(unlockedIds: string[] = []): void {
   if (globalDispatch) {
     const messages = listAchievements(unlockedIds);
     messages.forEach(message => {
-      globalDispatch!({ 
-        type: 'RECORD_MESSAGE', 
+      globalDispatch!({
+        type: 'RECORD_MESSAGE',
         payload: {
           id: `achievements-${Date.now()}-${Math.random()}`,
           text: message,
@@ -167,6 +175,6 @@ export function getAchievementStats(unlockedIds: string[] = []): { total: number
   const total = achievementDefinitions.length;
   const unlocked = unlockedIds.length;
   const percentage = Math.round((unlocked / total) * 100);
-  
+
   return { total, unlocked, percentage };
 }

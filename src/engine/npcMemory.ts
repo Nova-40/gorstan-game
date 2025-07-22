@@ -1,3 +1,11 @@
+  importance: 'low' | 'medium' | 'high';
+
+  importance?: NPCMemory['importance'];
+
+import { NPC, NPCMemory } from './NPCTypes';
+
+
+
 // Version: 6.0.0
 // (c) 2025 Geoffrey Alan Webster
 // Licensed under the MIT License
@@ -11,7 +19,6 @@ export interface NPCMemory {
   topic: string;
   time: number;
   location?: string;
-  importance: 'low' | 'medium' | 'high';
   id?: string;
   contextTags?: string[];
 }
@@ -65,7 +72,6 @@ export interface InteractionContext {
 /** Filters for memory queries */
 export interface MemoryQueryOptions {
   limit?: number;
-  importance?: NPCMemory['importance'];
   since?: number;
   topics?: string[];
   sortBy?: 'time' | 'importance' | 'relevance';
@@ -124,7 +130,7 @@ export function getAllTraits(): string[] {
 
 /** Collect achievements tagged in memory (e.g., 'achievement:xyz') */
 export function getAchievements(): string[] {
-  
+
   return Array.from(new Set(allTags))
     .filter(tag => tag.startsWith('achievement:'))
     .map(tag => tag.replace('achievement:', ''));

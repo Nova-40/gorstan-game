@@ -1,9 +1,14 @@
+import { NPC } from './NPCTypes';
+
+import { RoomDefinition } from '../types/RoomTypes';
+
+
+
 // glitchZone_datavoid.ts — rooms/glitchZone_datavoid.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: glitchZone_datavoid
 
-import { RoomDefinition } from '../types/RoomTypes';
 
 const datavoid: RoomDefinition = {
   id: 'datavoid',

@@ -1,14 +1,21 @@
+import type { LocalGameState } from '../state/gameState';
+
+import { getItemById } from '../engine/items';
+
+import { Room } from './RoomTypes';
+
+import { validateGlobalItemManagement } from './globalItemValidator';
+
+
+
 // Version: 1.0.0
-// (c) 2025 Geoffrey Alan Webster  
+// (c) 2025 Geoffrey Alan Webster
 // Licensed under the MIT License
 // Module: itemSystemIntegration.ts
 // Path: src/utils/itemSystemIntegration.ts
 //
 // Integration utility to ensure consistent item management across all game systems.
 
-import { getItemById } from '../engine/items';
-import { validateGlobalItemManagement } from './globalItemValidator';
-import type { LocalGameState } from '../state/gameState';
 
 /**
  * Comprehensive item system validation
@@ -50,7 +57,7 @@ export function validateItemSystemIntegration(
     result.isValid = false;
   }
 
-  // Validate Inventory Engine  
+  // Validate Inventory Engine
   try {
     // Check inventory system
     result.systems.inventoryEngine.details.push('✅ Non-stackable duplicate prevention');
@@ -81,7 +88,7 @@ export function validateItemSystemIntegration(
   try {
     const specialItems = ['dominic', 'runbag', 'goldfish_food', 'remote_control'];
     let registryValid = true;
-    
+
     specialItems.forEach(itemId => {
       const item = getItemById(itemId);
       if (!item) {
@@ -100,7 +107,7 @@ export function validateItemSystemIntegration(
       } else {
         result.systems.itemRegistry.details.push(`⚠️ Dominic category: ${dominic.category} (expected: pet)`);
       }
-      
+
       if (dominic.spawnRooms?.includes('dalesapartment')) {
         result.systems.itemRegistry.details.push('✅ Dominic spawns in Dale\'s apartment');
       } else {

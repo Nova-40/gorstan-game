@@ -1,3 +1,8 @@
+
+import type { Room } from '../RoomTypes';
+
+
+
 // GameTypes.ts — types/GameTypes.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
@@ -7,7 +12,6 @@
 // Gorstan (C) Geoff Webster 2025
 // Code MIT Licence
 
-import type { Room } from './Room';
 
 /**
  * Core player interface with all essential properties

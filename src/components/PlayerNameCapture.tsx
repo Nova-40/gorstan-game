@@ -1,3 +1,11 @@
+import React, { useState, useCallback, useEffect, useRef } from "react";
+
+import { NPC } from './NPCTypes';
+
+import { useGameState } from "../state/gameState";
+
+
+
 // PlayerNameCapture.tsx — components/PlayerNameCapture.tsx
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
@@ -7,8 +15,6 @@
 // Gorstan (C) Geoff Webster 2025
 // Code MIT Licence
 
-import React, { useState, useCallback, useEffect, useRef } from "react";
-import { useGameState } from "../state/gameState";
 
 // Pulsing Gorstan icon — swap the path if needed
 const GorstanIcon = () => (
@@ -234,7 +240,6 @@ const PlayerNameCapture: React.FC<{ onNameSubmit: (name: string) => void }> = ({
 };
 
 export default PlayerNameCapture;
-
 
 
 

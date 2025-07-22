@@ -1,9 +1,12 @@
+import { RoomDefinition } from '../types/RoomTypes';
+
+
+
 // latticeZone_hiddenlibrary.ts — rooms/latticeZone_hiddenlibrary.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: latticeZone_hiddenlibrary
 
-import { RoomDefinition } from '../types/RoomTypes';
 
 const hiddenlibrary: RoomDefinition = {
   id: 'hiddenlibrary',

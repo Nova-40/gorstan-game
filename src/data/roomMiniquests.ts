@@ -1,3 +1,9 @@
+import { Miniquest } from './GameTypes';
+
+import { RoomMiniquests } from '../types/MiniquestTypes';
+
+
+
 // roomMiniquests.ts — data/roomMiniquests.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
@@ -5,7 +11,6 @@
 
 // roomMiniquests.ts/Location: src/data/Version: 1.0/Gorstan elements (c) Geoff Webster/Code licensed under the MIT License
 
-import { RoomMiniquests } from '../types/MiniquestTypes';
 
 /**
  * Miniquest definitions for various rooms in Gorstan
@@ -45,7 +50,7 @@ export const roomMiniquests: RoomMiniquests[] = [
       }
     ]
   },
-  
+
   {
     roomId: 'faelake',
     miniquests: [
@@ -254,7 +259,7 @@ export const roomMiniquests: RoomMiniquests[] = [
     ]
   },
 
-  // Maze Zone Miniquests  
+  // Maze Zone Miniquests
   {
     roomId: 'forgottenchamber',
     miniquests: [

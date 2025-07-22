@@ -1,3 +1,11 @@
+import { Achievement, Puzzle } from './GameTypes';
+
+import { NPC } from './NPCTypes';
+
+import { updateScore, applyScoreBonus, applyScorePenalty } from './scoreManager';
+
+
+
 // scoreEffects.ts — state/scoreEffects.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
@@ -9,7 +17,6 @@
 // Gorstan elements (c) Geoff Webster
 // Code licensed under the MIT License
 
-import { updateScore, applyScoreBonus, applyScorePenalty } from './scoreManager';
 
 // Master map of events to score deltas
 export const eventScoreMap: Record<string, number> = {
@@ -17,18 +24,18 @@ export const eventScoreMap: Record<string, number> = {
   'intro.choice.jump': 10,
   'intro.choice.sip': 50,
   'intro.choice.wait': -25,
-  
+
   // Puzzle solving
   'solve.puzzle.simple': 25,
   'solve.puzzle.hard': 75,
   'solve.puzzle.expert': 150,
-  
+
   // Discovery and exploration
   'find.hidden.item': 30,
   'find.secret.room': 60,
   'find.easter.egg': 15,
   'discover.lore': 20,
-  
+
   // NPC interactions
   'npc.dominic.survives': 40,
   'npc.dominic.dead': -50,
@@ -36,14 +43,14 @@ export const eventScoreMap: Record<string, number> = {
   'npc.wendell.rude': -75,
   'npc.librarian.helpful': 35,
   'conversation.meaningful': 10,
-  
+
   // Game mechanics
   'cheat.mode.used': -100,
   'reset.button.pressed': -10,
   'blue.button.pressed': -20,
   'hint.used': -5,
   'save.game': 5,
-  
+
   // Items and objects
   'coffee.returned': 20,
   'item.stolen': -15,
@@ -55,23 +62,23 @@ export const eventScoreMap: Record<string, number> = {
   'hint.requested': -5,
   'discover.teleport.system': 100,
   'teleport.successful': 25,
-  
+
   // Gameplay actions
   'trap.disarmed': 15,
   'trap.triggered': -30,
   'door.unlocked': 10,
   'puzzle.skipped': -20,
-  
+
   // Death and resurrection
   'player.killed': -200,
   'player.resurrected': 100,
   'near.death.escape': 75,
-  
+
   // Achievements and milestones
   'achievement.unlocked': 50,
   'zone.completed': 100,
   'perfect.playthrough': 500,
-  
+
   // Special events
   'dream.sequence.completed': 40,
   'reality.hacked': 80,
@@ -126,12 +133,12 @@ export const scoreThresholds: Record<string, number> = {
   'explorer': 300,
   'master': 600,
   'legend': 1000,
-  
+
   // NPC reactions
   'dominic.impressed': 200,
   'wendell.approves': 400,
   'librarian.respects': 350,
-  
+
   // Special unlocks
   'secret.ending': 800,
   'perfect.rating': 1200,
@@ -163,7 +170,7 @@ export function getScoreBasedMessage(currentScore: number): string | null {
   } else if (currentScore <= 0) {
     return "Every expert was once a beginner.";
   }
-  
+
   return null;
 }
 
@@ -180,6 +187,6 @@ export function getDominicScoreComment(currentScore: number): string | null {
   } else if (currentScore <= 0) {
     return "Maybe try earning points through less fish-related activities?";
   }
-  
+
   return null;
 }

@@ -1,9 +1,14 @@
+import { Room } from '../types/RoomTypes';
+
+import { Room } from './RoomTypes';
+
+
+
 // latticeZone_lattice.ts — rooms/latticeZone_lattice.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: latticeZone_lattice
 
-import { Room } from '../types/RoomTypes';
 
 const lattice: Room = {
   id: "lattice",

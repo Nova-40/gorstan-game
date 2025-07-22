@@ -1,9 +1,14 @@
+import { NPC } from './NPCTypes';
+
+import { RoomDefinition } from '../types/RoomTypes';
+
+
+
 // glitchZone_glitchinguniverse.ts — rooms/glitchZone_glitchinguniverse.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: glitchZone_glitchinguniverse
 
-import { RoomDefinition } from '../types/RoomTypes';
 
 const glitchinguniverse: RoomDefinition = {
   id: 'glitchinguniverse',

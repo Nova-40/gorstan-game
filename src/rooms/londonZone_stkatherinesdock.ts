@@ -1,9 +1,12 @@
+import { RoomDefinition } from '../types/RoomTypes';
+
+
+
 // londonZone_stkatherinesdock.ts — rooms/londonZone_stkatherinesdock.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: londonZone_stkatherinesdock
 
-import { RoomDefinition } from '../types/RoomTypes';
 
 const stkatherinesdock: RoomDefinition = {
   id: 'stkatherinesdock',

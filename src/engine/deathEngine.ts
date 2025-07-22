@@ -1,3 +1,5 @@
+
+
 // Version: 6.0.0
 // (c) 2025 Geoffrey Alan Webster
 // Licensed under the MIT License
@@ -60,19 +62,19 @@ export interface DeathEffect {
  * Literal string union of all supported death types.
  * Used for statistics, messaging, and triggered logic.
  */
-export type DeathCause = 
-  | 'trap' 
-  | 'glitch' 
-  | 'npc' 
-  | 'environmental' 
-  | 'puzzle_failure' 
-  | 'combat' 
-  | 'starvation' 
-  | 'madness' 
-  | 'temporal_paradox' 
-  | 'maze_lost' 
-  | 'mirror_trap' 
-  | 'fae_curse' 
+export type DeathCause =
+  | 'trap'
+  | 'glitch'
+  | 'npc'
+  | 'environmental'
+  | 'puzzle_failure'
+  | 'combat'
+  | 'starvation'
+  | 'madness'
+  | 'temporal_paradox'
+  | 'maze_lost'
+  | 'mirror_trap'
+  | 'fae_curse'
   | 'unknown';
 
 /**
@@ -88,84 +90,84 @@ const deathMessages: Record<DeathCause, string[]> = {
     'Ancient mechanisms whir to life. You have seconds to regret your carelessness.',
     'The walls close in with mechanical precision. Your last thought is admiration for the craftsmanship.'
   ],
-  
+
   glitch: [
     'Reality folds in on itself. You vanish with a scream.',
     'The world pixelates around you. Error 404: Player not found.',
     'Time stutters. You exist in seventeen different moments simultaneously, then none.',
     'The universe hiccups. When it recovers, you are no longer part of the equation.'
   ],
-  
+
   npc: [
     "They warned you. You didn't listen. That was your last mistake.",
     'Their patience finally runs out. Some conversations end more permanently than others.',
     'You pushed too far. The look in their eyes is the last thing you see.',
     '"Nothing personal," they say, as everything becomes very personal indeed.'
   ],
-  
+
   environmental: [
     'The environment claims another victim. Nature is indifferent to your ambitions.',
     'Toxic fumes rise from the depths. Your lungs burn as consciousness fades.',
     'The cold seeps into your bones. Winter has claimed another soul.',
     'Radiation levels spike beyond survivable limits. The Geiger counter screams briefly, then falls silent.'
   ],
-  
+
   puzzle_failure: [
     'The puzzle rejects your solution violently. Intelligence is not always rewarded.',
     'Wrong answer. The consequences are immediate and fatal.',
     'The riddle turns lethal. Your final thought: "I should have studied harder."',
     'Failure has a price here. You pay it in full.'
   ],
-  
+
   combat: [
     'Your opponent proves superior. Honor in defeat is small comfort.',
     'The battle ends poorly for you. Victory was never guaranteed.',
     'Steel meets flesh. The outcome was never in doubt.',
     'Combat is unforgiving. You learn this lesson too late.'
   ],
-  
+
   starvation: [
     'Hunger finally claims you. The multiverse feeds on many things.',
     'Your body fails from lack of sustenance. Planning was never your strength.',
     'Starvation is a slow death, but no less final.',
     'The last ration is consumed. Hope follows shortly after.'
   ],
-  
+
   madness: [
     'Your mind fractures beyond repair. Some truths are too large for mortal comprehension.',
     'Sanity was always optional here. You chose unwisely.',
     'The whispers finally make sense. That was your mistake.',
     'Madness takes you gently, like an old friend. Reality was overrated anyway.'
   ],
-  
+
   temporal_paradox: [
     'You meet yourself coming the other way. The universe cannot tolerate this.',
     'Causality loops collapse. You are both the cause and effect of your own demise.',
     'Time travel has rules. You broke them. Time breaks you in return.',
     'Past and future collide in your present. Physics weeps.'
   ],
-  
+
   maze_lost: [
     'The maze claims another wanderer. Your bones will mark this path for others.',
     'Lost beyond hope of rescue, you become part of the labyrinth.',
     'The walls whisper your name as you fade. You are home now.',
     'Every maze needs its ghosts. Welcome to the collection.'
   ],
-  
+
   mirror_trap: [
     'The mirror reflects your death before it happens. Prophecy fulfilled.',
     'Your reflection steps out as you step in. Only one of you can exist.',
     'The glass spider-webs around your touch. Seven years of very bad luck.',
     'Mirrors lie, but this one tells a fatal truth.'
   ],
-  
+
   fae_curse: [
     'Fae magic exacts its price. You should have read the fine print.',
     'The curse activates with poetic justice. The fae appreciate irony.',
     'Ancient words carry ancient weight. Your tongue was too careless.',
     'Magic has rules. Breaking them breaks you.'
   ],
-  
+
   unknown: [
     'You feel a sudden chill... then nothing.',
     'The cause remains mysterious. Death rarely explains itself.',
@@ -184,17 +186,17 @@ export function handlePlayerDeath(
 ): DeathResult {
   try {
     // Calculate death statistics
-        
+
     // Get contextual death message
-        
+
     // Determine special effects based on death circumstances
-        
+
     // Build updated flags
-        
+
     // Determine respawn location
-        
+
     // Build response messages
-        
+
     return {
       nextRoomId,
       messages,
@@ -202,7 +204,7 @@ export function handlePlayerDeath(
       deathStats,
       specialEffects
     };
-    
+
   } catch (error) {
     console.error('[DeathEngine] Error handling player death:', error);
     return getFailsafeDeathResult(playerState, cause);
@@ -217,10 +219,10 @@ function calculateDeathStats(
   cause: DeathCause,
   location?: string
 ): DeathStatistics {
-        
+
   // Update death counts
       newDeathsByCause[cause] = (newDeathsByCause[cause] || 0) + 1;
-  
+
   return {
     totalDeaths: newDeathCount,
     deathsByCause: newDeathsByCause,
@@ -239,15 +241,15 @@ function getContextualDeathMessage(
   playerState: PlayerState,
   deathStats: DeathStatistics
 ): string {
-    
+
   // Select message based on death count for variation
     let selectedMessage = messages[messageIndex];
-  
+
   // Add context for repeated deaths
   if (deathStats.totalDeaths > 5) {
             selectedMessage = `${selectedMessage} ${contextMessage}`;
   }
-  
+
   return selectedMessage;
 }
 
@@ -260,7 +262,7 @@ function determineDeathEffects(
   deathStats: DeathStatistics
 ): DeathEffect[] {
   const effects: DeathEffect[] = [];
-  
+
   // Experience-based trait gains
   if (deathStats.totalDeaths >= 3 && !playerState.traits?.includes('experienced_with_death')) {
     effects.push({
@@ -269,7 +271,7 @@ function determineDeathEffects(
       value: 'experienced_with_death'
     });
   }
-  
+
   if (deathStats.totalDeaths >= 10 && !playerState.traits?.includes('death_defiant')) {
     effects.push({
       type: 'trait_gained',
@@ -277,7 +279,7 @@ function determineDeathEffects(
       value: 'death_defiant'
     });
   }
-  
+
   // Cause-specific effects
   switch (cause) {
     case 'trap':
@@ -289,7 +291,7 @@ function determineDeathEffects(
         });
       }
       break;
-      
+
     case 'maze_lost':
       if (deathStats.deathsByCause.maze_lost >= 2) {
         effects.push({
@@ -299,7 +301,7 @@ function determineDeathEffects(
         });
       }
       break;
-      
+
     case 'fae_curse':
       effects.push({
         type: 'trait_gained',
@@ -308,7 +310,7 @@ function determineDeathEffects(
       });
       break;
   }
-  
+
   // Consecutive death penalties
   if (deathStats.consecutiveDeaths >= 3) {
     effects.push({
@@ -317,7 +319,7 @@ function determineDeathEffects(
       value: 'confident'
     });
   }
-  
+
   return effects;
 }
 
@@ -339,7 +341,7 @@ function buildUpdatedFlags(
     deathsByCause: deathStats.deathsByCause,
     consecutiveDeaths: deathStats.consecutiveDeaths,
     lastDeathTime: deathStats.timeOfDeath,
-    deathExperience: deathStats.totalDeaths >= 5 ? 'veteran' : 
+    deathExperience: deathStats.totalDeaths >= 5 ? 'veteran' :
                     deathStats.totalDeaths >= 3 ? 'experienced' : 'novice'
   };
 }
@@ -356,23 +358,23 @@ function determineRespawnLocation(
   switch (cause) {
     case 'maze_lost':
       return 'mazeentrance'; // Respawn at maze entrance
-      
+
     case 'fae_curse':
       return 'elfhame'; // Respawn in fae realm
-      
+
     case 'temporal_paradox':
       return 'timerift'; // Special temporal location if it exists
-      
+
     case 'mirror_trap':
       return 'mirrored_introsplat'; // Alternate version if it exists
   }
-  
+
   // Experience-based respawn improvements
   if (deathStats.totalDeaths >= 10 && playerState.traits?.includes('death_defiant')) {
     // Experienced players might respawn closer to their death location
     return playerState.flags.lastSafeRoom as string || 'introsplat';
   }
-  
+
   // Default respawn
   return 'introsplat';
 }
@@ -386,26 +388,26 @@ function buildDeathMessages(
   deathStats: DeathStatistics,
   specialEffects: DeathEffect[]
 ): string[] {
-    
+
   // Add awakening message
-    
+
     messages.push(awakeningMessages[awakeningIndex]);
-  
+
   // Add death count information
   if (deathStats.totalDeaths > 1) {
     messages.push(`This is your ${getOrdinalNumber(deathStats.totalDeaths)} death.`);
   }
-  
+
   // Add special effect descriptions
   specialEffects.forEach(effect => {
     messages.push(effect.description);
   });
-  
+
   // Add cause-specific observations
   if (deathStats.deathsByCause[deathStats.lastDeathCause] > 1) {
     messages.push(`You seem particularly susceptible to ${deathStats.lastDeathCause}. Perhaps a different approach?`);
   }
-  
+
   return messages;
 }
 
@@ -447,7 +449,7 @@ function getDeathMessage(cause: string): string {
  */
 export function getDeathStatistics(playerState: PlayerState): DeathStatistics | null {
     if (!deathCount) return null;
-  
+
   return {
     totalDeaths: deathCount,
     deathsByCause: (playerState.flags.deathsByCause as Record<string, number>) || {},
@@ -469,7 +471,7 @@ export function resetDeathStatistics(playerState: PlayerState): PlayerState {
   delete cleanedFlags.lastDeathCause;
   delete cleanedFlags.lastDeathTime;
   delete cleanedFlags.deathExperience;
-  
+
   return {
     ...playerState,
     flags: cleanedFlags
@@ -487,7 +489,7 @@ export function hasPlayerDiedFrom(playerState: PlayerState, cause: DeathCause): 
  * Get player's death experience level
  */
 export function getDeathExperience(playerState: PlayerState): 'novice' | 'experienced' | 'veteran' | 'legend' {
-    
+
   if (deathCount >= 20) return 'legend';
   if (deathCount >= 10) return 'veteran';
   if (deathCount >= 5) return 'experienced';
@@ -509,7 +511,7 @@ export function validateDeathCause(cause: any): cause is DeathCause {
 /**
  * Export utilities for external use
  */
-export 
+export
 export default DeathEngine;
 
 // Maintain backwards compatibility

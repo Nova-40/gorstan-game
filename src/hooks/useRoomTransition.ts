@@ -1,3 +1,7 @@
+import { useEffect, useState } from 'react';
+
+
+
 // useRoomTransition.ts — hooks/useRoomTransition.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
@@ -7,7 +11,6 @@
 // Gorstan (C) Geoff Webster 2025
 // Code MIT Licence
 
-import { useEffect, useState } from 'react';
 
 interface RoomLike {
   id: string;
@@ -101,7 +104,7 @@ const isChairPortal = (fromRoom: RoomLike, toRoom: RoomLike): boolean => {
   // Check if fromRoom has chair-based exits
   const exits = fromRoom.exits || {};
   const chairExits = ['sit', 'chair', 'chair_portal'];
-  
+
   return chairExits.some(exit => exits[exit] === toRoom.id);
 };
 
@@ -110,18 +113,18 @@ const isPortalTravel = (fromRoom: RoomLike, toRoom: RoomLike): boolean => {
   // Check for portal-related exit names
   const exits = fromRoom.exits || {};
   const portalExits = ['portal', 'gateway', 'dimensional_door', 'step_through'];
-  
+
   return portalExits.some(exit => exits[exit] === toRoom.id);
 };
 
 // Helper function to get zone display name
 export const getZoneDisplayName = (zoneId?: string): string => {
   if (!zoneId) return 'Unknown Zone';
-  
+
   const zoneNames: Record<string, string> = {
     'introZone': 'Dimensional Control',
     'londonZone': 'London Reality',
-    'newyorkZone': 'New York Reality', 
+    'newyorkZone': 'New York Reality',
     'gorstanZone': 'Gorstan Highlands',
     'mazeZone': 'The Labyrinth',
     'elfhameZone': 'Elfhame Realm',
@@ -130,6 +133,6 @@ export const getZoneDisplayName = (zoneId?: string): string => {
     'offmultiverseZone': 'Broken Realities',
     'glitchZone': 'Glitch Realm'
   };
-  
+
   return zoneNames[zoneId] || zoneId.replace('Zone', ' Zone');
 };

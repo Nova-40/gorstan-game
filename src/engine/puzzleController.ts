@@ -1,13 +1,22 @@
+import PuzzleEngine, { PuzzleResult } from '../engine/puzzleEngine';
+
+import React from 'react';
+
+import { Achievement, Puzzle } from './GameTypes';
+
+import { GameAction } from '../types/GameTypes';
+
+import { LocalGameState } from '../state/gameState';
+
+import { PuzzleData } from '../components/PuzzleInterface';
+
+
+
 // puzzleController.ts — engine/puzzleController.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Description: Enhanced puzzle controller that manages puzzle UI and state
 
-import React from 'react';
-import PuzzleEngine, { PuzzleResult } from '../engine/puzzleEngine';
-import { PuzzleData } from '../components/PuzzleInterface';
-import { LocalGameState } from '../state/gameState';
-import { GameAction } from '../types/GameTypes';
 
 export interface PuzzleControllerResult {
   showPuzzleModal: boolean;
@@ -52,7 +61,7 @@ class PuzzleController {
    */
   public listRoomPuzzles(roomId: string, gameState: LocalGameState): string[] {
     const puzzles = this.puzzleEngine.getRoomPuzzles(roomId, gameState);
-    
+
     if (puzzles.length === 0) {
       return ['No puzzles available in this area.'];
     }
@@ -68,45 +77,45 @@ class PuzzleController {
       const attempts = puzzleState?.attempts || 0;
       const maxAttempts = puzzle.maxAttempts || 5;
 
-      const status = solved ? '✅ SOLVED' : 
-                    attempts >= maxAttempts ? '❌ EXHAUSTED' : 
+      const status = solved ? '✅ SOLVED' :
+                    attempts >= maxAttempts ? '❌ EXHAUSTED' :
                     attempts > 0 ? `🔄 ${maxAttempts - attempts} attempts left` : '🆕 NEW';
 
       messages.push(`• ${puzzle.name} [${puzzle.difficulty.toUpperCase()}] - ${status}`);
-      
+
       if (puzzle.description) {
         messages.push(`  ${puzzle.description}`);
       }
-      
+
       // Show requirements
       const requirements: string[] = [];
-      
+
       if (puzzle.requiredItems?.length) {
-        const hasItems = puzzle.requiredItems.every((item: string) => 
+        const hasItems = puzzle.requiredItems.every((item: string) =>
           gameState.player.inventory.includes(item)
         );
         const itemStatus = hasItems ? '✅' : '❌';
         requirements.push(`Items: ${puzzle.requiredItems.join(', ')} ${itemStatus}`);
       }
-      
+
       if (puzzle.requiredTraits?.length) {
         const playerTraits = gameState.player.traits || [];
-        const hasTraits = puzzle.requiredTraits.every((trait: string) => 
+        const hasTraits = puzzle.requiredTraits.every((trait: string) =>
           playerTraits.includes(trait)
         );
         const traitStatus = hasTraits ? '✅' : '❌';
         requirements.push(`Traits: ${puzzle.requiredTraits.join(', ')} ${traitStatus}`);
       }
-      
+
       if (requirements.length > 0) {
         messages.push(`  Requirements: ${requirements.join(', ')}`);
       }
-      
+
       messages.push('');
     });
 
     messages.push('Use `puzzle solve [puzzle name]` to open the puzzle interface');
-    
+
     return messages;
   }
 
@@ -114,14 +123,14 @@ class PuzzleController {
    * Start a puzzle solving session
    */
   public async startPuzzle(
-    puzzleId: string, 
-    roomId: string, 
+    puzzleId: string,
+    roomId: string,
     gameState: LocalGameState
   ): Promise<PuzzleControllerResult> {
     // Find the puzzle by ID or name
     const availablePuzzles = this.puzzleEngine.getRoomPuzzles(roomId, gameState);
-    const puzzle = availablePuzzles.find((p: PuzzleData) => 
-      p.id === puzzleId || 
+    const puzzle = availablePuzzles.find((p: PuzzleData) =>
+      p.id === puzzleId ||
       p.name.toLowerCase().includes(puzzleId.toLowerCase())
     );
 
@@ -132,11 +141,11 @@ class PuzzleController {
     }
 
     this.currentPuzzle = puzzle;
-    
+
     // Get current attempt count
     const puzzleState = (gameState as any).puzzleState?.[puzzle.id];
     const currentAttempt = puzzleState?.attempts || 0;
-    
+
     // Calculate time remaining if there's a time limit
     let timeRemaining: number | undefined;
     if (puzzle.timeLimit && puzzleState?.timeStarted) {
@@ -159,13 +168,13 @@ class PuzzleController {
    * Create submit handler for puzzle solutions
    */
   private createSubmitHandler(
-    puzzle: PuzzleData, 
+    puzzle: PuzzleData,
     gameState: LocalGameState
   ) {
     return async (solution: any): Promise<PuzzleResult> => {
       try {
         const result = await this.puzzleEngine.solvePuzzle(puzzle.id, solution, gameState);
-        
+
         if (this.dispatch) {
           // Add feedback message
           this.dispatch({
@@ -214,7 +223,7 @@ class PuzzleController {
       }
 
       const hint = puzzle.hints[hintIndex];
-      
+
       this.dispatch({
         type: 'ADD_MESSAGE',
         payload: {
@@ -231,7 +240,7 @@ class PuzzleController {
    * Handle puzzle completion rewards
    */
   private handlePuzzleRewards(
-    rewards: NonNullable<PuzzleResult['rewards']>, 
+    rewards: NonNullable<PuzzleResult['rewards']>,
     gameState: LocalGameState
   ): void {
     if (!this.dispatch) return;
@@ -335,13 +344,13 @@ class PuzzleController {
    * Check if a puzzle can be started
    */
   public canStartPuzzle(
-    puzzleId: string, 
-    roomId: string, 
+    puzzleId: string,
+    roomId: string,
     gameState: LocalGameState
   ): { canStart: boolean; reason?: string } {
     const availablePuzzles = this.puzzleEngine.getRoomPuzzles(roomId, gameState);
-    const puzzle = availablePuzzles.find((p: PuzzleData) => 
-      p.id === puzzleId || 
+    const puzzle = availablePuzzles.find((p: PuzzleData) =>
+      p.id === puzzleId ||
       p.name.toLowerCase().includes(puzzleId.toLowerCase())
     );
 
@@ -353,7 +362,7 @@ class PuzzleController {
     }
 
     const puzzleState = (gameState as any).puzzleState?.[puzzle.id];
-    
+
     // Check if already solved
     if (puzzleState?.solved && !puzzle.type.includes('repeatable')) {
       return {
@@ -372,7 +381,7 @@ class PuzzleController {
 
     // Check required items
     if (puzzle.requiredItems?.length) {
-      const missingItems = puzzle.requiredItems.filter((item: string) => 
+      const missingItems = puzzle.requiredItems.filter((item: string) =>
         !gameState.player.inventory.includes(item)
       );
       if (missingItems.length > 0) {
@@ -386,7 +395,7 @@ class PuzzleController {
     // Check required traits
     if (puzzle.requiredTraits?.length) {
       const playerTraits = gameState.player.traits || [];
-      const missingTraits = puzzle.requiredTraits.filter((trait: string) => 
+      const missingTraits = puzzle.requiredTraits.filter((trait: string) =>
         !playerTraits.includes(trait)
       );
       if (missingTraits.length > 0) {
@@ -410,8 +419,8 @@ class PuzzleController {
   } {
     const allPuzzles = this.puzzleEngine.getRoomPuzzles(roomId, gameState);
     const availablePuzzles = allPuzzles; // getRoomPuzzles already filters for availability
-    
-    const solvedCount = allPuzzles.filter((puzzle: PuzzleData) => 
+
+    const solvedCount = allPuzzles.filter((puzzle: PuzzleData) =>
       (gameState as any).puzzleState?.[puzzle.id]?.solved
     ).length;
 

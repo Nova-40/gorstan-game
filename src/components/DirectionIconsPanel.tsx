@@ -1,12 +1,17 @@
+import React from 'react';
+
+import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight, CornerUpLeft, MousePointerClick, Coffee, UploadCloud, Armchair } from 'lucide-react';
+
+import { useGameState } from '../state/gameState';
+
+
+
 // DirectionIconsPanel.tsx — components/DirectionIconsPanel.tsx
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: DirectionIconsPanel
 
 
-import React from 'react';
-import { useGameState } from '../state/gameState';
-import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight, CornerUpLeft, MousePointerClick, Coffee, UploadCloud, Armchair } from 'lucide-react';
 
 const directionLabels: Record<string, string> = {
   north: 'North',

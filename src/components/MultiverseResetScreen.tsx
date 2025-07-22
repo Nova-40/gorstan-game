@@ -1,9 +1,13 @@
+import '../styles/ResetScreen.css'; // Ensure global styles or override here
+
+import React, { useEffect, useState } from 'react';
+
+
+
 
 // MultiverseResetScreen.tsx
 // (c) 2025 Geoffrey Alan Webster. MIT Licence
 
-import React, { useEffect, useState } from 'react';
-import '../styles/ResetScreen.css'; // Ensure global styles or override here
 
 const MultiverseResetScreen: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
   const [countdown, setCountdown] = useState(10);

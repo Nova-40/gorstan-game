@@ -1,9 +1,16 @@
+import { NPC } from './NPCTypes';
+
+import { Room } from '../types/RoomTypes';
+
+import { Room } from './RoomTypes';
+
+
+
 // gorstanZone_carronspire.ts — rooms/gorstanZone_carronspire.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: gorstanZone_carronspire
 
-import { Room } from '../types/RoomTypes';
 
 const carronspire: Room = {
   id: "carronspire",

@@ -1,9 +1,16 @@
+import { NPC } from './NPCTypes';
+
+import { Room } from '../types/RoomTypes';
+
+import { Room } from './RoomTypes';
+
+
+
 // mazeZone_mirrorhall.ts — rooms/mazeZone_mirrorhall.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: mazeZone_mirrorhall
 
-import { Room } from '../types/RoomTypes';
 
 const mirrorhall: Room = {
   id: "mirrorhall",

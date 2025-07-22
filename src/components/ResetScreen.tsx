@@ -1,10 +1,13 @@
+import React, { useState, useEffect } from 'react';
+
+
+
 // Version: 6.0.0
 // (c) 2025 Geoffrey Alan Webster
 // Licensed under the MIT License
 // Module: ResetScreen.tsx
 // Path: src/components/ResetScreen.tsx
 
-import React, { useState, useEffect } from 'react';
 
 type ResetScreenProps = {
   onComplete?: () => void;
@@ -29,10 +32,10 @@ const ResetScreen: React.FC<ResetScreenProps> = ({ onComplete = () => {} }) => {
     'GORSTAN SYSTEM ONLINE',
     'Welcome back, traveller.'
   ];
-  
+
   // Spinner frames for the animated effect
   const spinnerFrames = ['|', '/', '-', '\\'];
-  
+
   // State for the current line being displayed
   const [currentLine, setCurrentLine] = useState(0);
   // State for the spinner animation frame

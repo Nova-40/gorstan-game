@@ -1,9 +1,12 @@
+import { RoomDefinition } from '../types/RoomTypes';
+
+
+
 // introZone_controlnexus.ts — rooms/introZone_controlnexus.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: introZone_controlnexus
 
-import { RoomDefinition } from '../types/RoomTypes';
 
 const controlnexus: RoomDefinition = {
   id: 'controlnexus',
@@ -16,7 +19,7 @@ const controlnexus: RoomDefinition = {
   ],
   image: 'introZone_controlnexus.png',
   ambientAudio: 'lowhum.mp3',
-  
+
   // Enhanced console intro with more narrative depth
   consoleIntro: [
     '>> NEXUS CONTROL SYSTEM - EMERGENCY PROTOCOLS ACTIVE',

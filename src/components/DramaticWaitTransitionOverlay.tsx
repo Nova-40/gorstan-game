@@ -1,11 +1,15 @@
+import React, { useEffect, useState } from 'react';
+
+import { motion, AnimatePresence } from 'framer-motion';
+
+
+
 // Gorstan Dramatic Wait Transition Overlay
 // Version: 2.0.0
 // (c) 2025 Geoffrey Alan Webster
 // Module: DramaticWaitTransitionOverlay.tsx
 // Description: Enhanced dramatic splat sequence with multiple stages and intense effects
 
-import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 
 interface DramaticWaitTransitionOverlayProps {
   onComplete: () => void;
@@ -51,7 +55,7 @@ const DramaticWaitTransitionOverlay: React.FC<DramaticWaitTransitionOverlayProps
   useEffect(() => {
     // Initialize audio on component mount
     const audio = initializeAudio();
-    
+
     // Try to play truck horn immediately with better error handling
     const playTruckHorn = async () => {
       try {
@@ -83,7 +87,7 @@ const DramaticWaitTransitionOverlay: React.FC<DramaticWaitTransitionOverlayProps
       setTimeout(() => setStage('reconstruction'), 6000),
       setTimeout(() => onComplete(), 8000),
     ];
-    
+
     return () => {
       timers.forEach(clearTimeout);
       // Stop all audio on cleanup
@@ -114,11 +118,11 @@ const DramaticWaitTransitionOverlay: React.FC<DramaticWaitTransitionOverlayProps
             <motion.div
               className="absolute inset-0 bg-red-900"
               initial={{ opacity: 0 }}
-              animate={{ 
+              animate={{
                 opacity: [0, 0.3, 0.1, 0.4, 0.2, 0.5],
                 scale: [1, 1.02, 1, 1.03, 1, 1.05]
               }}
-              transition={{ 
+              transition={{
                 duration: 1.5,
                 times: [0, 0.2, 0.4, 0.6, 0.8, 1],
                 ease: "easeInOut"
@@ -150,11 +154,11 @@ const DramaticWaitTransitionOverlay: React.FC<DramaticWaitTransitionOverlayProps
             <motion.div
               className="absolute inset-0 bg-red-800"
               initial={{ opacity: 0.3 }}
-              animate={{ 
+              animate={{
                 opacity: [0.3, 0.8, 0.4, 0.9, 0.5, 1.0],
                 filter: ["blur(0px)", "blur(2px)", "blur(0px)", "blur(3px)", "blur(0px)", "blur(1px)"]
               }}
-              transition={{ 
+              transition={{
                 duration: 1.5,
                 repeat: 1,
                 ease: "easeInOut"
@@ -162,11 +166,11 @@ const DramaticWaitTransitionOverlay: React.FC<DramaticWaitTransitionOverlayProps
             />
             <motion.div
               className="absolute inset-0"
-              animate={{ 
+              animate={{
                 x: [-2, 2, -1, 1, 0],
                 y: [-1, 1, -2, 2, 0]
               }}
-              transition={{ 
+              transition={{
                 duration: 0.1,
                 repeat: 15,
                 ease: "easeInOut"
@@ -189,11 +193,11 @@ const DramaticWaitTransitionOverlay: React.FC<DramaticWaitTransitionOverlayProps
             <motion.div
               className="absolute inset-0 bg-white"
               initial={{ opacity: 0 }}
-              animate={{ 
+              animate={{
                 opacity: [0, 1, 0.8, 1, 0.9, 1],
                 scale: [1, 1.2, 1.1, 1.3, 1.15, 1.5]
               }}
-              transition={{ 
+              transition={{
                 duration: 0.2,
                 ease: "easeOut"
               }}
@@ -202,7 +206,7 @@ const DramaticWaitTransitionOverlay: React.FC<DramaticWaitTransitionOverlayProps
               className="absolute inset-0 bg-yellow-300"
               initial={{ opacity: 0 }}
               animate={{ opacity: [0, 0.8, 0.6, 0.9] }}
-              transition={{ 
+              transition={{
                 duration: 0.15,
                 ease: "easeOut"
               }}
@@ -222,7 +226,7 @@ const DramaticWaitTransitionOverlay: React.FC<DramaticWaitTransitionOverlayProps
             <motion.div
               className="absolute inset-0 bg-[radial-gradient(circle,_transparent_40%,_#8B0000_70%,_#4B0000_100%)]"
               initial={{ opacity: 0, scale: 0.5 }}
-              animate={{ 
+              animate={{
                 opacity: [0, 1, 0.8, 1],
                 scale: [0.5, 1.2, 1.1, 1]
               }}
@@ -231,16 +235,16 @@ const DramaticWaitTransitionOverlay: React.FC<DramaticWaitTransitionOverlayProps
             <motion.div
               className="absolute inset-0 flex items-center justify-center text-red-400 font-mono"
               initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ 
+              animate={{
                 opacity: [0, 1, 0.9, 1],
                 scale: [0.8, 1.2, 1.1, 1]
               }}
               transition={{ duration: 1 }}
             >
               <div className="text-center">
-                <motion.div 
+                <motion.div
                   className="text-8xl mb-8"
-                  animate={{ 
+                  animate={{
                     rotate: [0, -5, 5, -3, 3, 0],
                     scale: [1, 1.1, 0.9, 1.05, 0.95, 1]
                   }}
@@ -248,7 +252,7 @@ const DramaticWaitTransitionOverlay: React.FC<DramaticWaitTransitionOverlayProps
                 >
                   💥
                 </motion.div>
-                <motion.div 
+                <motion.div
                   className="text-4xl font-bold mb-4"
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
@@ -256,7 +260,7 @@ const DramaticWaitTransitionOverlay: React.FC<DramaticWaitTransitionOverlayProps
                 >
                   SPLAT.
                 </motion.div>
-                <motion.div 
+                <motion.div
                   className="text-lg opacity-75"
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}

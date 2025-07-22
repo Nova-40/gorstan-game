@@ -1,9 +1,16 @@
+import { NPC } from './NPCTypes';
+
+import { Room } from '../types/RoomTypes';
+
+import { Room } from './RoomTypes';
+
+
+
 // mazeZone_secretmazeentry.ts — rooms/mazeZone_secretmazeentry.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: mazeZone_secretmazeentry
 
-import { Room } from '../types/RoomTypes';
 
 const secretmazeentry: Room = {
   id: "secretmazeentry",

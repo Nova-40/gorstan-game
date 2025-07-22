@@ -1,3 +1,9 @@
+import { NPC } from './NPCTypes';
+
+import { Room } from './RoomTypes';
+
+
+
 // Room.d.ts
 // Type definitions for Gorstan room modules
 // (c) 2025 Geoffrey Alan Webster. MIT Licence

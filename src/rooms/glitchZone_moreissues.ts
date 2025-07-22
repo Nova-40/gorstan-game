@@ -1,9 +1,16 @@
+import { NPC } from './NPCTypes';
+
+import { Room } from '../types/RoomTypes';
+
+import { Room } from './RoomTypes';
+
+
+
 // glitchZone_moreissues.ts — rooms/glitchZone_moreissues.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: glitchZone_moreissues
 
-import { Room } from '../types/RoomTypes';
 
 const moreissues: Room = {
   id: "moreissues",

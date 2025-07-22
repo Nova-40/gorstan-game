@@ -1,3 +1,7 @@
+import { Room } from './RoomTypes';
+
+
+
 // Version: 6.0.0
 // (c) 2025 Geoffrey Alan Webster
 // Licensed under the MIT License
@@ -83,22 +87,22 @@ const ROOM_SPAWN_RULES: Record<string, ItemSpawnRule[]> = {
     { itemId: 'ancient_tome', chance: 0.6 },
     { itemId: 'map', chance: 0.4 }
   ],
-  
+
   kitchen: [
     { itemId: 'coffee', chance: 0.9, maxQuantity: 3 },
     { itemId: 'food', chance: 0.7 }
   ],
-  
+
   storage: [
     { itemId: 'runbag', chance: 0.5 },
     { itemId: 'tools', chance: 0.6 }
   ],
-  
+
   mysticalGrove: [
     { itemId: 'temporal_device', chance: 0.3, condition: 'grove_unlocked' },
     { itemId: 'crystal', chance: 0.4 }
   ],
-  
+
   stantonharcourt: [
     { itemId: 'polly_gift', chance: 1.0, condition: 'polly_forgiveness' },
     { itemId: 'endgame_key', chance: 0.8, condition: 'readyForEndgame' }
@@ -116,7 +120,7 @@ const ROOM_SPAWN_RULES: Record<string, ItemSpawnRule[]> = {
  * @returns New array of rooms with updated items arrays
  */
 export function seedItemsInRooms(
-  rooms: RoomData[], 
+  rooms: RoomData[],
   context?: SeedingContext
 ): SeedingResult[] {
   if (!Array.isArray(rooms)) {
@@ -151,10 +155,10 @@ function seedRoomItems(room: RoomData, context?: SeedingContext): SeedingResult 
     const itemsSkipped: string[] = [];
 
     // Generate new items for this room, avoiding duplicates
-        
+
     for (const item of candidateItems) {
       // Check for duplicates (both string IDs and item objects)
-      
+
       if (!isDuplicate) {
         itemsToAdd.push(item.id);
       } else {
@@ -196,7 +200,7 @@ function seedRoomItems(room: RoomData, context?: SeedingContext): SeedingResult 
  */
 function generateRoomItems(roomId: string, context?: SeedingContext): ItemData[] {
   try {
-        
+
     if (!Array.isArray(allItems) || allItems.length === 0) {
       console.warn('[ItemEngine] No items available from item registry');
       return [];
@@ -215,9 +219,9 @@ function generateRoomItems(roomId: string, context?: SeedingContext): ItemData[]
     }
 
     // Then, add random items based on spawn chances
-    
+
     // Use deterministic random if seed is provided
-    
+
     const attempts = Math.min(maxItems * 3, allItems.length); // Prevent infinite loops
     let attemptCount = 0;
 
@@ -298,7 +302,7 @@ function shouldSpawnRandomItem(item: ItemData, roomId: string, context?: Seeding
     }
 
     // Calculate spawn chance based on rarity and base chance
-        
+
     return Math.random() < finalChance;
   } catch (error) {
     console.error('[ItemEngine] Error evaluating random item spawn:', error);
@@ -476,7 +480,7 @@ export function getSeedingStatistics(results: SeedingResult[]): {
 /**
  * Export utilities for external use
  */
-export 
+export
 export default ItemEngine;
 
 // Exported as named exports for use in world/room setup logic.

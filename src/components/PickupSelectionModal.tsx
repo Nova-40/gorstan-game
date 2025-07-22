@@ -1,11 +1,18 @@
+import React, { useState } from 'react';
+
+import { getItemById } from '../engine/items';
+
+import { Room } from './RoomTypes';
+
+import { X, Package, Check } from 'lucide-react';
+
+
+
 // PickupSelectionModal.tsx — components/PickupSelectionModal.tsx
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: PickupSelectionModal
 
-import React, { useState } from 'react';
-import { X, Package, Check } from 'lucide-react';
-import { getItemById } from '../engine/items';
 
 interface PickupSelectionModalProps {
   isOpen: boolean;
@@ -27,8 +34,8 @@ const PickupSelectionModal: React.FC<PickupSelectionModalProps> = ({
   if (!isOpen) return null;
 
   const handleItemToggle = (itemId: string) => {
-    setSelectedItems(prev => 
-      prev.includes(itemId) 
+    setSelectedItems(prev =>
+      prev.includes(itemId)
         ? prev.filter(id => id !== itemId)
         : [...prev, itemId]
     );
@@ -123,8 +130,8 @@ const PickupSelectionModal: React.FC<PickupSelectionModalProps> = ({
                       key={itemId}
                       className={`
                         border rounded-lg p-4 cursor-pointer transition-all duration-200
-                        ${isSelected 
-                          ? 'border-blue-500 bg-blue-50 shadow-md' 
+                        ${isSelected
+                          ? 'border-blue-500 bg-blue-50 shadow-md'
                           : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                         }
                       `}
@@ -133,8 +140,8 @@ const PickupSelectionModal: React.FC<PickupSelectionModalProps> = ({
                       <div className="flex items-start gap-3">
                         <div className={`
                           w-5 h-5 rounded border-2 flex items-center justify-center mt-1 flex-shrink-0
-                          ${isSelected 
-                            ? 'border-blue-500 bg-blue-500' 
+                          ${isSelected
+                            ? 'border-blue-500 bg-blue-500'
                             : 'border-gray-300'
                           }
                         `}>

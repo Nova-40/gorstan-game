@@ -1,3 +1,11 @@
+import React, { useState } from 'react';
+
+import { Button } from './button';
+
+import { Room } from './RoomTypes';
+
+
+
 // TeleportationMenu.tsx — components/TeleportationMenu.tsx
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
@@ -8,8 +16,6 @@
 // Gorstan (C) Geoff Webster 2025
 // Code MIT Licence
 
-import React, { useState } from 'react';
-import { Button } from './button';
 
 interface TeleportationMenuProps {
   onTeleport: (destination: string) => void;
@@ -32,7 +38,7 @@ const allDestinations: Destination[] = [
   { id: 'gorstanhub', name: 'Gorstan Hub', zone: 'Gorstan Zone', description: 'Highland realm central hub' },
   { id: 'londonhub', name: 'London Hub', zone: 'London Zone', description: 'Urban dimensional gateway' },
   { id: 'mazehub', name: 'Maze Hub', zone: 'Maze Zone', description: 'Labyrinthine navigation center' },
-  
+
   // Important locations (accessible with remote control)
   { id: 'hiddenlab', name: 'Hidden Laboratory', zone: 'Intro Zone', description: 'Secret research facility' },
   { id: 'controlroom', name: 'Control Room', zone: 'Intro Zone', description: 'Emergency command center' },
@@ -41,7 +47,7 @@ const allDestinations: Destination[] = [
   { id: 'gorstanvillage', name: 'Gorstan Village', zone: 'Gorstan Zone', description: 'Highland village community' },
   { id: 'lattice', name: 'The Lattice', zone: 'Lattice Zone', description: 'Crystalline information network' },
   { id: 'datavoid', name: 'Data Void', zone: 'Glitch Zone', description: 'Digital realm anomaly' },
-  
+
   // Extended locations
   { id: 'trentpark', name: 'Trent Park', zone: 'London Zone', description: 'Mystical parkland portal' },
   { id: 'stkatherinesdock', name: 'St Katherine\'s Dock', zone: 'London Zone', description: 'Thames-side portal gateway' },
@@ -67,11 +73,11 @@ const TeleportationMenu: React.FC<TeleportationMenuProps> = ({
   const [selectedZone, setSelectedZone] = useState<string>('all');
 
   const availableDestinations = hasRemoteControl ? allDestinations : crystalDestinations;
-  
+
   const zones = [...new Set(availableDestinations.map(dest => dest.zone))];
-  
-  const filteredDestinations = selectedZone === 'all' 
-    ? availableDestinations 
+
+  const filteredDestinations = selectedZone === 'all'
+    ? availableDestinations
     : availableDestinations.filter(dest => dest.zone === selectedZone);
 
   const handleTeleport = (destinationId: string) => {
@@ -93,12 +99,12 @@ const TeleportationMenu: React.FC<TeleportationMenuProps> = ({
 
         <div className="mb-4">
           <p className="text-gray-300 text-sm mb-2">
-            {hasRemoteControl 
+            {hasRemoteControl
               ? 'Select any destination across all realities:'
               : 'Navigation crystal offers limited travel options:'
             }
           </p>
-          
+
           {hasRemoteControl && (
             <div className="flex gap-2 mb-3">
               <Button

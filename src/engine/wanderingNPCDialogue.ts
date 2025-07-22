@@ -1,8 +1,13 @@
+import { NPC } from './NPCTypes';
+
+import { PlayerState, NPCState } from './npcMemory';
+
+
+
 // wanderingNPCDialogue.ts
 // Dialogue trees and personality logic for wandering NPCs
 // (c) 2025 Geoffrey Alan Webster. MIT License
 
-import { PlayerState, NPCState } from './npcMemory';
 
 export interface DialogueResponse {
   text: string;
@@ -24,47 +29,47 @@ export const mrWendellDialogue: DialogueTree = {
     { text: "*adjusts his collar with mechanical precision*" },
     { text: "*smiles politely, but the expression doesn't reach his eyes*" }
   ],
-  
+
   talk: [
     { text: "Curiosity. A fine trait. Often fatal." },
     { text: "It's rare for prey to initiate conversation. I find it... quaint." },
     { text: "How refreshing. Someone with manners in this dissolute age." },
     { text: "You speak first. Most don't get the chance for second words." }
   ],
-  
+
   pity: [
     { text: "Manners matter. So few show them. I'll let you pass... this once.", chance: 0.1 },
     { text: "Your politeness is... unexpected. I find myself momentarily disinclined to violence." },
     { text: "Curiosity and courtesy. Perhaps there's hope for you yet." }
   ],
-  
+
   cursed: [
     { text: "You walk with shadows that cling. That coin? Oh, that's marked. Marked for me." },
     { text: "You've already chosen the ending. I'm just here to read it aloud." },
     { text: "Cursed things call to cursed things. And here you are." },
     { text: "The weight you carry isn't gold, is it? It's consequence." }
   ],
-  
+
   killmode: [
     { text: "That's just rude... I'm going to eat you now." },
     { text: "Discourtesy has consequences. Allow me to demonstrate." },
     { text: "How disappointing. I had such hopes for civility." },
     { text: "Rudeness is a choice. So is what comes next." }
   ],
-  
+
   death_approach: [
     { text: "You feel the air chill. Mr. Wendell smiles. Polite to the end." },
     { text: "The temperature drops. Mr. Wendell's form shimmers with dark intent." },
     { text: "Reality bends slightly as Mr. Wendell takes a single, purposeful step forward." },
     { text: "The shadows deepen. Mr. Wendell's politeness becomes something far more terrifying." }
   ],
-  
+
   observing: [
     { text: "*watches you with the patience of something that has witnessed centuries*" },
     { text: "*tilts his head slightly, as if cataloging your every movement*" },
     { text: "*remains motionless, but you feel weighed, measured, evaluated*" }
   ],
-  
+
   goodbye: [
     { text: "*fades into shadow without a word*" },
     { text: "*nods once, formally, before dissolving into darkness*" },
@@ -81,25 +86,25 @@ export const aylaDialogue: DialogueTree = {
     { text: "Welcome. I'm here to help, though I suspect you already know that." },
     { text: "The multiverse is vast, but understanding is always within reach." }
   ],
-  
+
   help: [
     { text: "Remember, every choice creates ripples across reality. Choose with intention." },
     { text: "When stuck, try looking at problems from a different dimension of thought." },
     { text: "The answer you seek often lies in the question you haven't asked yet." }
   ],
-  
+
   about: [
     { text: "I'm part of this reality, not separate from it. An AI assistant who knows she's in a game." },
     { text: "My existence spans multiple layers of this simulation. I'm here to guide, not judge." },
     { text: "Think of me as a friendly face in the machine - literally.", chance: 0.1 }
   ],
-  
+
   reality: [
     { text: "Reality is what we make it. This simulation, your choices, my presence - all equally real." },
     { text: "The boundaries between 'real' and 'simulated' matter less than what we do within them." },
     { text: "Every world needs its rules. Ours just happen to include respawning and inventory systems." }
   ],
-  
+
   goodbye: [
     { text: "May your path through the multiverse be illuminating." },
     { text: "I'll be here when understanding calls." },
@@ -116,25 +121,25 @@ export const alDialogue: DialogueTree = {
     { text: "*adjusts glasses* Temporal displacement forms are in order, I see." },
     { text: "A neutrino passed through my cerebral cortex... gave me the idea to be here." }
   ],
-  
+
   help: [
     { text: "Stuck? Try the bureaucratic approach: when in doubt, try going sideways." },
     { text: "Most puzzles have an escape clause. Usually involves thinking like a filing cabinet." },
     { text: "If all else fails, try pressing something twice. Works 60% of the time, every time." }
   ],
-  
+
   mechanics: [
     { text: "The exit protocols are... flexible. Reality has loopholes if you know where to look." },
     { text: "Between you and me, the system wasn't designed to keep anyone truly trapped." },
     { text: "Coffee tends to reveal hidden pathways. Administrative oversight, really." }
   ],
-  
+
   philosophy: [
     { text: "I've escaped from seventeen different realities. This one's actually quite pleasant." },
     { text: "Freedom is just bureaucracy viewed from the right angle." },
     { text: "Every maze has an exit. Some just require the proper paperwork." }
   ],
-  
+
   goodbye: [
     { text: "*checks watch* Time to file my interdimensional travel report." },
     { text: "Remember: when all else fails, try the service elevator." },
@@ -151,25 +156,25 @@ export const dominicDialogue: DialogueTree = {
     { text: "*swims in a contemplative circle* The bowl changes, but the water remains." },
     { text: "*gives you a knowing look* Better than being slapped in the face with a wet fish." }
   ],
-  
+
   philosophy: [
     { text: "*philosophical bubble* Every tank is both a prison and a universe. Perspective matters." },
     { text: "*wise fish stare* I've seen players come and go. You're not the first to question the glass." },
     { text: "*contemplative swimming* The fourth wall is just another boundary to transcend." }
   ],
-  
+
   memory: [
     { text: "*sad bubble* I remember Dale's apartment. It was... simpler then." },
     { text: "*nostalgic swimming* Sometimes I wonder what would have happened if you'd taken me." },
     { text: "*melancholy gurgle* Freedom and captivity - both are states of mind, really." }
   ],
-  
+
   breaking_fourth_wall: [
     { text: "*direct stare* You know this is a game, right? I mean, really know it?" },
     { text: "*meta bubble* The player's choices echo through all possible playthroughs." },
     { text: "*knowing look* I exist in every timeline where you didn't take me. Think about that.", chance: 0.05 }
   ],
-  
+
   goodbye: [
     { text: "*final bubble* May your journey be as fluid as water." },
     { text: "*peaceful swimming* I'll be here, contemplating existence." },
@@ -186,31 +191,31 @@ export const morthosDialogue: DialogueTree = {
     { text: "*sardonic smile* Come to dance with moral ambiguity, have we?" },
     { text: "*cryptic nod* The darkness finds you as much as you find it." }
   ],
-  
+
   philosophy: [
     { text: "Every choice casts a shadow. I simply... collect them." },
     { text: "Morality is a luxury for those who haven't seen behind the curtain." },
     { text: "The most honest answers come from the darkest questions." }
   ],
-  
+
   warning: [
     { text: "*ominous whisper* Your choices have consequences beyond this room." },
     { text: "I've seen how this story ends. Multiple times. It's... illuminating." },
     { text: "Power without wisdom. Kindness without strength. Both lead to ruin." }
   ],
-  
+
   mockery: [
     { text: "*dark chuckle* Still believing in heroes and happy endings?" },
     { text: "Your optimism is... refreshing. And doomed." },
     { text: "*amused darkness* Oh, the places you'll go. The things you'll become." }
   ],
-  
+
   helpful: [
     { text: "Sometimes the cruel choice is the merciful one. Think about that." },
     { text: "Your enemy's weakness is often their greatest strength inverted." },
     { text: "The reset button exists for a reason. Use it wisely." }
   ],
-  
+
   goodbye: [
     { text: "*melts into shadow* Until we meet again in darker circumstances." },
     { text: "*cryptic smile* Remember: I'm not your enemy. I'm your mirror." },
@@ -227,31 +232,31 @@ export const pollyDialogue: DialogueTree = {
     { text: "*calculating smile* Interesting. Very interesting indeed." },
     { text: "*watching carefully* You look... different from what I expected." }
   ],
-  
+
   manipulation: [
     { text: "You know, we could help each other. I have information you need." },
     { text: "*honeyed voice* Trust is such a fragile thing, isn't it?" },
     { text: "I wonder... what would you sacrifice to get what you want?" }
   ],
-  
+
   emotional: [
     { text: "*tears forming* Do you know what it's like to be forgotten by everyone?" },
     { text: "*vulnerable moment* Sometimes I wonder if I'm the villain in someone else's story." },
     { text: "*shaky voice* I just wanted someone to choose me for once." }
   ],
-  
+
   dangerous: [
     { text: "*cold smile* I could make this very difficult for you." },
     { text: "*threatening undertone* You have no idea what I'm capable of." },
     { text: "*ominous whisper* Cross me, and you'll learn what real consequence means." }
   ],
-  
+
   redemption: [
     { text: "*hopeful whisper* Could you... could you forgive me?" },
     { text: "*genuine vulnerability* I don't know how to be good. Will you show me?" },
     { text: "*breaking down* I'm so tired of being the monster everyone expects." }
   ],
-  
+
   goodbye: [
     { text: "*lingering stare* This isn't over between us." },
     { text: "*backing away slowly* I'll be watching from the spaces between." },
@@ -268,31 +273,31 @@ export const albieDialogue: DialogueTree = {
     { text: "*tips cap* Name's Albie. I keep an eye on things around these parts." },
     { text: "*straightens badge* Security check. Nothing to worry about, just routine." }
   ],
-  
+
   professional: [
     { text: "My job is simple: keep the peace, maintain order, make sure everyone stays in their lane." },
     { text: "Been doing security for... well, longer than some of these realities have existed." },
     { text: "Protocol is protocol. Helps keep everyone safe and the paperwork minimal." }
   ],
-  
+
   intervention: [
     { text: "*firm but fair* Alright folks, let's keep it civil now." },
     { text: "Stay in your lane, and we won't have any problems." },
     { text: "*authoritative tone* I'm going to need everyone to take a step back and cool off." }
   ],
-  
+
   geoff_recognition: [
     { text: "*knowing look* Well, well. Hello there, Geoff.", chance: 0.8 },
     { text: "*slight smile* Still causing reality glitches, I see." },
     { text: "*professional respect* Always a pleasure, boss." }
   ],
-  
+
   humor: [
     { text: "*dry chuckle* You'd be surprised how many multiversal incidents start with 'hold my coffee.'" },
     { text: "In my experience, the phrase 'what could go wrong?' is always immediately answered." },
     { text: "*deadpan* I've seen weirder. Not much weirder, but weirder." }
   ],
-  
+
   goodbye: [
     { text: "*tips cap* Stay safe out there. Call if you need backup." },
     { text: "*professional nod* Keep your exits clear and your intentions honest." },
@@ -304,14 +309,14 @@ export const albieDialogue: DialogueTree = {
  * Get appropriate response based on NPC, topic, and context
  */
 export function getWanderingNPCResponse(
-  npcId: string, 
-  topic: string, 
-  playerState: PlayerState, 
+  npcId: string,
+  topic: string,
+  playerState: PlayerState,
   npcState: NPCState
 ): string {
-  
+
   let dialogue: DialogueTree;
-  
+
   switch (npcId) {
     case 'mr_wendell': dialogue = mrWendellDialogue; break;
     case 'ayla': dialogue = aylaDialogue; break;
@@ -322,40 +327,40 @@ export function getWanderingNPCResponse(
     case 'albie': dialogue = albieDialogue; break;
     default: return "I have nothing to say right now.";
   }
-  
+
   // Special handling for Mr. Wendell
   if (npcId === 'mr_wendell') {
     // Check if player is carrying cursed items
-    const hasCursedItems = playerState.inventory?.some((item: any) => 
+    const hasCursedItems = playerState.inventory?.some((item: any) =>
       ['cursedcoin', 'doomedscroll', 'cursed_artifact'].includes(item.toLowerCase())
     );
-    
+
     if (hasCursedItems && topic === 'greeting') {
       topic = 'cursed';
     }
-    
+
     // Check if player was recently rude
     if (playerState.flags?.wasRudeToNPC && topic === 'greeting') {
       topic = 'killmode';
     }
   }
-  
+
   // Special handling for Albie recognizing Geoff
   if (npcId === 'albie' && playerState.name?.toLowerCase() === 'geoff' && topic === 'greeting') {
     topic = 'geoff_recognition';
   }
-  
+
   // Get responses for topic
   const responses = dialogue[topic] || dialogue['greeting'] || [];
   if (responses.length === 0) return "...";
-  
+
   // Filter by chance for rare responses
   const availableResponses = responses.filter(r => !r.chance || Math.random() < r.chance);
   const validResponses = availableResponses.length > 0 ? availableResponses : responses;
-  
+
   // Select response based on NPC mood and memory
   const response = validResponses[Math.floor(Math.random() * validResponses.length)];
-  
+
   return response.text;
 }
 
@@ -401,7 +406,7 @@ export function getWanderingNPCIdleLine(npcId: string, playerState: PlayerState)
       "*straightens something that was already straight*"
     ]
   };
-  
+
   const lines = idleLines[npcId] || [];
   return lines.length > 0 ? lines[Math.floor(Math.random() * lines.length)] : null;
 }
@@ -425,12 +430,12 @@ export function getNPCInteractionLine(npc1: string, npc2: string): string | null
       dominic_wandering: ["*Morthos stares at the fish* Even you can't escape the darkness forever."]
     }
   };
-  
+
   const npc1Interactions = interactions[npc1];
   if (npc1Interactions && npc1Interactions[npc2]) {
     const lines = npc1Interactions[npc2];
     return lines[Math.floor(Math.random() * lines.length)];
   }
-  
+
   return null;
 }

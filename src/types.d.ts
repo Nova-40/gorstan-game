@@ -1,3 +1,14 @@
+import { Direction, Room, RoomCollection } from './RoomTypes';
+
+import { NPC, NPCMood, NPCMemory } from './NPCTypes';
+
+import { Trap, Puzzle, Miniquest, Achievement, ScoreData } from './GameTypes';
+
+
+
+
+
+
 // types.d.ts — types.d.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
@@ -116,7 +127,7 @@ interface ImportMeta {
 /**
  * Game stage constants for application flow control
  */
-export type GameStage = 
+export type GameStage =
   | 'WELCOME'           // Initial welcome screen
   | 'NAME_CAPTURE'      // Player name input
   | 'GAME'              // Main game loop
@@ -125,52 +136,6 @@ export type GameStage =
   | 'LOADING';          // Loading state
 
 /**
- * Direction types for room navigation
- * Includes standard compass directions and game-specific directions
- */
-export type Direction = 
-  | 'north' | 'south' | 'east' | 'west' 
-  | 'northeast' | 'northwest' | 'southeast' | 'southwest'
-  | 'up' | 'down' | 'in' | 'out'
-  | 'jump' | 'portal' | 'climb' | 'swim'
-  | 'coffee' | 'chair' | 'green' | 'church' // Game-specific directions
-  | string; // Allow custom directions
-
-/**
- * Comprehensive game state interface matching current implementation
- */
-export interface GameState {
-  // Player identity and progression
-  readonly playerName: string;
-  readonly currentRoom: string;
-  readonly gameStage: GameStage;
-  
-  // Player inventory and items
-  readonly inventory: readonly string[];
-  readonly itemsPickedUp: readonly string[];
-  
-  // Game flags and conditions
-  readonly flags: Readonly<Record<string, boolean>>;
-  readonly roomFlags: Readonly<Record<string, boolean>>;
-  
-  // Game history and narrative
-  readonly history: readonly string[];
-  readonly visitedRooms: readonly string[];
-  readonly commandHistory: readonly string[];
-  
-  // Game progression tracking
-  readonly score: number;
-  readonly turnCount: number;
-  readonly startTime: number;
-  
-  // Debug and development features
-  readonly debugMode: boolean;
-  readonly cheatEnabled: boolean;
-  
-  // Save/load state management
-  readonly lastSaved?: number;
-  readonly saveSlot?: string;
-}
 
 /**
  * Game actions for state reducer
@@ -198,21 +163,21 @@ export type GameAction =
 // =============================================================================
 
 /**
- * Trap severity levels for damage calculation
+ *  severity levels for damage calculation
  */
-export type TrapSeverity = 'light' | 'moderate' | 'critical';
+export type Severity = 'light' | 'moderate' | 'critical';
 
 /**
- * Trap types for different mechanisms
+ *  types for different mechanisms
  */
-export type TrapType = 'generic' | 'adaptive' | 'environmental' | 'magical';
+export type Type = 'generic' | 'adaptive' | 'environmental' | 'magical';
 
 /**
  * Current trap system definition matching room implementations
  */
-export interface TrapDefinition {
-  readonly type: TrapType;
-  readonly severity: TrapSeverity;
+export interface Definition {
+  readonly type: Type;
+  readonly severity: Severity;
   readonly disarmable: boolean;
   readonly message: string;
   readonly damage: number;
@@ -253,47 +218,10 @@ export interface SpecialProperties {
 /**
  * Comprehensive room definition matching current zone implementations
  */
-export interface Room {
-  // Core identification
-  readonly id: string;
-  readonly title: string;
-  readonly description: string;
-  readonly zone: string;
-  
-  // Enhanced descriptions
-  readonly lookDescription?: string;
-  readonly altDescriptions?: AltDescriptions;
-  
-  // Navigation and content
-  readonly exits: Readonly<Record<Direction, string>>;
-  readonly items: readonly string[];
-  readonly npcs: readonly string[];
-  
-  // Visual and audio
-  readonly image?: string;
-  readonly music?: string;
-  readonly ambient?: string;
-  
-  // Game mechanics
-  readonly trap?: TrapDefinition;
-  readonly flags: readonly string[];
-  readonly special?: SpecialProperties;
-  
-  // Narrative features
-  readonly visitNarratives?: VisitNarratives;
-  readonly echoes?: readonly string[];
-  readonly moodTag?: string;
-  readonly memoryHooks?: readonly string[];
-  readonly anomalies?: readonly AnomalyDefinition[];
-  readonly microQuestId?: string;
-}
 
 /**
  * Room collection by zone
  */
-export interface RoomCollection {
-  readonly [roomId: string]: Room;
-}
 
 // =============================================================================
 // NPC SYSTEM TYPES
@@ -302,53 +230,14 @@ export interface RoomCollection {
 /**
  * NPC emotional states for dynamic interaction
  */
-export type NPCMood = 
-  | 'neutral' | 'friendly' | 'hostile' | 'suspicious'
-  | 'helpful' | 'confused' | 'angry' | 'sad' | 'happy';
-
-/**
- * NPC memory system for tracking player interactions
- */
-export interface NPCMemory {
-  readonly interactions: number;
-  readonly lastInteraction: number;
-  readonly playerActions: readonly string[];
-  readonly relationship: number; // -100 to 100
-  readonly knownFacts: readonly string[];
-}
 
 /**
  * NPC conversation tree node
  */
-export interface ConversationNode {
-  readonly id: string;
-  readonly text: string;
-  readonly responses?: readonly {
-    readonly text: string;
-    readonly nextId?: string;
-    readonly action?: string;
-    readonly condition?: string;
-  }[];
-  readonly condition?: string;
-  readonly action?: string;
-}
 
 /**
  * Complete NPC definition
  */
-export interface NPC {
-  readonly id: string;
-  readonly name: string;
-  readonly description: string;
-  readonly mood: NPCMood;
-  readonly health: number;
-  readonly maxHealth: number;
-  readonly memory: NPCMemory;
-  readonly conversation?: readonly ConversationNode[];
-  readonly inventory: readonly string[];
-  readonly flags: readonly string[];
-  readonly special?: SpecialProperties;
-}
 
 // =============================================================================
 // ITEM SYSTEM TYPES
@@ -357,8 +246,8 @@ export interface NPC {
 /**
  * Item categories for organization and mechanics
  */
-export type ItemCategory = 
-  | 'tool' | 'weapon' | 'armor' | 'consumable' 
+export type ItemCategory =
+  | 'tool' | 'weapon' | 'armor' | 'consumable'
   | 'key' | 'document' | 'artifact' | 'misc';
 
 /**
@@ -490,7 +379,7 @@ export interface SaveFile {
 /**
  * Game-specific error types
  */
-export type GameErrorType = 
+export type GameErrorType =
   | 'ROOM_NOT_FOUND'
   | 'INVALID_COMMAND'
   | 'ITEM_NOT_FOUND'
@@ -537,25 +426,3 @@ export type RequiredFields<T, K extends keyof T> = T & Required<Pick<T, K>>;
 // =============================================================================
 
 export type {
-  Direction,
-  GameStage,
-  GameAction,
-  Room,
-  RoomCollection,
-  NPC,
-  NPCMood,
-  NPCMemory,
-  Item,
-  ItemCategory,
-  CommandResult,
-  ParsedCommand,
-  TerminalLine,
-  ConsoleConfig,
-  AylaState,
-  SaveFile,
-  SaveMetadata,
-  GameError,
-  GameErrorType,
-  TrapDefinition,
-  AnomalyDefinition
-};

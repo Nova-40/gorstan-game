@@ -1,3 +1,15 @@
+import { GameState } from '../types/GameTypes';
+
+import { Miniquest } from './GameTypes';
+
+import { Miniquest, MiniquestState, MiniquestResult, MiniquestProgress } from '../types/MiniquestTypes';
+
+import { Room } from '../types.d';
+
+import { Room } from './RoomTypes';
+
+
+
 // miniquestEngine.ts — engine/miniquestEngine.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
@@ -7,12 +19,9 @@
 // Gorstan (C) Geoff Webster 2025
 // Code MIT Licence
 
-import { Miniquest, MiniquestState, MiniquestResult, MiniquestProgress } from '../types/MiniquestTypes';
-import { GameState } from '../types/GameTypes';
-import { Room } from '../types.d';
 
 // Extended GameState interface for miniquest functionality
-type GameStateWithMiniquests = GameState & { 
+type GameStateWithMiniquests = GameState & {
   miniquestState?: MiniquestState;
 };
 
@@ -55,7 +64,7 @@ class MiniquestEngine {
 
       // Check required items
       if (quest.requiredItems) {
-        const hasAllItems = quest.requiredItems.every(item => 
+        const hasAllItems = quest.requiredItems.every(item =>
           gameState.player.inventory.includes(item)
         );
         if (!hasAllItems) return false;
@@ -78,8 +87,8 @@ class MiniquestEngine {
    * Attempt to complete a miniquest
    */
   public attemptQuest(
-    questId: string, 
-    roomId: string, 
+    questId: string,
+    roomId: string,
     gameState: GameStateWithMiniquests,
     triggerAction?: string
   ): MiniquestResult {
@@ -110,7 +119,7 @@ class MiniquestEngine {
 
     // Calculate success based on quest type and difficulty
     const success = this.calculateSuccess(quest, gameState);
-    
+
     if (success) {
       return this.completeQuest(quest, roomId, gameState);
     } else {
@@ -124,7 +133,7 @@ class MiniquestEngine {
   private completeQuest(quest: Miniquest, roomId: string, gameState: GameStateWithMiniquests): MiniquestResult {
     // Award score
     const { applyScoreForEvent } = require('../state/scoreEffects');
-    
+
     // Different score events based on quest type
     switch (quest.type) {
       case 'puzzle':
@@ -158,7 +167,7 @@ class MiniquestEngine {
    */
   private failQuest(quest: Miniquest, roomId: string, gameState: GameStateWithMiniquests): MiniquestResult {
     let message = `You attempt "${quest.title}" but don't succeed this time.`;
-    
+
     if (quest.hint) {
       message += ` ${quest.hint}`;
     }
@@ -236,7 +245,7 @@ class MiniquestEngine {
     roomQuests.forEach(quest => {
       const isCompleted = completedQuests.includes(quest.id);
       const isAvailable = availableQuests.find(q => q.id === quest.id);
-      
+
       let status = "🔒 LOCKED";
       if (isCompleted && !quest.repeatable) {
         status = "✅ COMPLETED";
@@ -255,9 +264,9 @@ class MiniquestEngine {
 
       messages.push(`• ${quest.title} [${quest.type.toUpperCase()}] ${difficultyIcon} - ${status}`);
       messages.push(`  ${quest.description}`);
-      
+
       if (quest.requiredItems && quest.requiredItems.length > 0) {
-        const hasItems = quest.requiredItems.every(item => 
+        const hasItems = quest.requiredItems.every(item =>
           gameState.player.inventory.includes(item)
         );
         const itemStatus = hasItems ? '✅' : '❌';
@@ -281,8 +290,8 @@ class MiniquestEngine {
    * Update miniquest state after completion
    */
   public updateStateAfterCompletion(
-    gameState: GameStateWithMiniquests, 
-    roomId: string, 
+    gameState: GameStateWithMiniquests,
+    roomId: string,
     questId: string
   ): Partial<GameStateWithMiniquests> {
     const currentState = gameState.miniquestState || {};

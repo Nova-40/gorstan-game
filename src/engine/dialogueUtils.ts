@@ -1,3 +1,7 @@
+import { NPC } from './NPCTypes';
+
+
+
 // Version: 6.0.0
 // (c) 2025 Geoffrey Alan Webster
 // Licensed under the MIT License
@@ -101,20 +105,20 @@ export function selectWeightedDialogue(
   playerState?: DialogueState
 ): string {
   // Filter variations by conditions if player state is provided
-  
+
   if (validVariations.length === 0) {
     return variations[0]?.text || "...";
   }
 
   // Calculate total weight
-    
+
   if (totalWeight === 0) {
     return validVariations[0].text;
   }
 
   // Select based on weighted probability
   let random = Math.random() * totalWeight;
-  
+
   for (const variation of validVariations) {
     random -= variation.weight;
     if (random <= 0) {
@@ -184,31 +188,31 @@ export function checkDialogueConditions(
     switch (condition.type) {
       case 'flag':
         return playerState.flags?.[condition.key] === condition.value;
-      
+
       case 'trait':
                 if (condition.operator === 'contains') {
           return traits.includes(condition.value);
         }
         return false;
-      
+
       case 'item':
                 if (condition.operator === 'contains') {
           return inventory.includes(condition.value);
         }
         return false;
-      
+
       case 'trust':
                 return compareValues(trust, condition.value, condition.operator || 'equals');
-      
+
       case 'stat':
                 return compareValues(statValue, condition.value, condition.operator || 'equals');
-      
+
       case 'room':
         return playerState.currentRoom === condition.value;
-      
+
       case 'quest':
         return playerState.questState === condition.value;
-      
+
       default:
         return true;
     }
@@ -249,32 +253,32 @@ export function getDialogueVariationsByMood(
   baseMood: 'friendly' | 'neutral' | 'hostile' | 'suspicious' | 'caring',
   playerState: DialogueState
 ): DialogueVariation[] {
-    
+
   const moodVariations: Record<string, DialogueVariation[]> = {
     friendly: [
       { text: "It's wonderful to see you again!", weight: 3, conditions: [{ type: 'trust', key: 'trust', value: 5, operator: 'greater' }] },
       { text: "Hello there, friend!", weight: 2, conditions: [{ type: 'trust', key: 'trust', value: 3, operator: 'greater' }] },
       { text: "Good to see you!", weight: 1 }
     ],
-    
+
     neutral: [
       { text: "Hello.", weight: 2 },
       { text: "What brings you here?", weight: 1 },
       { text: "Yes?", weight: 1 }
     ],
-    
+
     hostile: [
       { text: "What do you want?", weight: 2 },
       { text: "You again...", weight: 2, conditions: [{ type: 'trust', key: 'trust', value: 0, operator: 'less' }] },
       { text: "Make it quick.", weight: 1 }
     ],
-    
+
     suspicious: [
       { text: "What are you really after?", weight: 2 },
       { text: "I don't trust your motives.", weight: 2, conditions: [{ type: 'trust', key: 'trust', value: 2, operator: 'less' }] },
       { text: "Speak your business.", weight: 1 }
     ],
-    
+
     caring: [
       { text: "Are you alright? You look troubled.", weight: 3, conditions: [{ type: 'stat', key: 'deathCount', value: 2, operator: 'greater' }] },
       { text: "I worry about you out there.", weight: 2, conditions: [{ type: 'trust', key: 'trust', value: 4, operator: 'greater' }] },
@@ -297,17 +301,17 @@ export function generateContextualGreeting(
   npc: string,
   playerState: DialogueState
 ): string {
-        
+
   // Death-aware greetings
   if (deathCount > 5) {
         return deathGreetings[deathCount % deathGreetings.length];
   }
-  
+
   // Reset-aware greetings
   if (resetCount > 3) {
         return resetGreetings[resetCount % resetGreetings.length];
   }
-  
+
   // Trust-based greetings
   if (trust > 7) {
     return "My trusted friend, welcome back!";
@@ -316,7 +320,7 @@ export function generateContextualGreeting(
   } else if (trust < -2) {
     return "You again... what now?";
   }
-  
+
   // Default greeting
   return "Hello there.";
 }
@@ -332,7 +336,7 @@ export function sanitizeDialogueInput(input: string): string {
   if (typeof input !== 'string') {
     return '';
   }
-  
+
   return input
     .trim()
     .toLowerCase()
@@ -352,26 +356,26 @@ export function calculateDialogueMood(
   npc: string,
   playerState: DialogueState
 ): 'friendly' | 'neutral' | 'hostile' | 'suspicious' | 'caring' {
-        
+
   // NPC-specific mood calculations
   switch (npc.toLowerCase()) {
     case 'polly':
       if (playerState.flags?.polly_forgiveness) return 'caring';
       if (trust < 0) return 'hostile';
       return 'suspicious';
-      
+
     case 'ayla':
       if (deathCount > 3) return 'caring';
       if (trust > 5) return 'friendly';
       return 'neutral';
-      
+
     case 'dominic':
       return trust > 3 ? 'friendly' : 'neutral';
-      
+
     case 'wendell':
       if (traits.includes('scholar')) return 'friendly';
       return 'neutral';
-      
+
     default:
       if (trust > 5) return 'friendly';
       if (trust < -2) return 'hostile';
@@ -406,21 +410,21 @@ export function buildDialogueHistory(
  */
 export function validateDialogueData(data: any): boolean {
   if (!data || typeof data !== 'object') return false;
-  
+
   // Check required properties
   if (typeof data.text !== 'string') return false;
-  
+
   // Validate conditions if present
   if (data.conditions && !Array.isArray(data.conditions)) return false;
-  
+
   // Validate effects if present
   if (data.effects && !Array.isArray(data.effects)) return false;
-  
+
   return true;
 }
 
 /**
  * Export utilities for external use
  */
-export 
+export
 export default DialogueUtils;

@@ -1,9 +1,12 @@
+import { RoomDefinition } from '../types/RoomTypes';
+
+
+
 // introZone_hiddenlab.ts — rooms/introZone_hiddenlab.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: introZone_hiddenlab
 
-import { RoomDefinition } from '../types/RoomTypes';
 
 const hiddenlab: RoomDefinition = {
   id: 'hiddenlab',

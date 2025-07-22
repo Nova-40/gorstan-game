@@ -1,3 +1,5 @@
+
+
 // Version: 6.0.0
 // (c) 2025 Geoffrey Alan Webster
 // Licensed under the MIT License
@@ -25,7 +27,7 @@ export   audio.volume = 0.5;
  * Plays ambient looping audio, respecting autoplay restrictions.
  * @param {boolean} enabled - Whether ambient audio is allowed.
  */
-export 
+export
   if (!ambientAudio) {
     ambientAudio = new Audio('/sounds/ambient.mp3');
     ambientAudio.loop = true;
@@ -49,7 +51,7 @@ export
  * Smoothly fades ambient audio in or out.
  * @param {boolean} enabled - Whether ambient should be audible.
  */
-export 
+export
   if (enabled) {
     ambientAudio.volume = 0.3;
     ambientAudio.play().catch(err => {
@@ -74,7 +76,7 @@ export
  * Plays a contextual sound effect if known.
  * @param {string} type - e.g., "trap", "vanish", "talk", "teleport".
  */
-export 
+export
     if (!src) return;
 
     audio.volume = 0.5;

@@ -1,3 +1,21 @@
+import React, { useState } from 'react';
+
+import TeleportationMenu from './TeleportationMenu';
+
+import TravelMenu from './TravelMenu';
+
+import type { Room } from '../types/Room.d.ts';
+
+import { Button } from './button';
+
+import { GameStateContext } from '../state/gameState';
+
+import { NPC } from './NPCTypes';
+
+import { Room } from './RoomTypes';
+
+
+
 // QuickActions.tsx — components/QuickActions.tsx
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
@@ -9,12 +27,6 @@
 // Gorstan elements (c) Geoff Webster
 // Code licensed under the MIT License
 
-import React, { useState } from 'react';
-import { Button } from './button';
-import { GameStateContext } from '../state/gameState';
-import TeleportationMenu from './TeleportationMenu';
-import TravelMenu from './TravelMenu';
-import type { Room } from '../types/Room.d.ts';
 
 interface QuickActionsProps {
   room: Room | undefined;
@@ -25,7 +37,7 @@ const directions = ['north', 'south', 'east', 'west', 'up', 'down', 'jump', 'sit
 const QuickActions: React.FC<QuickActionsProps> = ({ room }) => {
   const game = React.useContext(GameStateContext);
   const [showTeleportMenu, setShowTeleportMenu] = useState(false);
-  
+
   if (!game) {
     return <div className="text-red-400">Game state not available.</div>;
   }
@@ -42,42 +54,42 @@ const QuickActions: React.FC<QuickActionsProps> = ({ room }) => {
 
   const handleTravelMenuTeleport = (destinationId: string) => {
     // Clear the travel menu flag and teleport
-    dispatch({ 
-      type: 'UPDATE_GAME_STATE', 
-      payload: { 
-        flags: { 
-          ...state.flags, 
+    dispatch({
+      type: 'UPDATE_GAME_STATE',
+      payload: {
+        flags: {
+          ...state.flags,
           showTravelMenu: false,
           travelMenuTitle: undefined,
           travelMenuSubtitle: undefined,
           travelDestinations: undefined,
-        } 
-      } 
+        }
+      }
     });
     handleAction(`teleport to ${destinationId}`);
   };
 
   const closeTravelMenu = () => {
-    dispatch({ 
-      type: 'UPDATE_GAME_STATE', 
-      payload: { 
-        flags: { 
-          ...state.flags, 
+    dispatch({
+      type: 'UPDATE_GAME_STATE',
+      payload: {
+        flags: {
+          ...state.flags,
           showTravelMenu: false,
           travelMenuTitle: undefined,
           travelMenuSubtitle: undefined,
           travelDestinations: undefined,
-        } 
-      } 
+        }
+      }
     });
   };
 
   // Get available items in current room
   const roomItems = room?.items || [];
-  
+
   // Get player inventory
   const inventory = state.player.inventory || [];
-  
+
   // Get interactable NPCs in room
   const npcs = room?.npcs || [];
 
@@ -85,8 +97,21 @@ const QuickActions: React.FC<QuickActionsProps> = ({ room }) => {
     return <div className="text-gray-500">No room loaded.</div>;
   }
 
+  // Debug: Log current room info to help diagnose sit button issue
+  console.log('🪑 QuickActions Debug:', {
+    roomId: room.id,
+    currentRoomId: state.currentRoomId,
+    sittingInCrossingChair: state.flags?.sittingInCrossingChair,
+    roomIdMatches: state.currentRoomId === 'crossing',
+    sitButtonShouldShow: !state.flags?.sittingInCrossingChair && state.currentRoomId === 'crossing'
+  });
+
   return (
     <div className="space-y-4">
+      {/* DEBUG: Show current room info */}
+      <div className="text-xs text-yellow-400 bg-black p-2 rounded">
+        🔍 DEBUG: Room ID = "{state.currentRoomId}" | Sitting = {state.flags?.sittingInCrossingChair ? 'true' : 'false'}
+      </div>
       {/* Movement Actions */}
       {room.exits && Object.keys(room.exits).length > 0 && (
         <div>
@@ -199,8 +224,15 @@ const QuickActions: React.FC<QuickActionsProps> = ({ room }) => {
               Get Hint
             </Button>
           )}
-          {/* Sit Button - only shows in crossing when not already sitting */}
-          {!state.flags?.sittingInCrossingChair && (state.currentRoomId === 'crossing' || state.currentRoomId === 'introZone_crossing') && (
+          {/* Sit Button - TEMPORARILY ALWAYS VISIBLE FOR TESTING */}
+          {/* DEBUG: Show sit button logic */}
+          {console.log('🪑 Sit Button Debug:', {
+            notSitting: !state.flags?.sittingInCrossingChair,
+            currentRoomId: state.currentRoomId,
+            inCrossing: state.currentRoomId === 'crossing',
+            shouldShow: !state.flags?.sittingInCrossingChair && state.currentRoomId === 'crossing'
+          })}
+          {true && ( // TEMPORARILY ALWAYS SHOW
             <Button
               onClick={() => handleAction('sit')}
               className="text-sm text-blue-300 hover:text-blue-100"
@@ -209,7 +241,7 @@ const QuickActions: React.FC<QuickActionsProps> = ({ room }) => {
             </Button>
           )}
           {/* Chair Press Button - only shows when sitting in crossing chair */}
-          {state.flags?.sittingInCrossingChair && (state.currentRoomId === 'crossing' || state.currentRoomId === 'introZone_crossing') && (
+          {state.flags?.sittingInCrossingChair && state.currentRoomId === 'crossing' && (
             <Button
               onClick={() => handleAction('press')}
               className="text-sm text-yellow-300 hover:text-yellow-100 bg-yellow-900 hover:bg-yellow-800"
@@ -218,7 +250,7 @@ const QuickActions: React.FC<QuickActionsProps> = ({ room }) => {
             </Button>
           )}
           {/* Stand Button - only shows when sitting in crossing chair */}
-          {state.flags?.sittingInCrossingChair && (state.currentRoomId === 'crossing' || state.currentRoomId === 'introZone_crossing') && (
+          {state.flags?.sittingInCrossingChair && state.currentRoomId === 'crossing' && (
             <Button
               onClick={() => handleAction('stand')}
               className="text-sm text-gray-300 hover:text-gray-100"
@@ -227,7 +259,7 @@ const QuickActions: React.FC<QuickActionsProps> = ({ room }) => {
             </Button>
           )}
           {/* Remote Control Fast Travel */}
-          {inventory.includes('remote_control') && (state.currentRoomId === 'crossing' || state.currentRoomId === 'introZone_crossing') && (
+          {inventory.includes('remote_control') && state.currentRoomId === 'crossing' && (
             <Button
               onClick={() => setShowTeleportMenu(true)}
               className="text-sm text-purple-300 hover:text-purple-100"
@@ -236,7 +268,7 @@ const QuickActions: React.FC<QuickActionsProps> = ({ room }) => {
             </Button>
           )}
           {/* Navigation Crystal Limited Travel */}
-          {!inventory.includes('remote_control') && inventory.includes('navigation_crystal') && (state.currentRoomId === 'crossing' || state.currentRoomId === 'introZone_crossing') && (
+          {!inventory.includes('remote_control') && inventory.includes('navigation_crystal') && state.currentRoomId === 'crossing' && (
             <Button
               onClick={() => setShowTeleportMenu(true)}
               className="text-sm text-blue-300 hover:text-blue-100"
@@ -246,7 +278,7 @@ const QuickActions: React.FC<QuickActionsProps> = ({ room }) => {
           )}
         </div>
       </div>
-      
+
       {/* Teleportation Menu */}
       {state.flags?.showTravelMenu && (
         <TravelMenu
@@ -257,7 +289,7 @@ const QuickActions: React.FC<QuickActionsProps> = ({ room }) => {
           onClose={closeTravelMenu}
         />
       )}
-      
+
       {showTeleportMenu && (
         <TeleportationMenu
           onTeleport={handleTeleport}

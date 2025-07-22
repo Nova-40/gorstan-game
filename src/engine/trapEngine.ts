@@ -1,3 +1,7 @@
+import { Trap } from './GameTypes';
+
+
+
 // Version: 6.0.0
 // (c) 2025 Geoffrey Alan Webster
 // Licensed under the MIT License
@@ -5,7 +9,7 @@
 // Path: src/engine/trapEngine.ts
 
 /**
- * trapEngine.ts – Gorstan Game v6.0.0 
+ * trapEngine.ts – Gorstan Game v6.0.0
  * Handles trap seeding, activation, disarming, and diagnostics.
  * Core trap engine that works in conjunction with trapController.ts
  * MIT License © 2025 Geoff Webster
@@ -121,7 +125,7 @@ const DEFAULT_SEED_CONFIG: TrapSeedingConfig = {
  * @param config - Seeding configuration (count, probability, exclusions, etc.).
  */
 export function seedTraps(
-  roomIds: string[] = [], 
+  roomIds: string[] = [],
   config?: Partial<TrapSeedingConfig>
 ): void {
   try {
@@ -135,7 +139,7 @@ export function seedTraps(
     trapCache.clear();
 
     // Filter out excluded rooms
-    
+
     if (validRooms.length === 0) {
       console.warn("[TrapEngine] No valid rooms available for trap seeding after exclusions.");
       return;
@@ -144,9 +148,9 @@ export function seedTraps(
     // Prioritize preferred rooms
 
     // Calculate number of traps to seed
-            
+
     // Seed traps in preferred rooms first
-        
+
     let trapsSeeded = 0;
 
     // Seed preferred rooms
@@ -182,7 +186,7 @@ export function seedTraps(
  */
 function generateTrapDefinition(roomId: string, config: TrapSeedingConfig): TrapDefinition {
   try {
-            
+
     return {
       id: `trap_${roomId}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       roomId,
@@ -259,7 +263,7 @@ export function handleRoomTrap(
 
     if (debugMode) {
       trapStats.debugModeUsage++;
-      return { 
+      return {
         message: `🔧 Trap in ${roomId} triggered but harmless in debug mode.`,
         disarmed: true,
         trapType: trap.type,
@@ -277,16 +281,16 @@ export function handleRoomTrap(
     // Normalize inventory - check both 'items' and 'inventory' properties
 
     // Enhanced disarming logic with multiple methods
-        
+
     if (disarmResult.canDisarm) {
       // Mark trap as triggered (disarmed)
       trap.triggered = true;
       trapStats.totalDisarmed++;
-      
+
       // Clear cache for this room
       trapCache.delete(roomId);
-      
-      return { 
+
+      return {
         message: disarmResult.message,
         disarmed: true,
         trapType: trap.type,
@@ -298,10 +302,10 @@ export function handleRoomTrap(
     // Trap activation
     trap.triggered = true;
     trapStats.totalTriggered++;
-    
+
     // Calculate damage with player-specific modifiers
     let damage = trap.damage || 0;
-    
+
     // Apply difficulty scaling
     if (playerState.difficulty === 'easy') {
       damage = Math.ceil(damage * 0.5);
@@ -324,7 +328,7 @@ export function handleRoomTrap(
     }
 
     trapStats.damageDealt += damage;
-    
+
     // Clear cache for this room
     trapCache.delete(roomId);
 
@@ -456,11 +460,11 @@ export function handleTrapEscape(roomId: string, playerState?: PlayerState): boo
     let escapeChance = 0.6; // Base 60% chance
 
     if (playerState) {
-            
+
       if (playerTraits.includes('agile') || playerTraits.includes('quick')) {
         escapeChance += 0.2;
       }
-      
+
       if (playerTraits.includes('clumsy')) {
         escapeChance -= 0.2;
       }
@@ -476,11 +480,11 @@ export function handleTrapEscape(roomId: string, playerState?: PlayerState): boo
     if (Math.random() < escapeChance) {
       delete seededTraps[roomId]; // Successfully escape and disarm
       trapCache.delete(roomId);
-      
+
       if (debugMode) {
         console.info(`🚪 Trap in ${roomId} disarmed via quick escape.`);
       }
-      
+
       return true;
     }
 
@@ -564,7 +568,7 @@ export function maybeTriggerInquisitionTrap(
         if (typeof playerState.score === 'number') {
           playerState.score += 5;
         }
-        
+
         // Add achievement trait
         if (!playerState.traits) {
           playerState.traits = [];
@@ -600,11 +604,11 @@ export function maybeTriggerBugblatterTrap(
       appendMessage(`💥 A voice booms: "Beware the Ravenous Bugblatter Beast of Traal!"`);
 
       // Check both inventory properties for towel
-            
+
       if (hasTowel) {
         appendMessage(`🧼 You wrap your towel around your head. The beast assumes you can't see it... and wanders off confused.`);
         appendMessage(`🧠 As Douglas Adams rightly pointed out, towels are invaluable for travel.`);
-        
+
         // Safely modify traits
         if (!playerState.traits) {
           playerState.traits = [];
@@ -615,7 +619,7 @@ export function maybeTriggerBugblatterTrap(
         if (!playerState.traits.includes("hoopy_frood")) {
           playerState.traits.push("hoopy_frood");
         }
-        
+
         if (typeof playerState.score === 'number') {
           playerState.score += 3;
         }
@@ -655,7 +659,7 @@ export function handleTrapResult(
 
     if (trap.triggered) {
             dispatchMessage(
-        `${severityIcon} You spring a ${trap.severity || 'unknown'} trap! ${trap.description}`, 
+        `${severityIcon} You spring a ${trap.severity || 'unknown'} trap! ${trap.description}`,
         'error'
       );
     } else {
@@ -677,7 +681,7 @@ export function clearAllTraps(): void {
   try {
         seededTraps = {};
     trapCache.clear();
-    
+
     if (debugMode) {
       console.info(`🧹 All ${trapCount} traps cleared`);
     }
@@ -728,7 +732,7 @@ export function getTrapStatistics(): TrapEngineStats & {
   activeTrapsBySeverity: Record<string, number>;
 } {
   try {
-        
+
           acc[type] = (acc[type] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
@@ -763,7 +767,7 @@ export function resetTrapStatistics(): void {
     trapStats.damageDealt = 0;
     trapStats.debugModeUsage = 0;
     trapStats.lastSeedTime = 0;
-    
+
     console.info("[TrapEngine] Trap statistics reset");
   } catch (error) {
     console.error("[TrapEngine] Error resetting trap statistics:", error);
@@ -789,14 +793,14 @@ export function getTrapInfo(roomId: string): TrapDefinition | null {
 function getWeightedRandom(weights: Record<string, number>): string {
   try {
         if (totalWeight === 0) return Object.keys(weights)[0] || 'default';
-    
+
     let random = Math.random() * totalWeight;
-    
+
     for (const [key, weight] of Object.entries(weights)) {
       random -= weight;
       if (random <= 0) return key;
     }
-    
+
     return Object.keys(weights)[0] || 'default';
   } catch (error) {
     console.error("[TrapEngine] Error in weighted random selection:", error);
@@ -905,7 +909,7 @@ export function clearTrapCache(): void {
 /**
  * Enhanced export object for easier module usage
  */
-export 
+export
 export default TrapEngine;
 
 // Unified trap export for reuse across modules

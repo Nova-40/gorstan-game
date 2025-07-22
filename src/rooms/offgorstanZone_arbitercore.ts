@@ -1,9 +1,16 @@
+import { NPC } from './NPCTypes';
+
+import { Room } from '../types/RoomTypes';
+
+import { Room } from './RoomTypes';
+
+
+
 // offgorstanZone_arbitercore.ts — rooms/offgorstanZone_arbitercore.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: offgorstanZone_arbitercore
 
-import { Room } from '../types/RoomTypes';
 
 const arbitercore: Room = {
   id: "arbitercore",

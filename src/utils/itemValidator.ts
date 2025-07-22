@@ -1,3 +1,11 @@
+import type { Player } from '../types/GameTypes';
+
+import type { Room } from '../types/Room';
+
+import { Room } from './RoomTypes';
+
+
+
 // itemValidator.ts — utils/itemValidator.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
@@ -9,8 +17,6 @@
 // Gorstan elements (c) Geoff Webster
 // Code licensed under the MIT License
 
-import type { Room } from '../types/Room';
-import type { Player } from '../types/GameTypes';
 
 /**
  * Item validation result interface
@@ -271,7 +277,7 @@ export function runFullItemValidation(
 
   // Collect all known items from rooms
   const allKnownItems = new Set<string>();
-  
+
   // Validate each room
   for (const [roomId, room] of Object.entries(rooms)) {
     try {
@@ -317,7 +323,7 @@ export function runFullItemValidation(
   }).length;
   const totalRooms = Object.keys(rooms).length;
   const itemCoverage = roomsWithItems / totalRooms;
-  
+
   if (itemCoverage < 0.3) {
     recommendations.push('Less than 30% of rooms have items - consider adding more interactive elements');
   } else if (itemCoverage > 0.8) {

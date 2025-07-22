@@ -1,3 +1,15 @@
+import { Dispatch } from 'react';
+
+import { GameAction } from '../types/GameTypes';
+
+import { NPC } from './NPCTypes';
+
+import { Puzzle } from './GameTypes';
+
+import { updateScore } from '../state/scoreManager';
+
+
+
 // codexTracker.ts — logic/codexTracker.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
@@ -9,8 +21,6 @@
 // Gorstan elements (c) Geoff Webster
 // Code licensed under the MIT License
 
-import { GameAction } from '../types/GameTypes';
-import { Dispatch } from 'react';
 
 export interface CodexEntry {
   id: string;
@@ -28,16 +38,16 @@ export interface CodexEntry {
   tags?: string[];
 }
 
-export type ItemCategory = 
-  | 'food_drink' 
-  | 'fae_artifact' 
-  | 'memory_fragment' 
-  | 'dimensional_tool' 
-  | 'puzzle_key' 
-  | 'common_item' 
-  | 'dominic_related' 
-  | 'trap_curse' 
-  | 'document' 
+export type ItemCategory =
+  | 'food_drink'
+  | 'fae_artifact'
+  | 'memory_fragment'
+  | 'dimensional_tool'
+  | 'puzzle_key'
+  | 'common_item'
+  | 'dominic_related'
+  | 'trap_curse'
+  | 'document'
   | 'magical_scroll'
   | 'glitch_relic'
   | 'quantum_device'
@@ -60,8 +70,8 @@ export function initializeCodexTracker(dispatch: Dispatch<GameAction>): void {
  * Record item discovery in the codex
  */
 export function recordItemDiscovery(
-  itemId: string, 
-  roomId: string, 
+  itemId: string,
+  roomId: string,
   itemData?: {
     name?: string;
     category?: ItemCategory;
@@ -75,7 +85,7 @@ export function recordItemDiscovery(
 
   const existingEntry = codexEntries.get(itemId);
   const isFirstEncounter = !existingEntry;
-  
+
   if (existingEntry) {
     // Update existing entry
     existingEntry.timesFound += 1;
@@ -84,7 +94,7 @@ export function recordItemDiscovery(
     // Create new entry
     const category = itemData?.category || categorizeItem(itemId);
     const significance = itemData?.significance || assessSignificance(itemId);
-    
+
     const newEntry: CodexEntry = {
       id: itemId,
       name: itemData?.name || formatItemName(itemId),
@@ -136,61 +146,61 @@ export function recordItemDiscovery(
  */
 function categorizeItem(itemId: string): ItemCategory {
   const lowerItem = itemId.toLowerCase();
-  
+
   // Food and drink
   if (lowerItem.includes('coffee') || lowerItem.includes('burger') || lowerItem.includes('napkin') || lowerItem.includes('menu')) {
     return 'food_drink';
   }
-  
+
   // Fae items
-  if (lowerItem.includes('fae') || lowerItem.includes('silver') || lowerItem.includes('ancient') || 
+  if (lowerItem.includes('fae') || lowerItem.includes('silver') || lowerItem.includes('ancient') ||
       lowerItem.includes('butterfly') || lowerItem.includes('ivy') || lowerItem.includes('flower')) {
     return 'fae_artifact';
   }
-  
+
   // Memory items
   if (lowerItem.includes('memory') || lowerItem.includes('photo') || lowerItem.includes('fragmented')) {
     return 'memory_fragment';
   }
-  
+
     // Dimensional and travel tools
   if (itemId.includes('remote') || itemId.includes('control') || itemId.includes('teleport')) {
     return 'dimensional_tool';
   }
-  if (lowerItem.includes('dimensional') || lowerItem.includes('portal') || lowerItem.includes('reality') || 
+  if (lowerItem.includes('dimensional') || lowerItem.includes('portal') || lowerItem.includes('reality') ||
       lowerItem.includes('quantum') || lowerItem.includes('multiverse')) {
     return 'dimensional_tool';
   }
-  
+
   // Dominic related
-  if (lowerItem.includes('dominic') || lowerItem.includes('goldfish') || lowerItem.includes('fish') || 
+  if (lowerItem.includes('dominic') || lowerItem.includes('goldfish') || lowerItem.includes('fish') ||
       lowerItem.includes('anchor') || lowerItem.includes('null_pointer')) {
     return 'dominic_related';
   }
-  
+
   // Puzzle keys
-  if (lowerItem.includes('key') || lowerItem.includes('combination') || lowerItem.includes('badge') || 
+  if (lowerItem.includes('key') || lowerItem.includes('combination') || lowerItem.includes('badge') ||
       lowerItem.includes('override')) {
     return 'puzzle_key';
   }
-  
+
   // Glitch items
-  if (lowerItem.includes('glitch') || lowerItem.includes('code') || lowerItem.includes('unstable') || 
+  if (lowerItem.includes('glitch') || lowerItem.includes('code') || lowerItem.includes('unstable') ||
       lowerItem.includes('corrupt')) {
     return 'glitch_relic';
   }
-  
+
   // Temporal items
   if (lowerItem.includes('temporal') || lowerItem.includes('time') || lowerItem.includes('chronos')) {
     return 'temporal_artifact';
   }
-  
+
   // Documents and scrolls
-  if (lowerItem.includes('scroll') || lowerItem.includes('document') || lowerItem.includes('plans') || 
+  if (lowerItem.includes('scroll') || lowerItem.includes('document') || lowerItem.includes('plans') ||
       lowerItem.includes('newspaper') || lowerItem.includes('receipt') || lowerItem.includes('card')) {
     return 'document';
   }
-  
+
   return 'common_item';
 }
 
@@ -199,31 +209,31 @@ function categorizeItem(itemId: string): ItemCategory {
  */
 function assessSignificance(itemId: string): CodexEntry['significance'] {
   const lowerItem = itemId.toLowerCase();
-  
+
   // Legendary items
-  if (lowerItem.includes('reality_anchor') || lowerItem.includes('multiverse') || 
+  if (lowerItem.includes('reality_anchor') || lowerItem.includes('multiverse') ||
       lowerItem.includes('architect') || lowerItem.includes('genesis')) {
     return 'legendary';
   }
-  
+
   // Mysterious items
-  if (lowerItem.includes('null_pointer') || lowerItem.includes('unstable') || 
+  if (lowerItem.includes('null_pointer') || lowerItem.includes('unstable') ||
       lowerItem.includes('forbidden') || lowerItem.includes('cursed')) {
     return 'mysterious';
   }
-  
+
   // Rare items
-  if (lowerItem.includes('dimensional') || lowerItem.includes('quantum') || 
+  if (lowerItem.includes('dimensional') || lowerItem.includes('quantum') ||
       lowerItem.includes('temporal') || lowerItem.includes('fae_')) {
     return 'rare';
   }
-  
+
   // Useful items
-  if (lowerItem.includes('key') || lowerItem.includes('tool') || lowerItem.includes('device') || 
+  if (lowerItem.includes('key') || lowerItem.includes('tool') || lowerItem.includes('device') ||
       lowerItem.includes('compass') || lowerItem.includes('scanner')) {
     return 'useful';
   }
-  
+
   return 'mundane';
 }
 
@@ -277,22 +287,22 @@ export function getCodexStats(): {
   recentDiscoveries: CodexEntry[];
 } {
   const entries = Array.from(codexEntries.values());
-  
+
   const categoryCounts = entries.reduce((acc, entry) => {
     acc[entry.category] = (acc[entry.category] || 0) + 1;
     return acc;
   }, {} as Record<ItemCategory, number>);
-  
+
   const significanceCounts = entries.reduce((acc, entry) => {
     const sig = entry.significance || 'mundane';
     acc[sig] = (acc[sig] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
-  
+
   const recentDiscoveries = entries
     .sort((a, b) => b.discoveredAt - a.discoveredAt)
     .slice(0, 5);
-  
+
   return {
     totalEntries: entries.length,
     categoryCounts,
@@ -310,9 +320,9 @@ export function updateCodexEntry(
 ): void {
   const entry = codexEntries.get(itemId);
   if (!entry) return;
-  
+
   Object.assign(entry, updates);
-  
+
   if (globalDispatch) {
     globalDispatch({
       type: 'UPDATE_CODEX_ENTRY',
@@ -331,7 +341,7 @@ export function updateCodexEntry(
 export function linkItemToQuest(itemId: string, questId: string): void {
   const entry = codexEntries.get(itemId);
   if (!entry) return;
-  
+
   if (!entry.relatedQuests!.includes(questId)) {
     entry.relatedQuests!.push(questId);
   }
@@ -343,7 +353,7 @@ export function linkItemToQuest(itemId: string, questId: string): void {
 export function linkItemToNPC(itemId: string, npcId: string): void {
   const entry = codexEntries.get(itemId);
   if (!entry) return;
-  
+
   if (!entry.relatedNPCs!.includes(npcId)) {
     entry.relatedNPCs!.push(npcId);
   }
@@ -354,19 +364,19 @@ export function linkItemToNPC(itemId: string, npcId: string): void {
  */
 export function displayCodex(filter?: { category?: ItemCategory; significance?: string }): void {
   if (!globalDispatch) return;
-  
+
   let entries = Array.from(codexEntries.values());
-  
+
   if (filter?.category) {
     entries = entries.filter(entry => entry.category === filter.category);
   }
-  
+
   if (filter?.significance) {
     entries = entries.filter(entry => entry.significance === filter.significance);
   }
-  
+
   const stats = getCodexStats();
-  
+
   // Display header
   globalDispatch({
     type: 'ADD_MESSAGE',
@@ -377,14 +387,14 @@ export function displayCodex(filter?: { category?: ItemCategory; significance?: 
       timestamp: Date.now(),
     }
   });
-  
+
   // Group by category
   const byCategory = entries.reduce((acc, entry) => {
     if (!acc[entry.category]) acc[entry.category] = [];
     acc[entry.category].push(entry);
     return acc;
   }, {} as Record<ItemCategory, CodexEntry[]>);
-  
+
   // Display entries
   Object.entries(byCategory).forEach(([category, categoryEntries]) => {
     globalDispatch!({
@@ -396,11 +406,11 @@ export function displayCodex(filter?: { category?: ItemCategory; significance?: 
         timestamp: Date.now(),
       }
     });
-    
+
     categoryEntries.forEach(entry => {
       const significance = entry.significance === 'mundane' ? '' : ` (${entry.significance})`;
       const timesSeen = entry.timesFound > 1 ? ` [x${entry.timesFound}]` : '';
-      
+
       globalDispatch!({
         type: 'ADD_MESSAGE',
         payload: {
@@ -410,7 +420,7 @@ export function displayCodex(filter?: { category?: ItemCategory; significance?: 
           timestamp: Date.now(),
         }
       });
-      
+
       if (entry.loreDescription) {
         globalDispatch!({
           type: 'ADD_MESSAGE',
@@ -429,25 +439,27 @@ export function displayCodex(filter?: { category?: ItemCategory; significance?: 
 /**
  * Record miniquest completion
  */
+
 export function recordMiniquestCompletion(
   questId: string,
-  questTitle: string, 
-  roomId: string
+  questTitle: string,
+  roomId: string,
+  points: number = 25 // Default to 25, can override for major/rare
 ): void {
   const entry: CodexEntry = {
     id: `miniquest_${questId}`,
     name: questTitle,
-    category: 'common_item', // Using existing category
+    category: 'common_item',
     description: `Completed miniquest: ${questTitle}`,
     loreDescription: `You successfully completed this optional challenge in ${roomId}.`,
-    significance: 'useful', // Using valid significance level
+    significance: 'useful',
     firstEncounter: true,
     timesFound: 1,
     discoveredIn: roomId,
     discoveredAt: Date.now(),
     tags: ['miniquest', 'completed', roomId]
   };
-  
   codexEntries.set(`miniquest_${questId}`, entry);
-  console.log(`📖 Codex: Recorded miniquest completion - ${questTitle}`);
+  updateScore(points);
+  console.log(`📖 Codex: Recorded miniquest completion - ${questTitle} (+${points} points)`);
 }

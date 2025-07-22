@@ -1,9 +1,14 @@
+import { Room } from '../types/RoomTypes';
+
+import { Room } from './RoomTypes';
+
+
+
 // gorstanZone_torridon.ts — rooms/gorstanZone_torridon.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: gorstanZone_torridon
 
-import { Room } from '../types/RoomTypes';
 
 const torridon: Room = {
   id: "torridon",

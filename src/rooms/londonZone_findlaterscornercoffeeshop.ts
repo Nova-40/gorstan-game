@@ -1,9 +1,12 @@
+import { RoomDefinition } from '../types/RoomTypes';
+
+
+
 // londonZone_findlaterscornercoffeeshop.ts — rooms/londonZone_findlaterscornercoffeeshop.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: londonZone_findlaterscornercoffeeshop
 
-import { RoomDefinition } from '../types/RoomTypes';
 
 const findlaterscornercoffeeshop: RoomDefinition = {
   id: 'findlaterscornercoffeeshop',

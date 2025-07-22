@@ -1,3 +1,7 @@
+import { NPC } from './NPCTypes';
+
+
+
 // Version: 6.0.0
 // (c) 2025 Geoffrey Alan Webster
 // Licensed under the MIT License
@@ -111,7 +115,7 @@ const npcDialogues: Record<string, NPCDialogueSet> = {
         priority: 5
       }
     ],
-    
+
     general: [
       {
         id: 'ayla_trust_high',
@@ -144,7 +148,7 @@ const npcDialogues: Record<string, NPCDialogueSet> = {
         priority: 7
       }
     ],
-    
+
     quest: [
       {
         id: 'ayla_constitution_quest',
@@ -159,7 +163,7 @@ const npcDialogues: Record<string, NPCDialogueSet> = {
         priority: 9
       }
     ],
-    
+
     special: [
       {
         id: 'ayla_multiple_deaths',
@@ -174,7 +178,7 @@ const npcDialogues: Record<string, NPCDialogueSet> = {
         priority: 8
       }
     ],
-    
+
     farewell: [
       {
         id: 'ayla_standard_farewell',
@@ -208,7 +212,7 @@ const npcDialogues: Record<string, NPCDialogueSet> = {
         priority: 9
       }
     ],
-    
+
     general: [
       {
         id: 'polly_dominic_pain',
@@ -229,7 +233,7 @@ const npcDialogues: Record<string, NPCDialogueSet> = {
         priority: 7
       }
     ],
-    
+
     quest: [
       {
         id: 'polly_redemption_arc',
@@ -244,7 +248,7 @@ const npcDialogues: Record<string, NPCDialogueSet> = {
         priority: 8
       }
     ],
-    
+
     special: [
       {
         id: 'polly_respect_earned',
@@ -256,7 +260,7 @@ const npcDialogues: Record<string, NPCDialogueSet> = {
         priority: 9
       }
     ],
-    
+
     farewell: [
       {
         id: 'polly_bitter_farewell',
@@ -281,7 +285,7 @@ const npcDialogues: Record<string, NPCDialogueSet> = {
         priority: 8
       }
     ],
-    
+
     general: [
       {
         id: 'dominic_memory_burden',
@@ -295,7 +299,7 @@ const npcDialogues: Record<string, NPCDialogueSet> = {
         priority: 8
       }
     ],
-    
+
     quest: [],
     special: [],
     farewell: [
@@ -316,7 +320,7 @@ const npcDialogues: Record<string, NPCDialogueSet> = {
         priority: 10
       }
     ],
-    
+
     general: [
       {
         id: 'wendell_scholarly_respect',
@@ -330,7 +334,7 @@ const npcDialogues: Record<string, NPCDialogueSet> = {
         priority: 6
       }
     ],
-    
+
     quest: [
       {
         id: 'wendell_scroll_requirements',
@@ -339,7 +343,7 @@ const npcDialogues: Record<string, NPCDialogueSet> = {
         priority: 9
       }
     ],
-    
+
     special: [],
     farewell: [
       {
@@ -356,32 +360,32 @@ const npcDialogues: Record<string, NPCDialogueSet> = {
  */
 export function getDialogue(npc: string, state: DialogueState): string {
   try {
-            
+
     if (!dialogueSet) {
       return handleUnknownNPC(npc, state);
     }
 
     // Try to find appropriate dialogue in order of priority
-        
+
     for (const context of contexts) {
             if (dialogue) {
         // Mark as used if it's a one-time dialogue
         if (dialogue.oneTime) {
           markDialogueAsUsed(npc, dialogue.id, state);
         }
-        
+
         // Apply any effects
         if (dialogue.responses && dialogue.responses.length === 1) {
           applyDialogueEffects(dialogue.responses[0].effects || [], state);
         }
-        
+
         return dialogue.text;
       }
     }
 
     // Fallback to basic dialogue
     return getFallbackDialogue(npcKey, state);
-    
+
   } catch (error) {
     console.error('[DialogueEngine] Error generating dialogue:', error);
     return `${npc} seems lost in thought.`;
@@ -396,9 +400,9 @@ function findMatchingDialogue(
   state: DialogueState
 ): DialogueNode | null {
   // Filter by conditions first
-    
+
   if (validDialogues.length === 0) return null;
-  
+
   // Sort by priority (higher first) and return the best match
   validDialogues.sort((a, b) => (b.priority || 0) - (a.priority || 0));
   return validDialogues[0];
@@ -412,35 +416,35 @@ function checkDialogueConditions(
   state: DialogueState
 ): boolean {
   return conditions.every(condition => {
-        
+
     switch (condition.type) {
       case 'flag':
         return state.flags?.[condition.key] === condition.value;
-      
+
       case 'trait':
                 if (condition.operator === 'contains') {
           return traits.includes(condition.value);
         }
         return traits === condition.value;
-      
+
       case 'item':
                 if (condition.operator === 'contains') {
           return inventory.includes(condition.value);
         }
         return inventory === condition.value;
-      
+
       case 'trust':
                 return compareValues(trust, condition.value, condition.operator || 'equals');
-      
+
       case 'stat':
                 return compareValues(statValue, condition.value, condition.operator || 'equals');
-      
+
       case 'room':
         return state.currentRoom === condition.value;
-      
+
       case 'quest':
         return state.questState === condition.value;
-      
+
       default:
         return true;
     }
@@ -478,7 +482,7 @@ function applyDialogueEffects(effects: DialogueEffect[], state: DialogueState): 
         if (!state.flags) state.flags = {};
         state.flags[effect.key] = effect.value;
         break;
-      
+
       case 'trait':
         if (!state.traits) state.traits = [];
         if (effect.operation === 'add' && !state.traits.includes(effect.value)) {
@@ -487,7 +491,7 @@ function applyDialogueEffects(effects: DialogueEffect[], state: DialogueState): 
           state.traits = state.traits.filter(trait => trait !== effect.value);
         }
         break;
-      
+
       case 'trust':
                 if (effect.operation === 'increment') {
           state.trust = currentTrust + (effect.value as number);
@@ -505,9 +509,9 @@ function applyDialogueEffects(effects: DialogueEffect[], state: DialogueState): 
 function markDialogueAsUsed(npc: string, dialogueId: string, state: DialogueState): void {
   if (!state.flags) state.flags = {};
   if (!state.flags.usedDialogues) state.flags.usedDialogues = {};
-  
+
     if (!usedDialogues[npc]) usedDialogues[npc] = [];
-  
+
   if (!usedDialogues[npc].includes(dialogueId)) {
     usedDialogues[npc].push(dialogueId);
   }
@@ -517,7 +521,7 @@ function markDialogueAsUsed(npc: string, dialogueId: string, state: DialogueStat
  * Handle unknown NPCs
  */
 function handleUnknownNPC(npc: string, state: DialogueState): string {
-    
+
     return unknownResponses[responseIndex];
 }
 
@@ -547,7 +551,7 @@ function getFallbackDialogue(npc: string, state: DialogueState): string {
       'Academic pursuit is its own reward.'
     ]
   };
-  
+
       return responses[responseIndex];
 }
 
@@ -558,11 +562,11 @@ export function getDialogueOptions(
   npc: string,
   state: DialogueState
 ): DialogueOption[] {
-      
+
   if (!dialogueSet) return [];
-  
+
   // Find current dialogue node
-    
+
   for (const context of contexts) {
         if (dialogue?.responses) {
       return dialogue.responses.filter(option =>
@@ -570,7 +574,7 @@ export function getDialogueOptions(
       );
     }
   }
-  
+
   return [];
 }
 
@@ -582,17 +586,17 @@ export function processDialogueChoice(
   choiceIndex: number,
   state: DialogueState
 ): { response: string; effects: DialogueEffect[] } {
-      
+
   if (!choice) {
     return {
       response: `${npc} doesn't understand your choice.`,
       effects: []
     };
   }
-  
+
   // Apply effects
     applyDialogueEffects(effects, state);
-  
+
   return {
     response: choice.text,
     effects
@@ -607,7 +611,7 @@ export function addDialogue(
   context: keyof NPCDialogueSet,
   dialogue: DialogueNode
 ): boolean {
-    
+
   if (!npcDialogues[npcKey]) {
     npcDialogues[npcKey] = {
       greeting: [],
@@ -617,7 +621,7 @@ export function addDialogue(
       farewell: []
     };
   }
-  
+
   npcDialogues[npcKey][context].push(dialogue);
   return true;
 }
@@ -632,7 +636,7 @@ export function validateDialogueState(state: any): state is DialogueState {
 /**
  * Export utilities for external use
  */
-export 
+export
 export default DialogueEngine;
 
 // Exported as a named export for use in NPC interaction logic

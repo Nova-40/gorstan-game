@@ -1,3 +1,7 @@
+import React, { useEffect } from 'react';
+
+
+
 // SplashScreen.tsx — components/SplashScreen.tsx
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
@@ -7,7 +11,6 @@
 // Gorstan (C) Geoff Webster 2025
 // Code MIT Licence
 
-import React, { useEffect } from 'react';
 
 type SplashScreenProps = {
   onComplete: () => void;
@@ -36,7 +39,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
       {/* Neon terminal styling */}
       <div className="text-center font-mono">
         {/* Main title */}
-        <h1 
+        <h1
           className="text-6xl md:text-8xl font-bold mb-4 animate-pulse"
           style={{
             color: '#00ff00',
@@ -52,9 +55,9 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
         >
           GORSTAN
         </h1>
-        
+
         {/* Subtitle */}
-        <p 
+        <p
           className="text-2xl md:text-3xl font-light tracking-wide"
           style={{
             color: '#00ffff',
@@ -67,9 +70,9 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
         >
           The Game vBeta 1.0
         </p>
-        
+
         {/* Optional scanning line effect */}
-        <div 
+        <div
           className="absolute inset-0 pointer-events-none opacity-30"
           style={{
             background: `linear-gradient(
@@ -81,7 +84,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
           }}
         />
       </div>
-      
+
       {/* Global CSS for the scanning animation */}
       <style dangerouslySetInnerHTML={{
         __html: `

@@ -1,9 +1,12 @@
+import { appendToConsole } from '../ui/consoleUtils';
+
+
+
 
 // askAylaEngine.ts
 // AskAyla v1.0 - contextual AI-style hint system
 // (c) 2025 Geoffrey Alan Webster. MIT License
 
-import { appendToConsole } from '../ui/consoleUtils';
 
 const aylaMemory: string[] = [];
 

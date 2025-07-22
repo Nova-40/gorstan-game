@@ -1,9 +1,14 @@
+import { Puzzle } from './GameTypes';
+
+import { RoomDefinition } from '../types/RoomTypes';
+
+
+
 // newyorkZone_manhattanhub.ts — rooms/newyorkZone_manhattanhub.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: newyorkZone_manhattanhub
 
-import { RoomDefinition } from '../types/RoomTypes';
 
 const manhattanhub: RoomDefinition = {
   id: 'manhattanhub',

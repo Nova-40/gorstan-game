@@ -1,14 +1,29 @@
+import { FlagRegistry } from '../state/flagRegistry';
+
+import { NPC } from './NPCTypes';
+
+import { npc, debug } from '../state/flagRegistry';
+
+import { Room } from './RoomTypes';
+
+import { useEffect } from 'react';
+
+import { useFlags } from './useFlags';
+
+import { useGameState } from '../state/gameState';
+
+import { useModuleLoader } from './useModuleLoader';
+
+import { useTimers } from './useTimers';
+
+
+
 // Version: 6.1.0
 // (c) 2025 Geoffrey Alan Webster
 // Licensed under the MIT License
 // Module: useNPCController.ts
 // Description: Unified NPC management hook for Gorstan game
 
-import { useEffect } from 'react';
-import { useFlags } from './useFlags';
-import { useModuleLoader } from './useModuleLoader';
-import { useTimers } from './useTimers';
-import { useGameState } from '../state/gameState';
 
 /**
  * Unified NPC controller hook that handles all NPC-related operations
@@ -19,40 +34,42 @@ export const useNPCController = () => {
   const { hasFlag, clearFlag, setFlag } = useFlags();
   const { loadModule } = useModuleLoader();
   const { setTimer } = useTimers();
-  
+
   const room = state.roomMap?.[state.currentRoomId] || null;
 
   // Handle wandering NPCs when entering rooms
   useEffect(() => {
-    if (room && hasFlag('evaluateWanderingNPCs')) {
-      clearFlag('evaluateWanderingNPCs');
-      
+    if (room && hasFlag(npc.evaluateWanderingNPCs)) {
+    if (room && hasFlag(FlagRegistry.npc.evaluateWanderingNPCs || 'evaluateWanderingNPCs')) {
+      clearFlag(FlagRegistry.npc.evaluateWanderingNPCs || 'evaluateWanderingNPCs');
+
       loadModule('../engine/wanderingNPCController').then((module) => {
         if (module?.handleRoomEntryForWanderingNPCs) {
           module.handleRoomEntryForWanderingNPCs(room, state, dispatch);
         }
       });
     }
-  }, [room, hasFlag('evaluateWanderingNPCs'), state, dispatch, clearFlag, loadModule]);
+  }, [room, hasFlag(npc.evaluateWanderingNPCs), state, dispatch, clearFlag, loadModule]);
 
   // Handle debug NPC spawning
   useEffect(() => {
-    const debugSpawnNPC = hasFlag('debugSpawnNPC');
-    const debugSpawnRoom = hasFlag('debugSpawnRoom');
-    
+    const debugSpawnNPC = hasFlag(debug.debugSpawnNPC);
+    const debugSpawnNPC = hasFlag(FlagRegistry.debug.debugSpawnNPC || 'debugSpawnNPC');
+    const debugSpawnRoom = hasFlag(FlagRegistry.debug.debugSpawnRoom || 'debugSpawnRoom');
+
     if (debugSpawnNPC && debugSpawnRoom) {
       loadModule('../engine/wanderingNPCController').then((module) => {
         if (module?.debugSpawnWanderingNPC) {
           const success = module.debugSpawnWanderingNPC(
-            debugSpawnNPC, 
-            debugSpawnRoom, 
+            debugSpawnNPC,
+            debugSpawnRoom,
             dispatch
           );
-          
-          dispatch({ 
-            type: 'ADD_MESSAGE', 
+
+          dispatch({
+            type: 'ADD_MESSAGE',
             payload: {
-              text: success 
+              text: success
                 ? `DEBUG: Spawned NPC '${debugSpawnNPC}' successfully.`
                 : `DEBUG: Failed to spawn NPC '${debugSpawnNPC}'.`,
               type: success ? 'system' : 'error',
@@ -61,29 +78,32 @@ export const useNPCController = () => {
           });
         }
       });
-      
-      clearFlag('debugSpawnNPC');
-      clearFlag('debugSpawnRoom');
+
+      clearFlag(debug.debugSpawnNPC);
+      clearFlag(FlagRegistry.debug.debugSpawnNPC || 'debugSpawnNPC');
+      clearFlag(FlagRegistry.debug.debugSpawnRoom || 'debugSpawnRoom');
     }
-  }, [hasFlag('debugSpawnNPC'), hasFlag('debugSpawnRoom'), dispatch, clearFlag, loadModule]);
+  }, [hasFlag(debug.debugSpawnNPC), hasFlag('debugSpawnRoom'), dispatch, clearFlag, loadModule]);
 
   // Handle debug NPC listing
   useEffect(() => {
-    if (hasFlag('debugListNPCs')) {
+    if (hasFlag(debug.debugListNPCs)) {
       loadModule('../engine/wanderingNPCController').then((module) => {
         if (module?.debugListActiveWanderingNPCs) {
           module.debugListActiveWanderingNPCs();
         }
       });
-      
-      clearFlag('debugListNPCs');
+
+    if (hasFlag(FlagRegistry.debug.debugListNPCs || 'debugListNPCs')) {
+      clearFlag(FlagRegistry.debug.debugListNPCs || 'debugListNPCs');
     }
-  }, [hasFlag('debugListNPCs'), clearFlag, loadModule]);
+  }, [hasFlag(debug.debugListNPCs), clearFlag, loadModule]);
 
   // Handle pending Mr. Wendell commands
   useEffect(() => {
-    const pendingCommand = hasFlag('pendingWendellCommand');
-    
+    const pendingCommand = hasFlag(npc.pendingWendellCommand);
+    const pendingCommand = hasFlag(FlagRegistry.system.pendingWendellCommand || 'pendingWendellCommand');
+
     if (pendingCommand) {
       loadModule('../engine/mrWendellController').then((module) => {
         if (module?.handleWendellInteraction) {
@@ -101,15 +121,17 @@ export const useNPCController = () => {
           }
         }
       });
-      
-      clearFlag('pendingWendellCommand');
+
+      clearFlag(npc.pendingWendellCommand);
+      clearFlag(FlagRegistry.system.pendingWendellCommand || 'pendingWendellCommand');
     }
-  }, [hasFlag('pendingWendellCommand'), state, dispatch, clearFlag, loadModule]);
+  }, [hasFlag(npc.pendingWendellCommand), state, dispatch, clearFlag, loadModule]);
 
   // Handle pending Librarian commands
   useEffect(() => {
-    const pendingCommand = hasFlag('pendingLibrarianCommand');
-    
+    const pendingCommand = hasFlag(npc.pendingLibrarianCommand);
+    const pendingCommand = hasFlag(FlagRegistry.system.pendingLibrarianCommand || 'pendingLibrarianCommand');
+
     if (pendingCommand) {
       loadModule('../engine/librarianController').then((module) => {
         if (module?.handleLibrarianInteraction) {
@@ -127,25 +149,26 @@ export const useNPCController = () => {
           }
         }
       });
-      
-      clearFlag('pendingLibrarianCommand');
+
+      clearFlag(npc.pendingLibrarianCommand);
+      clearFlag(FlagRegistry.system.pendingLibrarianCommand || 'pendingLibrarianCommand');
     }
-  }, [hasFlag('pendingLibrarianCommand'), state, dispatch, clearFlag, loadModule]);
+  }, [hasFlag(npc.pendingLibrarianCommand), state, dispatch, clearFlag, loadModule]);
 
   // Handle force Mr. Wendell spawn
   useEffect(() => {
-    if (hasFlag('forceWendellSpawn') && room) {
+    if (hasFlag(npc.forceWendellSpawn) && room) {
       loadModule('../engine/mrWendellController').then((module) => {
         // Force spawn by setting triggers
         setFlag('wasRudeToNPC', true);
-        
+
         // Load wandering NPC controller for room evaluation
         loadModule('../engine/wanderingNPCController').then((wanderingModule) => {
           if (wanderingModule?.handleRoomEntryForWanderingNPCs) {
             wanderingModule.handleRoomEntryForWanderingNPCs(room, state, dispatch);
           }
         });
-        
+
         dispatch({
           type: 'ADD_MESSAGE',
           payload: {
@@ -156,48 +179,48 @@ export const useNPCController = () => {
           }
         });
       });
-      
-      clearFlag('forceWendellSpawn');
+
+      clearFlag(npc.forceWendellSpawn);
     }
-  }, [hasFlag('forceWendellSpawn'), room, state, dispatch, clearFlag, setFlag, loadModule]);
+  }, [hasFlag(npc.forceWendellSpawn), room, state, dispatch, clearFlag, setFlag, loadModule]);
 
   // Handle Mr. Wendell status check
   useEffect(() => {
-    if (hasFlag('checkWendellStatus')) {
+    if (hasFlag(npc.checkWendellStatus)) {
       loadModule('../engine/mrWendellController').then((module) => {
         if (module?.isWendellActive && module?.getWendellRoom) {
           console.log('[DEBUG] Mr. Wendell Status:');
           console.log('- Active:', module.isWendellActive());
           console.log('- Current Room:', module.getWendellRoom());
           console.log('- Player Flags:', {
-            wasRudeToNPC: hasFlag('wasRudeToNPC'),
-            wasRudeRecently: hasFlag('wasRudeRecently'),
-            wendellSpared: hasFlag('wendellSpared')
+            wasRudeToNPC: hasFlag(npc.wasRudeToNPC),
+            wasRudeRecently: hasFlag(npc.wasRudeRecently),
+            wendellSpared: hasFlag(npc.wendellSpared)
           });
-          console.log('- Cursed Items:', state.player.inventory.filter((item: any) => 
+          console.log('- Cursed Items:', state.player.inventory.filter((item: any) =>
             ['cursedcoin', 'doomedscroll', 'cursed_artifact'].includes(item.toLowerCase())
           ));
         }
       });
-      
-      clearFlag('checkWendellStatus');
+
+      clearFlag(npc.checkWendellStatus);
     }
-  }, [hasFlag('checkWendellStatus'), state, clearFlag, hasFlag, loadModule]);
+  }, [hasFlag(npc.checkWendellStatus), state, clearFlag, hasFlag, loadModule]);
 
   // Handle force Librarian spawn
   useEffect(() => {
-    if (hasFlag('forceLibrarianSpawn') && room) {
+    if (hasFlag(npc.forceLibrarianSpawn) && room) {
       loadModule('../engine/librarianController').then((module) => {
         // Set up librarian spawn conditions
         setFlag('needsLibrarianHelp', true);
-        
+
         // Load wandering NPC controller for room evaluation
         loadModule('../engine/wanderingNPCController').then((wanderingModule) => {
           if (wanderingModule?.handleRoomEntryForWanderingNPCs) {
             wanderingModule.handleRoomEntryForWanderingNPCs(room, state, dispatch);
           }
         });
-        
+
         dispatch({
           type: 'ADD_MESSAGE',
           payload: {
@@ -208,10 +231,10 @@ export const useNPCController = () => {
           }
         });
       });
-      
-      clearFlag('forceLibrarianSpawn');
+
+      clearFlag(npc.forceLibrarianSpawn);
     }
-  }, [hasFlag('forceLibrarianSpawn'), room, state, dispatch, clearFlag, setFlag, loadModule]);
+  }, [hasFlag(npc.forceLibrarianSpawn), room, state, dispatch, clearFlag, setFlag, loadModule]);
 
   return {
     // Expose useful methods for external use if needed

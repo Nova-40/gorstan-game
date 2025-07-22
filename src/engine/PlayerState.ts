@@ -1,3 +1,7 @@
+import { NPC } from './NPCTypes';
+
+
+
 // Version: 6.1.0
 // (c) 2025 Geoffrey Alan Webster
 // Licensed under the MIT License
@@ -46,23 +50,23 @@ export interface GameState extends PlayerState {
   currentRoom: string;
   inventory: string[];
   flags: Record<string, boolean | string | number>;
-  
+
   // Game session tracking
   visitedRooms: string[];
   commandHistory: string[];
   gameLog: string[];
-  
+
   // Game flow control
   isTransitioning?: boolean;
   targetRoom?: string;
   lastCommand?: string;
-  
+
   // Enhanced state tracking
   health: number;
   score: number;
   level: number;
   resetCount: number;
-  
+
   // Session management
   sessionStart: number;
   totalPlayTime: number;
@@ -99,19 +103,19 @@ export const initialGameState: GameState = {
   currentRoom: 'controlnexus', // Default starting room for Gorstan
   inventory: [],
   flags: {},
-  
+
   // Game tracking
   visitedRooms: [],
   commandHistory: [],
   gameLog: [],
-  
+
   // Player stats
   name: 'Player',
   health: 100,
   score: 0,
   level: 1,
   resetCount: 0,
-  
+
   // Progression tracking
   traits: [],
   quest: '',
@@ -121,12 +125,12 @@ export const initialGameState: GameState = {
   dialogueFlags: {},
   conversationHistory: {},
   reputation: {},
-  
+
   // Session timing
   sessionStart: Date.now(),
   totalPlayTime: 0,
   lastSave: Date.now(),
-  
+
   // Game flow
   isTransitioning: false,
   targetRoom: undefined,
@@ -175,8 +179,8 @@ export function gameStateReducer(state: GameState, action: GameAction): GameStat
           ...state,
           currentRoom: action.payload,
           // Add to visited rooms if not already present
-          visitedRooms: state.visitedRooms.includes(action.payload) 
-            ? state.visitedRooms 
+          visitedRooms: state.visitedRooms.includes(action.payload)
+            ? state.visitedRooms
             : [...state.visitedRooms, action.payload],
           isTransitioning: false, // Clear transitioning state
           targetRoom: undefined,
@@ -191,7 +195,7 @@ export function gameStateReducer(state: GameState, action: GameAction): GameStat
         return {
           ...state,
           inventory: [...state.inventory, action.payload],
-          itemsCollected: state.itemsCollected 
+          itemsCollected: state.itemsCollected
             ? [...new Set([...state.itemsCollected, action.payload])]
             : [action.payload],
           lastSave: Date.now()
@@ -330,8 +334,8 @@ export function hasFlag(state: GameState, flagKey: string): boolean {
  * Get flag value with type safety
  */
 export function getFlagValue<T = boolean | string | number>(
-  state: GameState, 
-  flagKey: string, 
+  state: GameState,
+  flagKey: string,
   defaultValue?: T
 ): T {
     return value !== undefined ? (value as T) : (defaultValue as T);
@@ -369,12 +373,12 @@ export function validateGameState(state: Partial<GameState>): boolean {
     if (!Array.isArray(state.inventory)) return false;
     if (typeof state.flags !== 'object' || state.flags === null) return false;
     if (!Array.isArray(state.visitedRooms)) return false;
-    
+
     // Check numeric values
     if (typeof state.health !== 'number' || state.health < 0 || state.health > 100) return false;
     if (typeof state.score !== 'number' || state.score < 0) return false;
     if (typeof state.level !== 'number' || state.level < 1) return false;
-    
+
     return true;
   } catch (error) {
     console.error('[PlayerState] Error validating game state:', error);
@@ -393,7 +397,7 @@ export function prepareSaveState(state: GameState): Partial<GameState> {
     sessionStart,
     ...saveableState
   } = state;
-  
+
   return {
     ...saveableState,
     totalPlayTime: (state.totalPlayTime || 0) + calculateSessionTime(state)
@@ -404,7 +408,7 @@ export function prepareSaveState(state: GameState): Partial<GameState> {
  * Merge loaded state with current state safely
  */
 export function mergeLoadedState(
-  currentState: GameState, 
+  currentState: GameState,
   loadedState: Partial<GameState>
 ): GameState {
   // Validate loaded state before merging
@@ -412,7 +416,7 @@ export function mergeLoadedState(
     console.warn('[PlayerState] Invalid loaded state, using current state');
     return currentState;
   }
-  
+
   return {
     ...currentState,
     ...loadedState,

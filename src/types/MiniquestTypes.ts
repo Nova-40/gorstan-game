@@ -1,3 +1,7 @@
+import { Miniquest } from './GameTypes';
+
+
+
 // MiniquestTypes.ts — types/MiniquestTypes.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence

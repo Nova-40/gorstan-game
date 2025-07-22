@@ -1,9 +1,16 @@
+import { NPC } from './NPCTypes';
+
+import { Room } from '../types/RoomTypes';
+
+import { Room } from './RoomTypes';
+
+
+
 // offmultiverseZone_shatteredrealm.ts — rooms/offmultiverseZone_shatteredrealm.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: offmultiverseZone_shatteredrealm
 
-import { Room } from '../types/RoomTypes';
 
 const shatteredrealm: Room = {
   id: "shatteredrealm",

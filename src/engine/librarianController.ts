@@ -1,10 +1,16 @@
+
+import { GameAction } from '../types/GameTypes';
+import { LocalGameState } from '../state/gameState';
+import { NPC } from '../NPCTypes';
+import { unlockAchievement } from '../logic/achievementEngine';
+import type { Room } from '../RoomTypes';
+
+
+
 // librarianController.ts
 // The Librarian NPC and Three Doors of Resolution puzzle
 // (c) 2025 Geoffrey Alan Webster. MIT License
 
-import { LocalGameState } from '../state/gameState';
-import { GameAction } from '../types/GameTypes';
-import { Room } from '../types/Room';
 
 interface LibrarianState {
   isActive: boolean;
@@ -32,9 +38,9 @@ function isLibraryRoom(room: Room): boolean {
   const roomId = room.id?.toLowerCase() || '';
   const roomTitle = room.title?.toLowerCase() || '';
   const roomDescription = room.description?.toLowerCase() || '';
-  
-  return roomId.includes('library') || 
-         roomTitle.includes('library') || 
+
+  return roomId.includes('library') ||
+         roomTitle.includes('library') ||
          roomDescription.includes('library');
 }
 
@@ -45,25 +51,25 @@ export function evaluateLibrarianSpawn(
   room: Room,
   gameState: LocalGameState
 ): { shouldSpawn: boolean; reason: string } {
-  
+
   if (!isLibraryRoom(room)) {
     return { shouldSpawn: false, reason: 'Not a library room' };
   }
-  
+
   // Don't spawn if already active
   if (librarianState.isActive) {
     return { shouldSpawn: false, reason: 'Already active' };
   }
-  
+
   // 80% chance to spawn
   const shouldSpawn = Math.random() < 0.8;
-  
+
   if (!shouldSpawn) {
     // Increment entry attempts
     librarianState.entryAttempts++;
     return { shouldSpawn: false, reason: 'Random chance failed' };
   }
-  
+
   return { shouldSpawn: true, reason: 'Library room spawn' };
 }
 
@@ -77,7 +83,7 @@ export function spawnLibrarian(
 ): void {
   librarianState.isActive = true;
   librarianState.currentRoomId = room.id;
-  
+
   // Check if this is after failed attempts
   if (librarianState.entryAttempts > 1) {
     dispatch({
@@ -89,7 +95,7 @@ export function spawnLibrarian(
         timestamp: Date.now()
       }
     });
-    
+
     dispatch({
       type: 'ADD_MESSAGE',
       payload: {
@@ -109,7 +115,7 @@ export function spawnLibrarian(
         timestamp: Date.now()
       }
     });
-    
+
     dispatch({
       type: 'ADD_MESSAGE',
       payload: {
@@ -120,12 +126,12 @@ export function spawnLibrarian(
       }
     });
   }
-  
+
   // Reset entry attempts since he's now spawned
   librarianState.entryAttempts = 0;
-  
+
   // Check for greasy napkin immediately
-  if (gameState.player.inventory.includes('greasy napkin') || 
+  if (gameState.player.inventory.includes('greasy napkin') ||
       gameState.player.inventory.includes('greasily napkin') ||
       gameState.player.inventory.includes('napkin')) {
     setTimeout(() => {
@@ -141,7 +147,7 @@ function handleGreasyNapkin(
   gameState: LocalGameState,
   dispatch: React.Dispatch<GameAction>
 ): void {
-  
+
   dispatch({
     type: 'ADD_MESSAGE',
     payload: {
@@ -151,7 +157,7 @@ function handleGreasyNapkin(
       timestamp: Date.now()
     }
   });
-  
+
   dispatch({
     type: 'ADD_MESSAGE',
     payload: {
@@ -161,10 +167,10 @@ function handleGreasyNapkin(
       timestamp: Date.now()
     }
   });
-  
+
   // Unlock scrolls
   dispatch({ type: 'SET_FLAG', payload: { key: 'hasUnlockedScrolls', value: true } });
-  
+
   // Display scrolls
   setTimeout(() => {
     displayScrolls(dispatch);
@@ -179,7 +185,7 @@ function displayScrolls(dispatch: React.Dispatch<GameAction>): void {
     "📜 **Ancient Scroll I - The Nature of Truth**",
     "Truth is not always spoken directly. The wise learn to listen for what lies beneath words.",
     "",
-    "📜 **Ancient Scroll II - The Paradox of Inquiry**", 
+    "📜 **Ancient Scroll II - The Paradox of Inquiry**",
     "To find truth, sometimes you must ask about lies. To understand light, study shadow.",
     "",
     "📜 **Ancient Scroll III - The Guardian's Dilemma**",
@@ -188,7 +194,7 @@ function displayScrolls(dispatch: React.Dispatch<GameAction>): void {
     "📜 **Ancient Scroll IV - The Path to Resolution**",
     "Ask not what IS, but what WOULD BE SAID. The answer you seek hides in reflection."
   ];
-  
+
   scrolls.forEach((scroll, index) => {
     setTimeout(() => {
       dispatch({
@@ -202,12 +208,12 @@ function displayScrolls(dispatch: React.Dispatch<GameAction>): void {
       });
     }, index * 800);
   });
-  
+
   // After all scrolls, present the puzzle
   setTimeout(() => {
     presentThreeDoorsPuzzle(dispatch);
   }, scrolls.length * 800 + 1000);
-  
+
   librarianState.hasShownScrolls = true;
 }
 
@@ -217,7 +223,7 @@ function displayScrolls(dispatch: React.Dispatch<GameAction>): void {
 function presentThreeDoorsPuzzle(dispatch: React.Dispatch<GameAction>): void {
   librarianState.puzzleActive = true;
   librarianState.puzzleStage = 'presented';
-  
+
   dispatch({
     type: 'ADD_MESSAGE',
     payload: {
@@ -227,7 +233,7 @@ function presentThreeDoorsPuzzle(dispatch: React.Dispatch<GameAction>): void {
       timestamp: Date.now()
     }
   });
-  
+
   setTimeout(() => {
     dispatch({
       type: 'ADD_MESSAGE',
@@ -239,7 +245,7 @@ function presentThreeDoorsPuzzle(dispatch: React.Dispatch<GameAction>): void {
       }
     });
   }, 1000);
-  
+
   setTimeout(() => {
     dispatch({
       type: 'ADD_MESSAGE',
@@ -251,7 +257,7 @@ function presentThreeDoorsPuzzle(dispatch: React.Dispatch<GameAction>): void {
       }
     });
   }, 2000);
-  
+
   setTimeout(() => {
     dispatch({
       type: 'ADD_MESSAGE',
@@ -263,7 +269,7 @@ function presentThreeDoorsPuzzle(dispatch: React.Dispatch<GameAction>): void {
       }
     });
   }, 3000);
-  
+
   setTimeout(() => {
     dispatch({
       type: 'ADD_MESSAGE',
@@ -275,7 +281,7 @@ function presentThreeDoorsPuzzle(dispatch: React.Dispatch<GameAction>): void {
       }
     });
   }, 4000);
-  
+
   setTimeout(() => {
     dispatch({
       type: 'ADD_MESSAGE',
@@ -287,7 +293,7 @@ function presentThreeDoorsPuzzle(dispatch: React.Dispatch<GameAction>): void {
       }
     });
   }, 5000);
-  
+
   // Set up the puzzle logic
   const doors = ['red', 'blue', 'green'];
   librarianState.correctDoor = doors[Math.floor(Math.random() * doors.length)];
@@ -301,13 +307,13 @@ export function handleGuardQuestion(
   gameState: LocalGameState,
   dispatch: React.Dispatch<GameAction>
 ): { handled: boolean; success: boolean } {
-  
+
   if (!librarianState.puzzleActive || librarianState.puzzleStage !== 'presented') {
     return { handled: false, success: false };
   }
-  
+
   const lowerQuestion = question.toLowerCase().trim();
-  
+
   // Check for the correct question pattern
   const correctPatterns = [
     'if i asked one of the other guards which door leads to stanton harcourt, what would they say',
@@ -315,14 +321,14 @@ export function handleGuardQuestion(
     'what would the other guards say if i asked them which door leads to stanton harcourt',
     'which door would the other guards say leads to stanton harcourt'
   ];
-  
-  const isCorrectQuestion = correctPatterns.some(pattern => 
-    lowerQuestion.includes(pattern) || 
-    (lowerQuestion.includes('other guard') && 
-     lowerQuestion.includes('stanton harcourt') && 
+
+  const isCorrectQuestion = correctPatterns.some(pattern =>
+    lowerQuestion.includes(pattern) ||
+    (lowerQuestion.includes('other guard') &&
+     lowerQuestion.includes('stanton harcourt') &&
      lowerQuestion.includes('what would'))
   );
-  
+
   if (!isCorrectQuestion) {
     dispatch({
       type: 'ADD_MESSAGE',
@@ -335,15 +341,15 @@ export function handleGuardQuestion(
     });
     return { handled: true, success: false };
   }
-  
+
   // Give the incorrect door (player should choose opposite)
   const doors = ['red', 'blue', 'green'];
   const wrongDoors = doors.filter(door => door !== librarianState.correctDoor);
   const guardResponse = wrongDoors[Math.floor(Math.random() * wrongDoors.length)];
-  
+
   librarianState.guardResponse = guardResponse;
   librarianState.puzzleStage = 'question_asked';
-  
+
   dispatch({
     type: 'ADD_MESSAGE',
     payload: {
@@ -353,7 +359,7 @@ export function handleGuardQuestion(
       timestamp: Date.now()
     }
   });
-  
+
   dispatch({
     type: 'ADD_MESSAGE',
     payload: {
@@ -363,7 +369,7 @@ export function handleGuardQuestion(
       timestamp: Date.now()
     }
   });
-  
+
   return { handled: true, success: true };
 }
 
@@ -375,13 +381,13 @@ export function handleDoorChoice(
   gameState: LocalGameState,
   dispatch: React.Dispatch<GameAction>
 ): { handled: boolean; success: boolean; teleport?: string } {
-  
+
   if (!librarianState.puzzleActive) {
     return { handled: false, success: false };
   }
-  
+
   const chosenDoor = doorColor.toLowerCase();
-  
+
   // If they haven't asked the question yet
   if (librarianState.puzzleStage === 'presented') {
     dispatch({
@@ -395,15 +401,15 @@ export function handleDoorChoice(
     });
     return { handled: true, success: false };
   }
-  
+
   // Check if they chose correctly (should be the correct door if question was asked properly)
-  const isCorrect = (librarianState.puzzleStage === 'question_asked' && 
+  const isCorrect = (librarianState.puzzleStage === 'question_asked' &&
                     chosenDoor === librarianState.correctDoor);
-  
+
   if (isCorrect) {
     // Success!
     librarianState.puzzleStage = 'completed';
-    
+
     dispatch({
       type: 'ADD_MESSAGE',
       payload: {
@@ -413,7 +419,7 @@ export function handleDoorChoice(
         timestamp: Date.now()
       }
     });
-    
+
     dispatch({
       type: 'ADD_MESSAGE',
       payload: {
@@ -423,28 +429,26 @@ export function handleDoorChoice(
         timestamp: Date.now()
       }
     });
-    
+
     // Set completion flag and trigger teleport
     dispatch({ type: 'SET_FLAG', payload: { key: 'hasSolvedLibraryPuzzle', value: true } });
-    
+
     // Unlock achievement for solving the puzzle
-    import('../logic/achievementEngine').then(({ unlockAchievement }) => {
-      unlockAchievement('puzzle_solver');
-    });
-    
+    unlockAchievement('puzzle_solver');
+
     setTimeout(() => {
       dispatch({
         type: 'MOVE_TO_ROOM',
         payload: 'stantonZone_arrival'
       });
     }, 2000);
-    
+
     return { handled: true, success: true, teleport: 'stantonZone_arrival' };
-    
+
   } else {
     // Failure
     librarianState.puzzleStage = 'failed';
-    
+
     dispatch({
       type: 'ADD_MESSAGE',
       payload: {
@@ -454,7 +458,7 @@ export function handleDoorChoice(
         timestamp: Date.now()
       }
     });
-    
+
     dispatch({
       type: 'ADD_MESSAGE',
       payload: {
@@ -464,7 +468,7 @@ export function handleDoorChoice(
         timestamp: Date.now()
       }
     });
-    
+
     dispatch({
       type: 'ADD_MESSAGE',
       payload: {
@@ -474,7 +478,7 @@ export function handleDoorChoice(
         timestamp: Date.now()
       }
     });
-    
+
     // Reset puzzle and teleport back
     setTimeout(() => {
       resetLibrarianState();
@@ -483,7 +487,7 @@ export function handleDoorChoice(
         payload: 'controlnexus'
       });
     }, 2000);
-    
+
     return { handled: true, success: false, teleport: 'controlnexus' };
   }
 }
@@ -496,40 +500,40 @@ export function handleLibrarianInteraction(
   gameState: LocalGameState,
   dispatch: React.Dispatch<GameAction>
 ): { handled: boolean } {
-  
+
   if (!librarianState.isActive) {
     return { handled: false };
   }
-  
+
   const lowerCommand = command.toLowerCase().trim();
-  
+
   // Handle asking guard questions
   if (lowerCommand.startsWith('ask guard')) {
     const question = lowerCommand.replace('ask guard:', '').trim();
     const result = handleGuardQuestion(question, gameState, dispatch);
     return { handled: result.handled };
   }
-  
+
   // Handle door choices
   if (lowerCommand.includes('enter') && lowerCommand.includes('door')) {
     let doorColor = '';
     if (lowerCommand.includes('red')) doorColor = 'red';
     else if (lowerCommand.includes('blue')) doorColor = 'blue';
     else if (lowerCommand.includes('green')) doorColor = 'green';
-    
+
     if (doorColor) {
       const result = handleDoorChoice(doorColor, gameState, dispatch);
       return { handled: result.handled };
     }
   }
-  
+
   // Handle talking to librarian
-  if (lowerCommand.includes('talk to librarian') || 
+  if (lowerCommand.includes('talk to librarian') ||
       lowerCommand.includes('speak to librarian') ||
       lowerCommand.includes('ask librarian')) {
-    
-    if (!librarianState.hasShownScrolls && 
-        (gameState.player.inventory.includes('greasy napkin') || 
+
+    if (!librarianState.hasShownScrolls &&
+        (gameState.player.inventory.includes('greasy napkin') ||
          gameState.player.inventory.includes('napkin'))) {
       handleGreasyNapkin(gameState, dispatch);
     } else {
@@ -543,10 +547,10 @@ export function handleLibrarianInteraction(
         }
       });
     }
-    
+
     return { handled: true };
   }
-  
+
   return { handled: false };
 }
 

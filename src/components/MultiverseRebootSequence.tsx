@@ -1,9 +1,14 @@
+
+import React, { useEffect, useState } from 'react';
+
+import { useGameState } from '../state/gameState';
+
+
+
 // MultiverseRebootSequence.tsx
 // Animated reboot sequence for blue button press
 // (c) 2025 Geoffrey Alan Webster. MIT License
 
-import React, { useEffect, useState } from 'react';
-import { useGameState } from '../state/gameState';
 
 interface RebootMessage {
   text: string;
@@ -44,27 +49,27 @@ const MultiverseRebootSequence: React.FC = () => {
 
     if (currentMessageIndex < rebootSequence.length) {
       const currentMessage = rebootSequence[currentMessageIndex];
-      
+
       timeoutId = setTimeout(() => {
         setDisplayedMessages(prev => [...prev, currentMessage]);
         setCurrentMessageIndex(prev => prev + 1);
-        
+
         // If this is the last message, trigger the reset
         if (currentMessageIndex === rebootSequence.length - 1) {
           setTimeout(() => {
             setIsComplete(true);
-            
+
             // Unlock the multiverse rebooter achievement
             import('../logic/achievementEngine').then(({ unlockAchievement }) => {
               unlockAchievement('multiverse_rebooter');
             });
-            
+
             // Reset to crossing after completion (not introreset)
             dispatch({
               type: 'CHANGE_ROOM',
               payload: 'crossing'
             });
-            
+
             // Clear the reboot flags and reset fade stage
             dispatch({
               type: 'SET_FLAGS',
@@ -75,11 +80,11 @@ const MultiverseRebootSequence: React.FC = () => {
                 show_reset_sequence: false,
               }
             });
-            
+
             // Reset fade stage and opacity
             setFadeStage('none');
             setFadeOpacity(0);
-            
+
             // Add final completion message to console
             setTimeout(() => {
               dispatch({
@@ -92,7 +97,7 @@ const MultiverseRebootSequence: React.FC = () => {
                 }
               });
             }, 1000);
-            
+
           }, 1500); // Slightly longer delay for better effect
         }
       }, currentMessage.delay);
@@ -110,19 +115,19 @@ const MultiverseRebootSequence: React.FC = () => {
     if (state.flags?.multiverse_reboot_pending && !state.flags?.multiverse_reboot_active) {
       // Start fade to black
       setFadeStage('fading');
-      
+
       // Trigger fade animation after a brief delay to ensure state is set
       const initialDelay = setTimeout(() => {
         setFadeOpacity(1);
       }, 50);
-      
+
       let fadeTimeoutId: NodeJS.Timeout;
       let rebootTimeoutId: NodeJS.Timeout;
-      
+
       // After fade completes, hold black screen for 2 seconds
       fadeTimeoutId = setTimeout(() => {
         setFadeStage('black');
-        
+
         // After black screen hold, start the reboot sequence
         rebootTimeoutId = setTimeout(() => {
           setFadeStage('reboot');
@@ -260,7 +265,7 @@ const MultiverseRebootSequence: React.FC = () => {
             <div style={progressStyle} />
           </div>
         </div>
-        
+
         <div style={consoleStyle}>
           {displayedMessages.map((message, index) => (
             <div key={index} style={messageStyle}>
@@ -270,13 +275,13 @@ const MultiverseRebootSequence: React.FC = () => {
               </span>
             </div>
           ))}
-          
+
           {currentMessageIndex < rebootSequence.length && (
             <div style={cursorStyle}>█</div>
           )}
         </div>
       </div>
-      
+
       <style>{`
         @keyframes blink {
           0%, 50% { opacity: 1; }

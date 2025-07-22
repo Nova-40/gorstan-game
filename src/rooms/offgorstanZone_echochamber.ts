@@ -1,9 +1,16 @@
+import { NPC } from './NPCTypes';
+
+import { Room } from '../types/RoomTypes';
+
+import { Room } from './RoomTypes';
+
+
+
 // offgorstanZone_echochamber.ts — rooms/offgorstanZone_echochamber.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: offgorstanZone_echochamber
 
-import { Room } from '../types/RoomTypes';
 
 const echochamber: Room = {
   id: "echochamber",

@@ -1,11 +1,20 @@
+import { LocalGameState } from '../state/gameState';
+
+import { Puzzle } from './GameTypes';
+
+import { PuzzleData, PuzzleComponent } from '../components/PuzzleInterface';
+
+import { Room } from '../types.d';
+
+import { Room } from './RoomTypes';
+
+
+
 // puzzleEngine.ts — engine/puzzleEngine.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Description: Enhanced puzzle engine for world-class puzzle solving experience
 
-import { PuzzleData, PuzzleComponent } from '../components/PuzzleInterface';
-import { LocalGameState } from '../state/gameState';
-import { Room } from '../types.d';
 
 export interface PuzzleResult {
   success: boolean;
@@ -60,7 +69,7 @@ export class PuzzleEngine {
    */
   public registerPuzzle(roomId: string, puzzle: PuzzleData): void {
     this.puzzles.set(puzzle.id, puzzle);
-    
+
     if (!this.roomPuzzles.has(roomId)) {
       this.roomPuzzles.set(roomId, []);
     }
@@ -73,40 +82,40 @@ export class PuzzleEngine {
   public getRoomPuzzles(roomId: string, gameState: LocalGameState): PuzzleData[] {
     const puzzleIds = this.roomPuzzles.get(roomId) || [];
     const puzzleState = (gameState as any).puzzleState || {};
-    
+
     return puzzleIds
       .map(id => this.puzzles.get(id))
       .filter((puzzle): puzzle is PuzzleData => {
         if (!puzzle) return false;
-        
+
         // Check if puzzle is already solved and not repeatable
         const state = puzzleState[puzzle.id];
         if (state?.solved && !puzzle.type.includes('repeatable')) {
           return false;
         }
-        
+
         // Check if max attempts reached
         if (puzzle.maxAttempts && state?.attempts >= puzzle.maxAttempts) {
           return false;
         }
-        
+
         // Check required items
         if (puzzle.requiredItems) {
-          const hasAllItems = puzzle.requiredItems.every((item: string) => 
+          const hasAllItems = puzzle.requiredItems.every((item: string) =>
             gameState.player.inventory.includes(item)
           );
           if (!hasAllItems) return false;
         }
-        
+
         // Check required traits
         if (puzzle.requiredTraits) {
           const playerTraits = gameState.player.traits || [];
-          const hasAllTraits = puzzle.requiredTraits.every((trait: string) => 
+          const hasAllTraits = puzzle.requiredTraits.every((trait: string) =>
             playerTraits.includes(trait)
           );
           if (!hasAllTraits) return false;
         }
-        
+
         return true;
       });
   }
@@ -122,8 +131,8 @@ export class PuzzleEngine {
    * Solve a puzzle with the given solution
    */
   public async solvePuzzle(
-    puzzleId: string, 
-    solution: any, 
+    puzzleId: string,
+    solution: any,
     gameState: LocalGameState
   ): Promise<PuzzleResult> {
     const puzzle = this.puzzles.get(puzzleId);
@@ -147,7 +156,7 @@ export class PuzzleEngine {
 
     // Validate solution based on puzzle type
     const result = this.validateSolution(puzzle, solution);
-    
+
     // Update attempts
     currentState.attempts++;
     currentState.lastAttempt = Date.now();
@@ -195,31 +204,31 @@ export class PuzzleEngine {
     // Three Doors of Resolution logic
     if (puzzle.id === 'three_doors_resolution') {
       const chosenDoor = solution.door_choice;
-      
-      // The correct strategy is to ask: "If I asked one of the other guards which door 
+
+      // The correct strategy is to ask: "If I asked one of the other guards which door
       // leads to Stanton Harcourt, what would they say?" and then choose the OPPOSITE door
-      
+
       // For this implementation, we'll assume the correct door is randomly chosen
       // and the player needs to use the logical deduction
       const correctDoors = ['red', 'blue', 'green'];
       const actualCorrect = correctDoors[Math.floor(Math.random() * correctDoors.length)];
-      
+
       // Check if they asked the right question (this would be tracked in game state)
       const askedCorrectQuestion = solution.question_asked === 'logical_deduction';
-      
+
       if (!askedCorrectQuestion) {
         return {
           success: false,
           feedback: 'You must ask the right question to the guards first! Try asking about what another guard would say.'
         };
       }
-      
+
       // The logical answer should be the opposite of what was indicated
       const success = chosenDoor === actualCorrect;
-      
+
       return {
         success,
-        feedback: success 
+        feedback: success
           ? 'Brilliant! Your logical deduction was correct. The doors part before you, revealing the path to Stanton Harcourt!'
           : 'The door crumbles to dust. Your logic was flawed - try thinking about what each type of guard would say about the others.'
       };
@@ -238,16 +247,16 @@ export class PuzzleEngine {
     // Example: Grid pattern puzzle
     if (puzzle.id.includes('pattern_grid')) {
       const selectedCells = solution.pattern_grid || [];
-      
+
       // Example pattern: L-shape
       const correctPattern = [0, 3, 6, 7, 8]; // L-shape in 3x3 grid
-      
+
       const isCorrect = selectedCells.length === correctPattern.length &&
         correctPattern.every((cell: number) => selectedCells.includes(cell));
-      
+
       return {
         success: isCorrect,
-        feedback: isCorrect 
+        feedback: isCorrect
           ? 'Perfect! You identified the correct pattern.'
           : 'That\'s not quite right. Look for geometric shapes or symmetries in the pattern.'
       };
@@ -267,13 +276,13 @@ export class PuzzleEngine {
     if (puzzle.id.includes('maze_navigation')) {
       const moves = solution.move_sequence || [];
       const correctSequence = ['north', 'east', 'south', 'east', 'north'];
-      
+
       const isCorrect = moves.length === correctSequence.length &&
         moves.every((move: string, index: number) => move === correctSequence[index]);
-      
+
       return {
         success: isCorrect,
-        feedback: isCorrect 
+        feedback: isCorrect
           ? 'Excellent navigation! You found the correct path through the maze.'
           : 'That path doesn\'t lead to the destination. Try following the echo sounds or wall markings.'
       };
@@ -293,13 +302,13 @@ export class PuzzleEngine {
     if (puzzle.id.includes('tome_sequence')) {
       const sequence = solution.tome_order || [];
       const correctSequence = ['tome_of_origins', 'tome_of_elements', 'tome_of_balance', 'tome_of_endings'];
-      
+
       const isCorrect = sequence.length === correctSequence.length &&
         sequence.every((tome: string, index: number) => tome === correctSequence[index]);
-      
+
       return {
         success: isCorrect,
-        feedback: isCorrect 
+        feedback: isCorrect
           ? 'The tomes resonate with power as they are placed in the correct order!'
           : 'The tomes reject this arrangement. Consider the natural progression from beginning to end.'
       };
@@ -318,20 +327,20 @@ export class PuzzleEngine {
     // Simple validation for text-based puzzles
     if (puzzle.components?.length === 1 && puzzle.components[0].type === 'text_input') {
       const userAnswer = solution[puzzle.components[0].id]?.toLowerCase().trim();
-      
+
       // Example answers for different puzzle types
       const exampleAnswers: { [key: string]: string[] } = {
         'riddle_answer': ['mirror', 'reflection', 'looking glass'],
         'password_entry': ['stanton harcourt', 'stantonharcourt', 'stanton'],
         'mathematical_solution': ['42', 'forty-two', 'forty two']
       };
-      
+
       const acceptedAnswers = exampleAnswers[puzzle.id] || [];
       const isCorrect = acceptedAnswers.includes(userAnswer);
-      
+
       return {
         success: isCorrect,
-        feedback: isCorrect 
+        feedback: isCorrect
           ? 'Correct! Your answer is accepted.'
           : 'That\'s not the answer I was looking for. Try thinking about it differently.'
       };
@@ -386,27 +395,27 @@ export class PuzzleEngine {
       validation: (solution) => {
         const questionStrategy = solution.question_strategy;
         const doorChoice = solution.door_choice;
-        
+
         const correctQuestion = 'If I asked one of the other guards which door leads to Stanton Harcourt, what would they say?';
         const askedCorrectQuestion = questionStrategy === correctQuestion;
-        
+
         if (!askedCorrectQuestion) {
           return {
             success: false,
             feedback: 'Your question strategy won\'t give you reliable information. Think about how to get consistent information from inconsistent sources.'
           };
         }
-        
+
         // For simulation, assume the guard points to a random wrong door
         const wrongDoors = ['Red Door', 'Blue Door', 'Green Door'].filter(door => door !== 'Green Door');
         const guardResponse = wrongDoors[Math.floor(Math.random() * wrongDoors.length)];
-        
+
         // The correct strategy is to choose the opposite
         const correctChoice = doorChoice !== guardResponse;
-        
+
         return {
           success: correctChoice,
-          feedback: correctChoice 
+          feedback: correctChoice
             ? `The guard says "${guardResponse}" so you choose ${doorChoice}. Brilliant logical deduction! The door opens to reveal the path to Stanton Harcourt!`
             : `The guard says "${guardResponse}" but you chose ${doorChoice}. The door crumbles to dust. Remember: choose the opposite of what they indicate!`
         };
@@ -441,7 +450,7 @@ export class PuzzleEngine {
           label: 'Which echo pattern do you follow?',
           options: [
             'High-pitched, Low-pitched, Medium-pitched',
-            'Low-pitched, High-pitched, Medium-pitched', 
+            'Low-pitched, High-pitched, Medium-pitched',
             'Medium-pitched, Low-pitched, High-pitched',
             'Low-pitched, Medium-pitched, High-pitched'
           ],

@@ -1,9 +1,12 @@
+import { GameState, STAGES } from '../state/gameStateTypes';
+
+
+
 
 // blueButtonLogic.ts
 // Handles logic for pressing the blue button
 // (c) 2025 Geoffrey Alan Webster. MIT Licence
 
-import { GameState, STAGES } from '../state/gameStateTypes';
 
 export function handleBlueButtonPress(gameState: GameState, setGameStage: (s: string) => void, setTransition: (s: string | null) => void): string {
   const currentCount = gameState.flags?.blueButtonCount || 0;

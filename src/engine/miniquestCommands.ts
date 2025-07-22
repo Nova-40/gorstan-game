@@ -1,11 +1,18 @@
+import MiniquestController, { MiniquestControllerResult } from '../engine/miniquestController';
+
+import { GameAction, GameMessage } from '../types/GameTypes';
+
+import { LocalGameState } from '../state/gameState';
+
+import { Miniquest } from './GameTypes';
+
+
+
 // miniquestCommands.ts — engine/miniquestCommands.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Description: Enhanced miniquest commands integration
 
-import { LocalGameState } from '../state/gameState';
-import { GameAction, GameMessage } from '../types/GameTypes';
-import MiniquestController, { MiniquestControllerResult } from '../engine/miniquestController';
 
 /**
  * Enhanced miniquest commands integration
@@ -21,7 +28,7 @@ export interface MiniquestCommandResult {
  * Create a properly formatted GameMessage
  */
 function createGameMessage(
-  text: string, 
+  text: string,
   type: GameMessage['type'] = 'system',
   speaker?: string
 ): GameMessage {
@@ -56,7 +63,7 @@ export async function processMiniquestCommand(
       if (!noun || noun === 'list') {
         // Open the enhanced miniquest interface
         const interfaceData = await miniquestController.openMiniquestInterface(currentRoomId, gameState);
-        
+
         return {
           messages: [
             createGameMessage('🎯 **Opening Miniquest Interface...**'),
@@ -122,7 +129,7 @@ export async function processMiniquestCommand(
     case 'quests': {
       // Alias for miniquests command
       const interfaceData = await miniquestController.openMiniquestInterface(currentRoomId, gameState);
-      
+
       return {
         messages: [
           createGameMessage('🎯 **Opening Quest Interface...**'),
@@ -135,7 +142,7 @@ export async function processMiniquestCommand(
     case 'hint': {
       // Contextual hints for miniquests
       const roomProgress = miniquestController.getRoomProgress(currentRoomId, gameState);
-      
+
       if (roomProgress.total > 0) {
         return {
           messages: [
@@ -156,7 +163,7 @@ export async function processMiniquestCommand(
     case 'objectives': {
       // Show objectives in a more narrative way
       const interfaceData = await miniquestController.openMiniquestInterface(currentRoomId, gameState);
-      const availableQuests = interfaceData.miniquests.filter(q => 
+      const availableQuests = interfaceData.miniquests.filter(q =>
         interfaceData.progress[q.id]?.available && !interfaceData.progress[q.id]?.completed
       );
 
@@ -200,17 +207,17 @@ async function handleMiniquestAttempt(
 ): Promise<MiniquestCommandResult> {
   try {
     const result = await miniquestController.attemptQuest(questId, currentRoomId, gameState);
-    
+
     const messages = [
       createGameMessage(result.message, result.success ? 'system' : 'error')
     ];
-    
+
     if (result.success && result.scoreAwarded) {
       messages.push(createGameMessage(`🏆 Quest completed! +${result.scoreAwarded} points`, 'achievement'));
     }
-    
+
     return { messages };
-    
+
   } catch (error) {
     console.error('Error attempting miniquest:', error);
     return {
@@ -228,7 +235,7 @@ async function handleMiniquestAttempt(
 export function isMiniquestCommand(command: string): boolean {
   const commandWords = command.toLowerCase().trim().split(/\s+/);
   const verb = commandWords[0];
-  
+
   return ['miniquest', 'miniquests', 'attempt', 'quests', 'objectives'].includes(verb);
 }
 
@@ -238,24 +245,24 @@ export function isMiniquestCommand(command: string): boolean {
 export function getMiniquestContextualInfo(roomId: string, gameState: LocalGameState): string[] {
   const miniquestController = MiniquestController.getInstance();
   const progress = miniquestController.getRoomProgress(roomId, gameState);
-  
+
   const messages: string[] = [];
-  
+
   if (progress.total > 0) {
     if (progress.available > 0) {
       messages.push(`🎯 ${progress.available} miniquest${progress.available !== 1 ? 's' : ''} available (type "miniquests" to explore)`);
     }
-    
+
     if (progress.completed > 0) {
       messages.push(`✅ ${progress.completed}/${progress.total} miniquests completed in this area`);
     }
-    
+
     // Add contextual hints for specific room types
     if (progress.available > 0 && progress.completed === 0) {
       messages.push(`💡 Look around carefully - this area holds secrets waiting to be discovered`);
     }
   }
-  
+
   return messages;
 }
 

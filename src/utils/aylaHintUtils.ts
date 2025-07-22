@@ -1,3 +1,5 @@
+
+
 // Version: 6.0.0
 // (c) 2025 Geoffrey Alan Webster
 // Licensed under the MIT License
@@ -25,7 +27,7 @@ export function getAylaHint(
   inventory: string[],
   traits: string[]
 ): string {
-  
+
   // Special hint for godmode players
   if (flags?.godmode)
     return "🛠 You're in godmode. Try /goto or /solve if you're stuck.";

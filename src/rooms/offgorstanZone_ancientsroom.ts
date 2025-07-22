@@ -1,9 +1,16 @@
+import { NPC } from './NPCTypes';
+
+import { Room } from '../types/RoomTypes';
+
+import { Room } from './RoomTypes';
+
+
+
 // offgorstanZone_ancientsroom.ts — rooms/offgorstanZone_ancientsroom.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: offgorstanZone_ancientsroom
 
-import { Room } from '../types/RoomTypes';
 
 const ancientsroom: Room = {
   id: "ancientsroom",

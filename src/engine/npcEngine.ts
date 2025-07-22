@@ -1,3 +1,7 @@
+import { NPC } from './NPCTypes';
+
+
+
 // Version: 6.0.0
 // (c) 2025 Geoffrey Alan Webster
 // Licensed under the MIT License
@@ -447,10 +451,10 @@ const npcDatabase: Record<string, NPCData> = {
 function initializeLookupMaps(): void {
   npcLookupMap.clear();
   topicLookupMap.clear();
-  
+
   Object.entries(npcDatabase).forEach(([npcId, npcData]) => {
     npcLookupMap.set(npcId, npcData);
-    
+
     // Build topic lookup
     npcData.knowledge.forEach(topic => {
       if (!topicLookupMap.has(topic)) {
@@ -529,17 +533,17 @@ function getResponse(
 function processResponseTemplate(line: string, playerState: PlayerState): string {
   try {
     let processedLine = line;
-    
+
     // Replace player name
     processedLine = processedLine.replace(/<playerName>/g, playerState.name || 'friend');
-    
+
     // Replace other placeholders
     processedLine = processedLine.replace(/<currentRoom>/g, playerState.currentRoom || 'unknown location');
     processedLine = processedLine.replace(/<resetCount>/g, String(playerState.resetCount || 0));
-    
+
     // Replace conditional content
     processedLine = processConditionalContent(processedLine, playerState);
-    
+
     return processedLine;
   } catch (error) {
     console.error('[NPCEngine] Error processing template:', error);
@@ -553,7 +557,7 @@ function processResponseTemplate(line: string, playerState: PlayerState): string
 function processConditionalContent(line: string, playerState: PlayerState): string {
   try {
     // Pattern: {condition:content}
-        
+
     return line.replace(conditionalPattern, (match, condition, content) => {
       if (evaluateCondition(condition, playerState)) {
         return content;
@@ -572,20 +576,20 @@ function processConditionalContent(line: string, playerState: PlayerState): stri
 function evaluateCondition(condition: string, playerState: PlayerState): boolean {
   try {
     const [type, target, operator = 'equals', value] = condition.split('|');
-    
+
     switch (type) {
       case 'flag':
                 return compareValues(flagValue, value, operator);
-        
+
       case 'trait':
         return playerState.traits?.includes(target) || false;
-        
+
       case 'item':
         return playerState.inventory?.includes(target) || false;
-        
+
       case 'health':
         return compareValues(playerState.health || 0, parseInt(value), operator);
-        
+
       default:
         return false;
     }
@@ -629,11 +633,11 @@ function meetsTopicRequirements(npc: NPCData, topic: string, playerState: Player
     if (topic === 'riddle' && npc.name === 'Mr Wendell') {
       return !playerState.hasAnsweredRiddle;
     }
-    
+
     if (topic === 'completedRedemption' && npc.name === 'Polly') {
       return Boolean(playerState.hasCompletedRedemption);
     }
-    
+
     return true; // Default to allowing access
   } catch (error) {
     console.error('[NPCEngine] Error checking topic requirements:', error);
@@ -650,11 +654,11 @@ function findAlternativeTopic(npc: NPCData, requestedTopic: string, playerState:
     if (npc.name === 'Mr Wendell' && requestedTopic === 'riddle' && playerState.hasAnsweredRiddle) {
       return 'knowledge';
     }
-    
+
     if (npc.name === 'Polly' && requestedTopic === 'redemption' && playerState.hasCompletedRedemption) {
       return 'completedRedemption';
     }
-    
+
     return null;
   } catch (error) {
     console.error('[NPCEngine] Error finding alternative topic:', error);
@@ -667,15 +671,15 @@ function findAlternativeTopic(npc: NPCData, requestedTopic: string, playerState:
  */
 function findRelatedTopic(npc: NPCData, topic: string): string | null {
   try {
-        
+
     // Check if the topic is in the NPC's knowledge
-        
+
     if (knownTopic && npc.responses[knownTopic]) {
       return knownTopic;
     }
-    
+
     // Check for partial matches in response keys
-            
+
     return partialMatch || null;
   } catch (error) {
     console.error('[NPCEngine] Error finding related topic:', error);
@@ -929,7 +933,7 @@ export function generateAylaResponse(
     }
 
     // Find the best matching topic
-    
+
     return getResponse('ayla', bestTopic, playerState);
   } catch (error) {
     console.error('[NPCEngine] Error generating Ayla response:', error);
@@ -970,10 +974,10 @@ export function npcKnowsTopic(npcId: string, topic: string): boolean {
     if (!npcId || !topic || typeof npcId !== 'string' || typeof topic !== 'string') {
       return false;
     }
-    
+
         if (!npc) return false;
-    
-    return npc.knowledge.some(k => 
+
+    return npc.knowledge.some(k =>
       k.toLowerCase().includes(topic.toLowerCase()) ||
       topic.toLowerCase().includes(k.toLowerCase())
     ) || Object.keys(npc.responses).includes(topic);
@@ -992,8 +996,8 @@ export function addNPCResponse(
   responses: string[]
 ): boolean {
   try {
-    if (!npcId || !topic || !responses || 
-        typeof npcId !== 'string' || typeof topic !== 'string' || 
+    if (!npcId || !topic || !responses ||
+        typeof npcId !== 'string' || typeof topic !== 'string' ||
         !Array.isArray(responses) || responses.length === 0) {
       return false;
     }
@@ -1003,14 +1007,14 @@ export function addNPCResponse(
     if (!npc.responses[topic]) {
       npc.responses[topic] = [];
     }
-    
+
     npc.responses[topic].push(...responses);
-    
+
     // Add to knowledge if not already there
     if (!npc.knowledge.includes(topic)) {
       npc.knowledge.push(topic);
     }
-    
+
     console.log(`[NPCEngine] Added responses for ${npcId} on topic: ${topic}`);
     return true;
   } catch (error) {
@@ -1042,7 +1046,7 @@ export function validateNPCData(data: unknown): data is NPCData {
 export function getNPCsByTopic(topic: string): string[] {
   try {
     if (!topic || typeof topic !== 'string') return [];
-    
+
         return npcs ? Array.from(npcs) : [];
   } catch (error) {
     console.error('[NPCEngine] Error getting NPCs by topic:', error);
@@ -1059,9 +1063,9 @@ export function getConversationContext(
 ): ConversationContext | null {
   try {
     if (!npcId || !playerState) return null;
-    
+
         if (!npc) return null;
-    
+
     return {
       npcId,
       topic: 'intro',
@@ -1082,7 +1086,7 @@ export function getConversationContext(
 export function getNPCRelationship(npcId: string, playerState: PlayerState): number {
   try {
         if (relationship !== undefined) return relationship;
-    
+
         return npc?.relationshipLevels?.default || 0;
   } catch (error) {
     console.error('[NPCEngine] Error getting NPC relationship:', error);
@@ -1104,9 +1108,9 @@ export function getNPCStatus(npcId: string): unknown {
 }
 
 // Export main functions
-export { 
-  npcReact, 
-  getResponse, 
+export {
+  npcReact,
+  getResponse,
   getNPCData,
   getAllNPCs,
   npcKnowsTopic,
@@ -1118,7 +1122,7 @@ export {
 /**
  * Export utilities for external use
  */
-export 
+export
 export default NPCEngine;
 
 // Unify NPC systems with clear separation of concerns

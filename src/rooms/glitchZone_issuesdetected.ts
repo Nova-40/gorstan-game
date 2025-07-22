@@ -1,9 +1,12 @@
+import { RoomDefinition } from '../types/RoomTypes';
+
+
+
 // glitchZone_issuesdetected.ts — rooms/glitchZone_issuesdetected.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: glitchZone_issuesdetected
 
-import { RoomDefinition } from '../types/RoomTypes';
 
 const issuesdetected: RoomDefinition = {
   id: "issuesdetected",

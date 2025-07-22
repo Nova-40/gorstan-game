@@ -1,3 +1,15 @@
+import React, { useState, useEffect } from 'react';
+
+import { Bone, Fish, Bot, UserCircle, ChefHat, Shield, Diamond, Compass, Eye } from 'lucide-react';
+
+import { Room } from './RoomTypes';
+
+import { Room, RoomNPC, RoomItem } from '../types/Room';
+
+import { useGameState } from '../state/gameState';
+
+
+
 // RoomRenderer.tsx — components/RoomRenderer.tsx
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
@@ -7,10 +19,6 @@
 // Gorstan (C) Geoff Webster 2025
 // Code MIT Licence
 
-import React, { useState, useEffect } from 'react';
-import { Bone, Fish, Bot, UserCircle, ChefHat, Shield, Diamond, Compass, Eye } from 'lucide-react';
-import { useGameState } from '../state/gameState';
-import { Room, RoomNPC, RoomItem } from '../types/Room';
 
 // Icon map for known NPCs
 const npcIconMap: Record<string, React.ElementType> = {
@@ -45,21 +53,21 @@ const RoomRenderer: React.FC = () => {
 
   useEffect(() => {
     setLooked(false);
-    
+
     // Send room description to console when entering a new room
     if (room && room.id !== lastRoomId) {
       setLastRoomId(room.id);
-      
+
       const descriptionLines = Array.isArray(room.description)
         ? room.description
         : [room.description ?? 'You see nothing of note.'];
-      
+
       // Create room entry messages for the console
       const entryMessages = [
         { text: `--- ${room.title} ---`, type: 'narrative' },
         ...descriptionLines.map(line => ({ text: line, type: 'narrative' }))
       ];
-      
+
       // Add console intro messages if they exist
       if (room.consoleIntro && room.consoleIntro.length > 0) {
         // Helper function to interpolate template variables
@@ -85,7 +93,7 @@ const RoomRenderer: React.FC = () => {
           dispatch({ type: 'TRIGGER_TRAP', payload: activeTrap });
         }
       }
-      
+
       // Add messages to history
       const entryTimestamp = Date.now();
       entryMessages.forEach((msg, index) => {

@@ -1,3 +1,5 @@
+
+
 // WelcomeScreen.tsx — components/WelcomeScreen.tsx
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
@@ -68,7 +70,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onBegin, onLoadGame }) =>
         <div className="grid grid-cols-3 gap-4 w-full max-w-[600px]">
           {/* Empty left column for alignment */}
           <div></div>
-          
+
           {/* Center column - aligned with "Explore the Books" */}
           <div className="flex flex-col space-y-4">
             <button
@@ -87,7 +89,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onBegin, onLoadGame }) =>
               Load Saved Game
             </button>
           </div>
-          
+
           {/* Empty right column for alignment */}
           <div></div>
         </div>

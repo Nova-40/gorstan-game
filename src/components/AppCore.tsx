@@ -1,3 +1,73 @@
+import '../styles/GameUI.css';
+
+import CommandInput from './CommandInput';
+
+import DirectionIconsPanel from './DirectionIconsPanel';
+
+import DramaticWaitTransitionOverlay from './DramaticWaitTransitionOverlay';
+
+import JumpTransition from './animations/JumpTransition';
+
+import MultiverseRebootSequence from './MultiverseRebootSequence';
+
+import PlayerNameCapture from './PlayerNameCapture';
+
+import PlayerStatsPanel from './PlayerStatsPanel';
+
+import PresentNPCsPanel from './PresentNPCsPanel';
+
+import QuickActionsPanel from './QuickActionsPanel';
+
+import React, { useEffect, useRef, useState } from 'react';
+
+import RoomRenderer from './RoomRenderer';
+
+import RoomTransition from './animations/RoomTransition';
+
+import SipTransition from './animations/SipTransition';
+
+import SplashScreen from './SplashScreen';
+
+import TeletypeIntro from './TeletypeIntro';
+
+import TerminalConsole from './TerminalConsole';
+
+import WaitTransition from './animations/WaitTransition';
+
+import WelcomeScreen from './WelcomeScreen';
+
+import { Achievement, Miniquest } from './GameTypes';
+
+import { FlagMap } from '../state/flagRegistry';
+
+import { getAllRoomsAsObject } from '../utils/roomLoader';
+
+import { initializeAchievementEngine } from '../logic/achievementEngine';
+
+import { initializeWanderingNPCs, handleRoomEntryForWanderingNPCs } from '../engine/wanderingNPCController';
+
+import { NPC } from './NPCTypes';
+
+import { Room } from './RoomTypes';
+
+import { useFlags } from '../hooks/useFlags';
+
+import { useGameState } from '../state/gameState';
+
+import { useLibrarianLogic } from '../hooks/useLibrarianLogic';
+
+import { useModuleLoader } from '../hooks/useModuleLoader';
+
+import { useOptimizedEffects } from '../hooks/useOptimizedEffects';
+
+import { useRoomTransition, getZoneDisplayName } from '../hooks/useRoomTransition';
+
+import { useTimers } from '../hooks/useTimers';
+
+import { useWendellLogic } from '../hooks/useWendellLogic';
+
+
+
 // AppCore.tsx — components/AppCore.tsx
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
@@ -7,47 +77,35 @@
 // Gorstan (C) Geoff Webster 2025
 // Code MIT Licence
 
-import React, { useEffect, useRef, useState } from 'react';
-import SplashScreen from './SplashScreen';
-import WelcomeScreen from './WelcomeScreen';
-import PlayerNameCapture from './PlayerNameCapture';
-import TeletypeIntro from './TeletypeIntro';
-import RoomRenderer from './RoomRenderer';
-import TerminalConsole from './TerminalConsole';
-import CommandInput from './CommandInput';
-import PresentNPCsPanel from './PresentNPCsPanel';
-import PlayerStatsPanel from './PlayerStatsPanel';
-import DirectionIconsPanel from './DirectionIconsPanel';
-import QuickActionsPanel from './QuickActionsPanel';
-import MultiverseRebootSequence from './MultiverseRebootSequence';
-import { useGameState } from '../state/gameState';
-import { initializeAchievementEngine } from '../logic/achievementEngine';
-import { initializeWanderingNPCs, handleRoomEntryForWanderingNPCs } from '../engine/wanderingNPCController';
-import '../styles/GameUI.css';
-import { getAllRoomsAsObject } from '../utils/roomLoader';
-import JumpTransition from './animations/JumpTransition';
-import SipTransition from './animations/SipTransition';
-import WaitTransition from './animations/WaitTransition';
-import DramaticWaitTransitionOverlay from './DramaticWaitTransitionOverlay';
-import RoomTransition from './animations/RoomTransition';
-import { useRoomTransition, getZoneDisplayName } from '../hooks/useRoomTransition';
 
 // Import optimized hooks for better performance and code organization
-import { useFlags } from '../hooks/useFlags';
-import { useModuleLoader } from '../hooks/useModuleLoader';
-import { useTimers } from '../hooks/useTimers';
-import { useOptimizedEffects } from '../hooks/useOptimizedEffects';
 
 const AppCore: React.FC = () => {
   const { state, dispatch } = useGameState();
-  
+
   // Use optimized hooks for better performance
   const { hasFlag, setFlag, clearFlag } = useFlags();
   const { loadModule } = useModuleLoader();
   const { setTimer, clearTimer } = useTimers();
 
   const stage = state.stage || '';
-  const room = state.roomMap?.[state.currentRoomId] || null;
+  let room = state.roomMap?.[state.currentRoomId] || null;
+  if (!room) {
+    console.warn(`[AppCore] Room transition failed: Room '${state.currentRoomId}' does not exist. Falling back to 'controlnexus'.`);
+    dispatch({
+      type: 'ADD_MESSAGE',
+      payload: {
+        id: Date.now().toString(),
+        text: `Room transition failed: Room '${state.currentRoomId}' does not exist. Returning to Control Nexus.`,
+        type: 'error',
+        timestamp: Date.now()
+      }
+    });
+    room = state.roomMap?.['controlnexus'] || null;
+    if (room) {
+      dispatch({ type: 'UPDATE_GAME_STATE', payload: { currentRoomId: 'controlnexus' } });
+    }
+  }
   const playerName = state.player?.name || 'Player';
 
   // Apply additional optimized effects for system commands
@@ -59,115 +117,68 @@ const AppCore: React.FC = () => {
   const [roomMapReady, setRoomMapReady] = useState(false);
   const [transitionTargetRoom, setTransitionTargetRoom] = useState<string>('controlnexus');
   const [transitionInventory, setTransitionInventory] = useState<string[]>([]);
+
   const [lastMovementAction, setLastMovementAction] = useState<string>('');
   const [roomTransitionActive, setRoomTransitionActive] = useState(false);
   const [previousRoom, setPreviousRoom] = useState<any>(null);
   const hasMounted = useRef(false);
 
   // Track room changes for transition animations
-  useEffect(() => {
+  const { handleWendell } = useWendellLogic(state, dispatch, room, loadModule);
+  const { handleLibrarian } = useLibrarianLogic(state, dispatch, room, loadModule);
+
+useEffect(() => {
     if (room && previousRoom && room.id !== previousRoom.id) {
       setRoomTransitionActive(true);
     }
   }, [room, previousRoom]);
 
   // Handle wandering NPCs when entering rooms (OPTIMIZED)
-  useEffect(() => {
-    if (room && hasFlag('evaluateWanderingNPCs')) {
-      clearFlag('evaluateWanderingNPCs');
-      handleRoomEntryForWanderingNPCs(room, state, dispatch);
-    }
-  }, [room, hasFlag('evaluateWanderingNPCs'), state, dispatch, clearFlag]);
+
+
+// Removed: Wandering NPC evaluation flag (evaluateWanderingNPCs not in FlagMap)
 
   // Handle debug commands for wandering NPCs (OPTIMIZED)
-  useEffect(() => {
-    const debugSpawnNPC = hasFlag('debugSpawnNPC');
-    const debugSpawnRoom = hasFlag('debugSpawnRoom');
-    
-    if (debugSpawnNPC && debugSpawnRoom) {
-      loadModule('../engine/wanderingNPCController').then(({ debugSpawnWanderingNPC }) => {
-        const success = debugSpawnWanderingNPC(debugSpawnNPC, debugSpawnRoom, dispatch);
-        
-        dispatch({ 
-          type: 'ADD_MESSAGE', 
-          payload: {
-            text: success 
-              ? `DEBUG: Spawned NPC '${debugSpawnNPC}' successfully.`
-              : `DEBUG: Failed to spawn NPC '${debugSpawnNPC}'.`,
-            type: success ? 'system' : 'error',
-            timestamp: Date.now()
-          }
-        });
-      });
-      
-      clearFlag('debugSpawnNPC');
-      clearFlag('debugSpawnRoom');
-    }
-  }, [hasFlag('debugSpawnNPC'), hasFlag('debugSpawnRoom'), dispatch, clearFlag, loadModule]);
+
+
+// Removed: debugSpawnRoom logic (debugSpawnRoom not in FlagMap)
 
   // Handle debug list NPCs (OPTIMIZED)
-  useEffect(() => {
-    if (hasFlag('debugListNPCs')) {
+
+
+useEffect(() => {
+    if (hasFlag(FlagMap.debug.debugListNPCs)) {
       loadModule('../engine/wanderingNPCController').then(({ debugListActiveWanderingNPCs }) => {
         debugListActiveWanderingNPCs();
       });
-      clearFlag('debugListNPCs');
+      clearFlag(FlagMap.debug.debugListNPCs);
     }
-  }, [hasFlag('debugListNPCs'), clearFlag, loadModule]);
+  }, [hasFlag(FlagMap.debug.debugListNPCs), clearFlag, loadModule]);
 
-  // Handle pending Mr. Wendell commands (OPTIMIZED)
+  // Handle pending Wendell command
   useEffect(() => {
-    const pendingCommand = hasFlag('pendingWendellCommand');
-    
-    if (pendingCommand) {
-      loadModule('../engine/mrWendellController').then(({ handleWendellInteraction }) => {
-        const result = handleWendellInteraction(pendingCommand, state, dispatch);
-        if (!result.handled) {
-          dispatch({
-            type: 'ADD_MESSAGE',
-            payload: {
-              id: Date.now().toString(),
-              text: "I don't understand that command.",
-              type: 'error',
-              timestamp: Date.now()
-            }
-          });
-        }
-      });
-      clearFlag('pendingWendellCommand');
+    if (hasFlag(FlagMap.npc.pendingWendellCommand)) {
+      handleWendell();
+      clearFlag(FlagMap.npc.pendingWendellCommand);
     }
-  }, [hasFlag('pendingWendellCommand'), state, dispatch, clearFlag, loadModule]);
+  }, [hasFlag(FlagMap.npc.pendingWendellCommand), state, dispatch, clearFlag, loadModule]);
 
-  // Handle pending Librarian commands (OPTIMIZED)
+  // Handle pending Librarian command
   useEffect(() => {
-    const pendingCommand = hasFlag('pendingLibrarianCommand');
-    
-    if (pendingCommand) {
-      loadModule('../engine/librarianController').then(({ handleLibrarianInteraction }) => {
-        const result = handleLibrarianInteraction(pendingCommand, state, dispatch);
-        if (!result.handled) {
-          dispatch({
-            type: 'ADD_MESSAGE',
-            payload: {
-              id: Date.now().toString(),
-              text: "I don't understand that command.",
-              type: 'error',
-              timestamp: Date.now()
-            }
-          });
-        }
-      });
-      clearFlag('pendingLibrarianCommand');
+    if (hasFlag(FlagMap.npc.pendingLibrarianCommand)) {
+      handleLibrarian();
+      clearFlag(FlagMap.npc.pendingLibrarianCommand);
     }
-  }, [hasFlag('pendingLibrarianCommand'), state, dispatch, clearFlag, loadModule]);
+  }, [hasFlag(FlagMap.npc.pendingLibrarianCommand), state, dispatch, clearFlag, loadModule]);
 
   // Handle force Mr. Wendell spawn (OPTIMIZED)
-  useEffect(() => {
-    if (hasFlag('forceWendellSpawn') && room) {
+
+useEffect(() => {
+    if (hasFlag(FlagMap.npc.forceWendellSpawn) && room) {
       loadModule('../engine/mrWendellController').then((module) => {
-        setFlag('wasRudeToNPC', true);
+        setFlag(FlagMap.npc.wasRudeToNPC, true);
         handleRoomEntryForWanderingNPCs(room, state, dispatch);
-        
+
         dispatch({
           type: 'ADD_MESSAGE',
           payload: {
@@ -178,42 +189,44 @@ const AppCore: React.FC = () => {
           }
         });
       });
-      clearFlag('forceWendellSpawn');
+      clearFlag(FlagMap.npc.forceWendellSpawn);
     }
-  }, [hasFlag('forceWendellSpawn'), room, state, dispatch, setFlag, clearFlag, loadModule]);
+  }, [hasFlag(FlagMap.npc.forceWendellSpawn), room, state, dispatch, setFlag, clearFlag, loadModule]);
 
   // Handle Mr. Wendell status check (OPTIMIZED)
-  useEffect(() => {
-    if (hasFlag('checkWendellStatus')) {
+
+useEffect(() => {
+    if (hasFlag(FlagMap.npc.checkWendellStatus)) {
       loadModule('../engine/mrWendellController').then(({ isWendellActive, getWendellRoom }) => {
         console.log('[DEBUG] Mr. Wendell Status:');
         console.log('- Active:', isWendellActive());
         console.log('- Current Room:', getWendellRoom());
         console.log('- Player Flags:', {
-          wasRudeToNPC: hasFlag('wasRudeToNPC'),
-          wasRudeRecently: hasFlag('wasRudeRecently'),
-          wendellSpared: hasFlag('wendellSpared')
+          wasRudeToNPC: hasFlag(FlagMap.npc.wasRudeToNPC),
+          wasRudeRecently: hasFlag(FlagMap.npc.wasRudeRecently),
+          wendellSpared: hasFlag(FlagMap.npc.wendellSpared)
         });
-        console.log('- Cursed Items:', state.player.inventory.filter((item: any) => 
+        console.log('- Cursed Items:', state.player.inventory.filter((item: any) =>
           ['cursedcoin', 'doomedscroll', 'cursed_artifact'].includes(item.toLowerCase())
         ));
       });
-      clearFlag('checkWendellStatus');
+      clearFlag(FlagMap.npc.checkWendellStatus);
     }
-  }, [hasFlag('checkWendellStatus'), state.player.inventory, hasFlag, clearFlag, loadModule]);
+  }, [hasFlag(FlagMap.npc.checkWendellStatus), state.player.inventory, hasFlag, clearFlag, loadModule]);
 
   // Handle force Librarian spawn (OPTIMIZED)
-  useEffect(() => {
-    if (hasFlag('forceLibrarianSpawn') && room) {
+
+useEffect(() => {
+    if (hasFlag(FlagMap.npc.forceLibrarianSpawn) && room) {
       loadModule('../engine/librarianController').then(({ spawnLibrarian }) => {
         // Check if it's a library room
-        const isLibrary = room.id?.toLowerCase().includes('library') || 
+        const isLibrary = room.id?.toLowerCase().includes('library') ||
                          room.title?.toLowerCase().includes('library') ||
                          room.description?.toLowerCase().includes('library');
-        
+
         if (isLibrary) {
           spawnLibrarian(room, state, dispatch);
-          
+
           dispatch({
             type: 'ADD_MESSAGE',
             payload: {
@@ -235,35 +248,21 @@ const AppCore: React.FC = () => {
           });
         }
       });
-      clearFlag('forceLibrarianSpawn');
+      clearFlag(FlagMap.npc.forceLibrarianSpawn);
     }
-  }, [hasFlag('forceLibrarianSpawn'), room, state, dispatch, clearFlag, loadModule]);
+  }, [hasFlag(FlagMap.npc.forceLibrarianSpawn), room, state, dispatch, clearFlag, loadModule]);
 
   // Handle Librarian status check (OPTIMIZED)
-  useEffect(() => {
-    if (hasFlag('checkLibrarianStatus')) {
-      loadModule('../engine/librarianController').then(({ isLibrarianActive, getLibrarianRoom, getLibrarianDebugInfo }) => {
-        console.log('[DEBUG] Librarian Status:');
-        console.log('- Active:', isLibrarianActive());
-        console.log('- Current Room:', getLibrarianRoom());
-        console.log('- Debug Info:', getLibrarianDebugInfo());
-        console.log('- Player Flags:', {
-          hasUnlockedScrolls: hasFlag('hasUnlockedScrolls'),
-          hasSolvedLibraryPuzzle: hasFlag('hasSolvedLibraryPuzzle')
-        });
-        console.log('- Has Greasy Napkin:', state.player.inventory.some((item: any) => 
-          item.toLowerCase().includes('napkin')
-        ));
-      });
-      clearFlag('checkLibrarianStatus');
-    }
-  }, [hasFlag('checkLibrarianStatus'), state.player.inventory, hasFlag, clearFlag, loadModule]);
+
+
+// Removed: checkLibrarianStatus and hasUnlockedScrolls logic (not in FlagMap)
 
   // Get transition information
   const transitionInfo = useRoomTransition(previousRoom, room, lastMovementAction);
 
   // Load room map once on first mount (OPTIMIZED)
-  useEffect(() => {
+
+useEffect(() => {
     if (!hasMounted.current) {
       hasMounted.current = true;
       console.log('[AppCore] Component mounted.');
@@ -271,27 +270,27 @@ const AppCore: React.FC = () => {
       const roomMap = getAllRoomsAsObject();
       console.log('[AppCore] Loaded room map:', Object.keys(roomMap));
       dispatch({ type: 'LOAD_ROOM_MAP', payload: roomMap });
-      
+
       // Initialize achievement engine with dispatch function
       initializeAchievementEngine(dispatch);
       console.log('[AppCore] Achievement engine initialized.');
-      
+
       // Initialize systems using optimized module loader
       loadModule('../state/scoreManager').then(({ initializeScoreManager }) => {
         initializeScoreManager(dispatch);
         console.log('[AppCore] Score manager initialized.');
       });
-      
+
       loadModule('../logic/codexTracker').then(({ initializeCodexTracker }) => {
         initializeCodexTracker(dispatch);
         console.log('[AppCore] Codex tracker initialized.');
       });
-      
+
       loadModule('../engine/miniquestInitializer').then(({ initializeMiniquests }) => {
         initializeMiniquests();
         console.log('[AppCore] Miniquest system initialized.');
       });
-      
+
       // Initialize wandering NPC system
       initializeWanderingNPCs(dispatch);
       console.log('[AppCore] Wandering NPC system initialized.');
@@ -304,7 +303,8 @@ const AppCore: React.FC = () => {
   }, [room, hasLoaded, dispatch, loadModule]);
 
   // Detect when roomMap is populated
-  useEffect(() => {
+
+useEffect(() => {
     const keys = Object.keys(state.roomMap || {});
     if (keys.length > 0 && !roomMapReady) {
       console.log('[AppCore] roomMap is ready with', keys.length, 'rooms');
@@ -313,12 +313,13 @@ const AppCore: React.FC = () => {
   }, [state.roomMap, roomMapReady]);
 
   // Detect stage changes — only after roomMap is ready (OPTIMIZED)
-  useEffect(() => {
+
+useEffect(() => {
     if (!roomMapReady) return;
 
     const stageTransitions: Record<string, string> = {
       'transition_jump': 'jump',
-      'transition_sip': 'sip', 
+      'transition_sip': 'sip',
       'transition_wait': 'wait',
       'transition_dramatic_wait': 'dramatic_wait'
     };
@@ -326,7 +327,7 @@ const AppCore: React.FC = () => {
     const transitionType = stageTransitions[stage];
     if (transitionType) {
       setTransitionType(transitionType);
-      
+
       // Apply intro choice scoring using optimized module loader
       loadModule('../state/scoreEffects').then(({ applyScoreForEvent }) => {
         applyScoreForEvent(`intro.choice.${transitionType === 'dramatic_wait' ? 'dramatic_wait' : transitionType}`);
@@ -335,7 +336,8 @@ const AppCore: React.FC = () => {
   }, [stage, roomMapReady, loadModule]);
 
   // Final guarded transition logic
-  useEffect(() => {
+
+useEffect(() => {
     const availableRooms = Object.keys(state.roomMap || {});
     if (!readyForTransition || !transitionType || availableRooms.length === 0) {
       if (readyForTransition && availableRooms.length === 0) {
@@ -454,12 +456,12 @@ const AppCore: React.FC = () => {
 console.log("[AppCore] STAGE:", stage);
 console.log("[AppCore] CURRENT ROOM ID:", state.currentRoomId);
 console.log("[AppCore] ROOM OBJECT:", state.roomMap?.[state.currentRoomId]);
-  
+
   return (
     <div className="appcore-grid">
       {/* Multiverse Reboot Sequence Overlay */}
       <MultiverseRebootSequence />
-      
+
       {/* Room transition overlay */}
       <RoomTransition
         isActive={roomTransitionActive && transitionInfo.shouldAnimate}
@@ -471,7 +473,7 @@ console.log("[AppCore] ROOM OBJECT:", state.roomMap?.[state.currentRoomId]);
           setLastMovementAction('');
         }}
       />
-      
+
       <div className="quad quad-1">
         <RoomRenderer />
       </div>
@@ -481,18 +483,17 @@ console.log("[AppCore] ROOM OBJECT:", state.roomMap?.[state.currentRoomId]);
       <div className="quad quad-3">
         <PlayerStatsPanel />
         <CommandInput onCommand={handleCommand} playerName={playerName} />
-        <PresentNPCsPanel />
+        <PresentNPCsPanel npcs={[]} />
       </div>
       <div className="quad quad-4">
         <DirectionIconsPanel />
         <QuickActionsPanel />
       </div>
     </div>
-  ); 
+  );
 };
 
 export default AppCore;
-
 
 
 

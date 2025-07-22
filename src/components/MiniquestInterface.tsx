@@ -1,16 +1,23 @@
+import React, { useState, useEffect } from 'react';
+
+import { 
+
+import { motion, AnimatePresence } from 'framer-motion';
+
+import { Puzzle } from './GameTypes';
+
+
+
 // MiniquestInterface.tsx — components/MiniquestInterface.tsx
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Description: World-class miniquest interface component with adaptive design and comprehensive UX
 
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Star, 
-  Target, 
-  Trophy, 
-  Clock, 
-  CheckCircle, 
+  Star,
+  Target,
+  Trophy,
+  Clock,
+  CheckCircle,
   X,
   HelpCircle,
   User,
@@ -144,7 +151,7 @@ const MiniquestInterface: React.FC<MiniquestInterfaceProps> = ({
 
   const getQuestStatusInfo = (quest: MiniquestData) => {
     const questProgress = progress[quest.id];
-    
+
     if (questProgress?.completed) {
       return {
         status: quest.repeatable ? 'repeatable' : 'completed',
@@ -153,7 +160,7 @@ const MiniquestInterface: React.FC<MiniquestInterfaceProps> = ({
         label: quest.repeatable ? 'REPEATABLE' : 'COMPLETED'
       };
     }
-    
+
     if (questProgress?.available && hasRequiredItems(quest)) {
       return {
         status: 'available',
@@ -162,7 +169,7 @@ const MiniquestInterface: React.FC<MiniquestInterfaceProps> = ({
         label: 'AVAILABLE'
       };
     }
-    
+
     if (!hasRequiredItems(quest)) {
       return {
         status: 'needs_items',
@@ -171,7 +178,7 @@ const MiniquestInterface: React.FC<MiniquestInterfaceProps> = ({
         label: 'NEEDS ITEMS'
       };
     }
-    
+
     return {
       status: 'locked',
       color: 'text-gray-400',
@@ -202,7 +209,7 @@ const MiniquestInterface: React.FC<MiniquestInterfaceProps> = ({
                 <p className="text-indigo-200">{roomName}</p>
               </div>
             </div>
-            
+
             <div className="flex items-center space-x-6">
               {/* Stats */}
               <div className="flex items-center space-x-4 text-white">
@@ -219,7 +226,7 @@ const MiniquestInterface: React.FC<MiniquestInterfaceProps> = ({
                   <div className="text-xs text-indigo-200">Total Score</div>
                 </div>
               </div>
-              
+
               <button
                 onClick={onClose}
                 className="p-2 hover:bg-white/20 rounded-lg transition-colors"
@@ -228,7 +235,7 @@ const MiniquestInterface: React.FC<MiniquestInterfaceProps> = ({
               </button>
             </div>
           </div>
-          
+
           {/* Filter Tabs */}
           <div className="flex space-x-2 mt-4">
             {[
@@ -269,15 +276,15 @@ const MiniquestInterface: React.FC<MiniquestInterfaceProps> = ({
                   const statusInfo = getQuestStatusInfo(quest);
                   const difficultyData = getDifficultyData(quest.difficulty);
                   const isSelected = selectedQuest?.id === quest.id;
-                  
+
                   return (
                     <motion.div
                       key={quest.id}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       className={`bg-gray-800 rounded-lg border transition-all cursor-pointer ${
-                        isSelected 
-                          ? 'border-indigo-500 shadow-lg shadow-indigo-500/20' 
+                        isSelected
+                          ? 'border-indigo-500 shadow-lg shadow-indigo-500/20'
                           : 'border-gray-700 hover:border-gray-600'
                       }`}
                       onClick={() => setSelectedQuest(quest)}
@@ -306,7 +313,7 @@ const MiniquestInterface: React.FC<MiniquestInterfaceProps> = ({
                               </div>
                             </div>
                           </div>
-                          
+
                           <div className="flex items-center space-x-2">
                             <div className={`flex items-center space-x-1 text-xs px-2 py-1 rounded-full bg-gray-700 ${statusInfo.color}`}>
                               {statusInfo.icon}
@@ -318,10 +325,10 @@ const MiniquestInterface: React.FC<MiniquestInterfaceProps> = ({
                             </div>
                           </div>
                         </div>
-                        
+
                         {/* Quest Description */}
                         <p className="text-gray-300 text-sm mb-3">{quest.description}</p>
-                        
+
                         {/* Trigger Action */}
                         {quest.triggerAction && (
                           <div className="flex items-center space-x-2 text-xs">
@@ -332,7 +339,7 @@ const MiniquestInterface: React.FC<MiniquestInterfaceProps> = ({
                             </code>
                           </div>
                         )}
-                        
+
                         {/* Required Items */}
                         {quest.requiredItems && quest.requiredItems.length > 0 && (
                           <div className="flex items-center space-x-2 mt-2 text-xs">
@@ -340,7 +347,7 @@ const MiniquestInterface: React.FC<MiniquestInterfaceProps> = ({
                             <span className="text-orange-400">Required: </span>
                             <div className="flex space-x-1">
                               {quest.requiredItems.map(item => (
-                                <span 
+                                <span
                                   key={item}
                                   className={`px-2 py-1 rounded text-xs ${
                                     playerInventory.includes(item)

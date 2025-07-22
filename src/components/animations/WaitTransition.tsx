@@ -1,11 +1,15 @@
+import React, { useEffect, useState } from 'react';
+
+import { motion, AnimatePresence } from 'framer-motion';
+
+
+
 // WaitTransition.tsx — components/animations/WaitTransition.tsx
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: WaitTransition
 
 
-import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 
 interface WaitTransitionProps {
   onComplete: () => void;
@@ -61,7 +65,7 @@ const WaitTransition: React.FC<WaitTransitionProps> = ({ onComplete }) => {
                 background: 'radial-gradient(ellipse at 80% 50%, #660000 0%, #330000 40%, transparent 70%)',
               }}
             />
-            
+
             {/* Headlight beams */}
             <motion.div
               className="absolute inset-0"
@@ -88,7 +92,7 @@ const WaitTransition: React.FC<WaitTransitionProps> = ({ onComplete }) => {
                 background: '#ffffff',
               }}
             />
-            
+
             {/* Splatter effect */}
             <motion.div
               className="absolute inset-0"

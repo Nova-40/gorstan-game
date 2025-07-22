@@ -1,3 +1,9 @@
+import { NPC } from './NPCTypes';
+
+import { Room } from './RoomTypes';
+
+
+
 // Version: 6.0.0
 // (c) 2025 Geoffrey Alan Webster
 // Licensed under the MIT License
@@ -162,7 +168,7 @@ export function applyCommand({
     // Inventory limit logic: runbag increases capacity
     const hasRunBag = updatedInventory.includes('runbag');
     const inventoryLimit = hasRunBag ? 10 : 5;
-        
+
     // Debug output if enabled
     if (debug) {
       responses.push(`🛠 Debug: resolved input -> '${resolvedInput}'`);
@@ -175,14 +181,14 @@ export function applyCommand({
       return handleEndgameCommands(resolvedInput, { playerName, inventory, traits, flags });
     }
 
-    // Parse command structure            
+    // Parse command structure
     // Handle commands based on main verb
     switch (mainCommand) {
       case 'pick':
       case 'pickup':
         if (commandParts[1] === 'up') {
           return handlePickUp(target || commandParts.slice(2).join(' '), {
-            currentRoom, updatedInventory, updatedTraits, updatedFlags, 
+            currentRoom, updatedInventory, updatedTraits, updatedFlags,
             responses, inventoryLimit, hasRunBag, scoreDelta, specialActions
           });
         }
@@ -244,7 +250,7 @@ export function applyCommand({
       case 'help':
       case 'hint':
         return handleAylaRequest(target, {
-          updatedInventory, updatedTraits, updatedFlags, responses, 
+          updatedInventory, updatedTraits, updatedFlags, responses,
           currentRoom, scoreDelta, specialActions
         });
 
@@ -365,7 +371,7 @@ function handleEndgameCommands(
   context: { playerName: string; inventory: string[]; traits: string[]; flags: Record<string, any> }
 ): CommandResult {
   const { playerName, inventory, traits, flags } = context;
-  
+
   if (input === 'y' || input === 'yes') {
     return triggerEndgameAction('restart', { playerName, inventory, traits, flags });
   } else if (input === 'n' || input === 'no') {
@@ -373,7 +379,7 @@ function handleEndgameCommands(
   } else if (input === '/godrestart' && traits.includes('godmode')) {
     return triggerEndgameAction('instantreset', { playerName, inventory, traits, flags });
   }
-  
+
   return {
     messages: ['Please answer yes (y) or no (n).'],
     updates: { inventory, traits, flags, scoreDelta: 0 }
@@ -388,7 +394,7 @@ function handlePickUp(
   context: any
 ): CommandResult {
   const { currentRoom, updatedInventory, responses, inventoryLimit, hasRunBag, specialActions } = context;
-  
+
   if (!target) {
     responses.push('What would you like to pick up?');
     return buildResult(context);
@@ -438,7 +444,7 @@ function handlePickUp(
  */
 function handleUse(target: string, context: any): CommandResult {
   const { updatedInventory, updatedTraits, updatedFlags, responses, specialActions } = context;
-  
+
   if (!target) {
     responses.push('What would you like to use?');
     return buildResult(context);
@@ -457,7 +463,7 @@ function handleUse(target: string, context: any): CommandResult {
 
   // Use item system from items.ts
   const useResult = useItem(target, context);
-  
+
   responses.push(useResult.message);
 
   // Apply effects
@@ -506,7 +512,7 @@ function handleUse(target: string, context: any): CommandResult {
  */
 function handleDrop(target: string, context: any): CommandResult {
   const { currentRoom, updatedInventory, responses, specialActions } = context;
-  
+
   if (!target) {
     responses.push('What would you like to drop?');
     return buildResult(context);
@@ -519,13 +525,13 @@ function handleDrop(target: string, context: any): CommandResult {
 
   const itemData = getItemData(target);
   context.updatedInventory = updatedInventory.filter((item: string) => item !== target);
-  
+
   // Add to room items
   if (!currentRoom.items) currentRoom.items = [];
   currentRoom.items.push(target);
-  
+
   responses.push(`You dropped the ${itemData?.name || target}.`);
-  
+
   specialActions.push({
     type: 'item_effect',
     data: { action: 'drop', item: target, room: currentRoom.id }
@@ -539,7 +545,7 @@ function handleDrop(target: string, context: any): CommandResult {
  */
 function handleInspect(target: string, context: any): CommandResult {
   const { currentRoom, updatedInventory, responses, specialActions } = context;
-  
+
   if (!target) {
     responses.push('What would you like to inspect?');
     return buildResult(context);
@@ -550,7 +556,7 @@ function handleInspect(target: string, context: any): CommandResult {
     const itemData = getItemData(target);
     if (itemData) {
       responses.push(`${itemData.name}: ${itemData.description}`);
-      
+
       // Handle readable items
       if (itemData.readable && itemData.content) {
         responses.push(`Reading the ${itemData.name}:`);
@@ -591,7 +597,7 @@ function handleInspect(target: string, context: any): CommandResult {
  */
 function handleMovement(direction: string, context: any): CommandResult {
   const { currentRoom, responses, specialActions } = context;
-  
+
   if (!direction) {
     const exits = Object.keys(currentRoom.exits || {});
     if (exits.length > 0) {
@@ -610,7 +616,7 @@ function handleMovement(direction: string, context: any): CommandResult {
  */
 function handleDirectionalMovement(direction: string, context: any): CommandResult {
   const { currentRoom, updatedFlags, responses, specialActions } = context;
-  
+
   if (!currentRoom.exits?.[direction]) {
     responses.push(`You can't go ${direction} from here.`);
     return buildResult(context);
@@ -643,7 +649,7 @@ function handleDirectionalMovement(direction: string, context: any): CommandResu
  */
 function handleSpeaking(target: string, context: any): CommandResult {
   const { currentRoom, updatedInventory, updatedTraits, updatedFlags, responses, specialActions } = context;
-  
+
   if (!target) {
     const npcs = currentRoom.npcs || [];
     if (npcs.length > 0) {
@@ -661,7 +667,7 @@ function handleSpeaking(target: string, context: any): CommandResult {
 
   // Use NPC system
   const npcResponse = getNPCResponse(target, context);
-  
+
   responses.push(npcResponse);
   context.scoreDelta += 3;
 
@@ -678,7 +684,7 @@ function handleSpeaking(target: string, context: any): CommandResult {
  */
 function handleInventory(context: any): CommandResult {
   const { updatedInventory, responses } = context;
-  
+
   if (updatedInventory.length === 0) {
     responses.push('Your inventory is empty.');
   } else {
@@ -693,7 +699,7 @@ function handleInventory(context: any): CommandResult {
  */
 function handleJump(context: any): CommandResult {
   const { updatedInventory, updatedFlags, responses } = context;
-  
+
   if (!updatedInventory.includes('coffee')) {
     responses.push('You try to jump, but your hands are empty. No coffee, no go.');
     return buildResult(context);
@@ -733,7 +739,7 @@ function handleAylaRequest(query: string, context: any): CommandResult {
  */
 function handleCombine(target: string, context: any): CommandResult {
   const { updatedInventory, responses } = context;
-  
+
   const items = target.split(' and ');
   if (items.length !== 2) {
     responses.push('To combine items, use: combine [item1] and [item2]');
@@ -748,7 +754,7 @@ function handleCombine(target: string, context: any): CommandResult {
 
   // Basic combination logic - extend as needed
   responses.push(`You try to combine the ${item1} and ${item2}, but nothing happens. Maybe they don't work together.`);
-  
+
   return buildResult(context);
 }
 
@@ -757,7 +763,7 @@ function handleCombine(target: string, context: any): CommandResult {
  */
 function handleThrow(target: string, context: any): CommandResult {
   const { updatedInventory, responses, specialActions } = context;
-  
+
   if (!target) {
     responses.push('What would you like to throw?');
     return buildResult(context);

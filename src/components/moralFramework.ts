@@ -1,3 +1,5 @@
+
+
 // moralFramework.ts — components/moralFramework.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence

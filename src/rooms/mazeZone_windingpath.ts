@@ -1,9 +1,16 @@
+import { NPC } from './NPCTypes';
+
+import { Room } from '../types/RoomTypes';
+
+import { Room } from './RoomTypes';
+
+
+
 // mazeZone_windingpath.ts — rooms/mazeZone_windingpath.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: mazeZone_windingpath
 
-import { Room } from '../types/RoomTypes';
 
 const windingpath: Room = {
   id: "windingpath",

@@ -1,9 +1,16 @@
+import { NPC } from './NPCTypes';
+
+import { Room } from '../types/RoomTypes';
+
+import { Room } from './RoomTypes';
+
+
+
 // mazeZone_misleadchamber.ts — rooms/mazeZone_misleadchamber.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: mazeZone_misleadchamber
 
-import { Room } from '../types/RoomTypes';
 
 const misleadchamber: Room = {
   id: "misleadchamber",

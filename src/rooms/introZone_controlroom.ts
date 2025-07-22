@@ -1,9 +1,14 @@
+import { Room } from './RoomTypes';
+
+import { RoomDefinition } from '../types/RoomTypes';
+
+
+
 // introZone_controlroom.ts — rooms/introZone_controlroom.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: introZone_controlroom
 
-import { RoomDefinition } from '../types/RoomTypes';
 
 const controlroom: RoomDefinition = {
   id: 'controlroom',

@@ -1,11 +1,21 @@
+import { Dispatch } from 'react';
+
+import { GameAction } from '../types/GameTypes';
+
+import { NPC } from './NPCTypes';
+
+import { NPCState, PlayerState } from './npcMemory';
+
+import { Room } from '../types/Room';
+
+import { Room } from './RoomTypes';
+
+
+
 // npcSpawner.ts
 // Dynamic NPC spawning system for wandering characters
 // (c) 2025 Geoffrey Alan Webster. MIT License
 
-import { GameAction } from '../types/GameTypes';
-import { Room } from '../types/Room';
-import { NPCState, PlayerState } from './npcMemory';
-import { Dispatch } from 'react';
 
 export interface WanderingNPC {
   id: string;
@@ -105,7 +115,7 @@ export const wanderingNPCs: WanderingNPC[] = [
     zonePreferences: ['lattice', 'intro', 'london'],
     spawnChance: 0.15
   },
-  
+
   {
     id: 'al_escape_artist',
     name: 'Al',
@@ -126,7 +136,7 @@ export const wanderingNPCs: WanderingNPC[] = [
     zonePreferences: ['intro', 'lattice', 'system'],
     spawnChance: 0.12
   },
-  
+
   {
     id: 'dominic_wandering',
     name: 'Dominic',
@@ -149,7 +159,7 @@ export const wanderingNPCs: WanderingNPC[] = [
     zonePreferences: ['glitch', 'lattice', 'elfhame'],
     spawnChance: 0.08
   },
-  
+
   {
     id: 'morthos',
     name: 'Morthos',
@@ -173,7 +183,7 @@ export const wanderingNPCs: WanderingNPC[] = [
     zonePreferences: ['glitch', 'stanton', 'liminal'],
     spawnChance: 0.1
   },
-  
+
   {
     id: 'polly',
     name: 'Polly',
@@ -198,7 +208,7 @@ export const wanderingNPCs: WanderingNPC[] = [
     zonePreferences: ['stanton', 'emotional_spaces'],
     spawnChance: 0.06
   },
-  
+
   {
     id: 'albie',
     name: 'Albie',
@@ -236,15 +246,15 @@ export function initializeNPCSpawner(dispatch: Dispatch<GameAction>): void {
  * Main function to evaluate and spawn/despawn NPCs in a room
  */
 export function evaluateNPCSpawning(
-  roomId: string, 
-  room: Room, 
-  playerState: PlayerState, 
+  roomId: string,
+  room: Room,
+  playerState: PlayerState,
   npcStates: Record<string, NPCState>
 ): { spawn?: WanderingNPC; despawn?: string; messages: string[] } {
-  
+
   const messages: string[] = [];
   const currentNPC = activeNPCs.get(roomId);
-  
+
   // Check if current NPC should be despawned
   if (currentNPC) {
     const npc = wanderingNPCs.find(n => n.id === currentNPC);
@@ -256,7 +266,7 @@ export function evaluateNPCSpawning(
       return { despawn: currentNPC, messages };
     }
   }
-  
+
   // If no NPC or need to spawn new one, evaluate spawning
   if (!currentNPC) {
     const candidateNPC = selectNPCToSpawn(roomId, room, playerState, npcStates);
@@ -268,7 +278,7 @@ export function evaluateNPCSpawning(
       return { spawn: candidateNPC, messages };
     }
   }
-  
+
   return { messages };
 }
 
@@ -276,32 +286,32 @@ export function evaluateNPCSpawning(
  * Select which NPC should spawn in a room
  */
 function selectNPCToSpawn(
-  roomId: string, 
-  room: Room, 
-  playerState: PlayerState, 
+  roomId: string,
+  room: Room,
+  playerState: PlayerState,
   npcStates: Record<string, NPCState>
 ): WanderingNPC | null {
-  
-  const eligibleNPCs = wanderingNPCs.filter(npc => 
+
+  const eligibleNPCs = wanderingNPCs.filter(npc =>
     canNPCSpawnInRoom(npc, roomId, room, playerState, npcStates)
   );
-  
+
   if (eligibleNPCs.length === 0) return null;
-  
+
   // Sort by priority and spawn chance
   eligibleNPCs.sort((a, b) => {
     const priorityDiff = b.personality.priority - a.personality.priority;
     if (priorityDiff !== 0) return priorityDiff;
     return b.spawnChance - a.spawnChance;
   });
-  
+
   // Roll for spawn chance
   for (const npc of eligibleNPCs) {
     if (Math.random() < npc.spawnChance) {
       return npc;
     }
   }
-  
+
   return null;
 }
 
@@ -309,33 +319,33 @@ function selectNPCToSpawn(
  * Check if an NPC can spawn in a specific room
  */
 function canNPCSpawnInRoom(
-  npc: WanderingNPC, 
-  roomId: string, 
-  room: Room, 
-  playerState: PlayerState, 
+  npc: WanderingNPC,
+  roomId: string,
+  room: Room,
+  playerState: PlayerState,
   npcStates: Record<string, NPCState>
 ): boolean {
-  
+
   // Check spawn conditions
-  if (!npc.spawnConditions.every(condition => 
+  if (!npc.spawnConditions.every(condition =>
     evaluateSpawnCondition(condition, roomId, room, playerState, npcStates)
   )) {
     return false;
   }
-  
+
   // Check conflict rules
   for (const rule of npc.conflictRules) {
     if (!evaluateConflictRule(rule, roomId, room, playerState)) {
       return false;
     }
   }
-  
+
   // Check zone preferences
   const roomZone = getRoomZone(roomId, room);
   if (npc.zonePreferences.length > 0 && !npc.zonePreferences.includes(roomZone)) {
     return false;
   }
-  
+
   return true;
 }
 
@@ -343,20 +353,20 @@ function canNPCSpawnInRoom(
  * Check if an NPC should stay in a room
  */
 function shouldNPCStayInRoom(
-  npc: WanderingNPC, 
-  roomId: string, 
-  room: Room, 
+  npc: WanderingNPC,
+  roomId: string,
+  room: Room,
   playerState: PlayerState
 ): boolean {
-  
+
   // NPCs might leave if conditions change
   const roomZone = getRoomZone(roomId, room);
-  
+
   // Check if zone is still preferred
   if (npc.zonePreferences.length > 0 && !npc.zonePreferences.includes(roomZone)) {
     return Math.random() < 0.3; // 30% chance to stay anyway
   }
-  
+
   return true;
 }
 
@@ -364,39 +374,39 @@ function shouldNPCStayInRoom(
  * Evaluate a spawn condition
  */
 function evaluateSpawnCondition(
-  condition: SpawnCondition, 
-  roomId: string, 
-  room: Room, 
-  playerState: PlayerState, 
+  condition: SpawnCondition,
+  roomId: string,
+  room: Room,
+  playerState: PlayerState,
   npcStates: Record<string, NPCState>
 ): boolean {
-  
+
   switch (condition.type) {
     case 'flag':
       if (!condition.key || !playerState.flags) return false;
       const flagValue = playerState.flags[condition.key];
       return evaluateValue(flagValue, condition.value, condition.operator);
-      
+
     case 'inventory':
       if (!condition.key || !playerState.inventory) return false;
       const hasItem = playerState.inventory.includes(condition.key);
       return condition.operator === 'not_contains' ? !hasItem : hasItem;
-      
+
     case 'room_count':
       const visitedCount = playerState.visitedRooms?.length || 0;
       return evaluateValue(visitedCount, condition.value, condition.operator);
-      
+
     case 'random':
       return Math.random() < 0.3; // 30% random chance
-      
+
     case 'zone':
       const zone = getRoomZone(roomId, room);
       return zone === condition.value || zone.includes(condition.value as string);
-      
+
     case 'npc_memory':
       // Check NPC memory conditions
       return true; // Simplified for now
-      
+
     default:
       return false;
   }
@@ -406,27 +416,27 @@ function evaluateSpawnCondition(
  * Evaluate a conflict rule
  */
 function evaluateConflictRule(
-  rule: ConflictRule, 
-  roomId: string, 
-  room: Room, 
+  rule: ConflictRule,
+  roomId: string,
+  room: Room,
   playerState: PlayerState
 ): boolean {
-  
+
   switch (rule.type) {
     case 'cannot_coexist':
       // Check if conflicting NPC is in this room
       const conflictingNPC = activeNPCs.get(roomId);
       return !conflictingNPC || conflictingNPC !== rule.targetNPC;
-      
+
     case 'avoids_zone':
       const zone = getRoomZone(roomId, room);
       return zone !== rule.targetZone;
-      
+
     case 'requires_absence':
       // Check if target NPC is NOT in room
       const targetNPC = activeNPCs.get(roomId);
       return !targetNPC || targetNPC !== rule.targetNPC;
-      
+
     default:
       return true;
   }
@@ -454,14 +464,14 @@ function getRoomZone(roomId: string, room: Room): string {
   if (roomId.includes('Zone_')) {
     return roomId.split('Zone_')[0].toLowerCase();
   }
-  
+
   // Fallback to room analysis
   if (room.title?.toLowerCase().includes('puzzle')) return 'puzzle_heavy';
   if (room.description?.toLowerCase().includes('dark')) return 'dark';
   if (room.description?.toLowerCase().includes('stable')) return 'stable';
   if (roomId.includes('glitch')) return 'surreal';
   if (roomId.includes('lattice')) return 'surreal';
-  
+
   return 'neutral';
 }
 

@@ -1,3 +1,13 @@
+import type { LocalGameState } from '../state/gameState';
+
+import type { TrapDefinition } from '../types/RoomTypes';
+
+import { Room } from './RoomTypes';
+
+import { Trap } from './GameTypes';
+
+
+
 // Version: 1.0.0
 // (c) 2025 Geoffrey Alan Webster
 // Licensed under the MIT License
@@ -6,8 +16,6 @@
 //
 // Comprehensive trap system validation utility for Gorstan game.
 
-import type { TrapDefinition } from '../types/RoomTypes';
-import type { LocalGameState } from '../state/gameState';
 
 export interface TrapSystemValidationResult {
   isOperational: boolean;
@@ -131,7 +139,7 @@ export function validateTrapSystem(roomMap: Record<string, any>): TrapSystemVali
   for (const [roomId, room] of Object.entries(roomMap)) {
     if (room.traps && Array.isArray(room.traps)) {
       const trapValidations = room.traps.map((trap: TrapDefinition) => validateTrap(trap));
-      
+
       result.roomsWithTraps.push({
         roomId,
         trapCount: room.traps.length,
@@ -144,7 +152,7 @@ export function validateTrapSystem(roomMap: Record<string, any>): TrapSystemVali
           result.errors.push(`Room ${roomId}, trap ${validation.trapId}: ${validation.issues.join(', ')}`);
           result.isOperational = false;
         }
-        
+
         if (validation.issues.length > 0) {
           validation.issues.forEach((issue: string) => {
             result.warnings.push(`Room ${roomId}, trap ${validation.trapId}: ${issue}`);
@@ -212,7 +220,7 @@ export function testTrapSystem(): {
       details: 'RoomRenderer checks for traps on room entry',
     },
     {
-      name: 'Command Processor Integration', 
+      name: 'Command Processor Integration',
       passed: true, // Would test processRoomEntry function
       details: 'Command processor has trap handling logic',
     },
@@ -246,12 +254,12 @@ export function trapSystemHealthCheck(): {
 } {
   // This would be expanded with actual system checks
   const criticalIssues: string[] = [];
-  
+
   // Check for common issues
   const hasDefinitions = true; // TrapDefinition interface exists
   const hasGameStateIntegration = true; // TRIGGER_TRAP action exists
   const hasRoomIntegration = true; // RoomRenderer has trap logic
-  
+
   let status: 'OPERATIONAL' | 'WARNING' | 'ERROR' = 'OPERATIONAL';
   let message = 'Trap system is operational and ready for use';
 
@@ -316,7 +324,7 @@ export function generateTrapReport(roomMap: Record<string, any>): {
       // Check for high-risk rooms (multiple traps or fatal traps)
       const hasFatalTrap = room.traps.some((trap: TrapDefinition) => trap.severity === 'fatal');
       const hasMultipleTraps = room.traps.length > 1;
-      
+
       if (hasFatalTrap || hasMultipleTraps) {
         highRiskRooms.push(roomId);
       }

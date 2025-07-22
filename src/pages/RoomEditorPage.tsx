@@ -1,3 +1,9 @@
+import { Room } from './RoomTypes';
+
+import { Trap } from './GameTypes';
+
+
+
 // RoomEditorPage.tsx — pages/RoomEditorPage.tsx
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
@@ -25,7 +31,7 @@ function sanitizeTrigger(trigger: unknown): "enter" | "look" | "search" | "item_
     console.warn(`Invalid trap trigger type: ${typeof trigger}, defaulting to 'enter'`);
     return "enter";
   }
-  
+
     switch (normalized) {
     case "enter":
     case "onenter":
@@ -62,7 +68,7 @@ function sanitizeTrapType(type: unknown): "damage" | "teleport" | "item_loss" | 
     console.warn(`Invalid trap type: ${typeof type}, defaulting to 'damage'`);
     return "damage";
   }
-  
+
     switch (normalized) {
     case "damage":
       return "damage";
@@ -90,7 +96,7 @@ function sanitizeTrapSeverity(severity: unknown): "minor" | "major" | "fatal" {
     console.warn(`Invalid trap severity: ${typeof severity}, defaulting to 'minor'`);
     return "minor";
   }
-  
+
     switch (normalized) {
     case "minor":
       return "minor";
@@ -109,7 +115,7 @@ function sanitizeTrapSeverity(severity: unknown): "minor" | "major" | "fatal" {
  */
 function processTraps(room: Room, roomKey: string): TrapDefinition[] {
   const traps: TrapDefinition[] = [];
-  
+
   try {
     // Handle new traps array format
     if (Array.isArray(room.traps)) {
@@ -131,7 +137,7 @@ function processTraps(room: Room, roomKey: string): TrapDefinition[] {
         }
       });
     }
-  
+
     // Handle legacy single trap property
     if ('trap' in room && room.trap && typeof room.trap === 'object' && room.trap !== null && traps.length === 0) {
             const processedLegacyTrap: TrapDefinition = {
@@ -160,9 +166,9 @@ export default function RoomEditorPage(): JSX.Element {
   // Status messages for the page
   const [statusMessages, setStatusMessages] = useState<StatusMessage[]>([]);
   const [isValidationValid, setIsValidationValid] = useState<boolean>(true);
-  
+
   // Use refs to track timeouts for cleanup
-  
+
   /**
    * Cleanup function for timeouts
    */
@@ -181,25 +187,25 @@ export default function RoomEditorPage(): JSX.Element {
 
     // Prevent duplicate messages
     setStatusMessages(prev => {
-            
+
       if (isDuplicate) return prev;
-      
+
       return [...prev, newMessage];
     });
 
     // Auto-remove after 5 seconds with cleanup tracking
           timeoutRefs.current.delete(timeoutId);
     }, 5000);
-    
+
     timeoutRefs.current.add(timeoutId);
   }, []);
 
   /**
    * Convert RoomRegistry to RoomData format with improved performance
    */
-      
+
     try {
-            
+
       for (const [key, room] of roomEntries) {
         try {
           // Ensure proper type conversion from Room to RoomData
@@ -209,7 +215,7 @@ export default function RoomEditorPage(): JSX.Element {
             title: room.title || 'Untitled Room',
             zone: room.zone || 'unknown',
             description: room.description || '',
-            
+
             // Navigation - ensure exits is always a proper object
             exits: room.exits
               ? Object.fromEntries(
@@ -218,33 +224,33 @@ export default function RoomEditorPage(): JSX.Element {
                 ) as Record<string, string>
               : {},
             hiddenExits: room.hiddenExits || {},
-            
+
             // Content arrays (ensure they exist and are valid) - optimized filtering
             items: room.items?.filter(item => typeof item === 'string' && item.trim().length > 0) || [],
             npcs: room.npcs?.filter(npc => typeof npc === 'string' && npc.trim().length > 0) || [],
             flags: room.flags?.filter(flag => typeof flag === 'string' && flag.trim().length > 0) || [],
             furniture: room.furniture?.filter(item => typeof item === 'string' && item.trim().length > 0) || [],
             containers: room.containers?.filter(item => typeof item === 'string' && item.trim().length > 0) || [],
-            
+
             // Visual & Audio
             image: room.image,
             visualEffect: room.visualEffect,
             soundscape: room.soundscape,
             atmosphere: room.atmosphere,
-            
+
             // Narrative
             entryText: room.entryText,
             lookDescription: room.lookDescription,
             searchDescription: room.searchDescription,
             altDescriptions: room.altDescriptions,
             visitNarratives: room.visitNarratives,
-            
+
             // Game state
             requirements: room.requirements,
-            
+
             // Interactive elements - use extracted function for better performance
             traps: processTraps(room, key),
-            
+
             events: room.events || [],
             interactions: room.interactions && typeof room.interactions === 'object' && room.interactions !== null
               ? Object.fromEntries(
@@ -252,7 +258,7 @@ export default function RoomEditorPage(): JSX.Element {
                     .filter(([_, v]) => typeof v === 'string')
                 ) as Record<string, string>
               : {},
-            
+
             // Atmospheric details
             echoes: room.echoes,
             memoryHooks: room.memoryHooks,
@@ -265,21 +271,21 @@ export default function RoomEditorPage(): JSX.Element {
                   )
                 ) as Record<string, Partial<Room>>
               : undefined,
-            
+
             // Quest integration
             microQuestId: room.microQuestId,
             questFlags: room.questFlags,
             questRequirements: room.questRequirements,
-            
+
             // Technical
-            special: room.special && typeof room.special === 'object' && room.special !== null 
-              ? room.special as Record<string, unknown> 
+            special: room.special && typeof room.special === 'object' && room.special !== null
+              ? room.special as Record<string, unknown>
               : undefined,
-            metadata: room.metadata && typeof room.metadata === 'object' && room.metadata !== null 
-              ? room.metadata as Record<string, unknown> 
+            metadata: room.metadata && typeof room.metadata === 'object' && room.metadata !== null
+              ? room.metadata as Record<string, unknown>
               : undefined
           };
-          
+
           converted[key] = roomData;
         } catch (roomError) {
           console.error(`Error processing room ${key}:`, roomError);
@@ -297,7 +303,7 @@ export default function RoomEditorPage(): JSX.Element {
   /**
    * Handle room save - Fixed signature and improved error handling
    */
-        
+
       for (const field of requiredFields) {
         if (!room[field] || typeof room[field] !== 'string' || (room[field] as string).trim().length === 0) {
           throw new Error(`${field.charAt(0).toUpperCase() + field.slice(1)} is required and must be a non-empty string`);
@@ -310,7 +316,7 @@ export default function RoomEditorPage(): JSX.Element {
           if (!trap.id || !trap.description) {
             throw new Error(`Trap ${index + 1} is missing required fields (id or description)`);
           }
-          
+
           // Return sanitized trap
           return {
             ...trap,
@@ -326,13 +332,13 @@ export default function RoomEditorPage(): JSX.Element {
 
       // Simulate async save operation with proper Promise
       await new Promise<void>((resolve, reject) => {
-                    
+
             resolve();
           } catch (error) {
             reject(new Error(`Failed to save room data: ${error instanceof Error ? error.message : 'Unknown error'}`));
           }
         }, 1000);
-        
+
         timeoutRefs.current.add(timeoutId);
       });
 
@@ -349,13 +355,13 @@ export default function RoomEditorPage(): JSX.Element {
    * Handle validation state changes from RoomEditor
    */
   const handleValidationChange = useCallback((
-    isValid: boolean, 
+    isValid: boolean,
     errors: Array<{ field: string; message: string; severity: 'error' | 'warning' }>
   ): void => {
     setIsValidationValid(isValid);
-    
+
     // Show validation summary if there are errors
-            
+
     if (errorCount > 0) {
       addStatusMessage('error', `Validation failed: ${errorCount} error(s), ${warningCount} warning(s)`);
     } else if (warningCount > 0) {
@@ -441,7 +447,7 @@ export default function RoomEditorPage(): JSX.Element {
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Gorstan Room Editor</h1>
               <p className="text-sm text-gray-500">
-                {Object.keys(roomsData).length} rooms loaded • 
+                {Object.keys(roomsData).length} rooms loaded •
                 {isValidationValid ? ' ✅ Valid' : ' ⚠️ Validation issues'}
               </p>
             </div>

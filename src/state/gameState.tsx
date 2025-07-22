@@ -1,3 +1,23 @@
+import React, { createContext, useContext, useReducer, Dispatch } from 'react';
+
+import { GameAction, GameMessage, Player } from '../types/GameTypes';
+
+import { MiniquestState } from '../types/MiniquestTypes';
+
+import { NPC } from './NPCTypes';
+
+import { processCommand } from '../engine/commandProcessor';
+
+import { Room } from '../types/Room';
+
+import { Room } from './RoomTypes';
+
+import { Trap } from './GameTypes';
+
+import { unlockAchievement } from '../logic/achievementEngine';
+
+
+
 // gameState.tsx — state/gameState.tsx
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
@@ -7,12 +27,6 @@
 // Gorstan (C) Geoff Webster 2025
 // Code MIT Licence
 
-import React, { createContext, useContext, useReducer, Dispatch } from 'react';
-import { Room } from '../types/Room';
-import { GameAction, GameMessage, Player } from '../types/GameTypes';
-import { MiniquestState } from '../types/MiniquestTypes';
-import { processCommand } from '../engine/commandProcessor';
-import { unlockAchievement } from '../logic/achievementEngine';
 
 /**
  * Helper function to add room description messages to game history
@@ -21,9 +35,9 @@ function addRoomDescriptionToHistory(history: GameMessage[], room: Room | null, 
   if (!room || !room.description) {
     return history;
   }
-  
+
   const newHistory = [...history];
-  
+
   // Add room title if it exists and is different from room ID
   if (room.title && room.title !== roomId) {
     const roomTitleMessage: GameMessage = {
@@ -34,7 +48,7 @@ function addRoomDescriptionToHistory(history: GameMessage[], room: Room | null, 
     };
     newHistory.push(roomTitleMessage);
   }
-  
+
   // Add room description
   const roomDescriptionMessage: GameMessage = {
     id: `room-desc-${Date.now()}`,
@@ -43,7 +57,7 @@ function addRoomDescriptionToHistory(history: GameMessage[], room: Room | null, 
     timestamp: Date.now(),
   };
   newHistory.push(roomDescriptionMessage);
-  
+
   return newHistory;
 }
 
@@ -143,9 +157,9 @@ export const gameStateReducer = (state: LocalGameState, action: GameAction): Loc
     case 'ADD_SCORE':
       return {
         ...state,
-        player: { 
-          ...state.player, 
-          score: (state.player.score || 0) + (action.payload as number) 
+        player: {
+          ...state.player,
+          score: (state.player.score || 0) + (action.payload as number)
         },
       };
 
@@ -164,7 +178,7 @@ export const gameStateReducer = (state: LocalGameState, action: GameAction): Loc
     case 'LOAD_ROOM': {
       const payload = action.payload as { id: string; data: Room };
       const updatedHistory = addRoomDescriptionToHistory(state.history, payload.data, payload.id);
-      
+
       return {
         ...state,
         currentRoomId: payload.id,
@@ -195,7 +209,7 @@ export const gameStateReducer = (state: LocalGameState, action: GameAction): Loc
       const newRoomId = 'controlnexus';
       const newRoom = state.roomMap[newRoomId];
       const updatedHistory = addRoomDescriptionToHistory(state.history, newRoom, newRoomId);
-      
+
       return {
         ...state,
         stage: STAGES.GAME,
@@ -204,7 +218,7 @@ export const gameStateReducer = (state: LocalGameState, action: GameAction): Loc
       };
     }
 
-    
+
     case 'PRESS_BLUE_BUTTON':
       return handleBlueButtonPress(state);
 
@@ -315,25 +329,25 @@ export const gameStateReducer = (state: LocalGameState, action: GameAction): Loc
       const visitedRooms = state.player.visitedRooms || [];
       const isNewRoom = !visitedRooms.includes(roomId);
       const explorationScore = isNewRoom ? 25 : 0; // Points for exploring new rooms
-      
-      const newVisitedRooms = visitedRooms.includes(roomId) 
-        ? visitedRooms 
+
+      const newVisitedRooms = visitedRooms.includes(roomId)
+        ? visitedRooms
         : [...visitedRooms, roomId];
-      
+
       // Check for explorer achievement (10 rooms visited)
       if (newVisitedRooms.length >= 10 && visitedRooms.length < 10) {
         unlockAchievement('explorer');
       }
-      
+
       // Check for final zone achievement
       if (roomId.includes('final') || roomId.includes('end') || roomId.includes('stanton')) {
         unlockAchievement('reached_final_zone');
       }
-      
+
       // Add room description to console history
       const newRoom = state.roomMap[roomId];
       const updatedHistory = addRoomDescriptionToHistory(state.history, newRoom, roomId);
-      
+
       return {
         ...state,
         previousRoomId: state.currentRoomId,  // Track previous room
@@ -361,7 +375,7 @@ export const gameStateReducer = (state: LocalGameState, action: GameAction): Loc
       // Handle command input - integrate with command processor
       const command = action.payload as string;
       const currentRoom = state.roomMap[state.currentRoomId];
-      
+
       if (!currentRoom) {
         const errorMessage: GameMessage = {
           id: Date.now().toString(),
@@ -385,13 +399,13 @@ export const gameStateReducer = (state: LocalGameState, action: GameAction): Loc
 
       // Process the command
       const result = processCommand(command, state, currentRoom);
-      
+
       // Convert TerminalMessages to GameMessages
       const responseMessages: GameMessage[] = result.messages.map((msg: any, index: number) => ({
         id: `${Date.now()}-${index}`,
         text: msg.text,
-        type: msg.type === 'lore' ? 'narrative' : 
-              msg.type === 'info' ? 'action' : 
+        type: msg.type === 'lore' ? 'narrative' :
+              msg.type === 'info' ? 'action' :
               msg.type === 'error' ? 'error' : 'system',
         timestamp: Date.now(),
       }));
@@ -404,18 +418,18 @@ export const gameStateReducer = (state: LocalGameState, action: GameAction): Loc
 
       if (result.updates) {
         newState = { ...newState, ...result.updates };
-        
+
         // If the room changed, update visited rooms tracking and add room description
         if (result.updates.currentRoomId && result.updates.currentRoomId !== state.currentRoomId) {
           const visitedRooms = newState.player.visitedRooms || [];
           newState.previousRoomId = state.currentRoomId;  // Track previous room
           newState.player = {
             ...newState.player,
-            visitedRooms: visitedRooms.includes(result.updates.currentRoomId) 
-              ? visitedRooms 
+            visitedRooms: visitedRooms.includes(result.updates.currentRoomId)
+              ? visitedRooms
               : [...visitedRooms, result.updates.currentRoomId],
           };
-          
+
           // Add room description to console history when room changes
           const newRoom = newState.roomMap[result.updates.currentRoomId];
           newState.history = addRoomDescriptionToHistory(newState.history, newRoom, result.updates.currentRoomId);
@@ -429,7 +443,7 @@ export const gameStateReducer = (state: LocalGameState, action: GameAction): Loc
       const newRoomId = 'controlnexus';
       const newRoom = state.roomMap[newRoomId];
       const updatedHistory = addRoomDescriptionToHistory(state.history, newRoom, newRoomId);
-      
+
       return {
         ...state,
         stage: STAGES.GAME,
@@ -458,7 +472,7 @@ export const gameStateReducer = (state: LocalGameState, action: GameAction): Loc
       const currentHealth = state.player.health || 100;
       const damage = trap.effect?.damage || 0;
       const newHealth = Math.max(0, currentHealth - damage);
-      
+
       // Create trap message
       const trapMessage: GameMessage = {
         id: `trap-${Date.now()}`,
@@ -466,6 +480,12 @@ export const gameStateReducer = (state: LocalGameState, action: GameAction): Loc
         type: 'error',
         timestamp: Date.now(),
       };
+
+      // Standardized trap penalty: -10 points
+      if (trap.effect?.scorePenalty !== false) {
+        // Only apply if not explicitly disabled
+        state.player.score = (state.player.score || 0) - 10;
+      }
 
       const messages = [trapMessage];
 
@@ -675,6 +695,5 @@ export interface LocalGameState {
     codexEntries: Record<string, any>;
   };
 }
-
 
 

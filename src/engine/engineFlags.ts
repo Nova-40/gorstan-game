@@ -1,3 +1,5 @@
+
+
 // Version: 6.0.0
 // (c) 2025 Geoffrey Alan Webster
 // Licensed under the MIT License
@@ -57,7 +59,7 @@ export const INVENTORY_CONFIG: InventoryCapacityModifiers = {
  * @returns The calculated inventory capacity
  */
 export function getInventoryCapacity(
-  flags: Record<string, unknown>, 
+  flags: Record<string, unknown>,
   traits?: string[]
 ): number {
   try {
@@ -85,7 +87,7 @@ export function getInventoryCapacity(
 
     // Ensure minimum capacity
     return Math.max(capacity, 1);
-    
+
   } catch (error) {
     console.error('[EngineFlags] Error calculating inventory capacity:', error);
     return INVENTORY_CONFIG.baseCapacity;
@@ -119,8 +121,8 @@ export function hasFlag(flags: FlagState, flagName: string): boolean {
  * @returns Updated flags object
  */
 export function setFlag(
-  flags: FlagState, 
-  flagName: string, 
+  flags: FlagState,
+  flagName: string,
   value: unknown = true
 ): FlagState {
   try {
@@ -166,8 +168,8 @@ export function toggleFlag(flags: FlagState, flagName: string): FlagState {
  * @returns Updated flags object
  */
 export function incrementFlag(
-  flags: FlagState, 
-  flagName: string, 
+  flags: FlagState,
+  flagName: string,
   amount: number = 1
 ): FlagState {
   try {
@@ -189,13 +191,13 @@ export function incrementFlag(
  * @returns Updated flags object
  */
 export function decrementFlag(
-  flags: FlagState, 
-  flagName: string, 
+  flags: FlagState,
+  flagName: string,
   amount: number = 1,
   allowNegative: boolean = false
 ): FlagState {
   try {
-                
+
     return setFlag(flags, flagName, finalValue);
   } catch (error) {
     console.error(`[EngineFlags] Error decrementing flag '${flagName}':`, error);
@@ -231,8 +233,8 @@ export function removeFlag(flags: FlagState, flagName: string): FlagState {
  * @returns Flag value or default
  */
 export function getFlagValue<T = unknown>(
-  flags: FlagState, 
-  flagName: string, 
+  flags: FlagState,
+  flagName: string,
   defaultValue?: T
 ): T {
   try {
@@ -253,14 +255,14 @@ export function getFlagValue<T = unknown>(
  * @returns True if condition is met
  */
 export function checkMultipleFlags(
-  flags: FlagState, 
-  flagNames: string[], 
+  flags: FlagState,
+  flagNames: string[],
   mode: 'and' | 'or' = 'and'
 ): boolean {
   try {
     if (flagNames.length === 0) return true;
 
-    return mode === 'and' 
+    return mode === 'and'
       ? results.every(result => result)
       : results.some(result => result);
   } catch (error) {
@@ -278,7 +280,7 @@ export function checkMultipleFlags(
  * @returns Updated flags object
  */
 export function applyFlagOperations(
-  flags: FlagState, 
+  flags: FlagState,
   operations: FlagOperation[]
 ): FlagState {
   try {
@@ -324,8 +326,8 @@ export function validateFlagState(flags: unknown): flags is FlagState {
  * @returns True if valid flag name
  */
 export function validateFlagName(name: unknown): name is string {
-  return typeof name === 'string' && 
-         name.length > 0 && 
+  return typeof name === 'string' &&
+         name.length > 0 &&
          /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(name);
 }
 
@@ -345,7 +347,7 @@ export function getFlagStatistics(flags: FlagState): {
   trueBooleanFlags: number;
 } {
   try {
-        
+
     return {
       totalFlags: entries.length,
       booleanFlags: entries.filter(([_, v]) => typeof v === 'boolean').length,
@@ -409,18 +411,18 @@ export function mergeFlags(baseFlags: FlagState, newFlags: FlagState): FlagState
  * @returns Filtered flag state
  */
 export function filterFlags(
-  flags: FlagState, 
+  flags: FlagState,
   predicate: (key: string, value: unknown) => boolean
 ): FlagState {
   try {
     const filtered: FlagState = {};
-    
+
     Object.entries(flags).forEach(([key, value]) => {
       if (predicate(key, value)) {
         filtered[key] = value;
       }
     });
-    
+
     return filtered;
   } catch (error) {
     console.error('[EngineFlags] Error filtering flags:', error);
@@ -431,7 +433,7 @@ export function filterFlags(
 /**
  * Export utilities for external use
  */
-export 
+export
 export default EngineFlags;
 
 // Maintain backward compatibility by exporting the original function

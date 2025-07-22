@@ -1,3 +1,7 @@
+import { NPC } from './NPCTypes';
+
+
+
 // Version: 6.0.0
 // (c) 2025 Geoffrey Alan Webster
 // Licensed under the MIT License
@@ -126,7 +130,7 @@ const recentInterventions: Array<{
    */
   inRoom: (currentRoom: string | undefined, roomPattern: string): boolean => {
     try {
-      return Boolean(currentRoom && 
+      return Boolean(currentRoom &&
         currentRoom.toLowerCase().includes(roomPattern.toLowerCase()));
     } catch (error) {
       console.error(`[NPCIntervention] Error checking room ${roomPattern}:`, error);
@@ -139,7 +143,7 @@ const recentInterventions: Array<{
    */
   hasNPC: (npcsInRoom: string[], npcName: string): boolean => {
     try {
-      return npcsInRoom.some(npc => 
+      return npcsInRoom.some(npc =>
         npc.toLowerCase().trim() === npcName.toLowerCase().trim()
       );
     } catch (error) {
@@ -154,21 +158,21 @@ const recentInterventions: Array<{
   getReputation: (playerState: PlayerState | undefined): number => {
     try {
       if (!playerState) return 0;
-      
+
       // Check npcRelationships (new format)
       if (playerState.npcRelationships) {
                 if (reputationValues.length > 0) {
           return Math.max(...reputationValues);
         }
       }
-      
+
       // Check legacy reputation format
       if (playerState.reputation) {
                 if (reputationValues.length > 0) {
           return Math.max(...reputationValues);
         }
       }
-      
+
       return 0;
     } catch (error) {
       console.error('[NPCIntervention] Error getting reputation:', error);
@@ -313,7 +317,7 @@ const interventionRules: InterventionRule[] = [
         // 2. Has leadership traits
         // 3. Has achieved hero status
         // 4. Has proven themselves worthy of respect
-                
+
         return (
           reputation >= 15 ||
           ConditionHelpers.hasTrait(context.playerState, 'respected') ||
@@ -559,7 +563,7 @@ export function checkNPCInterventions(context: InterventionContext): Interventio
     for (const rule of availableRules) {
       try {
         if (canTriggerIntervention(rule, context)) {
-                    
+
           if (suppressedNPCs.length > 0) {
             // Check additional conditions with enhanced error handling
             if (rule.conditions) {
@@ -639,7 +643,7 @@ function createEmptyResult(): InterventionResult {
 function canTriggerIntervention(rule: InterventionRule, context: InterventionContext): boolean {
   try {
         let history = interventionHistory.get(rule.id);
-    
+
     // Initialize history if it doesn't exist
     if (!history) {
       history = {
@@ -669,7 +673,7 @@ function canTriggerIntervention(rule: InterventionRule, context: InterventionCon
     }
 
     // Check time restrictions
-    if (rule.timeRestrictions?.maxPerHour && 
+    if (rule.timeRestrictions?.maxPerHour &&
         history.hourlyCount >= rule.timeRestrictions.maxPerHour) {
       return false;
     }
@@ -743,8 +747,8 @@ function getPlayerReputation(playerState: PlayerState): number {
  */
 function findSuppressedNPCs(rule: InterventionRule, lowerNpcs: string[]): string[] {
   try {
-            
-    return lowerNpcs.filter(npc => 
+
+    return lowerNpcs.filter(npc =>
       targetNPCsLower.includes(npc) && npc !== interventionNPCLower
     );
   } catch (error) {
@@ -763,14 +767,14 @@ function executeIntervention(
 ): InterventionResult {
   try {
     const messages: string[] = [];
-    
+
     // Send intervention message
     messages.push(rule.messages.intervention);
     context.appendMessage(rule.messages.intervention, 'intervention');
 
     // Send suppression messages with better variation
     suppressedNPCs.forEach((npc, index) => {
-                                    
+
       messages.push(fullMessage);
       context.appendMessage(fullMessage, 'suppression');
     });
@@ -896,7 +900,7 @@ export function addInterventionRule(rule: InterventionRule): boolean {
       interventionRules.push(rule);
       console.log(`[NPCIntervention] Added intervention rule: ${rule.id}`);
     }
-    
+
     return true;
   } catch (error) {
     console.error('[NPCIntervention] Error adding intervention rule:', error);
@@ -942,10 +946,10 @@ export function removeInterventionRule(ruleId: string): boolean {
         if (index >= 0) {
       interventionRules.splice(index, 1);
       interventionHistory.delete(ruleId);
-      
+
       // Clean up recent interventions
             recentInterventions.splice(0, recentInterventions.length, ...filteredRecent);
-      
+
       console.log(`[NPCIntervention] Removed intervention rule: ${ruleId}`);
       return true;
     }
@@ -1014,7 +1018,7 @@ export function canNPCIntervene(
     }
 
     return applicableRules.some(rule => {
-            return suppressedNPCs.length > 0 && 
+            return suppressedNPCs.length > 0 &&
              canTriggerIntervention(rule, context) &&
              (!rule.conditions || rule.conditions(context));
     });
@@ -1042,10 +1046,10 @@ export function getPotentialInterventions(
     }
 
     return interventionRules.map(rule => {
-                        
+
       let conditionsMet = true;
       let conditionError = '';
-      
+
       if (rule.conditions) {
         try {
           conditionsMet = rule.conditions(context);
@@ -1102,7 +1106,7 @@ export function getInterventionStats(): {
   averageInterval?: number;
 } {
   try {
-    
+
     // Find most active rule
     let maxCount = 0;
     interventionHistory.forEach((history, ruleId) => {
@@ -1134,5 +1138,5 @@ export function getInterventionStats(): {
 /**
  * Export utilities for external use
  */
-export 
+export
 export default NPCInterventionEngine;

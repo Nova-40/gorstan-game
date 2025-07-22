@@ -1,11 +1,15 @@
+import React, { useEffect, useState } from 'react';
+
+import { motion, AnimatePresence } from 'framer-motion';
+
+
+
 // JumpTransition.tsx — components/animations/JumpTransition.tsx
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: JumpTransition
 
 
-import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 
 interface JumpTransitionProps {
   onComplete: () => void;
@@ -51,7 +55,7 @@ const JumpTransition: React.FC<JumpTransitionProps> = ({ onComplete }) => {
                 ease: 'easeInOut',
               }}
               style={{
-                background: `conic-gradient(from 0deg, 
+                background: `conic-gradient(from 0deg,
                   #ff006e, #8338ec, #3a86ff, #06ffa5, #ffbe0b, #fb5607, #ff006e)`,
                 clipPath: 'polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%)',
                 transformOrigin: 'center',
@@ -72,7 +76,7 @@ const JumpTransition: React.FC<JumpTransitionProps> = ({ onComplete }) => {
                 delay: 0.1,
               }}
               style={{
-                background: `conic-gradient(from 45deg, 
+                background: `conic-gradient(from 45deg,
                   #ff9a00, #c77dff, #7209b7, #560bad, #480ca8, #3f37c9, #ff9a00)`,
                 clipPath: 'polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%)',
                 transformOrigin: 'center',

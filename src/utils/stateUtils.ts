@@ -1,10 +1,15 @@
+import { GameState } from '../types/GameTypes';
+
+import { NPC } from './NPCTypes';
+
+
+
 // Version: 6.1.0
 // (c) 2025 Geoffrey Alan Webster
 // Licensed under the MIT License
 // Module: stateUtils.ts
 // Description: Unified state management utilities for Gorstan game
 
-import { GameState } from '../types/GameTypes';
 
 /**
  * Check if player has any of the specified items
@@ -66,7 +71,7 @@ export const isInAnyRoom = (state: GameState, roomIds: string[]): boolean => {
  * Check if player is sitting in any chair
  */
 export const isSittingInAnyChair = (state: GameState): boolean => {
-  const sittingFlags = Object.keys(state.flags || {}).filter(key => 
+  const sittingFlags = Object.keys(state.flags || {}).filter(key =>
     key.startsWith('sittingIn') && key.endsWith('Chair')
   );
   return sittingFlags.some(flag => Boolean(state.flags?.[flag]));
@@ -92,7 +97,7 @@ export const getActiveSittingStates = (state: GameState): string[] => {
  * Check if any NPCs are pending actions
  */
 export const hasAnyPendingNPCs = (state: GameState): boolean => {
-  const pendingFlags = Object.keys(state.flags || {}).filter(key => 
+  const pendingFlags = Object.keys(state.flags || {}).filter(key =>
     key.includes('NPC') && key.includes('pending')
   );
   return pendingFlags.some(flag => Boolean(state.flags?.[flag]));
@@ -141,7 +146,7 @@ export const isInventoryFull = (state: GameState, maxItems: number = 50): boolea
 export const getCurrentRoomFlags = (state: GameState): Record<string, any> => {
   const currentRoom = getCurrentLocation(state);
   if (!currentRoom) return {};
-  
+
   return Object.entries(state.flags || {})
     .filter(([key]) => key.includes(currentRoom))
     .reduce((acc, [key, value]) => {
@@ -156,7 +161,7 @@ export const getCurrentRoomFlags = (state: GameState): Record<string, any> => {
 export const getCurrentZone = (state: GameState): string => {
   const currentRoom = getCurrentLocation(state);
   if (!currentRoom) return '';
-  
+
   // Extract zone from room format like "introZone_crossing" -> "introZone"
   const zoneMatch = currentRoom.match(/^([a-zA-Z]+Zone)/);
   return zoneMatch ? zoneMatch[1] : '';

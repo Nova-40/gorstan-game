@@ -1,3 +1,5 @@
+
+
 // src/engine/storyProgress.js
 // Version: 6.0.0
 // (c) 2025 Geoffrey Alan Webster
@@ -95,8 +97,8 @@ const CLEANUP_INTERVAL = 60000; // 1 minute
  * Enhanced flag setting with comprehensive validation and integration
  */
 export function setFlag(
-  flag: string, 
-  expiry: number | null = null, 
+  flag: string,
+  expiry: number | null = null,
   category: string = 'general',
   description?: string,
   priority: number = 0
@@ -116,12 +118,12 @@ export function setFlag(
     }
 
     flags.add(flag);
-    
+
     // Set expiry timestamp
     if (expiry && expiry > 0) {
       flagTimestamps.set(flag, Date.now() + expiry);
     }
-    
+
     // Add to category
         if (categorizedFlags[normalizedCategory]) {
       categorizedFlags[normalizedCategory].add(flag);
@@ -143,7 +145,7 @@ export function setFlag(
 
     // Trigger events
     triggerEvent(flag);
-    
+
     console.log(`[StoryProgress] Flag set: ${flag} (category: ${normalizedCategory})`);
     return true;
   } catch (error) {
@@ -216,12 +218,12 @@ export function removeFlag(flag: string): boolean {
     flagDependencies.delete(flag);
     flagMetadata.delete(flag);
     flagCache.delete(flag);
-    
+
     // Remove from all categories
     Object.values(categorizedFlags).forEach(categorySet => {
       categorySet.delete(flag);
     });
-    
+
     // Clean up event triggers
     eventTriggers.delete(flag);
 
@@ -231,7 +233,7 @@ export function removeFlag(flag: string): boolean {
         flagDependencies.set(depFlag, updatedDeps);
       }
     });
-    
+
     console.log(`[StoryProgress] Flag removed: ${flag}`);
     return true;
   } catch (error) {
@@ -261,11 +263,11 @@ export function getFlagsByCategory(category: string): string[] {
         if (!categorizedFlags[normalizedCategory]) {
       return [];
     }
-    
+
     // Filter out expired flags and sort by priority
                     return (metaB?.priority || 0) - (metaA?.priority || 0);
       });
-    
+
     return categoryFlags;
   } catch (error) {
     console.error('[StoryProgress] Error getting flags by category:', error);
@@ -378,22 +380,22 @@ export function triggerEvent(flag: string, context?: any): void {
 export function cleanupExpiredFlags(): number {
   try {
     const expiredFlags: string[] = [];
-        
+
     for (const [flag, timestamp] of flagTimestamps.entries()) {
       if (now > timestamp) {
         expiredFlags.push(flag);
       }
     }
-    
+
     expiredFlags.forEach(flag => removeFlag(flag));
-    
+
     // Clean up cache as well
     cleanupCache();
-    
+
     if (expiredFlags.length > 0) {
       console.log(`[StoryProgress] Cleaned up ${expiredFlags.length} expired flags`);
     }
-    
+
     return expiredFlags.length;
   } catch (error) {
     console.error('[StoryProgress] Error during cleanup:', error);
@@ -410,15 +412,15 @@ export function loadFlags(): boolean {
       console.log('[StoryProgress] No saved state found');
       return false;
     }
-    
+
     const state: StoryProgressState = JSON.parse(savedData);
-    
+
     // Version migration if needed
     if (state.version !== MODULE_VERSION) {
       console.log(`[StoryProgress] Migrating from version ${state.version} to ${MODULE_VERSION}`);
       migrateState(state);
     }
-    
+
     // Restore flags
     if (state.flags && Array.isArray(state.flags)) {
       state.flags.forEach(flag => {
@@ -427,7 +429,7 @@ export function loadFlags(): boolean {
         }
       });
     }
-    
+
     // Restore timestamps
     if (state.timestamps) {
       Object.entries(state.timestamps).forEach(([flag, timestamp]) => {
@@ -436,7 +438,7 @@ export function loadFlags(): boolean {
         }
       });
     }
-    
+
     // Restore dependencies
     if (state.dependencies) {
       Object.entries(state.dependencies).forEach(([flag, deps]) => {
@@ -445,7 +447,7 @@ export function loadFlags(): boolean {
         }
       });
     }
-    
+
     // Restore categories
     if (state.categories) {
       Object.entries(state.categories).forEach(([category, flagList]) => {
@@ -465,9 +467,9 @@ export function loadFlags(): boolean {
         }
       });
     }
-    
+
     // Clean up expired flags after loading
-        
+
     console.log(`[StoryProgress] Loaded ${flags.size} flags from localStorage (cleaned ${cleanedCount} expired)`);
     return true;
   } catch (error) {
@@ -483,7 +485,7 @@ export function saveFlags(): boolean {
   try {
     // Clean up before saving
     cleanupExpiredFlags();
-    
+
     const state: StoryProgressState = {
       flags: Array.from(flags),
       timestamps: Object.fromEntries(flagTimestamps),
@@ -503,7 +505,7 @@ export function saveFlags(): boolean {
       cleanupOldData();
       localStorage.setItem('storyProgressState', serialized);
     }
-    
+
     console.log(`[StoryProgress] Saved ${flags.size} flags to localStorage`);
     return true;
   } catch (error) {
@@ -529,13 +531,13 @@ export function initialiseStoryProgress(): void {
       { name: 'lattice_connected', category: 'story_event', priority: 9, description: 'Connected to the lattice' },
       { name: 'endgame_triggered', category: 'chapter_progress', priority: 10, description: 'Endgame sequence has begun' }
     ];
-    
+
     initialFlags.forEach(({ name, category, priority, description }) => {
       if (!hasFlag(name)) {
         setFlag(name, null, category, description, priority);
       }
     });
-    
+
     console.log('[StoryProgress] Story progress initialized with Gorstan-specific flags');
   } catch (error) {
     console.error('[StoryProgress] Error initializing story progress:', error);
@@ -551,7 +553,7 @@ export function getProgressStatistics(): ProgressStatistics {
 
                     return metaB.priority - metaA.priority;
       });
-    
+
     return {
       totalFlags: flags.size,
       flagsByCategory,
@@ -590,10 +592,10 @@ export function clearAllProgress(confirm: boolean = false): boolean {
     flagCache.clear();
     Object.values(categorizedFlags).forEach(set => set.clear());
     eventTriggers.clear();
-    
+
     // Clear localStorage
     localStorage.removeItem('storyProgressState');
-    
+
     console.log('[StoryProgress] All progress cleared');
     return true;
   } catch (error) {
@@ -607,15 +609,15 @@ export function clearAllProgress(confirm: boolean = false): boolean {
  */
 
 function validateFlagName(flag: string): boolean {
-  return typeof flag === 'string' && 
-         flag.length > 0 && 
-         flag.length <= 100 && 
+  return typeof flag === 'string' &&
+         flag.length > 0 &&
+         flag.length <= 100 &&
          /^[a-zA-Z0-9_-]+$/.test(flag);
 }
 
 function validateCategory(category: string): string {
   const validCategories: FlagCategory[] = [
-    'quest', 'story_event', 'chapter_progress', 'general', 
+    'quest', 'story_event', 'chapter_progress', 'general',
     'achievement', 'relationship', 'exploration'
   ];
   return validCategories.includes(category as FlagCategory) ? category : 'general';
@@ -631,7 +633,7 @@ function validateMetadata(meta: any): meta is FlagMetadata {
 }
 
 function hasCircularDependency(flag: string, dependencies: string[]): boolean {
-    
+
   function dfs(current: string): boolean {
     if (stack.has(current)) return true;
     if (visited.has(current)) return false;
@@ -659,13 +661,13 @@ function updateCache(flag: string, valid: boolean): void {
 
 function cleanupCache(): void {
     const keysToDelete: string[] = [];
-  
+
   for (const [key, value] of flagCache.entries()) {
     if (now - value.timestamp > CACHE_TTL) {
       keysToDelete.push(key);
     }
   }
-  
+
   keysToDelete.forEach(key => flagCache.delete(key));
 }
 
@@ -738,7 +740,7 @@ if (typeof window !== 'undefined') {
 /**
  * Enhanced exports with comprehensive utilities
  */
-export 
+export
 export default StoryProgressUtils;
 
 // All functions and StoryProgressUtils object are exported for use in story, quest, and event logic.

@@ -1,11 +1,15 @@
+import React, { useEffect, useState } from 'react';
+
+import { motion, AnimatePresence } from 'framer-motion';
+
+
+
 // SipTransition.tsx — components/animations/SipTransition.tsx
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: SipTransition
 
 
-import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 
 interface SipTransitionProps {
   onComplete: () => void;
@@ -42,8 +46,8 @@ const SipTransition: React.FC<SipTransitionProps> = ({ onComplete }) => {
               <motion.div
                 key={i}
                 className="absolute w-1 h-8 bg-white opacity-30 rounded-full"
-                initial={{ 
-                  x: '50%', 
+                initial={{
+                  x: '50%',
                   y: '60%',
                   scaleY: 0,
                   opacity: 0,
@@ -72,7 +76,7 @@ const SipTransition: React.FC<SipTransitionProps> = ({ onComplete }) => {
           <motion.div
             className="absolute inset-0"
             initial={{ scale: 0, opacity: 0 }}
-            animate={{ 
+            animate={{
               scale: phase === 'warmth' ? [0, 1.5] : [1.5, 3],
               opacity: phase === 'warmth' ? [0, 0.8] : [0.8, 0.4],
             }}

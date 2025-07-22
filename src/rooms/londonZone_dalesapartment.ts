@@ -1,3 +1,7 @@
+import { RoomDefinition } from '../types/RoomTypes';
+
+
+
 // londonZone_dalesapartment.ts — rooms/londonZone_dalesapartment.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
@@ -9,7 +13,6 @@
 // Gorstan elements (c) Geoff Webster
 // Code licensed under the MIT License
 
-import { RoomDefinition } from '../types/RoomTypes';
 
 const dalesapartment: RoomDefinition = {
   id: 'dalesapartment',

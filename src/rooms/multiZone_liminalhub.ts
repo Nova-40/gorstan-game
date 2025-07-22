@@ -1,9 +1,14 @@
+import { Room } from '../types/RoomTypes';
+
+import { Room } from './RoomTypes';
+
+
+
 // multiZone_liminalhub.ts — rooms/multiZone_liminalhub.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Description: The Liminal Hub is a special, futuristic zone that acts as a central travel nexus.
 
-import { Room } from '../types/RoomTypes';
 
 /**
  * The Liminal Hub is a special, futuristic zone that acts as a central travel nexus.

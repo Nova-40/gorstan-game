@@ -1,9 +1,12 @@
+import { RoomDefinition } from '../types/RoomTypes';
+
+
+
 // newyorkZone_greasystoreroom.ts — rooms/newyorkZone_greasystoreroom.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
 // Module: newyorkZone_greasystoreroom
 
-import { RoomDefinition } from '../types/RoomTypes';
 
 const greasystoreroom: RoomDefinition = {
   id: 'greasystoreroom',

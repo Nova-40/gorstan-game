@@ -1,3 +1,5 @@
+
+
 // Version: 6.0.0
 // (c) 2025 Geoffrey Alan Webster
 // Licensed under the MIT License
@@ -19,7 +21,7 @@ export function attemptPickup(
   dispatch: (action: { type: string; payload: any }) => void,
   dispatchMessage: (action: { type: string; payload: { text: string; type: string } }) => void
 ): void {
-      
+
   if (state.inventory.includes(item)) {
     pushConsoleMessage(dispatchMessage, `You already have the ${item}.`, 'error');
     return;

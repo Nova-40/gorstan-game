@@ -1,4 +1,13 @@
 import { handlePlayerDeath } from "./deathEngine";
+
+import { NPC } from './NPCTypes';
+
+import { Room } from './RoomTypes';
+
+import { Trap } from './GameTypes';
+
+
+
 // Gorstan (c) Geoffrey Alan Webster. Code MIT Licence
 // Module: roomEngine.ts
 // Version: v6.1.0
@@ -35,7 +44,7 @@ interface Room {
  * Executes trap, NPC, lore, and ambient audio logic.
  */
 export function processRoomEntry(room: RoomDefinition, gameState: GameState): void {
-  
+
   if (!room) {
     console.warn(`[RoomEngine] Room '${roomId}' not found.`);
     appendToConsole(`Error: The room '${roomId}' could not be loaded.`);

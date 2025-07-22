@@ -1,3 +1,58 @@
+// --- Helper Functions ---
+function hasItem(inventory: string[], item: string) {
+  return inventory.includes(item);
+}
+
+function getRoomExit(currentRoom: Room, direction: string) {
+  return currentRoom.exits && currentRoom.exits[direction];
+}
+
+function updatePlayerInventory(player: any, newInventory: string[]) {
+  return { ...player, inventory: newInventory };
+}
+
+function mergeUpdates(base: any, ...updates: any[]) {
+  return updates.reduce((acc, update) => ({ ...acc, ...update }), { ...base });
+}
+
+function getItemName(item: any): string {
+  return typeof item === 'string' ? item : item.name;
+}
+
+function getRoomItems(room: Room): any[] {
+  return Array.isArray(room.items) ? room.items : [];
+}
+
+function getRoomNpcs(room: Room): any[] {
+  return Array.isArray(room.npcs) ? room.npcs : [];
+}
+
+function getRoomDef(room: Room): any {
+  return room as any;
+}
+
+function isDirection(cmd: string) {
+  return [
+    'north','south','east','west','up','down','northeast','northwest','southeast','southwest'
+  ].includes(cmd);
+}
+// --- End Helper Functions ---
+
+
+import { applyScoreForEvent, getScoreBasedMessage, getDominicScoreComment } from '../state/scoreEffects';
+import { LocalGameState } from '../state/gameState';
+// import { Miniquest } from '../types/GameTypes'; // Not used or missing, remove
+import { MiniquestEngine } from './miniquestInitializer';
+import { NPC } from '../NPCTypes';
+import { recordItemDiscovery, displayCodex } from '../logic/codexTracker';
+import { Room } from '../RoomTypes';
+import { isLibrarianActive } from './librarianController';
+// import { isWendellActive } from './mrWendellController'; // Not used or missing, remove
+import { TerminalMessage } from '../components/TerminalConsole';
+import { unlockAchievement, listAchievements } from '../logic/achievementEngine';
+
+
+
 // commandProcessor.ts — engine/commandProcessor.ts
 // Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
 // Code MIT Licence
@@ -7,19 +62,11 @@
 // Gorstan (C) Geoff Webster 2025
 // Code MIT Licence
 
-import { LocalGameState } from '../state/gameState';
-import { TerminalMessage } from '../components/TerminalConsole';
-import { Room } from '../types/Room';
-import { RoomDefinition, TrapDefinition } from '../types/RoomTypes';
-import { MiniquestEngine } from './miniquestInitializer';
-import { unlockAchievement, listAchievements } from '../logic/achievementEngine';
-import { applyScoreForEvent, getScoreBasedMessage, getDominicScoreComment } from '../state/scoreEffects';
-import { recordItemDiscovery, displayCodex } from '../logic/codexTracker';
 
 // Hub teleportation configuration for remote control
 const allowedHubs: Record<string, string> = {
   'control nexus': 'controlnexus',
-  'lattice hub': 'latticehub', 
+  'lattice hub': 'latticehub',
   'gorstan hub': 'gorstanhub',
   'maze entrance': 'mazeentrance',
   'library antechamber': 'hiddenlibrary',
@@ -31,7 +78,7 @@ const allowedHubs: Record<string, string> = {
 const hubDisplayNames: Record<string, string> = {
   'controlnexus': 'Control Nexus',
   'latticehub': 'Lattice Hub',
-  'gorstanhub': 'Gorstan Hub', 
+  'gorstanhub': 'Gorstan Hub',
   'mazeentrance': 'Maze Entrance',
   'hiddenlibrary': 'Library Antechamber',
   'londonhub': 'London Hub',
@@ -42,7 +89,7 @@ const hubDisplayNames: Record<string, string> = {
 /**
  * Process traps when entering a room
  */
-function processTrap(trap: TrapDefinition, gameState: LocalGameState): {
+function processTrap(trap: any, gameState: LocalGameState): {
   messages: TerminalMessage[];
   updates?: Partial<LocalGameState>;
 } {
@@ -51,19 +98,19 @@ function processTrap(trap: TrapDefinition, gameState: LocalGameState): {
 
   if (trap.trigger === 'enter' && !trap.hidden) {
     messages.push({ text: `⚠️ TRAP TRIGGERED: ${trap.description}`, type: 'error' });
-    
+
     switch (trap.type) {
       case 'damage':
         const damage = trap.effect?.damage || 10;
         const newHealth = Math.max(0, gameState.player.health - damage);
         messages.push({ text: `You take ${damage} damage! Health: ${newHealth}`, type: 'error' });
         updates.player = { ...gameState.player, health: newHealth };
-        
+
         // Check if this causes the player's first death
         if (newHealth === 0 && gameState.player.health > 0) {
           unlockAchievement('first_death');
         }
-        
+
         // Deduct score for taking damage from traps
         const scorePenalty = Math.floor(damage / 2);
         if (scorePenalty > 0) {
@@ -72,21 +119,21 @@ function processTrap(trap: TrapDefinition, gameState: LocalGameState): {
           messages.push({ text: `Score penalty: -${scorePenalty} points`, type: 'error' });
         }
         break;
-        
+
       case 'teleport':
         if (trap.effect?.teleportTo) {
           messages.push({ text: 'The trap teleports you to another location!', type: 'system' });
           updates.currentRoomId = trap.effect.teleportTo;
         }
         break;
-        
+
       case 'item_loss':
         if (trap.effect?.itemsLost && gameState.player.inventory.length > 0) {
-          const lostItems = trap.effect.itemsLost.filter(item => 
+          const lostItems = trap.effect.itemsLost.filter((item: any) =>
             gameState.player.inventory.includes(item)
           );
           if (lostItems.length > 0) {
-            const newInventory = gameState.player.inventory.filter(item => 
+            const newInventory = gameState.player.inventory.filter(item =>
               !lostItems.includes(item)
             );
             messages.push({ text: `You lose: ${lostItems.join(', ')}`, type: 'error' });
@@ -103,7 +150,7 @@ function processTrap(trap: TrapDefinition, gameState: LocalGameState): {
 /**
  * Check and process room entry events including traps
  */
-function processRoomEntry(room: Room & Partial<RoomDefinition>, gameState: LocalGameState): {
+function processRoomEntry(room: Room & Partial<any>, gameState: LocalGameState): {
   messages: TerminalMessage[];
   updates?: Partial<LocalGameState>;
 } {
@@ -150,7 +197,7 @@ function processRoomEvents(events: string[], room: Room, gameState: LocalGameSta
         // Only trigger if in coffee shop and player doesn't have coffee
         if (room.id === 'findlaterscornercoffeeshop' && !gameState.player.inventory.includes('coffee')) {
           const flags = gameState.flags || {};
-          
+
           // Only offer once per visit
           if (!flags.freeCoffeeOffered) {
             messages.push({
@@ -161,12 +208,12 @@ function processRoomEvents(events: string[], room: Room, gameState: LocalGameSta
               text: '"Here you go - on the house! You look like you could use it," she says with a warm smile.',
               type: 'lore'
             });
-            
+
             // Add coffee to inventory
             const newInventory = [...gameState.player.inventory, 'coffee'];
             updates.player = { ...gameState.player, inventory: newInventory };
             updates.flags = { ...flags, freeCoffeeOffered: true, coffeeForPykeCalled: true };
-            
+
             messages.push({
               text: '✨ You received: coffee',
               type: 'info'
@@ -174,7 +221,7 @@ function processRoomEvents(events: string[], room: Room, gameState: LocalGameSta
           }
         }
         break;
-        
+
       case 'resetCoffeeOfferFlag':
         // Reset the coffee offer flag when leaving the coffee shop
         if (room.id === 'findlaterscornercoffeeshop') {
@@ -182,13 +229,13 @@ function processRoomEvents(events: string[], room: Room, gameState: LocalGameSta
           updates.flags = { ...flags, freeCoffeeOffered: false };
         }
         break;
-        
+
       case 'triggerFamiliarity':
       case 'activateBarista':
       case 'checkTimeOfDay':
         // These events are handled by other systems or are purely narrative
         break;
-        
+
       default:
         // Unhandled event - could log for debugging
         break;
@@ -235,7 +282,7 @@ function processCursedItem(itemId: string, gameState: LocalGameState): {
 
     case 'trapped_box':
       messages.push({ text: '📦 The box springs open with a sharp click!', type: 'error' });
-      
+
       // Random trap effects
       const trapEffects = [
         () => {
@@ -268,7 +315,7 @@ function processCursedItem(itemId: string, gameState: LocalGameState): {
           };
         }
       ];
-      
+
       const randomEffect = trapEffects[Math.floor(Math.random() * trapEffects.length)];
       randomEffect();
       break;
@@ -320,35 +367,35 @@ function checkMiniquestTriggers(
 ): { messages: TerminalMessage[], updates?: any } {
   const engine = MiniquestEngine.getInstance();
   const availableQuests = engine.getAvailableQuests(gameState.currentRoomId, gameState as any);
-  
+
   // Find quests that match this action
-  const triggeredQuests = availableQuests.filter(quest => 
+  const triggeredQuests = availableQuests.filter(quest =>
     quest.triggerAction === action
   );
-  
+
   const messages: TerminalMessage[] = [];
   let updates: any = {};
-  
+
   triggeredQuests.forEach(quest => {
     const result = engine.attemptQuest(quest.id, gameState.currentRoomId, gameState as any, action);
-    
+
     if (result.success) {
       messages.push({ text: result.message, type: 'system' });
       if (result.scoreAwarded) {
         messages.push({ text: `Score: +${result.scoreAwarded} points!`, type: 'system' });
       }
-      
+
       if (result.completed) {
         const stateUpdate = engine.updateStateAfterCompletion(
-          gameState as any, 
-          gameState.currentRoomId, 
+          gameState as any,
+          gameState.currentRoomId,
           quest.id
         );
         updates = { ...updates, ...stateUpdate };
       }
     }
   });
-  
+
   return { messages, updates: Object.keys(updates).length > 0 ? updates : undefined };
 }
 
@@ -377,7 +424,7 @@ export function processCommand(
       if (currentRoom.exits && currentRoom.exits[direction]) {
         const targetRoomId = currentRoom.exits[direction];
         const targetRoom = gameState.roomMap[targetRoomId];
-        
+
         const messages: TerminalMessage[] = [{ text: `You go ${direction}.`, type: 'info' }];
         let updates: any = {
           currentRoomId: targetRoomId,
@@ -418,7 +465,7 @@ export function processCommand(
       const descriptionLines = Array.isArray(currentRoom.description)
         ? currentRoom.description
         : [currentRoom.description];
-      
+
       const messages: TerminalMessage[] = [
         { text: `--- ${currentRoom.title} ---`, type: 'lore' as const },
         ...descriptionLines.map(line => ({ text: line, type: 'lore' as const })),
@@ -427,7 +474,7 @@ export function processCommand(
       if (currentRoom.items && currentRoom.items.length > 0) {
         messages.push({ text: 'You see:', type: 'info' as const });
         currentRoom.items.forEach(item => {
-          const itemName = typeof item === 'string' ? item : item.name;
+          const itemName = typeof item === 'string' ? item : (item as any).name;
           messages.push({ text: `- ${itemName}`, type: 'info' as const });
         });
       }
@@ -435,7 +482,7 @@ export function processCommand(
       if (currentRoom.npcs && currentRoom.npcs.length > 0) {
         messages.push({ text: 'People here:', type: 'info' as const });
         currentRoom.npcs.forEach(npc => {
-          messages.push({ text: `- ${npc.name}`, type: 'info' as const });
+          messages.push({ text: `- ${npc}`, type: 'info' as const });
         });
       }
 
@@ -447,9 +494,9 @@ export function processCommand(
             messages.push({ text: `- ${exit}`, type: 'info' as const });
           }
         });
-        
+
         // Show hidden/special exits differently
-        const hiddenExits = Object.keys(currentRoom.exits).filter(exit => 
+        const hiddenExits = Object.keys(currentRoom.exits).filter(exit =>
           ['secret', 'hidden', 'shimmer', 'phase', 'dimensional_rift', 'coffee_portal'].includes(exit)
         );
         if (hiddenExits.length > 0) {
@@ -475,7 +522,7 @@ export function processCommand(
         if (pressCount > 0) {
           messages.push({ text: '--- Button Status ---', type: 'system' as const });
           messages.push({ text: `Blue button presses: ${pressCount}`, type: 'system' as const });
-          
+
           if (pressCount >= 1) {
             messages.push({ text: '⚠️ Warning signs are actively flashing!', type: 'error' as const });
           }
@@ -496,35 +543,35 @@ export function processCommand(
       if (!noun) {
         return { messages: [{ text: 'What do you want to take?', type: 'error' as const }] };
       }
-      
+
       // Check if player already has this item
       if (gameState.player.inventory.includes(noun)) {
         return { messages: [{ text: `You already have the ${noun}.`, type: 'error' as const }] };
       }
-      
+
       const roomItems = currentRoom.items || [];
-      const itemIndex = roomItems.findIndex((item: any) => 
+      const itemIndex = roomItems.findIndex((item: any) =>
         typeof item === 'string' ? item === noun : item.name === noun
       );
-      
+
       if (itemIndex !== -1) {
         const newRoomItems = [...roomItems];
         const takenItem = newRoomItems.splice(itemIndex, 1)[0];
-        const itemName = typeof takenItem === 'string' ? takenItem : takenItem.name;
+        const itemName = typeof takenItem === 'string' ? takenItem : (takenItem as any).name;
         const newPlayerInventory = [...gameState.player.inventory, itemName];
-        
+
         // Apply scoring for item collection
         applyScoreForEvent('find.hidden.item');
-        
+
         // Record in codex
         recordItemDiscovery(itemName, currentRoom.id);
-        
+
         // Special item effects and achievements
         if (itemName === 'dominic' || itemName === 'dominic_goldfish') {
           unlockAchievement('took_dominic');
           applyScoreForEvent('goldfish.rescued');
         }
-        
+
         if (itemName.includes('constitution') || itemName.includes('scroll')) {
           unlockAchievement('found_constitution');
           applyScoreForEvent('discover.lore');
@@ -542,7 +589,7 @@ export function processCommand(
             roomMap: {
               ...gameState.roomMap,
               [currentRoom.id]: {
-                ...currentRoom,
+                ...(currentRoom as any),
                 items: newRoomItems,
               },
             },
@@ -556,27 +603,27 @@ export function processCommand(
       if (!noun) {
         return { messages: [{ text: 'What do you want to drop?', type: 'error' as const }] };
       }
-      
+
       const playerInventory = gameState.player.inventory;
       const itemIndex = playerInventory.findIndex((item: string) => item === noun);
-      
+
       if (itemIndex !== -1) {
         const newPlayerInventory = [...playerInventory];
         const droppedItem = newPlayerInventory.splice(itemIndex, 1)[0];
         const currentRoomItems = currentRoom.items || [];
-        
+
         // Create new room item object for dropped items
-        const droppedRoomItem: any = typeof droppedItem === 'string' 
+        const droppedRoomItem: any = typeof droppedItem === 'string'
           ? { id: droppedItem, name: droppedItem }
           : droppedItem;
-        
+
         const newRoomItems = [...currentRoomItems, droppedRoomItem];
-        
+
         // Check for quest-critical items
         const criticalItems = ['greasy_napkin_with_plans', 'dimensional_key', 'reality_anchor'];
         if (criticalItems.includes(droppedItem)) {
           applyScoreForEvent('item.stolen'); // Apply penalty for dropping important items
-          
+
           return {
             messages: [
               { text: `You drop the ${noun}.`, type: 'system' as const },
@@ -590,7 +637,7 @@ export function processCommand(
               roomMap: {
                 ...gameState.roomMap,
                 [currentRoom.id]: {
-                  ...currentRoom,
+                  ...(currentRoom as any),
                   items: newRoomItems,
                 },
               },
@@ -609,10 +656,10 @@ export function processCommand(
             },
             roomMap: {
               ...gameState.roomMap,
-              [currentRoom.id]: {
-                ...currentRoom,
-                items: newRoomItems,
-              },
+                [currentRoom.id]: {
+                  ...(currentRoom as any),
+                  items: newRoomItems,
+                },
             },
           },
         };
@@ -649,7 +696,7 @@ export function processCommand(
 
     case 'score': {
       const currentScore = gameState.player.score || 0;
-      
+
       const messages: TerminalMessage[] = [
         { text: `Your current score is: ${currentScore}`, type: 'system' },
       ];
@@ -674,9 +721,9 @@ export function processCommand(
     case 'achievements': {
       // Display achievements using the achievement system
       const unlockedAchievements = gameState.metadata?.achievements || [];
-      
+
       const achievementMessages = listAchievements(unlockedAchievements);
-      
+
       return {
         messages: achievementMessages.map((msg: string) => ({ text: msg, type: 'system' as const })),
       };
@@ -686,7 +733,7 @@ export function processCommand(
       if (!noun) {
         return { messages: [{ text: 'What do you want to show?', type: 'error' as const }] };
       }
-      
+
       if (!gameState.player.inventory.includes(noun)) {
         return { messages: [{ text: `You don't have a ${noun} to show.`, type: 'error' as const }] };
       }
@@ -699,11 +746,11 @@ export function processCommand(
 
       // Special item-NPC interactions
       const messages: TerminalMessage[] = [];
-      
+
       if (noun === 'greasy_napkin_with_plans' && currentRoom.id?.includes('library')) {
         messages.push({ text: 'The Librarian\'s eyes widen. "That\'s not a napkin — it\'s your pass."', type: 'lore' });
         applyScoreForEvent('npc.librarian.helpful');
-        
+
         return {
           messages,
           updates: {
@@ -714,12 +761,12 @@ export function processCommand(
           },
         };
       }
-      
+
       if (noun === 'dominic' || noun === 'dominic_goldfish') {
         messages.push({ text: 'You show Dominic to the room. The goldfish seems pleased with the attention.', type: 'lore' });
         applyScoreForEvent('conversation.meaningful');
       }
-      
+
       if (noun.includes('memory') && roomNPCs.some((npc: any) => npc.id === 'polly')) {
         messages.push({ text: 'Polly looks at the memory fragment. "You kept that? Why?"', type: 'lore' });
         applyScoreForEvent('conversation.meaningful');
@@ -736,7 +783,7 @@ export function processCommand(
       if (!noun) {
         return { messages: [{ text: 'What do you want to use?', type: 'error' as const }] };
       }
-      
+
       if (!gameState.player.inventory.includes(noun)) {
         return { messages: [{ text: `You don't have a ${noun} to use.`, type: 'error' as const }] };
       }
@@ -748,9 +795,9 @@ export function processCommand(
       const cursedItems = ['cursed_amulet', 'cursed_mirror', 'trapped_box', 'venom_dagger'];
       if (cursedItems.includes(noun)) {
         const curseMessages = processCursedItem(noun, gameState);
-        return { 
+        return {
           messages: curseMessages.messages,
-          updates: curseMessages.updates
+          updates: curseMessages.updates as any
         };
       }
 
@@ -761,35 +808,35 @@ export function processCommand(
             messages.push({ text: 'The dimensional key activates the portal!', type: 'system' });
             applyScoreForEvent('solve.puzzle.hard');
             // Record item usage in codex
-            
+
             recordItemDiscovery(noun, 'Successfully used dimensional key to activate portal');
           } else {
             messages.push({ text: 'The key glows but has nothing to unlock here.', type: 'info' });
           }
           break;
-          
+
         case 'safe_combination':
           if (currentRoom.id?.includes('office') || currentRoom.id?.includes('safe')) {
             messages.push({ text: 'You use the combination to open the safe!', type: 'system' });
             applyScoreForEvent('solve.puzzle.simple');
-            
+
             recordItemDiscovery(noun, 'Opened safe with combination');
           } else {
             messages.push({ text: 'There\'s no safe here to use this on.', type: 'error' });
           }
           break;
-          
+
         case 'goldfish_food':
           if (gameState.player.inventory.includes('dominic')) {
             messages.push({ text: 'You feed Dominic. He seems appreciative and swims happily.', type: 'lore' });
             applyScoreForEvent('npc.dominic.survives');
-            
+
             recordItemDiscovery(noun, 'Fed to Dominic the goldfish');
           } else {
             messages.push({ text: 'You don\'t have a goldfish to feed.', type: 'error' });
           }
           break;
-          
+
         case 'firstaidkit':
           const currentHealth = gameState.player.health;
           if (currentHealth < 100) {
@@ -801,7 +848,7 @@ export function processCommand(
               inventory: gameState.player.inventory.filter((item: string) => item !== noun), // Consumable
             };
             applyScoreForEvent('item.shared'); // Bonus for self-care
-            
+
             recordItemDiscovery(noun, 'Used for healing');
           } else {
             messages.push({ text: 'You\'re already at full health.', type: 'info' });
@@ -812,7 +859,7 @@ export function processCommand(
           messages.push({ text: 'The scroll reveals arcane knowledge about dimensional travel.', type: 'lore' });
           messages.push({ text: 'You gain insight into the nature of reality!', type: 'system' });
           applyScoreForEvent('discover.lore');
-          
+
           recordItemDiscovery(noun, 'Revealed ancient knowledge about dimensional travel');
           break;
 
@@ -829,13 +876,13 @@ export function processCommand(
           break;
 
         case 'remote_control':
-          if (gameState.currentRoomId !== 'introZone_crossing') {
+          if (gameState.currentRoomId !== 'crossing') {
             messages.push({ text: 'The remote hums quietly but doesn\'t respond here. You need to be at the crossing to use it.', type: 'error' });
           } else {
             messages.push({ text: '📱 You flick open the remote control. The interface crackles with latent energy.', type: 'system' });
             messages.push({ text: '🌌 **Remote Control Hub List:**', type: 'system' });
             messages.push({ text: '', type: 'system' });
-            
+
             // Display available hubs
             let hubNumber = 1;
             Object.entries(hubDisplayNames).forEach(([hubId, displayName]) => {
@@ -844,28 +891,28 @@ export function processCommand(
                 hubNumber++;
               }
             });
-            
+
             messages.push({ text: '', type: 'system' });
             messages.push({ text: '💫 Type: `teleport to [hub name]` to travel instantly', type: 'info' });
             messages.push({ text: 'Example: `teleport to control nexus`', type: 'info' });
-            
+
             // Record codex entry for first use
-            
+
             recordItemDiscovery('remote_control', 'Activated interdimensional travel menu at the crossing');
-            
+
             // Apply score bonus for discovering the teleportation system
             applyScoreForEvent('discover.teleport.system');
-            
+
             // Unlock interdimensional traveler achievement
             unlockAchievement('interdimensional_traveler');
           }
           break;
-          
+
         default:
           // Check if it's a known item category
           const isDimensionalTool = noun.includes('dimensional') || noun.includes('key') || noun.includes('remote');
           const isMemoryFragment = noun.includes('memory') || noun.includes('fragment');
-          
+
           if (isDimensionalTool) {
             messages.push({ text: `The ${noun} hums with interdimensional energy but doesn't activate here.`, type: 'info' });
           } else if (isMemoryFragment) {
@@ -881,7 +928,7 @@ export function processCommand(
     }
 
     case 'codex': {
-      
+
       displayCodex();
       return { messages: [{ text: 'Codex displayed in console above.', type: 'system' }] };
     }
@@ -916,27 +963,27 @@ export function processCommand(
       }
 
       const targetDestination = noun.substring(3).trim(); // Remove "to " prefix
-      
+
       // Check if player has either remote control or navigation crystal
       const hasRemoteControl = gameState.player.inventory.includes('remote_control');
       const hasNavigationCrystal = gameState.player.inventory.includes('navigation_crystal');
-      
+
       if (!hasRemoteControl && !hasNavigationCrystal) {
-        return { 
-          messages: [{ 
-            text: 'You need either a remote control or navigation crystal to teleport.', 
-            type: 'error' 
-          }] 
+        return {
+          messages: [{
+            text: 'You need either a remote control or navigation crystal to teleport.',
+            type: 'error'
+          }]
         };
       }
 
       // Check if player is at the crossing
       if (gameState.currentRoomId !== 'crossing') {
-        return { 
-          messages: [{ 
-            text: 'You must be at the crossing to teleport. The devices don\'t respond elsewhere.', 
-            type: 'error' 
-          }] 
+        return {
+          messages: [{
+            text: 'You must be at the crossing to teleport. The devices don\'t respond elsewhere.',
+            type: 'error'
+          }]
         };
       }
 
@@ -947,13 +994,13 @@ export function processCommand(
         'gorstanvillage', 'lattice', 'datavoid', 'trentpark', 'stkatherinesdock',
         'torridoninn', 'libraryofnine', 'mazeecho', 'elfhame', 'faepalacemainhall'
       ];
-      
+
       const crystalDestinations = ['trentpark', 'findlaterscornercoffeeshop'];
-      
+
       // Determine available destinations based on what player has
       let allowedDestinations: string[] = [];
       let deviceName = '';
-      
+
       if (hasRemoteControl) {
         allowedDestinations = remoteControlDestinations;
         deviceName = 'remote control';
@@ -965,30 +1012,30 @@ export function processCommand(
       // Check if target destination is valid for the device
       if (!allowedDestinations.includes(targetDestination)) {
         const availableList = allowedDestinations.join(', ');
-        return { 
+        return {
           messages: [
             { text: `The ${deviceName} cannot reach that destination.`, type: 'error' },
             { text: `Available destinations: ${availableList}`, type: 'info' }
-          ] 
+          ]
         };
       }
 
       // Check if the target room exists in the game
       if (!gameState.roomMap[targetDestination]) {
-        return { 
-          messages: [{ 
-            text: `The destination "${targetDestination}" is currently inaccessible.`, 
-            type: 'error' 
-          }] 
+        return {
+          messages: [{
+            text: `The destination "${targetDestination}" is currently inaccessible.`,
+            type: 'error'
+          }]
         };
       }
 
       // Perform the teleportation
       const targetRoom = gameState.roomMap[targetDestination];
       const targetDisplayName = targetRoom.title || targetDestination;
-      
+
       const messages: TerminalMessage[] = [];
-      
+
       if (hasRemoteControl) {
         messages.push(
           { text: `📱 Remote control activated. Warping to ${targetDisplayName}...`, type: 'system' },
@@ -1052,18 +1099,18 @@ export function processCommand(
     case 'hint': {
       const currentRoom = gameState.roomMap[gameState.currentRoomId];
       const playerInventory = gameState.player.inventory || [];
-      
+
       // Generate contextual hints based on room and player state
       let hintMessage = '';
-      
+
       // Check if Ayla is available for hints
-      const aylaInRoom = currentRoom?.npcs?.some((npc: any) => 
-        npc.id?.toLowerCase().includes('ayla') || npc.name?.toLowerCase().includes('ayla')
+      const aylaInRoom = currentRoom?.npcs?.some((npc: any) =>
+        typeof npc === 'string' ? npc.toLowerCase().includes('ayla') : false
       );
-      
+
       if (aylaInRoom) {
         hintMessage = `🧚‍♀️ **Ayla whispers softly:**\n\n`;
-        
+
         // Room-specific hints
         if (currentRoom?.id?.includes('puzzle')) {
           hintMessage += "This place holds secrets that respond to the right combination of elements. Look for patterns in what you see.";
@@ -1074,34 +1121,34 @@ export function processCommand(
         } else {
           hintMessage += "Every step you take weaves the tapestry of your journey. Sometimes the answer lies in what you carry with you.";
         }
-        
+
         // Inventory-based hints
         if (playerInventory.length === 0) {
           hintMessage += "\n\nYour hands are empty, but your heart is full of potential. Look around for objects that resonate with purpose.";
         } else if (playerInventory.length > 5) {
           hintMessage += "\n\nYou carry much with you. Perhaps some items work better together than alone.";
         }
-        
+
         // Special hints for common stuck points
         if (currentRoom?.id?.includes('locked') || currentRoom?.id?.includes('barrier')) {
           hintMessage += "\n\nBarriers exist to be overcome. What you need may already be within your grasp.";
         }
-        
+
       } else {
         // Generic hints when Ayla is not present
         hintMessage = `💡 **Helpful Suggestions:**\n\n`;
         hintMessage += "• Use 'look' to examine your surroundings more carefully\n";
         hintMessage += "• Try 'inventory' to see what you're carrying\n";
         hintMessage += "• Check your 'codex' for information about discovered items\n";
-        
+
         if (currentRoom?.items?.length && currentRoom.items.length > 0) {
           hintMessage += "• There are items here you can 'take'\n";
         }
-        
+
         if (currentRoom?.npcs?.length && currentRoom.npcs.length > 0) {
           hintMessage += "• Someone here might have information - try 'talk to [name]'\n";
         }
-        
+
         hintMessage += "• Remember that some items can be 'use'd in specific situations";
       }
 
@@ -1122,41 +1169,41 @@ export function processCommand(
         ];
 
         roomDef.puzzles.forEach((puzzle: any) => {
-          const solved = currentRoom.flags?.[`${puzzle.id}_solved`];
+          const solved = (currentRoom.flags as any)?.[`${puzzle.id}_solved`];
           const attemptKey = `${puzzle.id}_attempts`;
-          const attempts = typeof currentRoom.flags?.[attemptKey] === 'number' 
-            ? currentRoom.flags[attemptKey] as number 
+          const attempts = typeof (currentRoom.flags as any)?.[attemptKey] === 'number'
+            ? (currentRoom.flags as any)[attemptKey] as number
             : 0;
           const maxAttempts = puzzle.maxAttempts || 5;
 
-          const status = solved ? '✅ SOLVED' : 
-                        attempts >= maxAttempts ? '❌ EXHAUSTED' : 
+          const status = solved ? '✅ SOLVED' :
+                        attempts >= maxAttempts ? '❌ EXHAUSTED' :
                         attempts > 0 ? `🔄 ${maxAttempts - attempts} attempts left` : '🆕 NEW';
 
-          messages.push({ 
-            text: `• ${puzzle.name || puzzle.id} [${puzzle.difficulty.toUpperCase()}] - ${status}`, 
-            type: 'system' 
+          messages.push({
+            text: `• ${puzzle.name || puzzle.id} [${puzzle.difficulty.toUpperCase()}] - ${status}`,
+            type: 'system'
           });
-          
+
           if (puzzle.description) {
             messages.push({ text: `  ${puzzle.description}`, type: 'info' });
           }
-          
+
           if (puzzle.requiredItems && puzzle.requiredItems.length > 0) {
-            const hasItems = puzzle.requiredItems.every((item: string) => 
+            const hasItems = puzzle.requiredItems.every((item: string) =>
               gameState.player.inventory.includes(item)
             );
             const itemStatus = hasItems ? '✅' : '❌';
-            messages.push({ 
-              text: `  Required items: ${puzzle.requiredItems.join(', ')} ${itemStatus}`, 
-              type: 'info' 
+            messages.push({
+              text: `  Required items: ${puzzle.requiredItems.join(', ')} ${itemStatus}`,
+              type: 'info'
             });
           }
         });
 
         messages.push({ text: '', type: 'system' });
         messages.push({ text: 'Use `solve [puzzle name]` to attempt a puzzle', type: 'info' });
-        
+
         return { messages };
       } else {
         return { messages: [{ text: 'There are no puzzles in this area.', type: 'info' }] };
@@ -1183,7 +1230,7 @@ export function processCommand(
       // Enhanced attempt handling with better feedback
       const engine = MiniquestEngine.getInstance();
       const result = engine.attemptQuest(noun, gameState.currentRoomId, gameState as any);
-      
+
       const messages: TerminalMessage[] = [
         { text: result.message, type: result.success ? 'system' : 'error' }
       ];
@@ -1196,16 +1243,16 @@ export function processCommand(
       if (result.completed) {
         // Update miniquest state
         const stateUpdate = engine.updateStateAfterCompletion(
-          gameState as any, 
-          gameState.currentRoomId, 
+          gameState as any,
+          gameState.currentRoomId,
           noun
         );
         updates = { ...updates, ...stateUpdate };
       }
 
-      return { 
-        messages, 
-        updates: Object.keys(updates).length > 0 ? updates : undefined 
+      return {
+        messages,
+        updates: Object.keys(updates).length > 0 ? updates : undefined
       };
     }
 
@@ -1224,7 +1271,7 @@ export function processCommand(
       // Show current objectives in this area
       const engine = MiniquestEngine.getInstance();
       const availableQuests = engine.getAvailableQuests(gameState.currentRoomId, gameState as any);
-      
+
       if (availableQuests.length === 0) {
         return {
           messages: [
@@ -1272,10 +1319,11 @@ export function processCommand(
         { text: `Game Stage: ${gameState.stage}`, type: 'system' as const },
         { text: `Room Exits: ${Object.keys(currentRoom.exits || {}).join(', ') || 'None'}`, type: 'system' as const },
         { text: `Room Items: ${(currentRoom.items && currentRoom.items.length > 0) ? currentRoom.items.join(', ') : 'None'}`, type: 'system' as const },
-        { text: `Room NPCs: ${(currentRoom.npcs && currentRoom.npcs.length > 0) ? currentRoom.npcs.map(npc => npc.name).join(', ') : 'None'}`, type: 'system' as const },
+        { text: `Room NPCs: ${(currentRoom.npcs && currentRoom.npcs.length > 0) ? currentRoom.npcs.join(', ') : 'None'}`, type: 'system' as const },
         { text: '--- DEBUG COMMANDS ---', type: 'system' as const },
         { text: 'heal - Restore full health', type: 'system' as const },
         { text: 'coffee - Add coffee to inventory', type: 'system' as const },
+        { text: 'cleartravelmenu - Force close travel menu', type: 'system' as const },
         { text: 'teleport [roomId] - Jump to any room', type: 'system' as const },
         { text: 'testachievement [id] - Test unlock achievement (debug)', type: 'system' as const },
         { text: 'spawnnpc [npcId] - Force spawn wandering NPC (debug)', type: 'system' as const },
@@ -1325,6 +1373,28 @@ export function processCommand(
       };
     }
 
+    case 'cleartravelmenu': {
+      // Debug command: force close travel menu (only for Geoff in debug mode)
+      if (gameState.player.name !== 'Geoff' || !gameState.settings.debugMode) {
+        return {
+          messages: [{ text: 'Unknown command. Type "help" for available commands.', type: 'error' }],
+        };
+      }
+
+      return {
+        messages: [{ text: 'DEBUG: Travel menu flags cleared.', type: 'system' }],
+        updates: {
+          flags: {
+            ...gameState.flags,
+            showTravelMenu: false,
+            travelMenuTitle: undefined,
+            travelMenuSubtitle: undefined,
+            travelDestinations: undefined,
+          },
+        },
+      };
+    }
+
     case 'testachievement': {
       // Debug command: test unlock achievement (only for Geoff in debug mode)
       if (gameState.player.name !== 'Geoff' || !gameState.settings.debugMode) {
@@ -1356,9 +1426,9 @@ export function processCommand(
 
       if (!noun) {
         return {
-          messages: [{ 
-            text: 'DEBUG: Available NPCs: ayla, al_escape_artist, dominic_wandering, morthos, polly, albie', 
-            type: 'system' 
+          messages: [{
+            text: 'DEBUG: Available NPCs: ayla, al_escape_artist, dominic_wandering, morthos, polly, albie',
+            type: 'system'
           }],
         };
       }
@@ -1472,7 +1542,7 @@ export function processCommand(
 
     case 'sit': {
       // Special handling for Trent Park runic chair
-      if (currentRoom.id === 'trentpark' && 
+      if (currentRoom.id === 'trentpark' &&
           (!noun || noun === 'chair' || noun === 'runic_chair' || noun === 'in_chair')) {
         return {
           messages: [
@@ -1495,7 +1565,7 @@ export function processCommand(
       }
 
       // Special handling for Torridon Inn innkeeper chair
-      if (currentRoom.id === 'torridoninn' && 
+      if (currentRoom.id === 'torridoninn' &&
           (!noun || noun === 'chair' || noun === 'innkeeper_chair' || noun === 'in_chair')) {
         return {
           messages: [
@@ -1517,7 +1587,7 @@ export function processCommand(
       }
 
       // Special handling for Burger Joint portal booth
-      if (currentRoom.id === 'burgerjoint' && 
+      if (currentRoom.id === 'burgerjoint' &&
           (!noun || noun === 'chair' || noun === 'booth' || noun === 'portal_booth' || noun === 'in_booth')) {
         return {
           messages: [
@@ -1539,7 +1609,7 @@ export function processCommand(
       }
 
       // Special handling for Findlater's dimensional chair
-      if ((currentRoom.id === 'findlaters' || currentRoom.id === 'findlaterscornercoffeeshop') && 
+      if ((currentRoom.id === 'findlaters' || currentRoom.id === 'findlaterscornercoffeeshop') &&
           (!noun || noun === 'chair' || noun === 'dimensional_chair' || noun === 'in_chair')) {
         return {
           messages: [
@@ -1561,7 +1631,7 @@ export function processCommand(
       }
 
       // Special handling for crossing room chair
-      if ((currentRoom.id === 'crossing' || currentRoom.id === 'introZone_crossing') && 
+      if (currentRoom.id === 'crossing' &&
           (!noun || noun === 'chair' || noun === 'in_chair')) {
         return {
           messages: [
@@ -1583,7 +1653,7 @@ export function processCommand(
       }
 
       // Special handling for Palace main hall throne
-      if (currentRoom.id === 'faepalacemainhall' && 
+      if (currentRoom.id === 'faepalacemainhall' &&
           (!noun || noun === 'throne' || noun === 'crystal_thrones' || noun === 'chair' || noun === 'in_throne')) {
         return {
           messages: [
@@ -1605,7 +1675,7 @@ export function processCommand(
       }
 
       // Special handling for maze storage chamber broken chair
-      if (currentRoom.id === 'storagechamber' && 
+      if (currentRoom.id === 'storagechamber' &&
           (!noun || noun === 'chair' || noun === 'broken_chair' || noun === 'in_chair')) {
         return {
           messages: [
@@ -1643,7 +1713,7 @@ export function processCommand(
           },
         };
       }
-      
+
       // Check for general sit exits (existing functionality)
       if (currentRoom.exits && currentRoom.exits.sit) {
         const targetRoomId = currentRoom.exits.sit;
@@ -1658,7 +1728,7 @@ export function processCommand(
           },
         };
       }
-      
+
       // Check if there's a chair interactable but no teleportation
       const roomDef = currentRoom as any;
       if (roomDef.interactables && roomDef.interactables.chair) {
@@ -1669,7 +1739,7 @@ export function processCommand(
           ],
         };
       }
-      
+
       return { messages: [{ text: "There's nowhere to sit here.", type: 'error' }] };
     }
 
@@ -1677,7 +1747,7 @@ export function processCommand(
     case 'get_up':
     case 'stand_up': {
       // Handle standing up from Torridon Inn innkeeper chair
-      if (currentRoom.id === 'torridoninn' && 
+      if (currentRoom.id === 'torridoninn' &&
           gameState.flags.sittingInTorridonInnChair) {
         return {
           messages: [
@@ -1697,7 +1767,7 @@ export function processCommand(
       }
 
       // Handle standing up from Burger Joint portal booth
-      if (currentRoom.id === 'burgerjoint' && 
+      if (currentRoom.id === 'burgerjoint' &&
           gameState.flags.sittingInBurgerJointBooth) {
         return {
           messages: [
@@ -1717,7 +1787,7 @@ export function processCommand(
       }
 
       // Handle standing up from Findlater's dimensional chair
-      if ((currentRoom.id === 'findlaters' || currentRoom.id === 'findlaterscornercoffeeshop') && 
+      if ((currentRoom.id === 'findlaters' || currentRoom.id === 'findlaterscornercoffeeshop') &&
           gameState.flags.sittingInFindlatersChair) {
         return {
           messages: [
@@ -1737,7 +1807,7 @@ export function processCommand(
       }
 
       // Handle standing up from Trent Park runic chair
-      if (currentRoom.id === 'trentpark' && 
+      if (currentRoom.id === 'trentpark' &&
           gameState.flags.sittingInTrentParkChair) {
         return {
           messages: [
@@ -1757,7 +1827,7 @@ export function processCommand(
       }
 
       // Handle standing up from Palace main hall throne
-      if (currentRoom.id === 'faepalacemainhall' && 
+      if (currentRoom.id === 'faepalacemainhall' &&
           gameState.flags.sittingInPalaceThrone) {
         return {
           messages: [
@@ -1777,7 +1847,7 @@ export function processCommand(
       }
 
       // Handle standing up from maze storage chamber broken chair
-      if (currentRoom.id === 'storagechamber' && 
+      if (currentRoom.id === 'storagechamber' &&
           gameState.flags.sittingInStorageChair) {
         return {
           messages: [
@@ -1797,7 +1867,7 @@ export function processCommand(
       }
 
       // Handle standing up from crossing chair
-      if ((currentRoom.id === 'crossing' || currentRoom.id === 'introZone_crossing') && 
+      if (currentRoom.id === 'crossing' &&
           gameState.flags.sittingInCrossingChair) {
         return {
           messages: [
@@ -1814,10 +1884,10 @@ export function processCommand(
           },
         };
       }
-      
+
       // Default stand response for any remaining sitting states
-      if (gameState.flags.sittingInCrossingChair || 
-          gameState.flags.sittingInTrentParkChair || 
+      if (gameState.flags.sittingInCrossingChair ||
+          gameState.flags.sittingInTrentParkChair ||
           gameState.flags.sittingInFindlatersChair ||
           gameState.flags.sittingInBurgerJointBooth ||
           gameState.flags.sittingInTorridonInnChair ||
@@ -1839,20 +1909,20 @@ export function processCommand(
           },
         };
       }
-      
+
       return { messages: [{ text: "You're already standing.", type: 'info' }] };
     }
 
     case 'jump': {
       if (currentRoom.exits && currentRoom.exits.jump) {
         const targetRoomId = currentRoom.exits.jump;
-        
+
         // Special message for jumping through portal at St Katherine's Dock
         let jumpMessage = 'You jump and find yourself somewhere else!';
         if (currentRoom.id === 'stkatherinesdock' && targetRoomId === 'centralpark') {
           jumpMessage = 'You take a running leap and dive headfirst through the shimmering portal! Reality blurs around you as you hurtle across dimensions from London to New York...';
         }
-        
+
         return {
           messages: [{ text: jumpMessage, type: 'info' }],
           updates: {
@@ -1871,25 +1941,25 @@ export function processCommand(
     case 'speak': {
       if (!noun) {
         if (currentRoom.npcs && currentRoom.npcs.length > 0) {
-          const npcNames = currentRoom.npcs.map(npc => npc.name).join(', ');
+          const npcNames = currentRoom.npcs.join(', ');
           return { messages: [{ text: `Who do you want to talk to? Available: ${npcNames}`, type: 'info' }] };
         }
         return { messages: [{ text: 'There is no one here to talk to.', type: 'error' }] };
       }
-      
+
       if (currentRoom.npcs && currentRoom.npcs.length > 0) {
-        const npc = currentRoom.npcs.find(n => n.name.toLowerCase().includes(noun.toLowerCase()));
+        const npc = currentRoom.npcs.find(n => n.toLowerCase().includes(noun.toLowerCase()));
         if (npc) {
-          const greeting = (npc as any).dialogue?.greeting || `${npc.name} nods at you but doesn't say anything.`;
-          
+          const greeting = `${npc} nods at you but doesn't say anything.`;
+
           // Award points for meaningful NPC interactions
           const conversationScore = 10;
           const newScore = (gameState.player.score || 0) + conversationScore;
-          
-          return { 
+
+          return {
             messages: [
-              { text: `You speak to ${npc.name}.`, type: 'info' },
-              { text: `${npc.name}: "${greeting}"`, type: 'lore' },
+              { text: `You speak to ${npc}.`, type: 'info' },
+              { text: `${npc}: "${greeting}"`, type: 'lore' },
               { text: `Score: +${conversationScore} points`, type: 'system' }
             ],
             updates: {
@@ -1909,15 +1979,15 @@ export function processCommand(
 
         // Remove coffee from inventory
         const newInventory = gameState.player.inventory.filter(item => item !== 'coffee');
-        
+
         // Award points for using coffee strategically
         const coffeeScore = 20;
         const newScore = (gameState.player.score || 0) + coffeeScore;
-        
+
         // Get list of previously visited rooms (excluding current room)
         const visitedRooms = gameState.player.visitedRooms || [gameState.currentRoomId];
         const availableDestinations = visitedRooms.filter((roomId: string) => roomId !== gameState.currentRoomId);
-        
+
         const messages: TerminalMessage[] = [
           { text: 'You drink the rich, aromatic coffee...', type: 'info' },
           { text: 'Your senses sharpen and reality seems to shift around you.', type: 'lore' },
@@ -1955,15 +2025,15 @@ export function processCommand(
 
         // Remove coffee from inventory
         const newInventory = gameState.player.inventory.filter(item => item !== 'coffee');
-        
+
         // Award fewer points than drinking (waste of coffee!)
         const throwScore = 10;
         const newScore = (gameState.player.score || 0) + throwScore;
-        
+
         // Get list of previously visited rooms (excluding current room)
         const visitedRooms = gameState.player.visitedRooms || [gameState.currentRoomId];
         const availableDestinations = visitedRooms.filter((roomId: string) => roomId !== gameState.currentRoomId);
-        
+
         const messages: TerminalMessage[] = [
           { text: 'You angrily throw the coffee across the room!', type: 'info' },
           { text: 'The liquid arcs through the air, splashing dramatically...', type: 'info' },
@@ -2034,16 +2104,16 @@ export function processCommand(
       const roomDef = currentRoom as any;
       const playerTraits = gameState.player.traits || [];
       const playerInventory = gameState.player.inventory || [];
-      
+
       if (roomDef.puzzles && Array.isArray(roomDef.puzzles)) {
-        const puzzle = roomDef.puzzles.find((p: any) => 
+        const puzzle = roomDef.puzzles.find((p: any) =>
           p.id.toLowerCase().includes(noun.toLowerCase()) ||
           p.name?.toLowerCase().includes(noun.toLowerCase())
         );
-        
+
         if (puzzle) {
           // Check if puzzle is already solved
-          if (currentRoom.flags?.[`${puzzle.id}_solved`]) {
+          if ((currentRoom.flags as any)?.[`${puzzle.id}_solved`]) {
             return { messages: [{ text: 'This puzzle has already been solved.', type: 'info' }] };
           }
 
@@ -2059,10 +2129,10 @@ export function processCommand(
           }
 
           // Check trait boosts
-          const hasBoostTrait = puzzle.traitBoost && puzzle.traitBoost.some((trait: string) => 
+          const hasBoostTrait = puzzle.traitBoost && puzzle.traitBoost.some((trait: string) =>
             playerTraits.includes(trait)
           );
-          
+
           // Calculate success chance based on difficulty and traits
           let baseChance = 0.7; // 70% base success rate
           switch (puzzle.difficulty) {
@@ -2071,29 +2141,29 @@ export function processCommand(
             case 'hard': baseChance = 0.5; break;
             case 'extreme': baseChance = 0.3; break;
           }
-          
+
           // Apply trait boost
           if (hasBoostTrait) {
             baseChance = Math.min(0.95, baseChance + 0.2); // +20% with trait, max 95%
           }
-          
+
           // Check attempt count
           const attemptKey = `${puzzle.id}_attempts`;
-          const currentAttempts = typeof currentRoom.flags?.[attemptKey] === 'number' 
-            ? currentRoom.flags[attemptKey] as number 
+          const currentAttempts = typeof (currentRoom.flags as any)?.[attemptKey] === 'number'
+            ? (currentRoom.flags as any)[attemptKey] as number
             : 0;
           const maxAttempts = puzzle.maxAttempts || 5;
-          
+
           if (currentAttempts >= maxAttempts) {
             return { messages: [
               { text: `You have exhausted all attempts for this puzzle (${maxAttempts} maximum).`, type: 'error' },
               { text: 'Perhaps you need to approach this differently or come back later.', type: 'info' }
             ]};
           }
-          
+
           const solved = Math.random() < baseChance;
           const newAttempts = currentAttempts + 1;
-          
+
           if (solved) {
             // Calculate score based on difficulty and performance
             let scoreReward = 25; // Base points
@@ -2103,68 +2173,68 @@ export function processCommand(
               case 'hard': scoreReward = 75; break;
               case 'extreme': scoreReward = 150; break;
             }
-            
+
             // Trait boost bonus
             if (hasBoostTrait) {
               scoreReward = Math.floor(scoreReward * 1.5);
             }
-            
+
             // First attempt bonus
             if (newAttempts === 1) {
               scoreReward = Math.floor(scoreReward * 1.25);
             }
-            
+
             const newScore = (gameState.player.score || 0) + scoreReward;
-            
+
             // Apply appropriate scoring event
             switch (puzzle.difficulty) {
-              case 'easy': 
-              case 'medium': 
-                applyScoreForEvent('solve.puzzle.simple'); 
+              case 'easy':
+              case 'medium':
+                applyScoreForEvent('solve.puzzle.simple');
                 break;
-              case 'hard': 
-                applyScoreForEvent('solve.puzzle.hard'); 
+              case 'hard':
+                applyScoreForEvent('solve.puzzle.hard');
                 break;
-              case 'extreme': 
-                applyScoreForEvent('solve.puzzle.expert'); 
+              case 'extreme':
+                applyScoreForEvent('solve.puzzle.expert');
                 break;
             }
-            
+
             // Unlock achievement
             unlockAchievement('puzzle_solver');
-            
+
             const messages: TerminalMessage[] = [
               { text: `🧩 You successfully solve the ${puzzle.name || puzzle.id}!`, type: 'system' },
             ];
-            
+
             if (hasBoostTrait) {
               const boostTraits = puzzle.traitBoost.filter((trait: string) => playerTraits.includes(trait));
-              messages.push({ 
-                text: `✨ Your ${boostTraits.join(', ')} trait${boostTraits.length > 1 ? 's' : ''} helped you solve this more easily!`, 
-                type: 'lore' 
+              messages.push({
+                text: `✨ Your ${boostTraits.join(', ')} trait${boostTraits.length > 1 ? 's' : ''} helped you solve this more easily!`,
+                type: 'lore'
               });
             }
-            
+
             if (newAttempts === 1) {
               messages.push({ text: '🎯 Perfect solve! First attempt bonus applied.', type: 'system' });
             }
-            
+
             messages.push({ text: 'Something in the room changes...', type: 'lore' });
             messages.push({ text: `Score: +${scoreReward} points!`, type: 'system' });
-            
+
             // Add reward items if any
             let inventoryUpdates = {};
             if (puzzle.rewardItems && puzzle.rewardItems.length > 0) {
               const newInventory = [...playerInventory, ...puzzle.rewardItems];
               inventoryUpdates = { inventory: newInventory };
-              messages.push({ 
-                text: `You receive: ${puzzle.rewardItems.join(', ')}`, 
-                type: 'system' 
+              messages.push({
+                text: `You receive: ${puzzle.rewardItems.join(', ')}`,
+                type: 'system'
               });
-              
+
               // Record items in codex
               puzzle.rewardItems.forEach((item: string) => {
-                
+
                 recordItemDiscovery(item, `Reward for solving ${puzzle.name || puzzle.id}`);
               });
             }
@@ -2172,8 +2242,8 @@ export function processCommand(
             // Mark puzzle as solved
             const updatedRoom = {
               ...currentRoom,
-              flags: { 
-                ...currentRoom.flags, 
+              flags: {
+                ...currentRoom.flags,
                 [`${puzzle.id}_solved`]: true,
                 [attemptKey]: newAttempts
               }
@@ -2182,14 +2252,14 @@ export function processCommand(
             return {
               messages,
               updates: {
-                player: { 
-                  ...gameState.player, 
+                player: {
+                  ...gameState.player,
                   score: newScore,
                   ...inventoryUpdates
                 },
                 roomMap: {
                   ...gameState.roomMap,
-                  [currentRoom.id]: updatedRoom,
+                  [currentRoom.id]: updatedRoom as any,
                 },
               },
             };
@@ -2199,21 +2269,21 @@ export function processCommand(
             const messages: TerminalMessage[] = [
               { text: `You struggle with the ${puzzle.name || puzzle.id} but can't solve it yet.`, type: 'error' }
             ];
-            
+
             if (remainingAttempts > 0) {
-              messages.push({ 
-                text: `You have ${remainingAttempts} attempt${remainingAttempts === 1 ? '' : 's'} remaining.`, 
-                type: 'info' 
+              messages.push({
+                text: `You have ${remainingAttempts} attempt${remainingAttempts === 1 ? '' : 's'} remaining.`,
+                type: 'info'
               });
-              
+
               // Give hints based on traits or items
               if (hasBoostTrait) {
-                messages.push({ 
-                  text: `Your ${puzzle.traitBoost.filter((t: string) => playerTraits.includes(t)).join(', ')} background suggests there might be a pattern here...`, 
-                  type: 'info' 
+                messages.push({
+                  text: `Your ${puzzle.traitBoost.filter((t: string) => playerTraits.includes(t)).join(', ')} background suggests there might be a pattern here...`,
+                  type: 'info'
                 });
               }
-              
+
               if (puzzle.hint) {
                 messages.push({ text: `Hint: ${puzzle.hint}`, type: 'info' });
               }
@@ -2224,8 +2294,8 @@ export function processCommand(
             // Update attempt count
             const updatedRoom = {
               ...currentRoom,
-              flags: { 
-                ...currentRoom.flags, 
+              flags: {
+                ...currentRoom.flags,
                 [attemptKey]: newAttempts
               }
             } as Room;
@@ -2235,7 +2305,7 @@ export function processCommand(
               updates: {
                 roomMap: {
                   ...gameState.roomMap,
-                  [currentRoom.id]: updatedRoom,
+                  [currentRoom.id]: updatedRoom as any,
                 },
               },
             };
@@ -2261,7 +2331,7 @@ export function processCommand(
       if (currentRoom.exits && currentRoom.exits[direction]) {
         const targetRoomId = currentRoom.exits[direction];
         const targetRoom = gameState.roomMap[targetRoomId];
-        
+
         const messages: TerminalMessage[] = [{ text: `You go ${direction}.`, type: 'info' }];
         let updates: any = {
           currentRoomId: targetRoomId,
@@ -2306,9 +2376,9 @@ export function processCommand(
       // Handle blue button specifically in reset room
       if (currentRoom.id === 'introreset' && (noun === 'button' || noun === 'blue_button' || noun.includes('blue'))) {
         const currentPressCount = typeof gameState.flags.resetButtonPressCount === 'number' ? gameState.flags.resetButtonPressCount : 0;
-        
+
         const messages: TerminalMessage[] = [];
-        
+
         // Different messages based on press count
         switch (currentPressCount) {
           case 0:
@@ -2355,14 +2425,14 @@ export function processCommand(
             if (currentPressCount >= 5) {
               // Unlock reset achievement
               unlockAchievement('reset_count_1');
-              
+
               messages.push(
                 { text: '💥 REALITY RESET INITIATED!', type: 'error' },
                 { text: '💥 The button finally does what it was designed to do...', type: 'error' },
                 { text: '💥 Everything dissolves into brilliant white light...', type: 'error' },
                 { text: '💥 You find yourself back at the beginning...', type: 'system' }
               );
-              
+
               // Trigger full game reset on 6th press
               return {
                 messages,
@@ -2382,7 +2452,7 @@ export function processCommand(
                     triggerResetEscalation: false,
                   },
                   history: [],
-                },
+                } as any,
               };
             } else {
               messages.push(
@@ -2406,16 +2476,16 @@ export function processCommand(
       }
 
       // Handle chair press button in Torridon Inn (when sitting in innkeeper chair)
-      if (currentRoom.id === 'torridoninn' && 
-          gameState.flags.sittingInTorridonInnChair && 
+      if (currentRoom.id === 'torridoninn' &&
+          gameState.flags.sittingInTorridonInnChair &&
           (!noun || noun === 'button' || noun === 'press_button' || noun === 'panel' || noun === 'wooden_panel')) {
-        
+
         // Get visited rooms for travel menu
         const visitedRooms = gameState.player.visitedRooms || [];
-        
+
         const title = '🏰 Innkeeper\'s Travel Network';
         const subtitle = 'Highland hospitality connects all roads - safe passage to known lands';
-        
+
         // Store destinations in game state for travel menu
         return {
           messages: [
@@ -2437,16 +2507,16 @@ export function processCommand(
       }
 
       // Handle booth press button in Burger Joint (when sitting in portal booth)
-      if (currentRoom.id === 'burgerjoint' && 
-          gameState.flags.sittingInBurgerJointBooth && 
+      if (currentRoom.id === 'burgerjoint' &&
+          gameState.flags.sittingInBurgerJointBooth &&
           (!noun || noun === 'button' || noun === 'press_button' || noun === 'control' || noun === 'controls')) {
-        
+
         // Get visited rooms for travel menu
         const visitedRooms = gameState.player.visitedRooms || [];
-        
+
         const title = '🍔 Burger Joint Portal System';
         const subtitle = 'NYC neighborhood dimensional travel - comfort food style';
-        
+
         // Store destinations in game state for travel menu
         return {
           messages: [
@@ -2468,16 +2538,16 @@ export function processCommand(
       }
 
       // Handle chair press button in Findlater's cafe (when sitting in dimensional chair)
-      if ((currentRoom.id === 'findlaters' || currentRoom.id === 'findlaterscornercoffeeshop') && 
-          gameState.flags.sittingInFindlatersChair && 
+      if ((currentRoom.id === 'findlaters' || currentRoom.id === 'findlaterscornercoffeeshop') &&
+          gameState.flags.sittingInFindlatersChair &&
           (!noun || noun === 'button' || noun === 'press_button' || noun === 'chair_button')) {
-        
+
         // Get visited rooms for travel menu
         const visitedRooms = gameState.player.visitedRooms || [];
-        
+
         const title = '☕ Cafe Dimensional Gateway';
         const subtitle = 'Coffee-powered interdimensional travel - all realities welcome';
-        
+
         // Store destinations in game state for travel menu
         return {
           messages: [
@@ -2499,16 +2569,16 @@ export function processCommand(
       }
 
       // Handle chair press button in Trent Park (when sitting in runic chair)
-      if (currentRoom.id === 'trentpark' && 
-          gameState.flags.sittingInTrentParkChair && 
+      if (currentRoom.id === 'trentpark' &&
+          gameState.flags.sittingInTrentParkChair &&
           (!noun || noun === 'button' || noun === 'press_button' || noun === 'chair_button')) {
-        
+
         // Get visited rooms for travel menu
         const visitedRooms = gameState.player.visitedRooms || [];
-        
+
         const title = '🌳 Runic Chair Portal System';
         const subtitle = 'Ancient magic activated - travel to places you have been';
-        
+
         // Store destinations in game state for travel menu
         return {
           messages: [
@@ -2530,19 +2600,19 @@ export function processCommand(
       }
 
       // Handle chair press button in crossing room (when sitting)
-      if ((currentRoom.id === 'crossing' || currentRoom.id === 'introZone_crossing') && 
-          gameState.flags.sittingInCrossingChair && 
+      if (currentRoom.id === 'crossing' &&
+          gameState.flags.sittingInCrossingChair &&
           (!noun || noun === 'button' || noun === 'press_button' || noun === 'chair_button')) {
-        
+
         const hasRemoteControl = gameState.player.inventory.includes('remote_control');
-        
+
         // Get visited rooms for coffee-triggered travel menu or use predefined lists
         const visitedRooms = gameState.player.visitedRooms || [];
-        
+
         let destinationList: string[];
         let title: string;
         let subtitle: string;
-        
+
         if (hasRemoteControl) {
           // Full access to all hub rooms excluding Stanton Harcourt rooms
           destinationList = [
@@ -2560,7 +2630,7 @@ export function processCommand(
           title = '🪑 Chair Navigation System';
           subtitle = 'Limited access - basic navigation only';
         }
-        
+
         // Store destinations in game state for travel menu
         return {
           messages: [
@@ -2581,16 +2651,16 @@ export function processCommand(
       }
 
       // Handle throne press button in Palace main hall (when sitting in crystal throne)
-      if (currentRoom.id === 'faepalacemainhall' && 
-          gameState.flags.sittingInPalaceThrone && 
+      if (currentRoom.id === 'faepalacemainhall' &&
+          gameState.flags.sittingInPalaceThrone &&
           (!noun || noun === 'button' || noun === 'press_button' || noun === 'control' || noun === 'regal_control')) {
-        
+
         // Get visited rooms for travel menu
         const visitedRooms = gameState.player.visitedRooms || [];
-        
+
         const title = '👑 Royal Fae Court Network';
         const subtitle = 'Throne magic activated - travel through the royal realms';
-        
+
         // Store destinations in game state for travel menu
         return {
           messages: [
@@ -2612,16 +2682,16 @@ export function processCommand(
       }
 
       // Handle broken chair press button in maze storage chamber (when sitting in broken chair)
-      if (currentRoom.id === 'storagechamber' && 
-          gameState.flags.sittingInStorageChair && 
+      if (currentRoom.id === 'storagechamber' &&
+          gameState.flags.sittingInStorageChair &&
           (!noun || noun === 'button' || noun === 'press_button' || noun === 'panel' || noun === 'flickering_panel')) {
-        
+
         // Get visited rooms for travel menu
         const visitedRooms = gameState.player.visitedRooms || [];
-        
+
         const title = '🪑 Broken Chair Portal System';
         const subtitle = 'Damaged but functional - unstable pathways to familiar places';
-        
+
         // Store destinations in game state for travel menu
         return {
           messages: [
@@ -2643,14 +2713,14 @@ export function processCommand(
       }
 
       // Handle control panel and navigation console in crossing room
-      if ((currentRoom.id === 'crossing' || currentRoom.id === 'introZone_crossing') && 
+      if (currentRoom.id === 'crossing' &&
           (noun === 'control_panel' || noun === 'panel' || noun === 'control' || noun === 'controls')) {
         const messages: TerminalMessage[] = [];
-        
+
         // Check if player has required navigation devices
         const hasRemoteControl = gameState.player.inventory.includes('remote_control');
         const hasNavigationCrystal = gameState.player.inventory.includes('navigation_crystal');
-        
+
         if (hasRemoteControl) {
           messages.push(
             { text: '✨ You press the crystalline control panel...', type: 'info' },
@@ -2673,18 +2743,18 @@ export function processCommand(
             { text: '🔍 You need to find a navigation device to access the dimensional transport system.', type: 'info' }
           );
         }
-        
+
         return { messages };
       }
 
       // Handle navigation console specifically
-      if ((currentRoom.id === 'crossing' || currentRoom.id === 'introZone_crossing') && 
+      if (currentRoom.id === 'crossing' &&
           (noun === 'navigation_console' || noun === 'console' || noun === 'navigation' || noun === 'interface')) {
         const messages: TerminalMessage[] = [];
-        
+
         const hasRemoteControl = gameState.player.inventory.includes('remote_control');
         const hasNavigationCrystal = gameState.player.inventory.includes('navigation_crystal');
-        
+
         if (hasRemoteControl || hasNavigationCrystal) {
           messages.push(
             { text: '🌀 You interface with the ethereal navigation console...', type: 'info' },
@@ -2700,13 +2770,13 @@ export function processCommand(
             { text: '🔮 Find a remote control or navigation crystal to access this system.', type: 'info' }
           );
         }
-        
+
         return { messages };
       }
 
       // Generic press for other objects
-      return { 
-        messages: [{ text: `You can't press the ${noun}.`, type: 'error' }] 
+      return {
+        messages: [{ text: `You can't press the ${noun}.`, type: 'error' }]
       };
     }
 
@@ -2717,7 +2787,7 @@ export function processCommand(
       const target = noun || 'room';
       const action = `inspect ${target}`;
       const miniquestResult = checkMiniquestTriggers(action, gameState, currentRoom);
-      
+
       // Default examine behavior if no specific target
       if (!noun) {
         return {
@@ -2728,10 +2798,10 @@ export function processCommand(
           updates: miniquestResult.updates
         };
       }
-      
+
       // Check for specific object examination
       const examineMessages: TerminalMessage[] = [];
-      
+
       if (target === 'stones' && currentRoom.id === 'faeglade') {
         examineMessages.push({ text: 'The standing stones pulse with ancient power, their Fae script shifting hypnotically.', type: 'lore' });
       } else if (target === 'reflections' && currentRoom.id === 'faelake') {
@@ -2741,7 +2811,7 @@ export function processCommand(
       } else {
         examineMessages.push({ text: `You examine the ${target} closely.`, type: 'info' });
       }
-      
+
       return {
         messages: [...examineMessages, ...miniquestResult.messages],
         updates: miniquestResult.updates
@@ -2752,9 +2822,9 @@ export function processCommand(
       const target = noun || '';
       const action = noun ? `listen ${noun}` : 'listen';
       const miniquestResult = checkMiniquestTriggers(action, gameState, currentRoom);
-      
+
       const listenMessages: TerminalMessage[] = [];
-      
+
       if (currentRoom.id === 'faeglade' && (!target || target === 'trees' || target === 'oaks')) {
         listenMessages.push({ text: 'The ancient oaks whisper secrets of ages past in the ethereal breeze.', type: 'lore' });
       } else if (currentRoom.id === 'faepalacedungeons' && target === 'chains') {
@@ -2762,7 +2832,7 @@ export function processCommand(
       } else {
         listenMessages.push({ text: 'You listen carefully to your surroundings.', type: 'info' });
       }
-      
+
       return {
         messages: [...listenMessages, ...miniquestResult.messages],
         updates: miniquestResult.updates
@@ -2773,7 +2843,7 @@ export function processCommand(
       const target = noun || '';
       const action = `gather ${target}`;
       const miniquestResult = checkMiniquestTriggers(action, gameState, currentRoom);
-      
+
       if (target === 'sand' && currentRoom.id === 'faelake') {
         return {
           messages: [
@@ -2789,7 +2859,7 @@ export function processCommand(
           }
         };
       }
-      
+
       return {
         messages: [
           { text: `You attempt to gather ${target || 'something'}.`, type: 'info' },
@@ -2803,9 +2873,9 @@ export function processCommand(
       const target = noun || '';
       const action = `trace ${target}`;
       const miniquestResult = checkMiniquestTriggers(action, gameState, currentRoom);
-      
+
       const traceMessages: TerminalMessage[] = [];
-      
+
       if (target === 'symbols' && currentRoom.id === 'faepalacedungeons') {
         traceMessages.push({ text: 'As you trace the reality symbols, visions of cosmic truths flash through your mind.', type: 'lore' });
       } else if (target === 'markings' && currentRoom.id === 'forgottenchamber') {
@@ -2813,7 +2883,7 @@ export function processCommand(
       } else {
         traceMessages.push({ text: `You trace the ${target} with your finger.`, type: 'info' });
       }
-      
+
       return {
         messages: [...traceMessages, ...miniquestResult.messages],
         updates: miniquestResult.updates
@@ -2824,7 +2894,7 @@ export function processCommand(
       const target = noun || '';
       const action = `decipher ${target}`;
       const miniquestResult = checkMiniquestTriggers(action, gameState, currentRoom);
-      
+
       return {
         messages: [
           { text: `You attempt to decipher the ${target}.`, type: 'info' },
@@ -2837,15 +2907,15 @@ export function processCommand(
     case 'meditate': {
       const action = 'meditate';
       const miniquestResult = checkMiniquestTriggers(action, gameState, currentRoom);
-      
+
       const meditateMessages: TerminalMessage[] = [];
-      
+
       if (currentRoom.id === 'trentpark') {
         meditateMessages.push({ text: 'You find inner peace in this sacred grove, feeling connected to ancient energies.', type: 'lore' });
       } else {
         meditateMessages.push({ text: 'You take a moment to center yourself and reflect.', type: 'info' });
       }
-      
+
       return {
         messages: [...meditateMessages, ...miniquestResult.messages],
         updates: miniquestResult.updates
@@ -2856,7 +2926,7 @@ export function processCommand(
       const target = noun || '';
       const action = `acknowledge ${target}`;
       const miniquestResult = checkMiniquestTriggers(action, gameState, currentRoom);
-      
+
       if (target === 'presence' && currentRoom.id === 'trentpark') {
         return {
           messages: [
@@ -2866,7 +2936,7 @@ export function processCommand(
           updates: miniquestResult.updates
         };
       }
-      
+
       return {
         messages: [
           { text: `You acknowledge the ${target}.`, type: 'info' },
@@ -2879,31 +2949,29 @@ export function processCommand(
     default: {
       // Check for special NPC interactions before returning unknown command
       const fullCommand = command.toLowerCase().trim();
-      
+
       // Check for Librarian interactions (ask guard, enter door, talk to librarian)
-      if (fullCommand.includes('ask guard') || 
+      if (fullCommand.includes('ask guard') ||
           fullCommand.includes('enter') && fullCommand.includes('door') ||
           fullCommand.includes('librarian')) {
-        
+
         // Import Librarian controller dynamically to avoid circular dependencies
-        import('./librarianController').then(({ handleLibrarianInteraction, isLibrarianActive }) => {
-          if (isLibrarianActive()) {
-            // Set a flag to handle this interaction in the next state update
-            return {
-              messages: [{ text: "...", type: 'system' as const }],
-              updates: {
-                flags: {
-                  ...gameState.flags,
-                  pendingLibrarianCommand: fullCommand
-                }
+        if (isLibrarianActive()) {
+          // Set a flag to handle this interaction in the next state update
+          return {
+            messages: [{ text: "...", type: 'system' as const }],
+            updates: {
+              flags: {
+                ...gameState.flags,
+                pendingLibrarianCommand: fullCommand
               }
-            };
-          }
-        });
-        
+            }
+          };
+        }
+
         // For door choices specifically
-        if ((fullCommand.includes('enter red door') || 
-             fullCommand.includes('enter blue door') || 
+        if ((fullCommand.includes('enter red door') ||
+             fullCommand.includes('enter blue door') ||
              fullCommand.includes('enter green door')) ||
             fullCommand.startsWith('ask guard:')) {
           return {
@@ -2917,33 +2985,29 @@ export function processCommand(
           };
         }
       }
-      
+
       // Check if Mr. Wendell is mentioned and handle interaction
       if (fullCommand.includes('wendell')) {
         // Import Mr. Wendell controller dynamically to avoid circular dependencies
-        import('./mrWendellController').then(({ handleWendellInteraction, isWendellActive }) => {
-          if (isWendellActive()) {
-            // Set a flag to handle this interaction in the next state update
-            // Since we can't dispatch from here, we'll use the flag system
-            return {
-              messages: [{ text: "...", type: 'system' as const }],
-              updates: {
-                flags: {
-                  ...gameState.flags,
-                  pendingWendellCommand: fullCommand
-                }
-              }
-            };
+        // If Mr. Wendell is active, set a flag to handle this interaction in the next state update
+        // (Dynamic import or controller logic should handle this elsewhere)
+        return {
+          messages: [{ text: "...", type: 'system' as const }],
+          updates: {
+            flags: {
+              ...gameState.flags,
+              pendingWendellCommand: fullCommand
+            }
           }
-        });
+        };
       }
-      
+
       // Check for general rude behavior patterns
       const rudePatterns = [
-        'bonehead', 'idiot', 'stupid', 'shut up', 'go away', 
+        'bonehead', 'idiot', 'stupid', 'shut up', 'go away',
         'fuck off', 'piss off', 'get lost', 'screw you'
       ];
-      
+
       if (rudePatterns.some(pattern => fullCommand.includes(pattern))) {
         return {
           messages: [{ text: "That's not very polite...", type: 'system' as const }],
@@ -2956,7 +3020,7 @@ export function processCommand(
           }
         };
       }
-      
+
       return {
         messages: [{ text: "I don't understand that command.", type: 'error' as const }],
       };

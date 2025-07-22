@@ -1,3 +1,5 @@
+
+
 // Version: 6.0.0
 // (c) 2025 Geoffrey Alan Webster
 // Licensed under the MIT License
@@ -39,15 +41,15 @@ export interface Item {
   conflictItems?: string[];
 }
 
-export type ItemCategory = 
-  | 'functional' 
-  | 'valuable' 
-  | 'junk' 
-  | 'puzzle' 
-  | 'quest' 
-  | 'easteregg' 
-  | 'knowledge' 
-  | 'healing' 
+export type ItemCategory =
+  | 'functional'
+  | 'valuable'
+  | 'junk'
+  | 'puzzle'
+  | 'quest'
+  | 'easteregg'
+  | 'knowledge'
+  | 'healing'
   | 'access'
   | 'tool'
   | 'consumable'
@@ -169,7 +171,7 @@ This document governs the decisions of Ayla — the AI fused with the Lattice.`,
       { type: 'flag', value: true, target: 'wendell_approval' }
     ]
   },
-  
+
   // Core Functional Items
   {
     id: "towel",
@@ -692,7 +694,7 @@ export function getItemById(id: string): Item | null {
     console.warn('[Items] Invalid item ID provided');
     return null;
   }
-  
+
   // Fallback to direct array search if Maps aren't working
   return ITEMS.find(item => item.id === id) || null;
 }
@@ -742,11 +744,11 @@ export function getItemsByRarity(rarity: ItemRarity): Item[] {
 export function validateItem(item: any): item is Item {
   if (!item || typeof item !== 'object') return false;
 
-  const hasRequiredFields = item.id && item.name && item.description && 
+  const hasRequiredFields = item.id && item.name && item.description &&
                            item.traits && typeof item.portable === 'boolean';
-  
+
   if (!hasRequiredFields) return false;
-  
+
   // Type validation
   return typeof item.id === 'string' &&
          typeof item.name === 'string' &&
@@ -822,55 +824,55 @@ export function useItem(
  * Processes individual item effects
  */
 function processItemEffect(
-  effect: ItemEffect, 
-  result: ItemUseResult, 
+  effect: ItemEffect,
+  result: ItemUseResult,
   playerState: any
 ): void {
   switch (effect.type) {
     case 'message':
       result.message = effect.value as string;
       break;
-      
+
     case 'health':
       const healthValue = typeof effect.value === 'number' ? effect.value : 0;
       result.healthChange = (result.healthChange || 0) + healthValue;
       break;
-      
+
     case 'score':
       const scoreValue = typeof effect.value === 'number' ? effect.value : 0;
       result.scoreChange = (result.scoreChange || 0) + scoreValue;
       break;
-      
+
     case 'flag':
       if (effect.target && result.flagChanges) {
         result.flagChanges[effect.target] = effect.value;
       }
       break;
-      
+
     case 'trait':
       if (effect.value && result.traitChanges) {
         if (!result.traitChanges.add) result.traitChanges.add = [];
         result.traitChanges.add.push(effect.value as string);
       }
       break;
-      
+
     case 'inventory':
       if (effect.value && result.inventoryChanges) {
         if (!result.inventoryChanges.add) result.inventoryChanges.add = [];
         result.inventoryChanges.add.push(effect.value as string);
       }
       break;
-      
+
     case 'unlock':
       result.message += ` ${effect.description || 'Something unlocks.'}`;
       break;
-      
+
     case 'transform':
       if (effect.target) {
         if (!result.inventoryChanges) result.inventoryChanges = {};
         if (!result.inventoryChanges.remove) result.inventoryChanges.remove = [];
         if (!result.inventoryChanges.add) result.inventoryChanges.add = [];
-        
+
         result.inventoryChanges.remove.push(effect.target);
         result.inventoryChanges.add.push(effect.value as string);
       }
@@ -897,27 +899,27 @@ function checkRequirement(
   switch (requirement.type) {
     case 'trait':
       return playerState.traits?.includes(requirement.value as string) || false;
-      
+
     case 'flag':
       if (!requirement.target) return false;
       const flagValue = playerState.flags?.[requirement.target];
       return compareValues(flagValue, requirement.value, requirement.operator || 'equals');
-      
+
     case 'item':
       return playerState.inventory?.includes(requirement.value as string) || false;
-      
+
     case 'health':
       const health = playerState.health || 0;
       return compareValues(health, requirement.value, requirement.operator || 'greater');
-      
+
     case 'room':
       return playerState.currentRoom === requirement.value;
-      
+
     case 'npc_trust':
       if (!requirement.target) return false;
       const trustLevel = playerState.npcTrust?.[requirement.target] || 0;
       return compareValues(trustLevel, requirement.value, requirement.operator || 'greater');
-      
+
     default:
       return false;
   }
@@ -977,7 +979,7 @@ export function searchItems(criteria: ItemSearchCriteria | string): Item[] {
   if (typeof criteria === 'string') {
     // Simple text search for backward compatibility
     if (!criteria) return [];
-    
+
     const lowerQuery = criteria.toLowerCase();
     return ITEMS.filter(item =>
       item.name.toLowerCase().includes(lowerQuery) ||
@@ -1031,7 +1033,7 @@ export function searchItems(criteria: ItemSearchCriteria | string): Item[] {
  * Enhanced with context-aware pricing.
  */
 export function getItemValue(
-  itemId: string, 
+  itemId: string,
   modifiers?: Record<string, number>,
   context?: {
     playerTraits?: string[];
@@ -1041,9 +1043,9 @@ export function getItemValue(
 ): number {
   const item = getItemById(itemId);
   if (!item) return 0;
-  
+
   let value = item.value || 0;
-  
+
   // Apply category/rarity modifiers
   if (modifiers) {
     if (item.category && modifiers[item.category]) {
@@ -1066,7 +1068,7 @@ export function getItemValue(
       value *= 1.1; // Reputation bonus
     }
   }
-  
+
   return Math.floor(value);
 }
 
@@ -1080,18 +1082,18 @@ export function addItem(item: Item): boolean {
     console.warn('[Items] Invalid item structure provided');
     return false;
   }
-  
+
   // Check for duplicate ID
   if (getItemById(item.id)) {
     console.warn(`[Items] Item with ID '${item.id}' already exists`);
     return false;
   }
-  
+
   ITEMS.push(item);
-  
+
   // Update lookup maps
   itemMap.set(item.id, item);
-  
+
   if (item.category) {
     const category = item.category;
     if (!categoryMap.has(category)) {
@@ -1099,14 +1101,14 @@ export function addItem(item: Item): boolean {
     }
     categoryMap.get(category)!.push(item);
   }
-  
+
   item.traits.forEach(trait => {
     if (!traitMap.has(trait)) {
       traitMap.set(trait, []);
     }
     traitMap.get(trait)!.push(item);
   });
-  
+
   if (item.rarity) {
     const rarity = item.rarity;
     if (!rarityMap.has(rarity)) {
@@ -1114,7 +1116,7 @@ export function addItem(item: Item): boolean {
     }
     rarityMap.get(rarity)!.push(item);
   }
-  
+
   console.log(`[Items] Added item: ${item.name} (${item.id})`);
   return true;
 }
@@ -1130,10 +1132,10 @@ export function removeItem(itemId: string): boolean {
   }
 
   ITEMS.splice(itemIndex, 1);
-  
+
   // Rebuild lookup maps (simple approach)
   initializeLookupMaps();
-  
+
   console.log(`[Items] Removed item: ${itemId}`);
   return true;
 }
@@ -1143,7 +1145,7 @@ export function removeItem(itemId: string): boolean {
  * Transform one item into another based on conditions
  */
 export function transformItem(
-  sourceId: string, 
+  sourceId: string,
   context?: {
     trigger: 'use' | 'time' | 'location' | 'interaction';
     playerFlags?: Record<string, unknown>;
@@ -1152,21 +1154,21 @@ export function transformItem(
 ): string | null {
   const sourceItem = getItemById(sourceId);
   if (!sourceItem || !sourceItem.transformInto) return null;
-  
+
   const transformation = {
     targetId: sourceItem.transformInto,
     condition: sourceItem.requirements?.[0]?.target // Simple transformation logic
   };
-  
+
   if (!transformation) return null;
-  
+
   // Check transformation conditions
   if (transformation.condition && context?.playerFlags) {
     if (!context.playerFlags[transformation.condition]) {
       return null;
     }
   }
-  
+
   return transformation.targetId;
 }
 
@@ -1196,7 +1198,7 @@ export function getItemStatistics(): {
     readableCount: 0,
     throwableCount: 0
   };
-  
+
   let totalValue = 0;
   let maxValue = -Infinity;
   let minValue = Infinity;
@@ -1213,12 +1215,12 @@ export function getItemStatistics(): {
     // Value stats
     const value = item.value || 0;
     totalValue += value;
-    
+
     if (value > maxValue) {
       maxValue = value;
       stats.mostExpensive = item;
     }
-    
+
     if (value < minValue) {
       minValue = value;
       stats.leastExpensive = item;

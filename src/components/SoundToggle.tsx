@@ -1,3 +1,7 @@
+        import('../utils/soundUtils').then(({ fadeAmbient }) => {
+
+
+
 // Version: 6.0.0
 // (c) 2025 Geoffrey Alan Webster
 // Licensed under the MIT License
@@ -32,7 +36,6 @@ const SoundToggle: React.FC<SoundToggleProps> = ({ soundEnabled, setSoundEnabled
    * Toggles the sound state and fades ambient sound accordingly.
    * Uses dynamic import to avoid loading soundUtils until needed.
    */
-        import('../utils/soundUtils').then(({ fadeAmbient }) => {
         fadeAmbient(newState);
       });
       return newState;
