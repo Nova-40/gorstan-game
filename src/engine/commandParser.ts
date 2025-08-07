@@ -1,0 +1,252 @@
+// src/engine/commandParser.ts
+// Gorstan Game Beta 1
+// Code Licence MIT
+// Gorstan and characters (c) Geoff Webster 2025
+// Parses and processes player commands.
+
+import { NPC } from '../types/NPCTypes';
+import { Room } from '../types/Room';
+import { TerminalMessage } from '../components/TerminalConsole';
+import { MiniquestEngine } from './miniquestInitializer';
+import { applyScoreForEvent, getScoreBasedMessage, getDominicScoreComment } from '../state/scoreEffects';
+import { unlockAchievement, listAchievements } from '../logic/achievementEngine';
+import { recordItemDiscovery, displayCodex } from '../logic/codexTracker';
+import { isLibrarianActive } from './librarianController';
+import { LocalGameState } from '../state/gameState';
+
+/**
+ * CommandParserParams interface for processing commands
+ */
+export interface CommandParserParams {
+  input: string;
+  currentRoom: Room;
+  gameState: LocalGameState;
+}
+
+/**
+ * CommandResult interface for processing outcomes
+ */
+export interface CommandResult {
+  messages: TerminalMessage[];
+  updates?: Partial<LocalGameState>;
+}
+
+/**
+ * Aliases for common commands
+ */
+const aliases: Record<string, string> = {
+  grab: 'pick up',
+  take: 'pick up',
+  get: 'pick up',
+  examine: 'inspect',
+  look: 'inspect',
+  read: 'inspect',
+  toss: 'drop',
+  throw: 'drop',
+  discard: 'drop',
+  move: 'go',
+  walk: 'go',
+  travel: 'go',
+  inv: 'inventory',
+  i: 'inventory',
+  items: 'inventory',
+  talk: 'speak',
+  chat: 'speak',
+  ask: 'speak',
+  help: 'ayla',
+  hint: 'ayla',
+  guidance: 'ayla',
+};
+
+/**
+ * Parses and processes player commands
+ */
+export function processCommand({
+  input,
+  currentRoom,
+  gameState,
+}: CommandParserParams): CommandResult {
+  // Validate input parameter
+  if (!input || typeof input !== 'string') {
+    return { 
+      messages: [{ text: 'Invalid command input.', type: 'error' }] 
+    };
+  }
+
+  const resolvedInput = aliases[input.toLowerCase().trim()] || input.toLowerCase().trim();
+  const commandParts = resolvedInput.split(' ');
+  const verb = commandParts[0];
+  const noun = commandParts.slice(1).join(' ');
+
+  const messages: TerminalMessage[] = [];
+  let updates: Partial<LocalGameState> = {};
+
+  switch (verb) {
+    case 'go':
+    case 'move': {
+      const direction = noun;
+      if (currentRoom.exits && currentRoom.exits[direction]) {
+        const targetRoomId = currentRoom.exits[direction];
+        const targetRoom = gameState.roomMap[targetRoomId];
+
+        messages.push({ text: `You go ${direction}.`, type: 'info' });
+        updates = {
+          currentRoomId: targetRoomId,
+          player: {
+            ...gameState.player,
+            currentRoom: targetRoomId,
+          },
+        };
+
+        if (targetRoom) {
+          const entryResult = processRoomEntry(targetRoom, gameState);
+          messages.push(...entryResult.messages);
+          if (entryResult.updates) {
+            updates = { ...updates, ...entryResult.updates };
+          }
+        }
+
+        return { messages, updates };
+      }
+      return { messages: [{ text: "You can't go that way.", type: 'error' }] };
+    }
+
+    case 'look': {
+      const descriptionLines = Array.isArray(currentRoom.description)
+        ? currentRoom.description
+        : [currentRoom.description];
+
+      messages.push(
+        { text: `--- ${currentRoom.title} ---`, type: 'lore' },
+        ...descriptionLines.map((line) => ({ text: line, type: 'lore' as const }))
+      );
+
+      if (currentRoom.items && currentRoom.items.length > 0) {
+        messages.push({ text: 'You see:', type: 'info' });
+        currentRoom.items.forEach((item) => {
+          const itemName = typeof item === 'string' ? item : item.name;
+          messages.push({ text: `- ${itemName}`, type: 'info' });
+        });
+      }
+
+      if (currentRoom.npcs && currentRoom.npcs.length > 0) {
+        messages.push({ text: 'People here:', type: 'info' });
+        currentRoom.npcs.forEach((npc) => {
+          messages.push({ text: `- ${npc}`, type: 'info' });
+        });
+      }
+
+      if (currentRoom.exits && Object.keys(currentRoom.exits).length > 0) {
+        messages.push({ text: 'Exits:', type: 'info' });
+        Object.keys(currentRoom.exits).forEach((exit) => {
+          messages.push({ text: `- ${exit}`, type: 'info' });
+        });
+      }
+
+      return { messages };
+    }
+
+    case 'inventory': {
+      if (gameState.player.inventory.length === 0) {
+        return { messages: [{ text: 'You are not carrying anything.', type: 'info' }] };
+      }
+      return {
+        messages: [
+          { text: 'You are carrying:', type: 'info' },
+          ...gameState.player.inventory.map((item) => ({
+            text: `- ${item}`,
+            type: 'info' as const,
+          })),
+        ],
+      };
+    }
+
+    case 'use': {
+      if (!noun) {
+        return { messages: [{ text: 'What do you want to use?', type: 'error' }] };
+      }
+
+      if (!gameState.player.inventory.includes(noun)) {
+        return { messages: [{ text: `You don't have a ${noun} to use.`, type: 'error' }] };
+      }
+
+      messages.push({ text: `You use the ${noun}.`, type: 'info' });
+      return { messages };
+    }
+
+    case 'help': {
+      const helpMessages: TerminalMessage[] = [
+        { text: '--- Common Commands ---', type: 'system' },
+        { text: 'go [direction] - Move in a direction', type: 'system' },
+        { text: 'look - Examine your surroundings', type: 'system' },
+        { text: 'get [item] - Take an item', type: 'system' },
+        { text: 'use [item] - Use an item from inventory', type: 'system' },
+        { text: 'inventory - Check what you\'re carrying', type: 'system' },
+        { text: 'help - Show this help message', type: 'system' },
+      ];
+
+      return { messages: helpMessages };
+    }
+
+    case 'speak': {
+      if (!noun) {
+        if (gameState.npcsInRoom && gameState.npcsInRoom.length > 0) {
+          const npcNames = gameState.npcsInRoom.map((npc: any) => 
+            typeof npc === 'string' ? npc : npc.name
+          ).join(', ');
+          return { 
+            messages: [
+              { text: 'Who do you want to talk to?', type: 'info' },
+              { text: `Available: ${npcNames}`, type: 'info' },
+              { text: 'Use: talk [name] or click on them directly', type: 'info' }
+            ] 
+          };
+        } else {
+          return { messages: [{ text: 'There is no one here to talk to.', type: 'error' }] };
+        }
+      }
+
+      // Check if the specified NPC is in the room
+      const targetNPC = gameState.npcsInRoom?.find((npc: any) => {
+        const name = typeof npc === 'string' ? npc : npc.name;
+        return name.toLowerCase().includes(noun.toLowerCase());
+      });
+
+      if (!targetNPC) {
+        return { 
+          messages: [{ text: `You don't see anyone named "${noun}" here.`, type: 'error' }] 
+        };
+      }
+
+      // Return a special message that AppCore can intercept to open the NPC console
+      return {
+        messages: [{ text: `Opening conversation with ${typeof targetNPC === 'string' ? targetNPC : targetNPC.name}...`, type: 'info' }],
+        updates: {
+          flags: {
+            ...gameState.flags,
+            openNPCConsole: typeof targetNPC === 'string' ? targetNPC : targetNPC.id
+          }
+        }
+      };
+    }
+
+    default:
+      return { messages: [{ text: "I don't understand that command.", type: 'error' }] };
+  }
+}
+
+/**
+ * Processes room entry logic
+ */
+function processRoomEntry(room: Room, gameState: LocalGameState): CommandResult {
+  const messages: TerminalMessage[] = [];
+  let updates: Partial<LocalGameState> = {};
+
+  if ((room as any).events?.onEnter) {
+    messages.push({ text: 'You feel something change as you enter the room.', type: 'info' });
+  }
+
+  return { messages, updates };
+}
+
+export default processCommand;

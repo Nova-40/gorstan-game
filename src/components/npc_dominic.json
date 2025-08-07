@@ -1,0 +1,32 @@
+{
+  "id": "dominic",
+  "name": "Dominic the Fish",
+  "states": {
+    "default": {
+      "dialogue": [
+        {
+          "condition": "playerState.dominicDeaths === 0",
+          "text": "Dominic bobs in his bowl. He seems... wary of you."
+        },
+        {
+          "condition": "playerState.dominicDeaths > 0",
+          "text": "Dominic narrows his fishy eyes. 'We\u2019ve done this dance before. It ends badly for me.'"
+        }
+      ],
+      "take": {
+        "condition": "currentRoom.id === 'daleApartment'",
+        "effects": [
+          "playerState.dominicDeaths += 1",
+          "playerState.dominicAlive = false",
+          "playerState.hasDominic = true"
+        ],
+        "inventoryItem": {
+          "id": "dominicDead",
+          "name": "Dominic (Deceased)",
+          "description": "A sadly lifeless fish in a bowl. Smells of regret."
+        },
+        "response": "Dominic lets out a tiny sigh as you pick him up. Moments later, he's gone. Again."
+      }
+    }
+  }
+}

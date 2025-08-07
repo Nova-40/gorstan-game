@@ -1,0 +1,38 @@
+# Node modules
+node_modules/
+
+# Vite build output
+dist/
+.vite/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.*
+
+# OS & editor files
+.DS_Store
+Thumbs.db
+*.swp
+*.tmp
+*.bak
+
+# IDE/project settings
+.vscode/
+.idea/
+
+# Public or large files
+*.zip      # ← This ignores ALL .zip files anywhere in the repo
+*.tar.gz
+*.7z
+
+# Game-specific
+rooms/**/*.bak
+public.zip  # Optional redundancy, already caught by *.zip
+
+# Backup directories
+src-backup*

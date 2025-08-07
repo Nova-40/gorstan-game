@@ -1,0 +1,30 @@
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: transparent;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none; /* allows background clicks unless modal-content captures them */
+}
+
+.modal-content {
+  width: 12.5vw;
+  height: 12.5vh;
+  background-color: black !important;
+  color: #39ff14;
+  border: 2px solid #39ff14;
+  font-family: "Courier New", Courier, monospace;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 1rem;
+  box-sizing: border-box;
+  pointer-events: auto; /* interactive content */
+}

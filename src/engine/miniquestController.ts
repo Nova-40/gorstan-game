@@ -1,0 +1,352 @@
+// src/engine/miniquestController.ts
+// Gorstan Game Beta 1
+// Code Licence MIT
+// Gorstan and characters (c) Geoff Webster 2025
+// Core game engine module.
+
+import type { Miniquest, GameAction } from '../types/GameTypes';
+
+import { LocalGameState } from '../state/gameState';
+
+import { MiniquestData, MiniquestProgress } from '../components/MiniquestInterface';
+
+import { MiniquestEngine } from '../engine/miniquestInitializer';
+
+
+
+
+
+
+
+
+
+
+
+export interface MiniquestControllerResult {
+  showMiniquestModal: boolean;
+  miniquests: MiniquestData[];
+  progress: { [questId: string]: MiniquestProgress };
+  roomName: string;
+  totalScore: number;
+  completedCount: number;
+  availableCount: number;
+}
+
+export interface MiniquestSession extends MiniquestControllerResult {
+  onAttemptQuest: (questId: string) => void;
+  onClose: () => void;
+}
+
+class MiniquestController {
+  private static instance: MiniquestController;
+  private dispatch: React.Dispatch<GameAction> | null = null;
+
+  public static getInstance(): MiniquestController {
+    if (!MiniquestController.instance) {
+      MiniquestController.instance = new MiniquestController();
+    }
+    return MiniquestController.instance;
+  }
+
+  public setDispatch(dispatch: React.Dispatch<GameAction>) {
+    this.dispatch = dispatch;
+  }
+
+  
+  public async openMiniquestInterface(
+    roomId: string,
+    gameState: LocalGameState
+  ): Promise<MiniquestControllerResult> {
+// Variable declaration
+    const engine = MiniquestEngine.getInstance();
+
+    
+// Variable declaration
+    const availableQuests = engine.getAvailableQuests(roomId, gameState as any);
+// Variable declaration
+    const allRoomQuests = this.getAllRoomQuests(roomId);
+
+    
+    const miniquests: MiniquestData[] = allRoomQuests.map(quest => ({
+      id: quest.id,
+      title: quest.title,
+      description: quest.description,
+      type: quest.type,
+      rewardPoints: quest.rewardPoints,
+      flagOnCompletion: quest.flagOnCompletion,
+      requiredItems: quest.requiredItems,
+      requiredConditions: quest.requiredConditions,
+      triggerAction: quest.triggerAction,
+      triggerText: quest.triggerText,
+      hint: quest.hint,
+      repeatable: quest.repeatable,
+      timeLimit: quest.timeLimit,
+      difficulty: quest.difficulty
+    }));
+
+    
+    const progress: { [questId: string]: MiniquestProgress } = {};
+// Variable declaration
+    const miniquestState = (gameState as any).miniquestState || {};
+// Variable declaration
+    const roomState = miniquestState[roomId];
+// Variable declaration
+    const completedQuests = roomState?.completedQuests || [];
+
+    miniquests.forEach(quest => {
+// Variable declaration
+      const isCompleted = completedQuests.includes(quest.id);
+// Variable declaration
+      const isAvailable = availableQuests.find(q => q.id === quest.id) !== undefined;
+// Variable declaration
+      const questProgress = roomState?.questProgress?.[quest.id];
+
+      progress[quest.id] = {
+        completed: isCompleted,
+        attempts: questProgress?.attempts || 0,
+        available: isAvailable || isCompleted,
+        locked: !isAvailable && !isCompleted,
+        lockReason: this.getLockReason(quest, gameState)
+      };
+    });
+
+    
+// Variable declaration
+    const completedCount = Object.values(progress).filter(p => p.completed).length;
+// Variable declaration
+    const availableCount = Object.values(progress).filter(p => p.available && !p.completed).length;
+// Variable declaration
+    const totalScore = this.calculateRoomScore(roomId, gameState);
+
+    
+// Variable declaration
+    const roomName = this.getRoomDisplayName(roomId, gameState);
+
+    return {
+      showMiniquestModal: true,
+      miniquests,
+      progress,
+      roomName,
+      totalScore,
+      completedCount,
+      availableCount
+    };
+  }
+
+  
+  public async attemptQuest(
+    questId: string,
+    roomId: string,
+    gameState: LocalGameState
+  ): Promise<{ success: boolean; message: string; scoreAwarded?: number }> {
+// Variable declaration
+    const engine = MiniquestEngine.getInstance();
+
+    try {
+// Variable declaration
+      const result = engine.attemptQuest(questId, roomId, gameState as any);
+
+      if (result.success && this.dispatch) {
+        
+// Variable declaration
+        const stateUpdate = engine.updateStateAfterCompletion(
+          gameState as any,
+          roomId,
+          questId
+        );
+
+        if (Object.keys(stateUpdate).length > 0) {
+          this.dispatch({
+            type: 'UPDATE_GAME_STATE',
+            payload: stateUpdate
+          } as any);
+        }
+
+        
+        if (result.scoreAwarded) {
+          this.dispatch({
+            type: 'UPDATE_SCORE',
+            payload: { score: (gameState.player.score || 0) + result.scoreAwarded }
+          } as any);
+        }
+
+        
+        this.dispatch({
+          type: 'ADD_MESSAGE',
+          payload: {
+            text: result.message,
+            type: 'achievement'
+          }
+        } as any);
+
+        if (result.scoreAwarded) {
+          this.dispatch({
+            type: 'ADD_MESSAGE',
+            payload: {
+              text: `🏆 Quest completed! +${result.scoreAwarded} points`,
+              type: 'system'
+            }
+          } as any);
+        }
+      }
+
+      return {
+        success: result.success,
+        message: result.message,
+        scoreAwarded: result.scoreAwarded
+      };
+
+    } catch (error) {
+      console.error('Error attempting quest:', error);
+      return {
+        success: false,
+        message: 'An error occurred while attempting the quest.'
+      };
+    }
+  }
+
+  
+  private getAllRoomQuests(roomId: string): any[] {
+// Variable declaration
+    const engine = MiniquestEngine.getInstance();
+    
+// JSX return block or main return
+    return (engine as any).roomQuests.get(roomId) || [];
+  }
+
+  
+  private getRoomDisplayName(roomId: string, gameState: LocalGameState): string {
+// Variable declaration
+    const room = gameState.roomMap[roomId];
+    return room?.title || roomId.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+  }
+
+  
+  private calculateRoomScore(roomId: string, gameState: LocalGameState): number {
+// Variable declaration
+    const miniquestState = (gameState as any).miniquestState || {};
+// Variable declaration
+    const roomState = miniquestState[roomId];
+// Variable declaration
+    const completedQuests = roomState?.completedQuests || [];
+// Variable declaration
+    const allQuests = this.getAllRoomQuests(roomId);
+
+    return allQuests
+      .filter(quest => completedQuests.includes(quest.id))
+      .reduce((total, quest) => total + quest.rewardPoints, 0);
+  }
+
+  
+  private getLockReason(quest: any, gameState: LocalGameState): string | undefined {
+    
+    if (quest.requiredItems && quest.requiredItems.length > 0) {
+// Variable declaration
+      const missingItems = quest.requiredItems.filter((item: string) =>
+        !gameState.player.inventory.includes(item)
+      );
+      if (missingItems.length > 0) {
+        return `Missing items: ${missingItems.join(', ')}`;
+      }
+    }
+
+    
+    if (quest.requiredConditions && quest.requiredConditions.length > 0) {
+      
+// Variable declaration
+      const unmetConditions = quest.requiredConditions.filter((condition: string) =>
+        !gameState.flags[condition]
+      );
+      if (unmetConditions.length > 0) {
+        return `Conditions not met: ${unmetConditions.join(', ')}`;
+      }
+    }
+
+    return 'Requirements not met';
+  }
+
+  
+  public getGlobalStats(gameState: LocalGameState): {
+    totalCompleted: number;
+    totalAvailable: number;
+    totalScore: number;
+    roomsWithQuests: number;
+  } {
+// Variable declaration
+    const miniquestState = (gameState as any).miniquestState || {};
+    let totalCompleted = 0;
+    let totalScore = 0;
+    let roomsWithQuests = 0;
+
+    Object.entries(miniquestState).forEach(([roomId, roomState]: [string, any]) => {
+      if (roomState.completedQuests && roomState.completedQuests.length > 0) {
+        roomsWithQuests++;
+        totalCompleted += roomState.completedQuests.length;
+
+// Variable declaration
+        const allQuests = this.getAllRoomQuests(roomId);
+// Variable declaration
+        const completedScore = allQuests
+          .filter(quest => roomState.completedQuests.includes(quest.id))
+          .reduce((sum, quest) => sum + quest.rewardPoints, 0);
+        totalScore += completedScore;
+      }
+    });
+
+    
+// Variable declaration
+    const engine = MiniquestEngine.getInstance();
+// Variable declaration
+    const allRoomIds = Object.keys(gameState.roomMap);
+    let totalAvailable = 0;
+
+    allRoomIds.forEach(roomId => {
+// Variable declaration
+      const availableQuests = engine.getAvailableQuests(roomId, gameState as any);
+      totalAvailable += availableQuests.length;
+    });
+
+    return {
+      totalCompleted,
+      totalAvailable,
+      totalScore,
+      roomsWithQuests
+    };
+  }
+
+  
+  public listRoomMiniquests(roomId: string, gameState: LocalGameState): string[] {
+// Variable declaration
+    const engine = MiniquestEngine.getInstance();
+    return engine.listRoomQuests(roomId, gameState as any);
+  }
+
+  
+  public getRoomProgress(roomId: string, gameState: LocalGameState): {
+    completed: number;
+    available: number;
+    total: number;
+  } {
+// Variable declaration
+    const engine = MiniquestEngine.getInstance();
+// Variable declaration
+    const allQuests = this.getAllRoomQuests(roomId);
+// Variable declaration
+    const availableQuests = engine.getAvailableQuests(roomId, gameState as any);
+
+// Variable declaration
+    const miniquestState = (gameState as any).miniquestState || {};
+// Variable declaration
+    const roomState = miniquestState[roomId];
+// Variable declaration
+    const completedQuests = roomState?.completedQuests || [];
+
+    return {
+      completed: completedQuests.length,
+      available: availableQuests.length,
+      total: allQuests.length
+    };
+  }
+}
+
+export default MiniquestController;
