@@ -8,6 +8,7 @@ import { GameAction } from '../types/GameTypes';
 import { LocalGameState } from '../state/gameState';
 import { Room } from '../types/Room';
 import { Dispatch } from 'react';
+import { maybeTriggerInquisitionTrap } from './trapEngine';
 
 /**
  * Handles room entry events, including special encounters
@@ -20,6 +21,34 @@ export function handleRoomEntry(
   // Check for Morthos & Al first encounter in Control Room
   if (room.id === 'controlroom' && !gameState.flags?.hasMetMorthosAl) {
     triggerMorthosAlEncounter(gameState, dispatch);
+  }
+  
+  // Random chance for Spanish Inquisition (but not during intro stages)
+  if (gameState.stage === 'game' && room.id !== 'introreset') {
+    const playerState = {
+      traits: gameState.player.traits || [],
+      items: gameState.player.inventory || [],
+      inventory: gameState.player.inventory || [],
+      command: '', // Last command would need to be tracked
+      score: gameState.player.score || 0,
+      health: gameState.player.health || 100,
+      level: 1, // Default level
+      flags: {}, // Convert complex flags to boolean flags for trap engine
+      name: gameState.player.name || 'Player',
+      difficulty: 'normal'
+    };
+    
+    maybeTriggerInquisitionTrap(room.id, playerState, (message: string) => {
+      dispatch({
+        type: 'ADD_MESSAGE',
+        payload: {
+          id: `inquisition-${Date.now()}`,
+          text: message,
+          type: 'system',
+          timestamp: Date.now()
+        }
+      });
+    });
   }
   
   // Handle other room-specific events

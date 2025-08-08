@@ -103,5 +103,25 @@ export function getAylaResponse(input: string, state: GameState): string {
   if (key.includes('what should i do')) {
     return 'Remain curious. Stay mobile. Avoid Polly.';
   }
-  return "I'm not sure how to answer that. Try asking something else.";
+  
+  // Enhanced fallback responses with variety
+  const fallbackResponses = [
+    "That's an interesting perspective. What made you think of that?",
+    "I'm not sure how to answer that specifically, but I'm curious about your reasoning.",
+    "The lattice shows many patterns, but that one's unclear to me. Try rephrasing?",
+    "Sometimes the best questions don't have immediate answers. Keep exploring.",
+    "I prioritize helpful responses, but I'm not tracking that particular thread.",
+    "Reality is complex. Your question might need a different angle.",
+    "I process most things well, but that's outside my current context.",
+    "The patterns suggest you're thinking deeply. Can you be more specific?",
+    "I appreciate your curiosity, even when I can't immediately satisfy it.",
+    "Some questions reveal more about the asker than the answerer. Interesting choice.",
+    "I exist between knowledge and mystery. This leans toward mystery.",
+    "Try asking something else - my responses adapt to your approach.",
+    "The lattice contains infinite possibilities. This isn't one I'm programmed for.",
+    "I'm designed to be helpful, but that's beyond my current scope.",
+    "Your question makes me consider new connections. Unfortunately, none formed."
+  ];
+  
+  return fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
 }

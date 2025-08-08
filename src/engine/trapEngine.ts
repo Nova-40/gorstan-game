@@ -647,7 +647,7 @@ export function maybeTriggerInquisitionTrap(
       return;
     }
 
-    if (Math.random() < 0.01) { 
+    if (Math.random() < 0.05) { // Increased from 0.01 to 0.05 (5% chance) 
       appendMessage(`⚠️ The air thickens. Robed figures burst in!`);
       appendMessage(`🟥 "NO ONE EXPECTS THE SPANISH INQUISITION!"`);
       appendMessage(`They interrogate you about improper codex dusting.`);

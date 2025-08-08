@@ -402,10 +402,31 @@
 /* Blue Button Warning Modal */
 .blue-button-warning .modal-content {
   max-width: 700px;
+  width: 90%;
+  max-height: 80vh;
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f1e 100%);
   border: 2px solid #ff4444;
   box-shadow: 0 0 50px rgba(255, 68, 68, 0.3);
   animation: warningPulse 2s ease-in-out infinite;
+  overflow-y: auto;
+}
+
+/* Responsive adjustments for Blue Button Warning Modal */
+@media (max-width: 768px) {
+  .blue-button-warning .modal-content {
+    width: 95%;
+    margin: 10px;
+    max-height: 90vh;
+  }
+}
+
+@media (max-width: 480px) {
+  .blue-button-warning .modal-content {
+    width: 98%;
+    margin: 5px;
+    max-height: 95vh;
+    font-size: 0.9em;
+  }
 }
 
 @keyframes warningPulse {

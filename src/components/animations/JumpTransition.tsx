@@ -23,19 +23,53 @@ interface JumpTransitionProps {
 
 const JumpTransition: React.FC<JumpTransitionProps> = ({ onComplete }) => {
   const [phase, setPhase] = useState<'start' | 'kaleidoscope' | 'portal' | 'arrival'>('start');
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  // Check for prefers-reduced-motion
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
+    
+    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+    mediaQuery.addEventListener('change', handler);
+    return () => mediaQuery.removeEventListener('change', handler);
+  }, []);
 
 // React effect hook
   useEffect(() => {
+    console.log('[JumpTransition] Starting animation, prefersReducedMotion:', prefersReducedMotion);
+    
+    if (prefersReducedMotion) {
+      // Skip animation phases for reduced motion
+      const timer = setTimeout(() => {
+        console.log('[JumpTransition] Completing immediately due to reduced motion preference');
+        onComplete();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+    
 // Variable declaration
     const timers = [
-      setTimeout(() => setPhase('kaleidoscope'), 500),
-      setTimeout(() => setPhase('portal'), 1500),
-      setTimeout(() => setPhase('arrival'), 2500),
-      setTimeout(() => onComplete(), 3500),
+      setTimeout(() => {
+        console.log('[JumpTransition] Phase: kaleidoscope');
+        setPhase('kaleidoscope');
+      }, 500),
+      setTimeout(() => {
+        console.log('[JumpTransition] Phase: portal');
+        setPhase('portal');
+      }, 1500),
+      setTimeout(() => {
+        console.log('[JumpTransition] Phase: arrival');
+        setPhase('arrival');
+      }, 2500),
+      setTimeout(() => {
+        console.log('[JumpTransition] Animation complete');
+        onComplete();
+      }, 3500),
     ];
 // JSX return block or main return
     return () => timers.forEach(clearTimeout);
-  }, [onComplete]);
+  }, [onComplete, prefersReducedMotion]);
 
 // JSX return block or main return
   return (

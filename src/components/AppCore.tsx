@@ -38,6 +38,7 @@ import { useWendellLogic } from '../hooks/useWendellLogic';
 
 import { initializeAchievementEngine } from '../logic/achievementEngine';
 import { initializeWanderingNPCs, handleRoomEntryForWanderingNPCs } from '../engine/wanderingNPCController';
+import { handleRoomEntry } from '../engine/roomEventHandler';
 import { getAllRoomsAsObject } from '../utils/roomLoader';
 
 import { UseItemModal } from "./UseItemModal";
@@ -879,6 +880,15 @@ const handleBackout = useCallback((): void => {
     }
   }, [room, previousRoom]);
 
+  // Handle transition stages by extracting transition type from stage
+  useEffect(() => {
+    if (stage.startsWith('transition_')) {
+      const type = stage.replace('transition_', '');
+      console.log('[AppCore] Setting transition type from stage:', stage, '→', type);
+      setTransitionType(type);
+    }
+  }, [stage]);
+
   // Enhanced game initialization with proper error handling and typing
   useEffect(() => {
     if (!state.roomMap || Object.keys(state.roomMap).length === 0) {
@@ -964,6 +974,7 @@ const handleBackout = useCallback((): void => {
       setLastShownRoomDescription(Array.isArray(room.description) ? room.description.join(' ') : room.description);
       
       if (room.id) {
+        handleRoomEntry(room, state, dispatch);
         handleRoomEntryForWanderingNPCs(room, state, dispatch);
       }
     }
@@ -971,6 +982,12 @@ const handleBackout = useCallback((): void => {
 
   // Enhanced transition execution effect with proper error handling and typing
   useEffect(() => {
+    console.log('[AppCore] Transition execution effect triggered:', {
+      readyForTransition,
+      transitionType,
+      roomMapLoaded: Object.keys(roomMap).length > 0
+    });
+    
     if (!readyForTransition || !transitionType || Object.keys(roomMap).length === 0) return;
     
     try {
@@ -978,12 +995,15 @@ const handleBackout = useCallback((): void => {
       const foundRoom: Room | undefined = roomMap[target];
       const targetRoomId: string = foundRoom ? target : 'controlnexus';
       
+      console.log('[AppCore] Executing transition to room:', targetRoomId);
       dispatch({ type: 'MOVE_TO_ROOM', payload: targetRoomId });
       
       transitionInventory.forEach((item: string) => {
+        console.log('[AppCore] Adding transition inventory item:', item);
         dispatch({ type: 'ADD_TO_INVENTORY', payload: item });
       });
       
+      console.log('[AppCore] Advancing to game stage');
       dispatch({ type: 'ADVANCE_STAGE', payload: 'game' });
       setTransitionType(null);
       setReadyForTransition(false);
@@ -1026,16 +1046,32 @@ const handleBackout = useCallback((): void => {
 
   // Enhanced stage-based rendering with proper typing
   if (transitionType === 'jump') {
-    return <JumpTransition onComplete={() => setReadyForTransition(true)} />;
+    console.log('[AppCore] Rendering JumpTransition');
+    return <JumpTransition onComplete={() => {
+      console.log('[AppCore] JumpTransition completed');
+      setReadyForTransition(true);
+    }} />;
   }
   if (transitionType === 'sip') {
-    return <SipTransition onComplete={() => setReadyForTransition(true)} />;
+    console.log('[AppCore] Rendering SipTransition');
+    return <SipTransition onComplete={() => {
+      console.log('[AppCore] SipTransition completed');
+      setReadyForTransition(true);
+    }} />;
   }
   if (transitionType === 'wait') {
-    return <WaitTransition onComplete={() => setReadyForTransition(true)} />;
+    console.log('[AppCore] Rendering WaitTransition');
+    return <WaitTransition onComplete={() => {
+      console.log('[AppCore] WaitTransition completed');
+      setReadyForTransition(true);
+    }} />;
   }
   if (transitionType === 'dramatic_wait') {
-    return <DramaticWaitTransition onComplete={() => setReadyForTransition(true)} />;
+    console.log('[AppCore] Rendering DramaticWaitTransition');
+    return <DramaticWaitTransition onComplete={() => {
+      console.log('[AppCore] DramaticWaitTransition completed');
+      setReadyForTransition(true);
+    }} />;
   }
   if (stage === 'splash') {
     return <SplashScreen onComplete={() => dispatch({ type: 'ADVANCE_STAGE', payload: 'welcome' })} />;
@@ -1063,12 +1099,23 @@ const handleBackout = useCallback((): void => {
       <TeletypeIntro 
         playerName={playerName} 
         onComplete={(data: IntroCompletionData) => { 
-          if (data.targetRoom) setTransitionTargetRoom(data.targetRoom); 
-          if (data.inventoryBonus) setTransitionInventory(data.inventoryBonus); 
-          setTimeout(() => dispatch({ 
-            type: 'ADVANCE_STAGE', 
-            payload: `transition_${data.route}` as GameStage 
-          }), 750); 
+          console.log('[AppCore] Intro completed with data:', data);
+          if (data.targetRoom) {
+            console.log('[AppCore] Setting transition target room:', data.targetRoom);
+            setTransitionTargetRoom(data.targetRoom);
+          }
+          if (data.inventoryBonus) {
+            console.log('[AppCore] Setting transition inventory:', data.inventoryBonus);
+            setTransitionInventory(data.inventoryBonus);
+          }
+          const targetStage = `transition_${data.route}` as GameStage;
+          console.log('[AppCore] Advancing to transition stage:', targetStage);
+          setTimeout(() => {
+            dispatch({ 
+              type: 'ADVANCE_STAGE', 
+              payload: targetStage
+            });
+          }, 750); 
         }} 
       />
     );

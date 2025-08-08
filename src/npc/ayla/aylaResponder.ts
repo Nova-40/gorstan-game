@@ -137,8 +137,19 @@ function getCoreAylaResponse(input: string, state: GameState): string {
     return "I'm here to assist. Feel free to ask about books, the game, or the nature of reality itself.";
   }
 
-  // Default fallback
-  return "I'm not sure how to answer that. Try asking something else, or perhaps we could discuss literature?";
+  // Default fallback with more personality
+  const contextualFallbacks = [
+    "I'm not sure how to answer that specifically. Try asking something else, or perhaps we could discuss literature?",
+    "That's an intriguing question, but I don't have a helpful response. What else would you like to explore?",
+    "The lattice patterns suggest you're thinking creatively, but I'm not tracking that thread. Try a different approach?",
+    "I process most topics well, but that one's outside my scope. Feel free to ask about books, the game, or reality itself.",
+    "Interesting perspective. I don't have insight on that particular topic, but I'm always ready for other questions.",
+    "Sometimes the best conversations start with unexpected questions, even when I can't immediately answer them.",
+    "I exist to help, but that's beyond my current understanding. What else can I assist with?",
+    "Your curiosity is admirable, even when it leads to areas I can't illuminate. Keep asking!"
+  ];
+  
+  return contextualFallbacks[Math.floor(Math.random() * contextualFallbacks.length)];
 }
 
 /**

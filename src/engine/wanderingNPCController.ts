@@ -19,6 +19,9 @@ export function handleRoomEntryForWanderingNPCs(
   state: LocalGameState,
   dispatch: Dispatch<GameAction>
 ) {
+  console.log('[handleRoomEntryForWanderingNPCs] Checking room:', room.id);
+  console.log('[handleRoomEntryForWanderingNPCs] NPC registry size:', npcRegistry.size);
+  
   const visibleNPCs: NPC[] = [];
 
   for (const [npcId, npc] of npcRegistry.entries()) {
@@ -26,6 +29,8 @@ export function handleRoomEntryForWanderingNPCs(
     const isVisible = typeof npc.shouldBeVisible === 'function'
       ? npc.shouldBeVisible(state, room)
       : true;
+
+    console.log(`[handleRoomEntryForWanderingNPCs] NPC ${npcId}: currentRoom=${npc.currentRoom}, targetRoom=${room.id}, isHere=${isHere}, isVisible=${isVisible}`);
 
     if (isHere && isVisible) {
       visibleNPCs.push(npc);
@@ -40,6 +45,8 @@ export function handleRoomEntryForWanderingNPCs(
       });
     }
   }
+
+  console.log('[handleRoomEntryForWanderingNPCs] Found NPCs in room:', visibleNPCs.map(n => n.name));
 
   dispatch({
     type: 'SET_NPCS_IN_ROOM',
