@@ -12,6 +12,7 @@ import { applyScoreForEvent, getScoreBasedMessage, getDominicScoreComment } from
 import { unlockAchievement, listAchievements } from '../logic/achievementEngine';
 import { recordItemDiscovery, displayCodex } from '../logic/codexTracker';
 import { isLibrarianActive } from './librarianController';
+import { handleCrossingInteraction, resetCrossingState } from './crossingController';
 import { LocalGameState } from '../state/gameState';
 
 /**
@@ -269,8 +270,27 @@ export function processCommand({
       return { messages: statusMessages };
     }
 
-    default:
+    default: {
+      // Try crossing interaction handler first
+      const crossingResult = handleCrossingInteraction(input, gameState);
+      if (crossingResult.handled) {
+        const messages: TerminalMessage[] = crossingResult.messages?.map(msg => ({
+          text: msg.text,
+          type: msg.type === 'description' ? 'lore' :
+                msg.type === 'narrative' ? 'lore' :
+                msg.type === 'hint' ? 'info' :
+                msg.type === 'success' ? 'lore' :
+                msg.type === 'error' ? 'error' : 'system'
+        })) || [];
+        
+        return { 
+          messages, 
+          updates: crossingResult.updates 
+        };
+      }
+      
       return { messages: [{ text: "I don't understand that command.", type: 'error' }] };
+    }
   }
 }
 
@@ -280,6 +300,11 @@ export function processCommand({
 function processRoomEntry(room: Room, gameState: LocalGameState): CommandResult {
   const messages: TerminalMessage[] = [];
   let updates: Partial<LocalGameState> = {};
+
+  // Reset crossing state when entering crossing room
+  if (room.id === 'crossing') {
+    resetCrossingState();
+  }
 
   if ((room as any).events?.onEnter) {
     messages.push({ text: 'You feel something change as you enter the room.', type: 'info' });
