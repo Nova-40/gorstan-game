@@ -62,8 +62,12 @@ export function interruptNPC(npcId: string) {
 
 
 // --- Function: npcReact ---
-export function npcReact(npcId: string, playerInput: string) {
-  const state: LocalGameState = getGameState();
+export function npcReact(npcId: string, playerInput: string, gameState?: LocalGameState | null) {
+  if (!gameState) {
+    console.warn('npcReact called without gameState - functionality may be limited');
+    return;
+  }
+  const state = gameState;
   const npcObj: NPC | undefined = npcRegistry.get(npcId);
   if (!npcObj || npcObj.interrupted) return;
   

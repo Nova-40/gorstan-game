@@ -50,8 +50,6 @@ import NPCSelectionModal from './NPCSelectionModal';
 import { npcReact } from '../engine/npcEngine';
 import Modal from './Modal';
 import { itemDescriptions } from '../data/itemDescriptions';
-import { OverlayPortal } from '../seasonal/OverlayPortal';
-import { useSeasonalController } from '../seasonal/useSeasonalController';
 
 import type { Room } from '../types/Room';
 import type { NPC, NPCMood } from '../types/NPCTypes';
@@ -209,9 +207,6 @@ const handleBackout = useCallback((): void => {
   const { handleWendell } = useWendellLogic(state, dispatch, room, loadModule);
   const { handleLibrarian } = useLibrarianLogic(state, dispatch, room, loadModule);
   
-  // Initialize seasonal controller for overlay management
-  useSeasonalController(dispatch);
-
   // Enhanced modal management with proper typing
   const openModal = useCallback((name: OpenModalType): void => setModal(name), []);
   const closeModal = useCallback((): void => setModal(null), []);
@@ -395,11 +390,11 @@ const handleBackout = useCallback((): void => {
 
   const handleNPCMessage = useCallback((message: string, npcId: string) => {
     // Send message to NPC engine
-    npcReact(npcId, message);
+    npcReact(npcId, message, state);
     
     // Note: Conversation logging is handled within NPCConsole to prevent double-echo
     // Only log significant game-affecting interactions to main console
-  }, [dispatch]);
+  }, [dispatch, state]);
 
   // Handle NPC selection from selection modal
   const handleSelectNPC = useCallback((npc: NPC) => {
@@ -571,7 +566,7 @@ const handleBackout = useCallback((): void => {
       
       if (match) {
         const npcId: string = typeof match === 'object' && 'id' in match ? match.id : match as string;
-        npcReact(npcId, "greet");
+        npcReact(npcId, "greet", state);
       } else {
         dispatch({ 
           type: 'ADD_MESSAGE', 
@@ -1271,8 +1266,7 @@ const handleBackout = useCallback((): void => {
         onClose={() => dispatch({ type: 'DISMISS_BLUE_BUTTON_WARNING' })}
       />
 
-      {/* Seasonal Overlays Portal */}
-      <OverlayPortal />
+      {/* Celebration System Active */}
     </div>
   );
 };

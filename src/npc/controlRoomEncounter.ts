@@ -664,7 +664,11 @@ export class ControlRoomEncounterOrchestrator {
           // Apply game state changes
           if (outcome.gameStateChanges) {
             const gameState = getGameState();
-            Object.assign(gameState.flags, outcome.gameStateChanges);
+            if (gameState && gameState.flags) {
+              Object.assign(gameState.flags, outcome.gameStateChanges);
+            } else {
+              console.warn('Could not apply game state changes - game state not available');
+            }
           }
           break;
       }

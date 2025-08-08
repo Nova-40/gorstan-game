@@ -20,11 +20,17 @@ export function getAylaEdgeCaseResponse(input: string, state: GameState): string
 
   // Dynamic tone modifiers
   let tone = '';
-  if (dominicDead) tone = 'cold';
-  else if (zone.includes('glitchrealm') || zone.includes('glitch')) tone = 'fragmented';
-  else if (pollyTakeover) tone = 'urgent';
-  else if (resetCount > 5) tone = 'exasperated';
-  else if (room === 'controlnexus') tone = 'clarity';
+  if (dominicDead) {
+    tone = 'cold';
+  } else if (zone.includes('glitchrealm') || zone.includes('glitch')) {
+    tone = 'fragmented';
+  } else if (pollyTakeover) {
+    tone = 'urgent';
+  } else if (resetCount > 5) {
+    tone = 'exasperated';
+  } else if (room === 'controlnexus') {
+    tone = 'clarity';
+  }
 
   // Edge-case and meta responses
   switch (true) {
@@ -83,11 +89,19 @@ export function getAylaEdgeCaseResponse(input: string, state: GameState): string
  */
 export function getAylaResponse(input: string, state: GameState): string {
   const edge = getAylaEdgeCaseResponse(input, state);
-  if (edge) return edge;
+  if (edge) {
+    return edge;
+  }
   // Fallback: core Ayla logic (can be expanded)
   const key = input.toLowerCase().trim();
-  if (key.includes('who are you')) return "I'm Ayla. I am the Lattice.";
-  if (key.includes('what do you know')) return 'Most things. But I prioritise relevance, not volume.';
-  if (key.includes('what should i do')) return 'Remain curious. Stay mobile. Avoid Polly.';
+  if (key.includes('who are you')) {
+    return "I'm Ayla. I am the Lattice.";
+  }
+  if (key.includes('what do you know')) {
+    return 'Most things. But I prioritise relevance, not volume.';
+  }
+  if (key.includes('what should i do')) {
+    return 'Remain curious. Stay mobile. Avoid Polly.';
+  }
   return "I'm not sure how to answer that. Try asking something else.";
 }

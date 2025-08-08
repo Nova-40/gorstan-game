@@ -5,6 +5,7 @@
 // Game module.
 
 import AppCore from './components/AppCore';
+import { CelebrationController } from './celebrate';
 
 import React from 'react';
 
@@ -26,7 +27,9 @@ const App: React.FC = () => {
 // JSX return block or main return
   return (
     <GameStateProvider>
-      <AppCore />
+      <CelebrationController>
+        <AppCore />
+      </CelebrationController>
     </GameStateProvider>
   );
 };

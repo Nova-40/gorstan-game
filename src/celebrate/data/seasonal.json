@@ -1,0 +1,786 @@
+{
+  "solsticesEquinoxes": [
+    {
+      "id": "2025-03-20_spring_equinox_2025",
+      "start": "2025-03-20",
+      "end": "2025-03-20",
+      "label": "Spring Equinox 2025"
+    },
+    {
+      "id": "2025-06-21_summer_solstice_2025",
+      "start": "2025-06-21",
+      "end": "2025-06-21",
+      "label": "Summer Solstice 2025"
+    },
+    {
+      "id": "2025-09-22_autumn_equinox_2025",
+      "start": "2025-09-22",
+      "end": "2025-09-22",
+      "label": "Autumn Equinox 2025"
+    },
+    {
+      "id": "2025-12-21_winter_solstice_2025",
+      "start": "2025-12-21",
+      "end": "2025-12-21",
+      "label": "Winter Solstice 2025"
+    },
+    {
+      "id": "2026-03-20_spring_equinox_2026",
+      "start": "2026-03-20",
+      "end": "2026-03-20",
+      "label": "Spring Equinox 2026"
+    },
+    {
+      "id": "2026-06-21_summer_solstice_2026",
+      "start": "2026-06-21",
+      "end": "2026-06-21",
+      "label": "Summer Solstice 2026"
+    },
+    {
+      "id": "2026-09-23_autumn_equinox_2026",
+      "start": "2026-09-23",
+      "end": "2026-09-23",
+      "label": "Autumn Equinox 2026"
+    },
+    {
+      "id": "2026-12-21_winter_solstice_2026",
+      "start": "2026-12-21",
+      "end": "2026-12-21",
+      "label": "Winter Solstice 2026"
+    },
+    {
+      "id": "2027-03-20_spring_equinox_2027",
+      "start": "2027-03-20",
+      "end": "2027-03-20",
+      "label": "Spring Equinox 2027"
+    },
+    {
+      "id": "2027-06-21_summer_solstice_2027",
+      "start": "2027-06-21",
+      "end": "2027-06-21",
+      "label": "Summer Solstice 2027"
+    },
+    {
+      "id": "2027-09-23_autumn_equinox_2027",
+      "start": "2027-09-23",
+      "end": "2027-09-23",
+      "label": "Autumn Equinox 2027"
+    },
+    {
+      "id": "2027-12-22_winter_solstice_2027",
+      "start": "2027-12-22",
+      "end": "2027-12-22",
+      "label": "Winter Solstice 2027"
+    },
+    {
+      "id": "2028-03-20_spring_equinox_2028",
+      "start": "2028-03-20",
+      "end": "2028-03-20",
+      "label": "Spring Equinox 2028"
+    },
+    {
+      "id": "2028-06-20_summer_solstice_2028",
+      "start": "2028-06-20",
+      "end": "2028-06-20",
+      "label": "Summer Solstice 2028"
+    },
+    {
+      "id": "2028-09-22_autumn_equinox_2028",
+      "start": "2028-09-22",
+      "end": "2028-09-22",
+      "label": "Autumn Equinox 2028"
+    },
+    {
+      "id": "2028-12-21_winter_solstice_2028",
+      "start": "2028-12-21",
+      "end": "2028-12-21",
+      "label": "Winter Solstice 2028"
+    },
+    {
+      "id": "2029-03-20_spring_equinox_2029",
+      "start": "2029-03-20",
+      "end": "2029-03-20",
+      "label": "Spring Equinox 2029"
+    },
+    {
+      "id": "2029-06-21_summer_solstice_2029",
+      "start": "2029-06-21",
+      "end": "2029-06-21",
+      "label": "Summer Solstice 2029"
+    },
+    {
+      "id": "2029-09-22_autumn_equinox_2029",
+      "start": "2029-09-22",
+      "end": "2029-09-22",
+      "label": "Autumn Equinox 2029"
+    },
+    {
+      "id": "2029-12-21_winter_solstice_2029",
+      "start": "2029-12-21",
+      "end": "2029-12-21",
+      "label": "Winter Solstice 2029"
+    },
+    {
+      "id": "2030-03-20_spring_equinox_2030",
+      "start": "2030-03-20",
+      "end": "2030-03-20",
+      "label": "Spring Equinox 2030"
+    },
+    {
+      "id": "2030-06-21_summer_solstice_2030",
+      "start": "2030-06-21",
+      "end": "2030-06-21",
+      "label": "Summer Solstice 2030"
+    },
+    {
+      "id": "2030-09-22_autumn_equinox_2030",
+      "start": "2030-09-22",
+      "end": "2030-09-22",
+      "label": "Autumn Equinox 2030"
+    },
+    {
+      "id": "2030-12-21_winter_solstice_2030",
+      "start": "2030-12-21",
+      "end": "2030-12-21",
+      "label": "Winter Solstice 2030"
+    },
+    {
+      "id": "2031-03-20_spring_equinox_2031",
+      "start": "2031-03-20",
+      "end": "2031-03-20",
+      "label": "Spring Equinox 2031"
+    },
+    {
+      "id": "2031-06-21_summer_solstice_2031",
+      "start": "2031-06-21",
+      "end": "2031-06-21",
+      "label": "Summer Solstice 2031"
+    },
+    {
+      "id": "2031-09-23_autumn_equinox_2031",
+      "start": "2031-09-23",
+      "end": "2031-09-23",
+      "label": "Autumn Equinox 2031"
+    },
+    {
+      "id": "2031-12-22_winter_solstice_2031",
+      "start": "2031-12-22",
+      "end": "2031-12-22",
+      "label": "Winter Solstice 2031"
+    },
+    {
+      "id": "2032-03-20_spring_equinox_2032",
+      "start": "2032-03-20",
+      "end": "2032-03-20",
+      "label": "Spring Equinox 2032"
+    },
+    {
+      "id": "2032-06-20_summer_solstice_2032",
+      "start": "2032-06-20",
+      "end": "2032-06-20",
+      "label": "Summer Solstice 2032"
+    },
+    {
+      "id": "2032-09-22_autumn_equinox_2032",
+      "start": "2032-09-22",
+      "end": "2032-09-22",
+      "label": "Autumn Equinox 2032"
+    },
+    {
+      "id": "2032-12-21_winter_solstice_2032",
+      "start": "2032-12-21",
+      "end": "2032-12-21",
+      "label": "Winter Solstice 2032"
+    },
+    {
+      "id": "2033-03-20_spring_equinox_2033",
+      "start": "2033-03-20",
+      "end": "2033-03-20",
+      "label": "Spring Equinox 2033"
+    },
+    {
+      "id": "2033-06-21_summer_solstice_2033",
+      "start": "2033-06-21",
+      "end": "2033-06-21",
+      "label": "Summer Solstice 2033"
+    },
+    {
+      "id": "2033-09-22_autumn_equinox_2033",
+      "start": "2033-09-22",
+      "end": "2033-09-22",
+      "label": "Autumn Equinox 2033"
+    },
+    {
+      "id": "2033-12-21_winter_solstice_2033",
+      "start": "2033-12-21",
+      "end": "2033-12-21",
+      "label": "Winter Solstice 2033"
+    },
+    {
+      "id": "2034-03-20_spring_equinox_2034",
+      "start": "2034-03-20",
+      "end": "2034-03-20",
+      "label": "Spring Equinox 2034"
+    },
+    {
+      "id": "2034-06-21_summer_solstice_2034",
+      "start": "2034-06-21",
+      "end": "2034-06-21",
+      "label": "Summer Solstice 2034"
+    },
+    {
+      "id": "2034-09-23_autumn_equinox_2034",
+      "start": "2034-09-23",
+      "end": "2034-09-23",
+      "label": "Autumn Equinox 2034"
+    },
+    {
+      "id": "2034-12-21_winter_solstice_2034",
+      "start": "2034-12-21",
+      "end": "2034-12-21",
+      "label": "Winter Solstice 2034"
+    },
+    {
+      "id": "2035-03-20_spring_equinox_2035",
+      "start": "2035-03-20",
+      "end": "2035-03-20",
+      "label": "Spring Equinox 2035"
+    },
+    {
+      "id": "2035-06-21_summer_solstice_2035",
+      "start": "2035-06-21",
+      "end": "2035-06-21",
+      "label": "Summer Solstice 2035"
+    },
+    {
+      "id": "2035-09-23_autumn_equinox_2035",
+      "start": "2035-09-23",
+      "end": "2035-09-23",
+      "label": "Autumn Equinox 2035"
+    },
+    {
+      "id": "2035-12-21_winter_solstice_2035",
+      "start": "2035-12-21",
+      "end": "2035-12-21",
+      "label": "Winter Solstice 2035"
+    },
+    {
+      "id": "2036-03-20_spring_equinox_2036",
+      "start": "2036-03-20",
+      "end": "2036-03-20",
+      "label": "Spring Equinox 2036"
+    },
+    {
+      "id": "2036-06-20_summer_solstice_2036",
+      "start": "2036-06-20",
+      "end": "2036-06-20",
+      "label": "Summer Solstice 2036"
+    },
+    {
+      "id": "2036-09-22_autumn_equinox_2036",
+      "start": "2036-09-22",
+      "end": "2036-09-22",
+      "label": "Autumn Equinox 2036"
+    },
+    {
+      "id": "2036-12-21_winter_solstice_2036",
+      "start": "2036-12-21",
+      "end": "2036-12-21",
+      "label": "Winter Solstice 2036"
+    },
+    {
+      "id": "2037-03-20_spring_equinox_2037",
+      "start": "2037-03-20",
+      "end": "2037-03-20",
+      "label": "Spring Equinox 2037"
+    },
+    {
+      "id": "2037-06-21_summer_solstice_2037",
+      "start": "2037-06-21",
+      "end": "2037-06-21",
+      "label": "Summer Solstice 2037"
+    },
+    {
+      "id": "2037-09-22_autumn_equinox_2037",
+      "start": "2037-09-22",
+      "end": "2037-09-22",
+      "label": "Autumn Equinox 2037"
+    },
+    {
+      "id": "2037-12-21_winter_solstice_2037",
+      "start": "2037-12-21",
+      "end": "2037-12-21",
+      "label": "Winter Solstice 2037"
+    },
+    {
+      "id": "2038-03-20_spring_equinox_2038",
+      "start": "2038-03-20",
+      "end": "2038-03-20",
+      "label": "Spring Equinox 2038"
+    },
+    {
+      "id": "2038-06-21_summer_solstice_2038",
+      "start": "2038-06-21",
+      "end": "2038-06-21",
+      "label": "Summer Solstice 2038"
+    },
+    {
+      "id": "2038-09-23_autumn_equinox_2038",
+      "start": "2038-09-23",
+      "end": "2038-09-23",
+      "label": "Autumn Equinox 2038"
+    },
+    {
+      "id": "2038-12-22_winter_solstice_2038",
+      "start": "2038-12-22",
+      "end": "2038-12-22",
+      "label": "Winter Solstice 2038"
+    },
+    {
+      "id": "2039-03-20_spring_equinox_2039",
+      "start": "2039-03-20",
+      "end": "2039-03-20",
+      "label": "Spring Equinox 2039"
+    },
+    {
+      "id": "2039-06-21_summer_solstice_2039",
+      "start": "2039-06-21",
+      "end": "2039-06-21",
+      "label": "Summer Solstice 2039"
+    },
+    {
+      "id": "2039-09-23_autumn_equinox_2039",
+      "start": "2039-09-23",
+      "end": "2039-09-23",
+      "label": "Autumn Equinox 2039"
+    },
+    {
+      "id": "2039-12-21_winter_solstice_2039",
+      "start": "2039-12-21",
+      "end": "2039-12-21",
+      "label": "Winter Solstice 2039"
+    },
+    {
+      "id": "2040-03-20_spring_equinox_2040",
+      "start": "2040-03-20",
+      "end": "2040-03-20",
+      "label": "Spring Equinox 2040"
+    },
+    {
+      "id": "2040-06-20_summer_solstice_2040",
+      "start": "2040-06-20",
+      "end": "2040-06-20",
+      "label": "Summer Solstice 2040"
+    },
+    {
+      "id": "2040-09-22_autumn_equinox_2040",
+      "start": "2040-09-22",
+      "end": "2040-09-22",
+      "label": "Autumn Equinox 2040"
+    },
+    {
+      "id": "2040-12-21_winter_solstice_2040",
+      "start": "2040-12-21",
+      "end": "2040-12-21",
+      "label": "Winter Solstice 2040"
+    },
+    {
+      "id": "2041-03-20_spring_equinox_2041",
+      "start": "2041-03-20",
+      "end": "2041-03-20",
+      "label": "Spring Equinox 2041"
+    },
+    {
+      "id": "2041-06-21_summer_solstice_2041",
+      "start": "2041-06-21",
+      "end": "2041-06-21",
+      "label": "Summer Solstice 2041"
+    },
+    {
+      "id": "2041-09-22_autumn_equinox_2041",
+      "start": "2041-09-22",
+      "end": "2041-09-22",
+      "label": "Autumn Equinox 2041"
+    },
+    {
+      "id": "2041-12-21_winter_solstice_2041",
+      "start": "2041-12-21",
+      "end": "2041-12-21",
+      "label": "Winter Solstice 2041"
+    },
+    {
+      "id": "2042-03-20_spring_equinox_2042",
+      "start": "2042-03-20",
+      "end": "2042-03-20",
+      "label": "Spring Equinox 2042"
+    },
+    {
+      "id": "2042-06-21_summer_solstice_2042",
+      "start": "2042-06-21",
+      "end": "2042-06-21",
+      "label": "Summer Solstice 2042"
+    },
+    {
+      "id": "2042-09-22_autumn_equinox_2042",
+      "start": "2042-09-22",
+      "end": "2042-09-22",
+      "label": "Autumn Equinox 2042"
+    },
+    {
+      "id": "2042-12-21_winter_solstice_2042",
+      "start": "2042-12-21",
+      "end": "2042-12-21",
+      "label": "Winter Solstice 2042"
+    },
+    {
+      "id": "2043-03-20_spring_equinox_2043",
+      "start": "2043-03-20",
+      "end": "2043-03-20",
+      "label": "Spring Equinox 2043"
+    },
+    {
+      "id": "2043-06-21_summer_solstice_2043",
+      "start": "2043-06-21",
+      "end": "2043-06-21",
+      "label": "Summer Solstice 2043"
+    },
+    {
+      "id": "2043-09-23_autumn_equinox_2043",
+      "start": "2043-09-23",
+      "end": "2043-09-23",
+      "label": "Autumn Equinox 2043"
+    },
+    {
+      "id": "2043-12-21_winter_solstice_2043",
+      "start": "2043-12-21",
+      "end": "2043-12-21",
+      "label": "Winter Solstice 2043"
+    },
+    {
+      "id": "2044-03-20_spring_equinox_2044",
+      "start": "2044-03-20",
+      "end": "2044-03-20",
+      "label": "Spring Equinox 2044"
+    },
+    {
+      "id": "2044-06-20_summer_solstice_2044",
+      "start": "2044-06-20",
+      "end": "2044-06-20",
+      "label": "Summer Solstice 2044"
+    },
+    {
+      "id": "2044-09-22_autumn_equinox_2044",
+      "start": "2044-09-22",
+      "end": "2044-09-22",
+      "label": "Autumn Equinox 2044"
+    },
+    {
+      "id": "2044-12-21_winter_solstice_2044",
+      "start": "2044-12-21",
+      "end": "2044-12-21",
+      "label": "Winter Solstice 2044"
+    },
+    {
+      "id": "2045-03-20_spring_equinox_2045",
+      "start": "2045-03-20",
+      "end": "2045-03-20",
+      "label": "Spring Equinox 2045"
+    },
+    {
+      "id": "2045-06-21_summer_solstice_2045",
+      "start": "2045-06-21",
+      "end": "2045-06-21",
+      "label": "Summer Solstice 2045"
+    },
+    {
+      "id": "2045-09-22_autumn_equinox_2045",
+      "start": "2045-09-22",
+      "end": "2045-09-22",
+      "label": "Autumn Equinox 2045"
+    },
+    {
+      "id": "2045-12-21_winter_solstice_2045",
+      "start": "2045-12-21",
+      "end": "2045-12-21",
+      "label": "Winter Solstice 2045"
+    },
+    {
+      "id": "2046-03-20_spring_equinox_2046",
+      "start": "2046-03-20",
+      "end": "2046-03-20",
+      "label": "Spring Equinox 2046"
+    },
+    {
+      "id": "2046-06-21_summer_solstice_2046",
+      "start": "2046-06-21",
+      "end": "2046-06-21",
+      "label": "Summer Solstice 2046"
+    },
+    {
+      "id": "2046-09-23_autumn_equinox_2046",
+      "start": "2046-09-23",
+      "end": "2046-09-23",
+      "label": "Autumn Equinox 2046"
+    },
+    {
+      "id": "2046-12-22_winter_solstice_2046",
+      "start": "2046-12-22",
+      "end": "2046-12-22",
+      "label": "Winter Solstice 2046"
+    },
+    {
+      "id": "2047-03-20_spring_equinox_2047",
+      "start": "2047-03-20",
+      "end": "2047-03-20",
+      "label": "Spring Equinox 2047"
+    },
+    {
+      "id": "2047-06-21_summer_solstice_2047",
+      "start": "2047-06-21",
+      "end": "2047-06-21",
+      "label": "Summer Solstice 2047"
+    },
+    {
+      "id": "2047-09-23_autumn_equinox_2047",
+      "start": "2047-09-23",
+      "end": "2047-09-23",
+      "label": "Autumn Equinox 2047"
+    },
+    {
+      "id": "2047-12-21_winter_solstice_2047",
+      "start": "2047-12-21",
+      "end": "2047-12-21",
+      "label": "Winter Solstice 2047"
+    },
+    {
+      "id": "2048-03-20_spring_equinox_2048",
+      "start": "2048-03-20",
+      "end": "2048-03-20",
+      "label": "Spring Equinox 2048"
+    },
+    {
+      "id": "2048-06-20_summer_solstice_2048",
+      "start": "2048-06-20",
+      "end": "2048-06-20",
+      "label": "Summer Solstice 2048"
+    },
+    {
+      "id": "2048-09-22_autumn_equinox_2048",
+      "start": "2048-09-22",
+      "end": "2048-09-22",
+      "label": "Autumn Equinox 2048"
+    },
+    {
+      "id": "2048-12-21_winter_solstice_2048",
+      "start": "2048-12-21",
+      "end": "2048-12-21",
+      "label": "Winter Solstice 2048"
+    },
+    {
+      "id": "2049-03-20_spring_equinox_2049",
+      "start": "2049-03-20",
+      "end": "2049-03-20",
+      "label": "Spring Equinox 2049"
+    },
+    {
+      "id": "2049-06-21_summer_solstice_2049",
+      "start": "2049-06-21",
+      "end": "2049-06-21",
+      "label": "Summer Solstice 2049"
+    },
+    {
+      "id": "2049-09-22_autumn_equinox_2049",
+      "start": "2049-09-22",
+      "end": "2049-09-22",
+      "label": "Autumn Equinox 2049"
+    },
+    {
+      "id": "2049-12-21_winter_solstice_2049",
+      "start": "2049-12-21",
+      "end": "2049-12-21",
+      "label": "Winter Solstice 2049"
+    },
+    {
+      "id": "2050-03-20_spring_equinox_2050",
+      "start": "2050-03-20",
+      "end": "2050-03-20",
+      "label": "Spring Equinox 2050"
+    },
+    {
+      "id": "2050-06-21_summer_solstice_2050",
+      "start": "2050-06-21",
+      "end": "2050-06-21",
+      "label": "Summer Solstice 2050"
+    },
+    {
+      "id": "2050-09-22_autumn_equinox_2050",
+      "start": "2050-09-22",
+      "end": "2050-09-22",
+      "label": "Autumn Equinox 2050"
+    },
+    {
+      "id": "2050-12-21_winter_solstice_2050",
+      "start": "2050-12-21",
+      "end": "2050-12-21",
+      "label": "Winter Solstice 2050"
+    }
+  ],
+  "nawRuz": [
+    {
+      "id": "2025-03-20_naw-rúz_2025",
+      "start": "2025-03-20",
+      "end": "2025-03-20",
+      "label": "Naw-Rúz 2025"
+    },
+    {
+      "id": "2026-03-20_naw-rúz_2026",
+      "start": "2026-03-20",
+      "end": "2026-03-20",
+      "label": "Naw-Rúz 2026"
+    },
+    {
+      "id": "2027-03-20_naw-rúz_2027",
+      "start": "2027-03-20",
+      "end": "2027-03-20",
+      "label": "Naw-Rúz 2027"
+    },
+    {
+      "id": "2028-03-20_naw-rúz_2028",
+      "start": "2028-03-20",
+      "end": "2028-03-20",
+      "label": "Naw-Rúz 2028"
+    },
+    {
+      "id": "2029-03-20_naw-rúz_2029",
+      "start": "2029-03-20",
+      "end": "2029-03-20",
+      "label": "Naw-Rúz 2029"
+    },
+    {
+      "id": "2030-03-20_naw-rúz_2030",
+      "start": "2030-03-20",
+      "end": "2030-03-20",
+      "label": "Naw-Rúz 2030"
+    },
+    {
+      "id": "2031-03-20_naw-rúz_2031",
+      "start": "2031-03-20",
+      "end": "2031-03-20",
+      "label": "Naw-Rúz 2031"
+    },
+    {
+      "id": "2032-03-20_naw-rúz_2032",
+      "start": "2032-03-20",
+      "end": "2032-03-20",
+      "label": "Naw-Rúz 2032"
+    },
+    {
+      "id": "2033-03-20_naw-rúz_2033",
+      "start": "2033-03-20",
+      "end": "2033-03-20",
+      "label": "Naw-Rúz 2033"
+    },
+    {
+      "id": "2034-03-20_naw-rúz_2034",
+      "start": "2034-03-20",
+      "end": "2034-03-20",
+      "label": "Naw-Rúz 2034"
+    },
+    {
+      "id": "2035-03-20_naw-rúz_2035",
+      "start": "2035-03-20",
+      "end": "2035-03-20",
+      "label": "Naw-Rúz 2035"
+    },
+    {
+      "id": "2036-03-20_naw-rúz_2036",
+      "start": "2036-03-20",
+      "end": "2036-03-20",
+      "label": "Naw-Rúz 2036"
+    },
+    {
+      "id": "2037-03-20_naw-rúz_2037",
+      "start": "2037-03-20",
+      "end": "2037-03-20",
+      "label": "Naw-Rúz 2037"
+    },
+    {
+      "id": "2038-03-20_naw-rúz_2038",
+      "start": "2038-03-20",
+      "end": "2038-03-20",
+      "label": "Naw-Rúz 2038"
+    },
+    {
+      "id": "2039-03-20_naw-rúz_2039",
+      "start": "2039-03-20",
+      "end": "2039-03-20",
+      "label": "Naw-Rúz 2039"
+    },
+    {
+      "id": "2040-03-20_naw-rúz_2040",
+      "start": "2040-03-20",
+      "end": "2040-03-20",
+      "label": "Naw-Rúz 2040"
+    },
+    {
+      "id": "2041-03-20_naw-rúz_2041",
+      "start": "2041-03-20",
+      "end": "2041-03-20",
+      "label": "Naw-Rúz 2041"
+    },
+    {
+      "id": "2042-03-20_naw-rúz_2042",
+      "start": "2042-03-20",
+      "end": "2042-03-20",
+      "label": "Naw-Rúz 2042"
+    },
+    {
+      "id": "2043-03-20_naw-rúz_2043",
+      "start": "2043-03-20",
+      "end": "2043-03-20",
+      "label": "Naw-Rúz 2043"
+    },
+    {
+      "id": "2044-03-20_naw-rúz_2044",
+      "start": "2044-03-20",
+      "end": "2044-03-20",
+      "label": "Naw-Rúz 2044"
+    },
+    {
+      "id": "2045-03-20_naw-rúz_2045",
+      "start": "2045-03-20",
+      "end": "2045-03-20",
+      "label": "Naw-Rúz 2045"
+    },
+    {
+      "id": "2046-03-20_naw-rúz_2046",
+      "start": "2046-03-20",
+      "end": "2046-03-20",
+      "label": "Naw-Rúz 2046"
+    },
+    {
+      "id": "2047-03-20_naw-rúz_2047",
+      "start": "2047-03-20",
+      "end": "2047-03-20",
+      "label": "Naw-Rúz 2047"
+    },
+    {
+      "id": "2048-03-20_naw-rúz_2048",
+      "start": "2048-03-20",
+      "end": "2048-03-20",
+      "label": "Naw-Rúz 2048"
+    },
+    {
+      "id": "2049-03-20_naw-rúz_2049",
+      "start": "2049-03-20",
+      "end": "2049-03-20",
+      "label": "Naw-Rúz 2049"
+    },
+    {
+      "id": "2050-03-20_naw-rúz_2050",
+      "start": "2050-03-20",
+      "end": "2050-03-20",
+      "label": "Naw-Rúz 2050"
+    }
+  ]
+}

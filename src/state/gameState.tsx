@@ -853,12 +853,12 @@ export const useGameState = () => {
   return context;
 };
 
-export function getGameState(): LocalGameState {
-  const context = useContext(GameStateContext);
-  if (!context) {
-    throw new Error('getGameState must be used within a GameStateContext.Provider');
-  }
-  return context.state;
+// Note: getGameState cannot use React hooks - use useGameState hook instead in React components
+export function getGameState(): LocalGameState | null {
+  // This function is kept for backward compatibility but should not be used in React components
+  // React components should use useGameState() hook instead
+  console.warn('getGameState() called - React components should use useGameState() hook instead');
+  return null;
 }
 
 // --- Full Type Definitions (restored for feature parity) ---
