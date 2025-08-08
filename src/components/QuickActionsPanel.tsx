@@ -24,6 +24,8 @@ interface QuickActionsPanelProps {
     west: boolean;
     jump: boolean;
     sit: boolean;
+    up: boolean;
+    down: boolean;
   };
   directionRoomTitles: {
     north: string;
@@ -32,6 +34,8 @@ interface QuickActionsPanelProps {
     west: string;
     jump: string;
     sit: string;
+    up: string;
+    down: string;
   };
   onShowInventory: () => void;
   onUse: () => void;
@@ -192,8 +196,9 @@ const QuickActionsPanel: React.FC<QuickActionsPanelProps> = ({
    * Memoized debug visibility check for performance
    * Core Logic Preserved: Debug menu only shows for Geoff with Ctrl+Click
    */
+  // Show debug if Geoff and either ctrlClickOnInstructions or debugMode is set
   const showDebug = useMemo((): boolean => {
-    return playerName === "Geoff" && ctrlClickOnInstructions;
+    return playerName === "Geoff" && (ctrlClickOnInstructions || (typeof window !== 'undefined' && (window as any).debugMode));
   }, [playerName, ctrlClickOnInstructions]);
 
   /**
@@ -241,6 +246,30 @@ const QuickActionsPanel: React.FC<QuickActionsPanelProps> = ({
             onMove("west");
           }}
           aria-label={`Move west${directionRoomTitles.west ? ` to ${directionRoomTitles.west}` : ''}`}
+        />
+      )}
+      {availableDirections.up && (
+        <IconButton 
+          key="up"
+          icon={<Maximize2 />}
+          title={`Up${directionRoomTitles.up ? ` (${directionRoomTitles.up})` : ''}`} 
+          onClick={() => {
+            console.log('[QuickActions] Up button clicked');
+            onMove("up");
+          }}
+          aria-label={`Move up${directionRoomTitles.up ? ` to ${directionRoomTitles.up}` : ''}`}
+        />
+      )}
+      {availableDirections.down && (
+        <IconButton 
+          key="down"
+          icon={<Minimize2 />}
+          title={`Down${directionRoomTitles.down ? ` (${directionRoomTitles.down})` : ''}`} 
+          onClick={() => {
+            console.log('[QuickActions] Down button clicked');
+            onMove("down");
+          }}
+          aria-label={`Move down${directionRoomTitles.down ? ` to ${directionRoomTitles.down}` : ''}`}
         />
       )}
       {availableDirections.east && (

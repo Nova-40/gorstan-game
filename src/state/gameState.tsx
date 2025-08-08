@@ -552,6 +552,10 @@ export const gameStateReducer = (state: LocalGameState, action: GameAction): Loc
       return {
         ...state,
         settings: { ...state.settings, debugMode: true },
+        flags: {
+          ...state.flags,
+          ctrlClickOnInstructions: true,
+        },
       };
     }
     case 'TOGGLE_CHEAT_MODE':

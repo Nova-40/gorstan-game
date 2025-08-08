@@ -5,6 +5,7 @@
 // Enhanced NPC conversation interface with images and dialogue
 
 import React, { useState, useEffect, useRef } from 'react';
+import { getNPCResponseWithState } from '../npcs/npcMemory';
 import { MessageCircle, X, Send, User } from 'lucide-react';
 import type { NPC } from '../types/NPCTypes';
 import { useGameState } from '../state/gameState';
@@ -175,13 +176,29 @@ const NPCConsole: React.FC<NPCConsoleProps> = ({
   }, [npc, isOpen, isPlayerRedacted]);
 
   const handleSendMessage = () => {
-    if (!inputMessage.trim() || !npc) return;
+    if (!npc) return;
+    const trimmed = inputMessage.trim();
+    if (!trimmed) {
+      // Special: Ayla handles empty input with meta response
+      if (npc.id === 'ayla') {
+        const silenceResponse = getNPCResponseWithState(npc, '', state) || 'Silence is a choice. Just not always a good one.';
+        setMessages(prev => [...prev, {
+          id: `npc-silence-${Date.now()}`,
+          speaker: 'npc',
+          text: silenceResponse,
+          timestamp: Date.now(),
+          mood: (npc.mood as any) || 'neutral'
+        }]);
+      }
+      setInputMessage('');
+      return;
+    }
 
     // Add player message
     const playerMessage: DialogueMessage = {
       id: `player-${Date.now()}`,
       speaker: 'player',
-      text: inputMessage,
+      text: trimmed,
       timestamp: Date.now()
     };
 
@@ -190,13 +207,14 @@ const NPCConsole: React.FC<NPCConsoleProps> = ({
 
     // Simulate NPC thinking time
     setTimeout(() => {
-      const response = generateNPCResponse(inputMessage, npc);
+      // Use enhanced getNPCResponseWithState for all NPCs
+      const responseText = getNPCResponseWithState(npc, trimmed, state);
       const npcMessage: DialogueMessage = {
         id: `npc-${Date.now()}`,
         speaker: 'npc',
-        text: response.text,
+        text: responseText,
         timestamp: Date.now(),
-        mood: response.mood
+        mood: (npc.mood as any) || 'neutral'
       };
 
       setMessages(prev => [...prev, npcMessage]);
@@ -204,40 +222,11 @@ const NPCConsole: React.FC<NPCConsoleProps> = ({
     }, 1000 + Math.random() * 2000);
 
     // Send to game engine
-    onSendMessage(inputMessage, npc.id);
+    onSendMessage(trimmed, npc.id);
     setInputMessage('');
   };
 
-  const generateNPCResponse = (playerInput: string, npc: NPC): { text: string; mood: 'friendly' | 'neutral' | 'angry' | 'confused' | 'mysterious' } => {
-    const personality = npcPersonalities[npc.id.toLowerCase()] || npcPersonalities[npc.name.toLowerCase()];
-    
-    if (!personality) {
-      return { text: "...", mood: 'neutral' };
-    }
-
-    const input = playerInput.toLowerCase();
-    
-    // Use redacted responses for Ayla if player is redacted
-    const responses = (isPlayerRedacted && npc.id.toLowerCase() === 'ayla' && personality.redactedResponses) 
-      ? { ...personality.responses, ...personality.redactedResponses }
-      : personality.responses;
-    
-    const catchPhrases = (isPlayerRedacted && npc.id.toLowerCase() === 'ayla' && personality.redactedCatchPhrases)
-      ? personality.redactedCatchPhrases
-      : personality.catchPhrases;
-    
-    // Check for specific response patterns
-    for (const [key, responseArray] of Object.entries(responses)) {
-      if (input.includes(key)) {
-        const response = responseArray[Math.floor(Math.random() * responseArray.length)];
-        return { text: response, mood: personality.mood };
-      }
-    }
-
-    // Fallback to catch phrases
-    const catchPhrase = catchPhrases[Math.floor(Math.random() * catchPhrases.length)];
-    return { text: catchPhrase, mood: personality.mood };
-  };
+  // (generateNPCResponse is now replaced by getNPCResponse utility)
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {

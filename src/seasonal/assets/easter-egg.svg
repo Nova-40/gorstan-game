@@ -1,0 +1,20 @@
+<!-- Easter Egg SVG Asset -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" role="img" aria-label="Decorated Easter egg">
+  <!-- Egg shape -->
+  <ellipse cx="50" cy="70" rx="30" ry="40" fill="#f0f8ff" stroke="#4a90e2" stroke-width="2"/>
+  
+  <!-- Decorative patterns -->
+  <path d="M20 60 Q50 55 80 60" stroke="#ff6b9d" stroke-width="2" fill="none"/>
+  <path d="M20 75 Q50 70 80 75" stroke="#ff6b9d" stroke-width="2" fill="none"/>
+  <path d="M20 90 Q50 85 80 90" stroke="#ff6b9d" stroke-width="2" fill="none"/>
+  
+  <!-- Dots -->
+  <circle cx="35" cy="65" r="3" fill="#4a90e2"/>
+  <circle cx="65" cy="65" r="3" fill="#4a90e2"/>
+  <circle cx="50" cy="80" r="3" fill="#4a90e2"/>
+  <circle cx="35" cy="95" r="3" fill="#4a90e2"/>
+  <circle cx="65" cy="95" r="3" fill="#4a90e2"/>
+  
+  <!-- Top highlight -->
+  <ellipse cx="45" cy="50" rx="8" ry="12" fill="#ffffff" opacity="0.6"/>
+</svg>

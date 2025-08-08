@@ -50,6 +50,8 @@ import NPCSelectionModal from './NPCSelectionModal';
 import { npcReact } from '../engine/npcEngine';
 import Modal from './Modal';
 import { itemDescriptions } from '../data/itemDescriptions';
+import { OverlayPortal } from '../seasonal/OverlayPortal';
+import { useSeasonalController } from '../seasonal/useSeasonalController';
 
 import type { Room } from '../types/Room';
 import type { NPC, NPCMood } from '../types/NPCTypes';
@@ -146,8 +148,29 @@ const AppCore: React.FC = () => {
       if (room) {
         setPreviousRoom(room);
       }
-      console.log('[AppCore] Dispatching MOVE_TO_ROOM action');
-      dispatch({ type: "MOVE_TO_ROOM", payload: newRoomId });
+
+      // Check if this is a zone change to trigger teleport animation
+      const currentZone = room?.zone;
+      const newRoom = roomMap[newRoomId];
+      const newZone = newRoom?.zone;
+      
+      if (currentZone && newZone && currentZone !== newZone) {
+        console.log('[AppCore] Zone change detected:', currentZone, '→', newZone);
+        
+        // Determine teleport type based on zones
+        const teleportType = newZone === 'glitchZone' ? 'fractal' : 'trek';
+        
+        // Set up teleport animation with callback to complete the room change
+        setTeleportType(teleportType);
+        setTeleportCallback(() => () => {
+          console.log('[AppCore] Teleport animation complete, changing room');
+          dispatch({ type: "MOVE_TO_ROOM", payload: newRoomId });
+        });
+      } else {
+        // Same zone or no zone info - direct room change
+        console.log('[AppCore] Same zone movement, direct change');
+        dispatch({ type: "MOVE_TO_ROOM", payload: newRoomId });
+      }
     }
   };
 
@@ -155,7 +178,7 @@ const handleBackout = useCallback((): void => {
     const count = roomHistory.length;
 
     if (!roomHistory || count === 0) {
-      dispatch({ type: 'ADD_CONSOLE_LINE', payload: "You can't go back." });
+      dispatch({ type: 'ADD_MESSAGE', payload: { id: Date.now().toString(), text: "You can't go back." , type: 'system', timestamp: Date.now() } });
       return;
     }
 
@@ -171,7 +194,7 @@ const handleBackout = useCallback((): void => {
       ? "Back we go... again."
       : "You return to the previous room.";
 
-    dispatch({ type: 'ADD_CONSOLE_LINE', payload: sarcasm });
+    dispatch({ type: 'ADD_MESSAGE', payload: { id: Date.now().toString(), text: sarcasm , type: 'system', timestamp: Date.now() } });
   }, [roomHistory, dispatch]);
   const playerName: string = useMemo(() => state.player?.name || 'Player', [state.player?.name]);
   const inventory: string[] = useMemo(() => state.player?.inventory || [], [state.player?.inventory]);
@@ -185,6 +208,9 @@ const handleBackout = useCallback((): void => {
   useOptimizedEffects(state, dispatch, room);
   const { handleWendell } = useWendellLogic(state, dispatch, room, loadModule);
   const { handleLibrarian } = useLibrarianLogic(state, dispatch, room, loadModule);
+  
+  // Initialize seasonal controller for overlay management
+  useSeasonalController(dispatch);
 
   // Enhanced modal management with proper typing
   const openModal = useCallback((name: OpenModalType): void => setModal(name), []);
@@ -350,6 +376,7 @@ const handleBackout = useCallback((): void => {
       const aylaHelper: NPC = {
         id: 'ayla',
         name: 'Ayla',
+        location: 'universal', // Ayla is available universally as a helper
         description: 'Your helpful guide through the game',
         portrait: '/images/Ayla.png',
         mood: 'helpful' as NPCMood,
@@ -370,17 +397,9 @@ const handleBackout = useCallback((): void => {
     // Send message to NPC engine
     npcReact(npcId, message);
     
-    // Log interaction in game history
-    dispatch({ 
-      type: 'RECORD_MESSAGE', 
-      payload: { 
-        id: `npc-chat-${Date.now()}`, 
-        text: `You said to ${selectedNPC?.name}: "${message}"`, 
-        type: 'action', 
-        timestamp: Date.now() 
-      } 
-    });
-  }, [selectedNPC, dispatch]);
+    // Note: Conversation logging is handled within NPCConsole to prevent double-echo
+    // Only log significant game-affecting interactions to main console
+  }, [dispatch]);
 
   // Handle NPC selection from selection modal
   const handleSelectNPC = useCallback((npc: NPC) => {
@@ -418,6 +437,20 @@ const handleBackout = useCallback((): void => {
       }
     }
   }, [state.flags?.openNPCConsole, npcsInRoom, handleOpenNPCConsole, dispatch]);
+
+  // Monitor for teleport test trigger
+  useEffect(() => {
+    if (state.flags?.triggerTeleport) {
+      const teleportType = state.flags.triggerTeleport as TeleportType;
+      console.log('[AppCore] Teleport test triggered:', teleportType);
+      setTeleportType(teleportType);
+      setTeleportCallback(() => () => {
+        console.log('[AppCore] Teleport test complete');
+      });
+      // Clear the flag
+      dispatch({ type: 'SET_FLAG', payload: { flag: 'triggerTeleport', value: null } });
+    }
+  }, [state.flags?.triggerTeleport, dispatch]);
 
   // Enhanced keyboard handler with proper typing
   useEffect(() => {
@@ -782,7 +815,9 @@ const handleBackout = useCallback((): void => {
       east: Boolean(room?.exits?.east),
       west: Boolean(room?.exits?.west),
       jump: Boolean(room?.exits?.jump),
-      sit: Boolean(room?.exits?.sit)
+      sit: Boolean(room?.exits?.sit),
+      up: Boolean(room?.exits?.up),
+      down: Boolean(room?.exits?.down)
     };
     
     // Debug logging to see what's happening
@@ -795,14 +830,20 @@ const handleBackout = useCallback((): void => {
     return directions;
   }, [room?.exits, currentRoomId, stage]);
 
+  
   const directionRoomTitles = useMemo(() => ({
-    north: room?.exits?.north || "Unknown",
-    south: room?.exits?.south || "Unknown",
-    east: room?.exits?.east || "Unknown",
-    west: room?.exits?.west || "Unknown",
-    jump: room?.exits?.jump || "Unknown",
-    sit: room?.exits?.sit || "Unknown"
-  }), [room?.exits]);
+    north: room?.exits?.north ? roomMap[room.exits.north]?.title ?? room.exits.north : "",
+    south: room?.exits?.south ? roomMap[room.exits.south]?.title ?? room.exits.south : "",
+    east : room?.exits?.east  ? roomMap[room.exits.east ]?.title ?? room.exits.east  : "",
+    west : room?.exits?.west  ? roomMap[room.exits.west ]?.title ?? room.exits.west  : "",
+    jump : room?.exits?.jump  ? roomMap[room.exits.jump ]?.title ?? room.exits.jump  : "",
+    sit  : room?.exits?.sit   ? roomMap[room.exits.sit  ]?.title ?? room.exits.sit   : "",
+    up   : room?.exits?.up    ? roomMap[room.exits.up   ]?.title ?? room.exits.up    : "",
+    down : room?.exits?.down  ? roomMap[room.exits.down ]?.title ?? room.exits.down  : "",
+    back : room?.exits?.back  ? roomMap[room.exits.back ]?.title ?? room.exits.back  : "",
+    out  : room?.exits?.out   ? roomMap[room.exits.out  ]?.title ?? room.exits.out   : ""
+  }), [room?.exits, roomMap]);
+
 
   // Enhanced room validation effect with proper typing
   useEffect(() => {
@@ -1229,6 +1270,9 @@ const handleBackout = useCallback((): void => {
         isOpen={Boolean(state.player.flags?.showBlueButtonWarning)}
         onClose={() => dispatch({ type: 'DISMISS_BLUE_BUTTON_WARNING' })}
       />
+
+      {/* Seasonal Overlays Portal */}
+      <OverlayPortal />
     </div>
   );
 };

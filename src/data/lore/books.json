@@ -1,0 +1,166 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2025-08-08",
+  "books": [
+    {
+      "id": "1984",
+      "title": "1984",
+      "author": "George Orwell",
+      "genre": "fiction",
+      "publicationYear": 1949,
+      "themes": ["dystopia", "surveillance", "totalitarianism", "language", "truth"],
+      "description": "A dystopian social science fiction novel about totalitarian control and surveillance.",
+      "ailaResponse": {
+        "mainResponse": "Orwell's masterpiece about surveillance states. Rather prescient, considering how many cameras watch us daily.",
+        "cheekySideChance": 0.25,
+        "cheekySide": "Though I suspect Big Brother would find our puzzle solutions disappointingly mundane."
+      },
+      "relatedBooks": ["brave-new-world", "fahrenheit-451"],
+      "tags": ["classic", "dystopian", "political", "surveillance"]
+    },
+    {
+      "id": "pride-prejudice",
+      "title": "Pride and Prejudice",
+      "author": "Jane Austen",
+      "genre": "fiction",
+      "publicationYear": 1813,
+      "themes": ["romance", "social-class", "marriage", "manners", "first-impressions"],
+      "description": "A romantic novel about Elizabeth Bennet and Mr. Darcy navigating love and social expectations.",
+      "ailaResponse": {
+        "mainResponse": "Austen's wit cuts through social pretension like a well-sharpened blade. Elizabeth's independence remains refreshing.",
+        "cheekySideChance": 0.3,
+        "cheekySide": "Mr. Darcy's awkward proposal technique could use work though."
+      },
+      "relatedBooks": ["emma", "sense-sensibility"],
+      "tags": ["classic", "romance", "social-commentary", "wit"]
+    },
+    {
+      "id": "dune",
+      "title": "Dune",
+      "author": "Frank Herbert",
+      "genre": "fiction",
+      "publicationYear": 1965,
+      "themes": ["ecology", "politics", "religion", "power", "desert"],
+      "description": "Epic science fiction novel set on the desert planet Arrakis, focusing on politics, ecology, and mysticism.",
+      "ailaResponse": {
+        "mainResponse": "Herbert created something extraordinary - a universe where ecology drives politics. The spice must flow, as they say.",
+        "cheekySideChance": 0.2,
+        "cheekySide": "Though I'd take a nice cup of tea over melange any day."
+      },
+      "relatedBooks": ["foundation", "hyperion"],
+      "tags": ["science-fiction", "epic", "ecology", "politics"]
+    },
+    {
+      "id": "to-kill-mockingbird",
+      "title": "To Kill a Mockingbird",
+      "author": "Harper Lee",
+      "genre": "fiction",
+      "publicationYear": 1960,
+      "themes": ["racism", "justice", "childhood", "moral-courage", "prejudice"],
+      "description": "A novel about racial injustice in the American South, told through a child's perspective.",
+      "ailaResponse": {
+        "mainResponse": "Lee's exploration of moral courage through Scout's eyes remains powerful. Atticus represents ideals worth striving for.",
+        "cheekySideChance": 0.15,
+        "cheekySide": "Though one hopes real justice systems work better than Maycomb's."
+      },
+      "relatedBooks": ["go-set-watchman"],
+      "tags": ["classic", "social-justice", "childhood", "american-literature"]
+    },
+    {
+      "id": "lord-of-rings",
+      "title": "The Lord of the Rings",
+      "author": "J.R.R. Tolkien",
+      "genre": "fiction",
+      "publicationYear": 1954,
+      "themes": ["heroism", "friendship", "good-vs-evil", "nature", "sacrifice"],
+      "description": "Epic fantasy trilogy following Frodo's quest to destroy the One Ring and save Middle-earth.",
+      "ailaResponse": {
+        "mainResponse": "Tolkien built Middle-earth with the thoroughness of a linguist and the heart of a storyteller. Pure escapism at its finest.",
+        "cheekySideChance": 0.25,
+        "cheekySide": "Though walking to Mordor seems inefficient when eagles exist."
+      },
+      "relatedBooks": ["hobbit", "silmarillion"],
+      "tags": ["fantasy", "epic", "adventure", "mythology"]
+    },
+    {
+      "id": "great-gatsby",
+      "title": "The Great Gatsby",
+      "author": "F. Scott Fitzgerald",
+      "genre": "fiction",
+      "publicationYear": 1925,
+      "themes": ["american-dream", "wealth", "love", "decadence", "disillusionment"],
+      "description": "A critique of the American Dream set in the Jazz Age, following Jay Gatsby's pursuit of Daisy Buchanan.",
+      "ailaResponse": {
+        "mainResponse": "Fitzgerald captured the hollow glitter of the American Dream perfectly. Gatsby's optimism feels both inspiring and tragic.",
+        "cheekySideChance": 0.3,
+        "cheekySide": "Though his party planning skills were undeniably impressive."
+      },
+      "relatedBooks": ["tender-is-night"],
+      "tags": ["classic", "american-dream", "jazz-age", "tragedy"]
+    },
+    {
+      "id": "hamlet",
+      "title": "Hamlet",
+      "author": "William Shakespeare",
+      "genre": "drama",
+      "publicationYear": 1603,
+      "themes": ["revenge", "madness", "death", "duty", "uncertainty"],
+      "description": "Shakespeare's tragedy about the Prince of Denmark's quest for revenge against his uncle.",
+      "ailaResponse": {
+        "mainResponse": "Shakespeare's psychological masterpiece. Hamlet's indecision feels remarkably modern for a 400-year-old play.",
+        "cheekySideChance": 0.2,
+        "cheekySide": "Though 'to be or not to be' could use a more decisive editor."
+      },
+      "relatedBooks": ["macbeth", "king-lear"],
+      "tags": ["shakespeare", "drama", "tragedy", "psychology"]
+    },
+    {
+      "id": "sapiens",
+      "title": "Sapiens: A Brief History of Humankind",
+      "author": "Yuval Noah Harari",
+      "genre": "non-fiction",
+      "publicationYear": 2014,
+      "themes": ["human-evolution", "civilization", "technology", "society", "future"],
+      "description": "Explores how Homo sapiens came to dominate Earth through cognitive, agricultural, and scientific revolutions.",
+      "ailaResponse": {
+        "mainResponse": "Harari weaves human history into a compelling narrative. His perspective on how myths unite societies is particularly insightful.",
+        "cheekySideChance": 0.25,
+        "cheekySide": "Though I suspect he underestimates the power of a good cup of tea in civilization's development."
+      },
+      "relatedBooks": ["homo-deus"],
+      "tags": ["history", "anthropology", "society", "evolution"]
+    },
+    {
+      "id": "hitchhiker-guide",
+      "title": "The Hitchhiker's Guide to the Galaxy",
+      "author": "Douglas Adams",
+      "genre": "fiction",
+      "publicationYear": 1979,
+      "themes": ["absurdity", "humor", "existentialism", "adventure", "technology"],
+      "description": "Comedic science fiction following Arthur Dent's accidental journey through space after Earth's destruction.",
+      "ailaResponse": {
+        "mainResponse": "Adams proved the universe is not only stranger than we imagine, but funnier too. Don't panic, and always carry a towel.",
+        "cheekySideChance": 0.4,
+        "cheekySide": "Though I'm still waiting for someone to calculate the question to 42."
+      },
+      "relatedBooks": ["restaurant-end-universe"],
+      "tags": ["science-fiction", "comedy", "satire", "british-humor"]
+    },
+    {
+      "id": "brave-new-world",
+      "title": "Brave New World",
+      "author": "Aldous Huxley",
+      "genre": "fiction",
+      "publicationYear": 1932,
+      "themes": ["dystopia", "technology", "conditioning", "happiness", "individuality"],
+      "description": "Dystopian novel about a society where happiness is manufactured and individuality is suppressed.",
+      "ailaResponse": {
+        "mainResponse": "Huxley's vision of comfortable oppression feels eerily relevant. Sometimes the cage is gilded with entertainment and soma.",
+        "cheekySideChance": 0.2,
+        "cheekySide": "Though I'd choose Bernard's angst over perpetual contentment any day."
+      },
+      "relatedBooks": ["1984", "fahrenheit-451"],
+      "tags": ["dystopian", "classic", "technology", "society"]
+    }
+  ]
+}

@@ -47,34 +47,30 @@ export interface SpecialProperties {
 }
 
 export interface NPC {
-  readonly id: string;
-  readonly name: string;
-  readonly description?: string;
-  readonly mood: NPCMood;
-  readonly health?: number;
-  readonly maxHealth?: number;
-  memory: NPCMemory;
-  readonly conversation?: readonly ConversationNode[];
-  readonly inventory?: readonly string[];
-  readonly flags?: readonly string[];
-  readonly special?: SpecialProperties;
-  
-  // Runtime properties
-  portrait?: string;
+  id: string;
+  name: string;
+  location: string;
+  personality?: string;
   knowledge?: string[];
+  customResponses?: Record<string, string>;
+  // Existing/legacy fields for compatibility
+  description?: string;
+  mood?: NPCMood | string;
+  health?: number;
+  maxHealth?: number;
+  memory?: NPCMemory;
+  conversation?: readonly ConversationNode[];
+  inventory?: readonly string[];
+  flags?: readonly string[];
+  special?: SpecialProperties;
+  portrait?: string;
   responses?: Record<string, string[]>;
-  personality?: {
-    mood: string;
-    traits: string[];
-  };
   relationshipLevels?: Record<string, number>;
   questData?: {
     available: string[];
     completed: string[];
     requirements: Record<string, string[]>;
   };
-  
-  // Game logic and wandering
   currentRoom?: string;
   shouldBeVisible?: (state: any, room: any) => boolean;
   shouldWander?: boolean;
@@ -83,8 +79,6 @@ export interface NPC {
   lastMoved?: number;
   validRooms?: string[];
   biasZones?: string[];
-  
-  // Dialogue and memory
   lastMessage?: string;
   emotion?: string;
   interrupted?: boolean;

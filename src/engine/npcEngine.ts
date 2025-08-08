@@ -13,6 +13,7 @@ import { v4 as uuidv4 } from 'uuid';
 declare function dispatchToConsole(payload: any): void;
 import type { NPC } from '../types/NPCTypes';
 import type { LocalGameState } from '../state/gameState';
+import { getEnhancedAylaResponse } from '../npc/ayla/aylaResponder';
 
 type Topic = {
   triggers: string[];
@@ -65,6 +66,20 @@ export function npcReact(npcId: string, playerInput: string) {
   const state: LocalGameState = getGameState();
   const npcObj: NPC | undefined = npcRegistry.get(npcId);
   if (!npcObj || npcObj.interrupted) return;
+  
+  // Special handling for enhanced Ayla with book lore and CTAs
+  if (npcId === 'ayla' || npcObj.name?.toLowerCase() === 'ayla') {
+    try {
+      const aylaResponse = getEnhancedAylaResponse(playerInput, state);
+      npcSpeak(npcId, aylaResponse, 'mysterious');
+      return;
+    } catch (error) {
+      console.error('[npcEngine] Error with enhanced Ayla response:', error);
+      // Fall through to standard handling
+    }
+  }
+  
+  // Standard NPC topic-based handling
   const memory: Record<string, any> = npcObj.memory || {};
   const playerName: string = state.player?.name || "Player";
   const flags: Record<string, any> = state.flags || {};

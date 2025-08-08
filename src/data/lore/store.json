@@ -1,0 +1,149 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2025-08-08",
+  "globalSettings": {
+    "maxCTAsPerDay": 2,
+    "defaultCooldownHours": 6,
+    "ctaEnabledByDefault": true
+  },
+  "ctas": [
+    {
+      "id": "indie-bookstore-rec",
+      "type": "bookstore",
+      "trigger": {
+        "minInteractions": 3,
+        "cooldownHours": 24,
+        "probability": 0.08
+      },
+      "content": {
+        "message": "Since you appreciate good literature, you might enjoy browsing some independent bookstores online.",
+        "actionText": "Explore Bookstores",
+        "url": "https://bookshop.org",
+        "dismissText": "Not right now"
+      },
+      "restrictions": {
+        "maxPerDay": 1,
+        "maxPerWeek": 2,
+        "respectSnooze": true
+      },
+      "targeting": {
+        "preferredGenres": ["fiction", "poetry", "drama"],
+        "timeOfDay": "any"
+      }
+    },
+    {
+      "id": "reading-group",
+      "type": "book-club",
+      "trigger": {
+        "minInteractions": 5,
+        "cooldownHours": 48,
+        "probability": 0.06
+      },
+      "content": {
+        "message": "Your literary discussions remind me of good book clubs. There are some wonderful online reading communities.",
+        "actionText": "Find Reading Groups",
+        "dismissText": "Maybe later"
+      },
+      "restrictions": {
+        "maxPerDay": 1,
+        "maxPerWeek": 1,
+        "respectSnooze": true
+      },
+      "targeting": {
+        "preferredGenres": ["fiction", "non-fiction"],
+        "timeOfDay": "evening"
+      }
+    },
+    {
+      "id": "classic-literature",
+      "type": "reading-recommendation",
+      "trigger": {
+        "minInteractions": 4,
+        "cooldownHours": 18,
+        "probability": 0.07
+      },
+      "content": {
+        "message": "If you're enjoying our literary chats, you might like some curated classic literature collections.",
+        "actionText": "Browse Classics",
+        "url": "https://standardebooks.org",
+        "dismissText": "Not interested"
+      },
+      "restrictions": {
+        "maxPerDay": 1,
+        "maxPerWeek": 2,
+        "respectSnooze": true
+      },
+      "targeting": {
+        "preferredGenres": ["fiction", "drama", "poetry"],
+        "timeOfDay": "any"
+      }
+    },
+    {
+      "id": "literary-podcast",
+      "type": "literary-discussion",
+      "trigger": {
+        "minInteractions": 6,
+        "cooldownHours": 36,
+        "probability": 0.05
+      },
+      "content": {
+        "message": "Given your interest in books, you might enjoy some thoughtful literary podcasts and discussions.",
+        "actionText": "Discover Podcasts",
+        "dismissText": "No thanks"
+      },
+      "restrictions": {
+        "maxPerDay": 1,
+        "maxPerWeek": 1,
+        "respectSnooze": true
+      },
+      "targeting": {
+        "timeOfDay": "any"
+      }
+    },
+    {
+      "id": "local-library",
+      "type": "reading-recommendation",
+      "trigger": {
+        "minInteractions": 2,
+        "cooldownHours": 72,
+        "probability": 0.04
+      },
+      "content": {
+        "message": "Your local library likely has wonderful collections and literary events worth exploring.",
+        "actionText": "Find Libraries",
+        "dismissText": "Not now"
+      },
+      "restrictions": {
+        "maxPerDay": 1,
+        "maxPerWeek": 1,
+        "respectSnooze": true
+      },
+      "targeting": {
+        "timeOfDay": "any"
+      }
+    },
+    {
+      "id": "author-newsletter",
+      "type": "literary-discussion",
+      "trigger": {
+        "minInteractions": 7,
+        "cooldownHours": 60,
+        "probability": 0.03
+      },
+      "content": {
+        "message": "Many authors share fascinating insights about their work and the writing process in newsletters.",
+        "actionText": "Explore Author Updates",
+        "dismissText": "Maybe another time"
+      },
+      "restrictions": {
+        "maxPerDay": 1,
+        "maxPerWeek": 1,
+        "respectSnooze": true
+      },
+      "targeting": {
+        "preferredGenres": ["fiction", "non-fiction"],
+        "timeOfDay": "afternoon"
+      }
+    }
+  ]
+}

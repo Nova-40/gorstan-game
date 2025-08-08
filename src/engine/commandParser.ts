@@ -230,6 +230,45 @@ export function processCommand({
       };
     }
 
+    // Debug commands (dev mode only)
+    case 'test': {
+      if (noun === 'fractal' && gameState.settings?.debugMode) {
+        return {
+          messages: [{ text: 'Triggering fractal teleport overlay test...', type: 'system' }],
+          updates: {
+            flags: {
+              ...gameState.flags,
+              triggerTeleport: 'fractal'
+            }
+          }
+        };
+      }
+      if (noun === 'trek' && gameState.settings?.debugMode) {
+        return {
+          messages: [{ text: 'Triggering trek teleport overlay test...', type: 'system' }],
+          updates: {
+            flags: {
+              ...gameState.flags,
+              triggerTeleport: 'trek'
+            }
+          }
+        };
+      }
+      return { messages: [{ text: 'test fractal | test trek (debug mode only)', type: 'system' }] };
+    }
+
+    case 'status': {
+      const statusMessages: TerminalMessage[] = [
+        { text: '=== GAME STATUS ===', type: 'system' },
+        { text: `Current Stage: ${gameState.stage}`, type: 'system' },
+        { text: `Current Room: ${gameState.currentRoomId}`, type: 'system' },
+        { text: `Player Name: ${gameState.player?.name || 'Not set'}`, type: 'system' },
+        { text: `Room Map Loaded: ${Object.keys(gameState.roomMap || {}).length} rooms`, type: 'system' },
+        { text: `Available Exits: ${Object.keys(currentRoom.exits || {}).join(', ') || 'None'}`, type: 'system' }
+      ];
+      return { messages: statusMessages };
+    }
+
     default:
       return { messages: [{ text: "I don't understand that command.", type: 'error' }] };
   }
