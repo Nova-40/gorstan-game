@@ -9,6 +9,7 @@ import { LocalGameState } from '../state/gameState';
 import { Room } from '../types/Room';
 import { Dispatch } from 'react';
 import { maybeTriggerInquisitionTrap } from './trapEngine';
+import { detectTrapsOnEntry } from './trapDetection';
 
 /**
  * Handles room entry events, including special encounters
@@ -18,6 +19,42 @@ export function handleRoomEntry(
   gameState: LocalGameState,
   dispatch: Dispatch<GameAction>
 ): void {
+  // Check for traps when entering room
+  const trapDetection = detectTrapsOnEntry(room, gameState);
+  if (trapDetection.detected && trapDetection.warning) {
+    let messageType: 'system' | 'warning' | 'error' = 'warning';
+    
+    // Adjust message type based on severity
+    if (trapDetection.severity === 'extreme') {
+      messageType = 'error';
+    } else if (trapDetection.severity === 'low') {
+      messageType = 'system';
+    }
+
+    dispatch({
+      type: 'ADD_MESSAGE',
+      payload: {
+        id: `trap-warning-${Date.now()}`,
+        text: trapDetection.warning,
+        type: messageType,
+        timestamp: Date.now()
+      }
+    });
+
+    // Add disarm hint if applicable
+    if (trapDetection.canDisarm) {
+      dispatch({
+        type: 'ADD_MESSAGE',
+        payload: {
+          id: `trap-hint-${Date.now()}`,
+          text: '💡 You might be able to disarm this trap with the right tools or skills. Try "disarm trap" or "search for traps".',
+          type: 'system',
+          timestamp: Date.now()
+        }
+      });
+    }
+  }
+
   // Check for Morthos & Al first encounter in Control Room
   if (room.id === 'controlroom' && !gameState.flags?.hasMetMorthosAl) {
     triggerMorthosAlEncounter(gameState, dispatch);

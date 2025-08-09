@@ -56,16 +56,16 @@ const datavoid: Room = {
     {
       id: 'void_collapse',
       type: 'damage',
-      severity: 'fatal',
-      description: 'The unstable data void suddenly collapses around you! Reality fragments and digital chaos tears at your very existence!',
+      severity: 'major', // Reduced from 'fatal'
+      description: 'Reality fragments around you as the data void destabilizes! Digital chaos tears at your existence!',
       trigger: 'enter',
       effect: {
-        damage: 80,
+        damage: 25, // Reduced from 80 to 25 - still significant but not instant death
         flagsSet: ['void_survivor']
       },
       triggered: false,
-      disarmable: false,
-      hidden: true,
+      disarmable: true, // Changed to true - players should have some agency
+      hidden: false, // Changed to false - give players a fair warning
     }
   ],
 

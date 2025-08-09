@@ -50,11 +50,11 @@ const arbitercore: Room = {
     {
       id: 'judgment_field',
       type: 'damage',
-      severity: 'fatal',
-      description: 'The Arbiter Core judges you unworthy! Reality-altering energy tears through your being as the universe itself weighs your soul!',
+      severity: 'major', // Reduced from 'fatal'
+      description: 'The Arbiter Core judges you harshly! Reality-altering energy strikes you as the universe weighs your actions!',
       trigger: 'enter',
       effect: {
-        damage: 90,
+        damage: 35, // Reduced from 90 to 35 - severe but survivable
         flagsSet: ['judged_by_arbiter']
       },
       triggered: false,
