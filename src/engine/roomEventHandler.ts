@@ -251,24 +251,10 @@ function handleRoomEvent(
 }
 
 /**
- * Handles wandering NPC movement intervals
+ * REMOVED: initializeNPCMovementSystem
+ * This secondary timer system was causing conflicts with the main NPC timer.
+ * NPC movement is now handled exclusively by useNPCController.ts for better performance.
  */
-export function initializeNPCMovementSystem(
-  gameState: LocalGameState,
-  dispatch: Dispatch<GameAction>
-): void {
-  // Set up wandering NPC movement timer
-  const movementInterval = setInterval(() => {
-    // Trigger NPC evaluation flag
-    dispatch({
-      type: 'SET_FLAG',
-      payload: { flag: 'evaluateWanderingNPCs', value: true }
-    });
-  }, 15000); // Check every 15 seconds
-
-  // Store interval ID for cleanup
-  (window as any).npcMovementInterval = movementInterval;
-}
 
 /**
  * Enhanced wandering NPC movement trigger

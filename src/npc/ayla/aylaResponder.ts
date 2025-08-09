@@ -6,11 +6,29 @@ import { getAylaEdgeCaseResponse } from '../../utils/aylaBrain';
 import { bookLoreService } from '../../services/bookLore';
 import { bookStoreService } from '../../services/bookStore';
 import { applyAylaPersonality, getAylaCTAIntroduction } from './personality';
+import { aylaService } from '../../services/AylaService';
 
 /**
- * Enhanced Ayla response with book lore and CTA integration
+ * Enhanced Ayla response with advanced intent matching and conversational memory
  */
 export function getEnhancedAylaResponse(input: string, state: GameState): string {
+  // Use the new enhanced Ayla service for primary responses
+  const enhancedResponse = aylaService.getResponse(input, state);
+  
+  // If enhanced service returns a good response, use it
+  if (enhancedResponse && !enhancedResponse.includes("I'm not sure")) {
+    return enhancedResponse;
+  }
+  
+  // Fall back to legacy system for backward compatibility
+  const legacyResponse = getLegacyAylaResponse(input, state);
+  return legacyResponse;
+}
+
+/**
+ * Legacy Ayla response system (preserved for compatibility)
+ */
+function getLegacyAylaResponse(input: string, state: GameState): string {
   // First check for edge cases from existing system
   const edgeResponse = getAylaEdgeCaseResponse(input, state);
   if (edgeResponse) return edgeResponse;

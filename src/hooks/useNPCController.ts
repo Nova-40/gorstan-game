@@ -29,26 +29,60 @@ export const useNPCController = () => {
 // Variable declaration
   const systemFlags = FlagMap.system;
 
-  // Enhanced wandering NPC movement system
+  // Optimized unified NPC movement system
   useEffect(() => {
+    // Skip NPC movement during system overlays or special states using flags
+    if (state.flags?.pollyTakeoverInProgress || state.flags?.isSystemTransition || !state.roomMap) {
+      return;
+    }
+
     const movementInterval = setInterval(() => {
+      // Skip if currently in transition or overlay state
+      if (state.flags?.pollyTakeoverInProgress || state.flags?.isSystemTransition) {
+        return;
+      }
+
       // Set flag to trigger NPC movement evaluation
       setFlag(npcFlags.evaluateWanderingNPCs, true);
       
-      // Also trigger individual NPC wandering
+      // Optimized module loading with error handling
       loadModule('../engine/wanderingNPCController').then(mod => {
-        if (mod?.wanderNPC && state.roomMap) {
-          // Move wandering NPCs
-          const wanderingNPCs = ['morthos', 'al_escape_artist', 'polly', 'dominic_wandering', 'mr_wendell'];
+        if (mod?.wanderNPC && state.roomMap && !state.flags?.pollyTakeoverInProgress) {
+          // Dynamic NPC list from current game state instead of hardcoded
+          const wanderingNPCs = state.npcsInRoom
+            ?.filter(npc => npc.canWander && !npc.questOnly)
+            ?.map(npc => npc.id) || [];
+          
+          // Fallback to known wandering NPCs if no NPCs in current state
+          if (wanderingNPCs.length === 0) {
+            const fallbackNPCs = ['morthos', 'al_escape_artist', 'polly', 'dominic_wandering', 'mr_wendell'];
+            wanderingNPCs.push(...fallbackNPCs);
+          }
+          
+          // Batch process NPCs with error handling
           wanderingNPCs.forEach(npcId => {
-            mod.wanderNPC(npcId, state);
+            try {
+              mod.wanderNPC(npcId, state);
+            } catch (error) {
+              console.warn(`[NPC] Failed to move ${npcId}:`, error);
+            }
           });
         }
+      }).catch(error => {
+        console.warn('[NPC] Module loading failed:', error);
       });
-    }, 20000); // Every 20 seconds
+    }, 18000); // Optimized to 18 seconds to avoid conflicts
 
-    return () => clearInterval(movementInterval);
-  }, [state.roomMap]);
+    // Enhanced cleanup
+    return () => {
+      clearInterval(movementInterval);
+      // Clean up any lingering window intervals
+      if ((window as any).npcMovementInterval) {
+        clearInterval((window as any).npcMovementInterval);
+        delete (window as any).npcMovementInterval;
+      }
+    };
+  }, [state.roomMap, state.flags?.pollyTakeoverInProgress, state.flags?.isSystemTransition]);
 
   // Trigger Morthos/Al encounter in control room
   useEffect(() => {

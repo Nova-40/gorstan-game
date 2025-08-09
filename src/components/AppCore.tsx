@@ -40,6 +40,7 @@ import { initializeAchievementEngine } from '../logic/achievementEngine';
 import { initializeWanderingNPCs, handleRoomEntryForWanderingNPCs } from '../engine/wanderingNPCController';
 import { handleRoomEntry } from '../engine/roomEventHandler';
 import { getAllRoomsAsObject } from '../utils/roomLoader';
+import { performanceMonitor } from '../utils/performanceMonitor';
 
 import { UseItemModal } from "./UseItemModal";
 import { InventoryModal } from "./InventoryModal";
@@ -51,6 +52,7 @@ import NPCSelectionModal from './NPCSelectionModal';
 import { npcReact } from '../engine/npcEngine';
 import Modal from './Modal';
 import { itemDescriptions } from '../data/itemDescriptions';
+import PerformanceDashboard from './PerformanceDashboard';
 
 import type { Room } from '../types/Room';
 import type { NPC, NPCMood } from '../types/NPCTypes';
@@ -96,6 +98,9 @@ interface Item {
  * - Enhanced type safety throughout
  */
 const AppCore: React.FC = () => {
+  // Performance monitoring for render cycles
+  performanceMonitor.markRenderStart();
+  
   // Enhanced state with proper typing
   const { state, dispatch } = useGameState();
   const { hasFlag } = useFlags();
@@ -137,6 +142,7 @@ const AppCore: React.FC = () => {
   const [lastShownRoomDescription, setLastShownRoomDescription] = useState<string | null>(null);
   const [roomFallbackAttempted, setRoomFallbackAttempted] = useState<boolean>(false);
   const [roomHistory, setRoomHistory] = useState<string[]>([]);
+  const [showPerformanceDashboard, setShowPerformanceDashboard] = useState<boolean>(false);
 
   const handleRoomChange = (newRoomId: string) => {
     console.log('[AppCore] handleRoomChange called with:', newRoomId);
@@ -457,6 +463,10 @@ const handleBackout = useCallback((): void => {
       if (e.ctrlKey && e.key === 's') {
         e.preventDefault();
         openModal('saveGame');
+      }
+      if (e.ctrlKey && e.key === 'p') {
+        e.preventDefault();
+        setShowPerformanceDashboard(true);
       }
       if (e.key.toLowerCase() === 't' && !modal && stage === 'game') {
         // Talk to NPC shortcut
@@ -1287,7 +1297,7 @@ const handleBackout = useCallback((): void => {
           ctrlClickOnInstructions={hasFlag('ctrlClickOnInstructions')}
           onDebugMenu={() => dispatch({ type: 'OPEN_DEBUG' })}
           onBackout={handleBackout}
-          canBackout={Boolean(previousRoom && previousRoom.id !== currentRoomId)}
+          canBackout={roomHistory.length > 0}
           currentRoomId={currentRoomId}
           npcsInRoom={npcsInRoom}
           onTalkToNPC={handleOpenNPCConsole}
@@ -1313,9 +1323,18 @@ const handleBackout = useCallback((): void => {
         onClose={() => dispatch({ type: 'DISMISS_BLUE_BUTTON_WARNING' })}
       />
 
+      {/* Performance Dashboard */}
+      <PerformanceDashboard
+        isVisible={showPerformanceDashboard}
+        onClose={() => setShowPerformanceDashboard(false)}
+      />
+
       {/* Celebration System Active */}
     </div>
   );
 };
+
+// Performance monitoring cleanup
+performanceMonitor.markRenderEnd();
 
 export default AppCore;

@@ -6,6 +6,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { getNPCResponseWithState } from '../npcs/npcMemory';
+import { getEnhancedAylaResponse } from '../npc/ayla/aylaResponder';
 import { MessageCircle, X, Send, User } from 'lucide-react';
 import type { NPC } from '../types/NPCTypes';
 import { useGameState } from '../state/gameState';
@@ -178,10 +179,14 @@ const NPCConsole: React.FC<NPCConsoleProps> = ({
   const handleSendMessage = () => {
     if (!npc) return;
     const trimmed = inputMessage.trim();
+    
+    // Clear input immediately for better UX
+    setInputMessage('');
+    
     if (!trimmed) {
       // Special: Ayla handles empty input with meta response
       if (npc.id === 'ayla') {
-        const silenceResponse = getNPCResponseWithState(npc, '', state) || 'Silence is a choice. Just not always a good one.';
+        const silenceResponse = getEnhancedAylaResponse('', state) || 'Silence is a choice. Just not always a good one.';
         setMessages(prev => [...prev, {
           id: `npc-silence-${Date.now()}`,
           speaker: 'npc',
@@ -190,7 +195,6 @@ const NPCConsole: React.FC<NPCConsoleProps> = ({
           mood: (npc.mood as any) || 'neutral'
         }]);
       }
-      setInputMessage('');
       return;
     }
 
@@ -205,10 +209,18 @@ const NPCConsole: React.FC<NPCConsoleProps> = ({
     setMessages(prev => [...prev, playerMessage]);
     setIsTyping(true);
 
-    // Simulate NPC thinking time
+    // Simulate NPC thinking time (varied based on response complexity)
+    const thinkingTime = npc.id === 'ayla' ? 800 + Math.random() * 1200 : 1000 + Math.random() * 2000;
+    
     setTimeout(() => {
-      // Use enhanced getNPCResponseWithState for all NPCs
-      const responseText = getNPCResponseWithState(npc, trimmed, state);
+      // Use enhanced Ayla service for Ayla, regular system for others
+      let responseText: string;
+      if (npc.id === 'ayla') {
+        responseText = getEnhancedAylaResponse(trimmed, state);
+      } else {
+        responseText = getNPCResponseWithState(npc, trimmed, state);
+      }
+      
       const npcMessage: DialogueMessage = {
         id: `npc-${Date.now()}`,
         speaker: 'npc',
@@ -219,11 +231,10 @@ const NPCConsole: React.FC<NPCConsoleProps> = ({
 
       setMessages(prev => [...prev, npcMessage]);
       setIsTyping(false);
-    }, 1000 + Math.random() * 2000);
+    }, thinkingTime);
 
     // Send to game engine
     onSendMessage(trimmed, npc.id);
-    setInputMessage('');
   };
 
   // (generateNPCResponse is now replaced by getNPCResponse utility)

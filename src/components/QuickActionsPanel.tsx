@@ -251,7 +251,7 @@ const QuickActionsPanel: React.FC<QuickActionsPanelProps> = ({
       {availableDirections.up && (
         <IconButton 
           key="up"
-          icon={<Maximize2 />}
+          icon={<ArrowUp />}
           title={`Up${directionRoomTitles.up ? ` (${directionRoomTitles.up})` : ''}`} 
           onClick={() => {
             console.log('[QuickActions] Up button clicked');
@@ -263,7 +263,7 @@ const QuickActionsPanel: React.FC<QuickActionsPanelProps> = ({
       {availableDirections.down && (
         <IconButton 
           key="down"
-          icon={<Minimize2 />}
+          icon={<ArrowDown />}
           title={`Down${directionRoomTitles.down ? ` (${directionRoomTitles.down})` : ''}`} 
           onClick={() => {
             console.log('[QuickActions] Down button clicked');

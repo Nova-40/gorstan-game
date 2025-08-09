@@ -66,21 +66,46 @@ export function wanderNPC(npcId: string, state: LocalGameState) {
   const now = Date.now();
   if (npc.lastMoved && now - npc.lastMoved < 15000) return; // 15 second cooldown
 
-  // Get all valid rooms from the room map for wandering
-  let validRooms: Room[] = Object.values(roomMap).filter(room => 
-    room &&
-    typeof room === 'object' &&
-    room.id !== npc.currentRoom && // Don't stay in same room
-    !room.id.includes('trap') &&
-    !room.id.includes('cutscene') &&
-    !room.id.includes('puzzle') &&
-    !room.id.includes('boss') &&
-    room.zone !== 'private' // Avoid private rooms
-  );
+  // Enhanced room filtering with adjacency logic
+  const currentRoom = npc.currentRoom ? roomMap[npc.currentRoom] : null;
+  if (!currentRoom) return;
 
-  // If NPC has zone preferences, bias toward those
+  // Get adjacent rooms from current room's exits for realistic movement
+  const adjacentRoomIds = Object.values(currentRoom.exits || {}).filter(Boolean) as string[];
+  
+  // Start with adjacent rooms, then expand if none available
+  let validRooms: Room[] = adjacentRoomIds
+    .map(id => roomMap[id])
+    .filter(room => 
+      room &&
+      typeof room === 'object' &&
+      room.id !== npc.currentRoom && // Don't stay in same room
+      !room.id.includes('trap') &&
+      !room.id.includes('cutscene') &&
+      !room.id.includes('puzzle') &&
+      !room.id.includes('boss') &&
+      room.zone !== 'private' // Avoid private rooms
+    );
+
+  // If no adjacent rooms, fall back to zone-based movement
+  if (validRooms.length === 0) {
+    const biasZones: string[] = npc.biasZones || [];
+    validRooms = Object.values(roomMap).filter(room => 
+      room &&
+      typeof room === 'object' &&
+      room.id !== npc.currentRoom &&
+      !room.id.includes('trap') &&
+      !room.id.includes('cutscene') &&
+      !room.id.includes('puzzle') &&
+      !room.id.includes('boss') &&
+      room.zone !== 'private' &&
+      (biasZones.length === 0 || (room.zone && biasZones.includes(room.zone)))
+    );
+  }
+
+  // Zone bias logic for adjacent rooms
   const biasZones: string[] = npc.biasZones || [];
-  if (flags.waited && biasZones.length > 0) {
+  if (flags.waited && biasZones.length > 0 && validRooms.length > 1) {
     const biasRooms = validRooms.filter(r => r.zone && biasZones.includes(r.zone));
     const neutralRooms = validRooms.filter(r => r.zone && !biasZones.includes(r.zone));
     const roll = Math.random();
@@ -89,18 +114,48 @@ export function wanderNPC(npcId: string, state: LocalGameState) {
 
   if (!validRooms.length) return;
 
-  const newRoom: Room = pickRandom(validRooms);
-  if (newRoom && newRoom.id !== npc.currentRoom) {
-    const previousRoom = npc.currentRoom;
-    npc.currentRoom = newRoom.id;
-    npc.lastMoved = now;
+  // Enhanced room selection with collision detection
+  let attemptCount = 0;
+  const maxAttempts = 5;
+  
+  while (attemptCount < maxAttempts) {
+    const newRoom: Room = pickRandom(validRooms);
     
-    console.log(`[WANDER] ${npc.name} moved from ${previousRoom} to ${newRoom.id}`);
-    
-    // Trigger room update if player is in the room the NPC left or entered
-    if (state.currentRoomId === previousRoom || state.currentRoomId === newRoom.id) {
-      // The NPC controller will handle this via evaluateWanderingNPCs flag
+    if (newRoom && newRoom.id !== npc.currentRoom) {
+      // Check for room capacity (max 3 NPCs per room)
+      const npcsInTargetRoom = state.npcsInRoom?.filter(n => n.currentRoom === newRoom.id) || [];
+      
+      if (npcsInTargetRoom.length >= 3) {
+        console.log(`[WANDER] ${npc.name} cannot move to ${newRoom.id} - room at capacity (${npcsInTargetRoom.length} NPCs)`);
+        
+        // Remove this room from valid rooms and try again
+        validRooms = validRooms.filter(r => r.id !== newRoom.id);
+        attemptCount++;
+        
+        if (validRooms.length === 0) break;
+        continue;
+      }
+      
+      // Movement successful
+      const previousRoom = npc.currentRoom;
+      npc.currentRoom = newRoom.id;
+      npc.lastMoved = now;
+      
+      console.log(`[WANDER] ${npc.name} moved from ${previousRoom} to ${newRoom.id} (${adjacentRoomIds.includes(newRoom.id) ? 'adjacent' : 'zone-based'}) - ${npcsInTargetRoom.length + 1} NPCs in room`);
+      
+      // Trigger room update if player is in the room the NPC left or entered
+      if (state.currentRoomId === previousRoom || state.currentRoomId === newRoom.id) {
+        // The NPC controller will handle this via evaluateWanderingNPCs flag
+      }
+      
+      break; // Movement successful, exit loop
     }
+    
+    attemptCount++;
+  }
+  
+  if (attemptCount >= maxAttempts) {
+    console.log(`[WANDER] ${npc.name} unable to find suitable room after ${maxAttempts} attempts`);
   }
 }
 
