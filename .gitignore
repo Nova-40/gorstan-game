@@ -9,10 +9,17 @@ dist/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 
 # Environment variables
 .env
-.env.*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Vercel
+.vercel
 
 # OS & editor files
 .DS_Store
@@ -36,3 +43,19 @@ public.zip  # Optional redundancy, already caught by *.zip
 
 # Backup directories
 src-backup*
+
+# TypeScript
+*.tsbuildinfo
+
+# Coverage reports
+coverage/
+.nyc_output
+
+# Dependency directories
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache

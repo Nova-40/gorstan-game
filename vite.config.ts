@@ -16,8 +16,18 @@ export default defineConfig({
   build: {
     // Increase chunk size warning limit for Vercel
     chunkSizeWarningLimit: 1000,
+    // Enable sourcemaps for production debugging
+    sourcemap: false,
+    // Minimize output
+    minify: 'terser',
+    // Target modern browsers for better optimization
+    target: 'esnext',
     rollupOptions: {
       output: {
+        // Optimize chunk naming for caching
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]',
         manualChunks: {
           // Split large dependencies into separate chunks
           'framer-motion': ['framer-motion'],
@@ -41,6 +51,14 @@ export default defineConfig({
         }
       }
     }
+  },
+  // Optimize for production
+  define: {
+    'process.env.NODE_ENV': JSON.stringify('production')
+  },
+  // Enable compression
+  server: {
+    compression: true
   }
 });
 
