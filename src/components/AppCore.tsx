@@ -27,6 +27,7 @@ import WelcomeScreen from './WelcomeScreen';
 import TeleportManager from './animations/TeleportManager';
 import QuickActionsPanel from './QuickActionsPanel';
 import BlueButtonWarningModal from './BlueButtonWarningModal';
+import { handleAskAyla as askAylaEngine } from '../logic/askAylaEngine';
 
 import { useFlags } from '../hooks/useFlags';
 import { useGameState } from '../state/gameState';
@@ -400,6 +401,27 @@ const handleBackout = useCallback((): void => {
     }
   }, [npcsInRoom, openModal]);
 
+  const handleAskAyla = useCallback(() => {
+    // Create Ayla NPC and open console directly
+    const aylaHelper: NPC = {
+      id: 'ayla',
+      name: 'Ayla',
+      location: 'universal',
+      description: 'Your helpful guide through the game',
+      portrait: '/images/Ayla.png',
+      mood: 'helpful' as NPCMood,
+      memory: {
+        interactions: 0,
+        lastInteraction: Date.now(),
+        playerActions: [],
+        relationship: 50,
+        knownFacts: []
+      }
+    };
+    setSelectedNPC(aylaHelper);
+    openModal('npcConsole');
+  }, [openModal]);
+
   const handleNPCMessage = useCallback((message: string, npcId: string) => {
     // Send message to NPC engine
     npcReact(npcId, message, state);
@@ -467,6 +489,116 @@ const handleBackout = useCallback((): void => {
     
     return () => clearTimeout(autoModalTimer);
   }, [npcsInRoom, stage, modal, handleOpenNPCConsole, openModal]);
+
+  // Special trigger for Morthos/Al encounter - flash speech bubble then show modal
+  useEffect(() => {
+    if (state.flags?.hasMetMorthosAl && stage === 'game' && npcsInRoom.length >= 2) {
+      // Wait for the "dimensional energy" message sequence to complete
+      const flashTimer = setTimeout(() => {
+        if (!modal) {
+          console.log('[AppCore] Post-encounter triggering NPC modal after dimensional energy message');
+          
+          // Flash a speech bubble indicator for visual feedback
+          const flashIndicator = document.createElement('div');
+          flashIndicator.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #4a9eff 0%, #357abd 100%);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            z-index: 9999;
+            box-shadow: 0 4px 20px rgba(74, 158, 255, 0.4);
+            animation: speechBubbleFlash 1.5s ease-out forwards;
+            pointer-events: none;
+          `;
+          flashIndicator.innerHTML = '💬 NPCs want to talk!';
+          document.body.appendChild(flashIndicator);
+          
+          // Add the flash animation if it doesn't exist
+          if (!document.getElementById('speechBubbleAnimation')) {
+            const style = document.createElement('style');
+            style.id = 'speechBubbleAnimation';
+            style.textContent = `
+              @keyframes speechBubbleFlash {
+                0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+                50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+                100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+              }
+            `;
+            document.head.appendChild(style);
+          }
+          
+          // Remove flash indicator and show modal
+          setTimeout(() => {
+            document.body.removeChild(flashIndicator);
+            openModal('npcSelection');
+          }, 1500);
+        }
+      }, 7000); // Wait for dimensional energy message sequence (6s) + 1s buffer
+      
+      return () => clearTimeout(flashTimer);
+    }
+  }, [state.flags?.hasMetMorthosAl, stage, npcsInRoom, modal, openModal]);
+
+  // Fallback: Trigger Ayla helper when no NPCs present
+  useEffect(() => {
+    if (stage === 'game' && npcsInRoom.length === 0 && !modal && !state.flags?.hasMetMorthosAl) {
+      // Flash speech bubble for Ayla helper
+      const aylaFlashTimer = setTimeout(() => {
+        const flashIndicator = document.createElement('div');
+        flashIndicator.style.cssText = `
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          background: linear-gradient(135deg, #88cc88 0%, #66aa66 100%);
+          color: white;
+          padding: 10px 16px;
+          border-radius: 20px;
+          font-size: 14px;
+          font-weight: 600;
+          z-index: 9999;
+          box-shadow: 0 4px 15px rgba(136, 204, 136, 0.4);
+          animation: aylaFlash 2s ease-out forwards;
+          cursor: pointer;
+        `;
+        flashIndicator.innerHTML = '💡 Ask Ayla for help';
+        flashIndicator.onclick = () => {
+          document.body.removeChild(flashIndicator);
+          handleAskAyla();
+        };
+        document.body.appendChild(flashIndicator);
+        
+        // Add Ayla flash animation
+        if (!document.getElementById('aylaFlashAnimation')) {
+          const style = document.createElement('style');
+          style.id = 'aylaFlashAnimation';
+          style.textContent = `
+            @keyframes aylaFlash {
+              0% { opacity: 0; transform: translateY(10px) scale(0.9); }
+              20% { opacity: 1; transform: translateY(0) scale(1.05); }
+              80% { opacity: 1; transform: translateY(0) scale(1); }
+              100% { opacity: 0.7; transform: translateY(0) scale(1); }
+            }
+          `;
+          document.head.appendChild(style);
+        }
+        
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+          if (document.body.contains(flashIndicator)) {
+            document.body.removeChild(flashIndicator);
+          }
+        }, 5000);
+      }, 3000); // 3 second delay when no NPCs
+      
+      return () => clearTimeout(aylaFlashTimer);
+    }
+  }, [stage, npcsInRoom, modal, state.flags?.hasMetMorthosAl, handleAskAyla]);
 
   // Monitor for teleport test trigger
   useEffect(() => {

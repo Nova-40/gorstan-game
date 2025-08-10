@@ -55,10 +55,8 @@ export function handleRoomEntry(
     }
   }
 
-  // Check for Morthos & Al first encounter in Control Room
-  if (room.id === 'controlroom' && !gameState.flags?.hasMetMorthosAl) {
-    triggerMorthosAlEncounter(gameState, dispatch);
-  }
+  // Check for Morthos & Al first encounter in Control Room - handled by room file
+  // (Removed duplicate encounter trigger - room handles its own events)
   
   // Random chance for Spanish Inquisition (but not during intro stages)
   if (gameState.stage === 'game' && room.id !== 'introreset') {
@@ -97,126 +95,6 @@ export function handleRoomEntry(
 }
 
 /**
- * Triggers the first encounter with Morthos and Al in the Control Room
- */
-function triggerMorthosAlEncounter(
-  gameState: LocalGameState,
-  dispatch: Dispatch<GameAction>
-): void {
-  // Delay the encounter slightly to let the room settle
-  setTimeout(() => {
-    // Initial atmosphere
-    dispatch({
-      type: 'RECORD_MESSAGE',
-      payload: {
-        id: `encounter-start-${Date.now()}`,
-        text: '🌫️ The shadows in the control room suddenly deepen, and the air grows thick with tension...',
-        type: 'narrative',
-        timestamp: Date.now()
-      }
-    });
-
-    // Morthos appears
-    setTimeout(() => {
-      dispatch({
-        type: 'RECORD_MESSAGE',
-        payload: {
-          id: `morthos-appear-${Date.now()}`,
-          text: '🌑 From the darkest corner of the room, a figure emerges. Morthos steps forward, shadows writhing around his form like living things.',
-          type: 'narrative',
-          timestamp: Date.now()
-        }
-      });
-    }, 1500);
-
-    setTimeout(() => {
-      dispatch({
-        type: 'RECORD_MESSAGE',
-        payload: {
-          id: `morthos-speak-${Date.now()}`,
-          text: '🗣️ MORTHOS: "So... another operator discovers our little sanctuary. How deliciously... inevitable."',
-          type: 'system',
-          timestamp: Date.now()
-        }
-      });
-    }, 3000);
-
-    // Al appears  
-    setTimeout(() => {
-      dispatch({
-        type: 'RECORD_MESSAGE',
-        payload: {
-          id: `al-appear-${Date.now()}`,
-          text: '📋 A bureaucratic figure in a slightly rumpled suit materializes near the monitoring stations, adjusting his glasses with practiced efficiency.',
-          type: 'narrative',
-          timestamp: Date.now()
-        }
-      });
-    }, 4500);
-
-    setTimeout(() => {
-      dispatch({
-        type: 'RECORD_MESSAGE',
-        payload: {
-          id: `al-speak-${Date.now()}`,
-          text: '🗣️ AL: "Ah, excellent timing. We have protocols to discuss, forms to file, and reality to stabilize. In that order."',
-          type: 'system',
-          timestamp: Date.now()
-        }
-      });
-    }, 6000);
-
-    // The tension
-    setTimeout(() => {
-      dispatch({
-        type: 'RECORD_MESSAGE',
-        payload: {
-          id: `tension-build-${Date.now()}`,
-          text: '⚡ The room crackles with dimensional energy as these two powerful entities regard each other—and you—with interest.',
-          type: 'narrative',
-          timestamp: Date.now()
-        }
-      });
-    }, 7500);
-
-    setTimeout(() => {
-      dispatch({
-        type: 'RECORD_MESSAGE',
-        payload: {
-          id: `encounter-complete-${Date.now()}`,
-          text: '✨ You sense this encounter will shape your journey through the multiverse...',
-          type: 'system',
-          timestamp: Date.now()
-        }
-      });
-
-      // Set the flags
-      dispatch({
-        type: 'SET_FLAG',
-        payload: { flag: 'hasMetMorthosAl', value: true }
-      });
-      
-      dispatch({
-        type: 'SET_FLAG',
-        payload: { flag: 'metMorthos', value: true }
-      });
-      
-      dispatch({
-        type: 'SET_FLAG',
-        payload: { flag: 'metAl', value: true }
-      });
-
-      dispatch({
-        type: 'SET_FLAG',
-        payload: { flag: 'firstEncounterComplete', value: true }
-      });
-
-    }, 9000);
-
-  }, 2000); // Initial delay to let room description settle
-}
-
-/**
  * Generic room event handler
  */
 function handleRoomEvent(
@@ -227,9 +105,8 @@ function handleRoomEvent(
 ): void {
   switch (event) {
     case 'checkMorthosAlEncounter':
-      if (!gameState.flags?.hasMetMorthosAl) {
-        triggerMorthosAlEncounter(gameState, dispatch);
-      }
+      // Encounter is now handled directly by the room file
+      console.log('[RoomEventHandler] Morthos/Al encounter delegated to room file');
       break;
     
     case 'showControlRoomIntro':
