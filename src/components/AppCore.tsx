@@ -445,6 +445,29 @@ const handleBackout = useCallback((): void => {
     }
   }, [state.flags?.openNPCConsole, npcsInRoom, handleOpenNPCConsole, dispatch]);
 
+  // Auto-trigger NPC modal when NPCs are detected in room
+  useEffect(() => {
+    // Only trigger in game stage, not during intro/transitions
+    if (stage !== 'game' || modal) return;
+    
+    // Small delay to let room settle and avoid conflicts with other modals
+    const autoModalTimer = setTimeout(() => {
+      if (npcsInRoom.length > 0 && !modal) {
+        console.log('[AppCore] Auto-triggering NPC modal for NPCs:', npcsInRoom.map(npc => npc.name));
+        
+        if (npcsInRoom.length === 1) {
+          // Single NPC - open console directly
+          handleOpenNPCConsole(npcsInRoom[0]);
+        } else {
+          // Multiple NPCs - show selection modal
+          openModal('npcSelection');
+        }
+      }
+    }, 1500); // 1.5 second delay to avoid conflicts
+    
+    return () => clearTimeout(autoModalTimer);
+  }, [npcsInRoom, stage, modal, handleOpenNPCConsole, openModal]);
+
   // Monitor for teleport test trigger
   useEffect(() => {
     if (state.flags?.triggerTeleport) {

@@ -3,6 +3,18 @@
 
 import { Span } from './gen/util';
 
+// Import celebration data directly
+import indexData from './data/index.json';
+import christianData from './data/christian.json';
+import islamicData from './data/islamic.json';
+import jewishData from './data/jewish.json';
+import chineseData from './data/chinese.json';
+import hinduData from './data/hindu.json';
+import buddhistData from './data/buddhist.json';
+import sikhData from './data/sikh.json';
+import shintoData from './data/shinto.json';
+import seasonalData from './data/seasonal.json';
+
 // Type definitions for celebration data
 export interface CelebrationData {
   [key: string]: Span[];
@@ -19,6 +31,19 @@ export interface CelebrationIndex {
 let celebrationCache: Map<string, CelebrationData> = new Map();
 let indexCache: CelebrationIndex | null = null;
 
+// Data mapping
+const dataMap: Record<string, CelebrationData> = {
+  christian: christianData,
+  islamic: islamicData,
+  jewish: jewishData,
+  chinese: chineseData,
+  hindu: hinduData,
+  buddhist: buddhistData,
+  sikh: sikhData,
+  shinto: shintoData,
+  seasonal: seasonalData
+};
+
 /**
  * Load celebration data for a specific tradition
  */
@@ -28,8 +53,7 @@ export async function loadCelebrationData(tradition: string): Promise<Celebratio
   }
   
   try {
-    const response = await fetch(`/src/celebrate/data/${tradition}.json`);
-    const data = await response.json();
+    const data = dataMap[tradition] || {};
     celebrationCache.set(tradition, data);
     return data;
   } catch (error) {
@@ -47,10 +71,8 @@ export async function loadCelebrationIndex(): Promise<CelebrationIndex | null> {
   }
   
   try {
-    const response = await fetch('/src/celebrate/data/index.json');
-    const data = await response.json();
-    indexCache = data;
-    return data;
+    indexCache = indexData as CelebrationIndex;
+    return indexCache;
   } catch (error) {
     console.warn('Could not load celebration index:', error);
     return null;
