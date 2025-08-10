@@ -1,24 +1,9 @@
 {
   "version": 2,
-  "name": "gorstan-game",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "installCommand": "npm ci",
   "framework": null,
-  "functions": {
-    "src/**/*.ts": {
-      "maxDuration": 30
-    }
-  },
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
-    }
-  ],
   "headers": [
     {
       "source": "/(.*)",
@@ -51,7 +36,7 @@
       ]
     },
     {
-      "source": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2))",
+      "source": "/static/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
