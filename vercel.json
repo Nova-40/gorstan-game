@@ -4,6 +4,7 @@
   "outputDirectory": "dist",
   "installCommand": "npm ci",
   "framework": null,
+  "alias": ["gorstan-game.vercel.app"],
   "headers": [
     {
       "source": "/(.*)",

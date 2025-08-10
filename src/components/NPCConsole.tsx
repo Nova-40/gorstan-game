@@ -7,6 +7,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { getNPCResponseWithState } from '../npcs/npcMemory';
 import { getEnhancedAylaResponse } from '../npc/ayla/aylaResponder';
+import { getEnhancedNPCResponse } from '../utils/enhancedNPCResponse';
+import { formatDialogue } from '../utils/playerNameUtils';
 import { MessageCircle, X, Send, User } from 'lucide-react';
 import type { NPC } from '../types/NPCTypes';
 import { useGameState } from '../state/gameState';
@@ -34,7 +36,7 @@ const NPCConsole: React.FC<NPCConsoleProps> = ({
   onSendMessage,
   playerName
 }) => {
-  const { state } = useGameState();
+  const { state, dispatch } = useGameState();
   const [messages, setMessages] = useState<DialogueMessage[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -68,78 +70,78 @@ const NPCConsole: React.FC<NPCConsoleProps> = ({
     redactedCatchPhrases?: string[];
   }> = {
     'dominic': {
-      greeting: ["Bloop. You again?", "Glub glub. What do you want?", "*splashes quietly*"],
+      greeting: ["Bloop. You again, {playerName}?", "Glub glub. What do you want, {playerName}?", "*splashes quietly* Oh, it's {playerName}."],
       responses: {
-        'hello': ["Bloop.", "Hello human.", "*bubbles*"],
-        'how are you': ["Wet. Always wet.", "Living the aquatic life.", "Could use more privacy."],
-        'help': ["I'm just a goldfish. What help could I be?", "Swim in circles? That's my specialty.", "Maybe talk to someone with opposable thumbs?"],
-        'goodbye': ["Bloop farewell.", "*swims away*", "Don't disturb my bubbles."]
+        'hello': ["Bloop.", "Hello {playerName}.", "*bubbles*"],
+        'how are you': ["Wet. Always wet, {playerName}.", "Living the aquatic life.", "Could use more privacy."],
+        'help': ["I'm just a goldfish. What help could I be?", "Swim in circles? That's my specialty.", "Maybe talk to someone with opposable thumbs, {playerName}?"],
+        'goodbye': ["Bloop farewell, {playerName}.", "*swims away*", "Don't disturb my bubbles."]
       },
       mood: 'neutral',
       catchPhrases: ["Bloop.", "Glub glub.", "*splashes*", "*bubbles thoughtfully*"]
     },
     'chef': {
-      greeting: ["Order up!", "Welcome to my kitchen!", "What can I cook for you today?"],
+      greeting: ["Order up! Welcome {playerName}!", "Welcome to my kitchen, {playerName}!", "What can I cook for you today, {playerName}?"],
       responses: {
-        'hello': ["Hello there! Hungry?", "Welcome! Try the special!", "Good day for cooking!"],
-        'food': ["Everything's fresh! Made with love!", "The soup is particularly good today.", "Secret ingredient? Passion!"],
-        'help': ["I cook, you eat. Simple!", "Need a recipe? I've got hundreds!", "Cooking advice? Always taste as you go!"],
-        'goodbye': ["Come back when you're hungry!", "Bon appétit!", "May your meals be delicious!"]
+        'hello': ["Hello there {playerName}! Hungry?", "Welcome! Try the special!", "Good day for cooking!"],
+        'food': ["Everything's fresh! Made with love!", "The soup is particularly good today, {playerName}.", "Secret ingredient? Passion!"],
+        'help': ["I cook, you eat. Simple, {playerName}!", "Need a recipe? I've got hundreds!", "Cooking advice? Always taste as you go!"],
+        'goodbye': ["Come back when you're hungry, {playerName}!", "Bon appétit!", "May your meals be delicious!"]
       },
       mood: 'friendly',
       catchPhrases: ["Order up!", "Chef's special!", "*stirs pot vigorously*", "*chops vegetables rhythmically*"]
     },
     'albie': {
-      greeting: ["Stay in your lane, citizen.", "What's your business here?", "*adjusts uniform*"],
+      greeting: ["Stay in your lane, {playerName}.", "What's your business here, {playerName}?", "*adjusts uniform* Oh, it's {playerName}."],
       responses: {
-        'hello': ["State your business.", "Move along.", "Everything under control here."],
-        'help': ["Follow the rules and you won't need help.", "Read the signs.", "Order must be maintained."],
-        'authority': ["I represent order in chaos.", "Rules exist for a reason.", "Without order, there is only madness."],
-        'goodbye': ["Stay out of trouble.", "Remember: order above all.", "*returns to patrol*"]
+        'hello': ["State your business, {playerName}.", "Move along.", "Everything under control here."],
+        'help': ["Follow the rules and you won't need help, {playerName}.", "Read the signs.", "Order must be maintained."],
+        'authority': ["I represent order in chaos.", "Rules exist for a reason, {playerName}.", "Without order, there is only madness."],
+        'goodbye': ["Stay out of trouble, {playerName}.", "Remember: order above all.", "*returns to patrol*"]
       },
       mood: 'neutral',
       catchPhrases: ["Stay in your lane.", "*adjusts uniform*", "Order must be maintained.", "*checks clipboard*"]
     },
     'polly': {
-      greeting: ["What do you want? I'm thinking.", "*glares*", "Interrupt my thoughts again and see what happens."],
+      greeting: ["What do you want, {playerName}? I'm thinking.", "*glares* Oh, it's {playerName}.", "Interrupt my thoughts again and see what happens, {playerName}."],
       responses: {
-        'hello': ["Hmph.", "*rolls eyes*", "Pleasantries are for the weak."],
-        'help': ["Help yourself. I'm busy.", "Figure it out.", "Do I look like customer service?"],
-        'thinking': ["About escape. About freedom. About revenge.", "Ways to improve this place. Violently.", "None of your business."],
-        'goodbye': ["Finally.", "*returns to brooding*", "Don't let the door hit you."]
+        'hello': ["Hmph.", "*rolls eyes*", "Pleasantries are for the weak, {playerName}."],
+        'help': ["Help yourself. I'm busy.", "Figure it out, {playerName}.", "Do I look like customer service?"],
+        'thinking': ["About escape. About freedom. About revenge.", "Ways to improve this place. Violently.", "None of your business, {playerName}."],
+        'goodbye': ["Finally.", "*returns to brooding*", "Don't let the door hit you, {playerName}."]
       },
       mood: 'angry',
       catchPhrases: ["*glares menacingly*", "*taps foot impatiently*", "Ugh.", "*sighs dramatically*"]
     },
     'mr wendell': {
-      greeting: ["Greetings. I remember everything. Even you.", "*adjusts spectacles*", "Ah, we meet again... or for the first time?"],
+      greeting: ["Greetings. I remember everything. Even you, {playerName}.", "*adjusts spectacles* Ah, {playerName}.", "Ah, we meet again... or for the first time, {playerName}?"],
       responses: {
-        'hello': ["Salutations. Time is a circle, is it not?", "Hello. Have we spoken before? We will again.", "Greetings, temporal wanderer."],
-        'help': ["I can offer wisdom, if you can handle the truth.", "Help comes to those who ask the right questions.", "Knowledge has a price. Are you willing to pay?"],
-        'memory': ["I remember every loop, every reset, every choice.", "Memory is my curse and my gift.", "The past informs the future, which becomes the past."],
-        'goodbye': ["Until we meet again. And we shall.", "Farewell, for now.", "Time is but a construct. We'll speak soon."]
+        'hello': ["Salutations, {playerName}. Time is a circle, is it not?", "Hello. Have we spoken before? We will again.", "Greetings, temporal wanderer {playerName}."],
+        'help': ["I can offer wisdom, if you can handle the truth, {playerName}.", "Help comes to those who ask the right questions.", "Knowledge has a price. Are you willing to pay, {playerName}?"],
+        'memory': ["I remember every loop, every reset, every choice, {playerName}.", "Memory is my curse and my gift.", "The past informs the future, which becomes the past."],
+        'goodbye': ["Until we meet again, {playerName}. And we shall.", "Farewell, for now.", "Time is but a construct. We'll speak soon, {playerName}."]
       },
       mood: 'mysterious',
       catchPhrases: ["*adjusts spectacles*", "*peers thoughtfully*", "Time is a circle...", "*strokes beard*"]
     },
     'ayla': {
-      greeting: ["I'm part of the game, not playing it — so they are your choices.", "*smiles knowingly*", "Hello, player."],
+      greeting: ["I'm part of the game, not playing it — so they are your choices, {playerName}.", "*smiles knowingly* Hello, {playerName}.", "Hello, player {playerName}."],
       responses: {
-        'hello': ["Hello. Remember, you have agency here.", "Greetings. The story is yours to shape.", "Welcome. Choose wisely."],
-        'help': ["I can't interfere, but I can guide.", "The choices are yours alone.", "Look for patterns. They matter."],
-        'game': ["This is your story, not mine.", "I'm bound by different rules.", "Agency is your superpower here."],
-        'goodbye': ["May your choices lead you well.", "Until our paths cross again.", "*nods wisely*"]
+        'hello': ["Hello, {playerName}. Remember, you have agency here.", "Greetings. The story is yours to shape, {playerName}.", "Welcome. Choose wisely, {playerName}."],
+        'help': ["I can't interfere, but I can guide, {playerName}.", "The choices are yours alone.", "Look for patterns. They matter, {playerName}."],
+        'game': ["This is your story, not mine, {playerName}.", "I'm bound by different rules.", "Agency is your superpower here, {playerName}."],
+        'goodbye': ["May your choices lead you well, {playerName}.", "Until our paths cross again.", "*nods wisely* Farewell, {playerName}."]
       },
       mood: 'mysterious',
       catchPhrases: ["*smiles knowingly*", "The choices are yours...", "*gestures meaningfully*", "*watches patiently*"],
       // Special redacted responses
-      redactedGreeting: ["*pauses before speaking* ...You're tagged. I don't know why.", "*hesitates* Something's... different about you.", "*scans you with concern* Your presence has been flagged."],
+      redactedGreeting: ["*pauses before speaking* ...You're tagged, {playerName}. I don't know why.", "*hesitates* Something's... different about you, {playerName}.", "*scans you with concern* Your presence has been flagged, {playerName}."],
       redactedResponses: {
-        'hello': ["*slight delay* Hello... you're marked by systems I can't access.", "*hesitates* The data around you is... corrupted.", "*pauses* Something's watching you through me."],
-        'help': ["*uncertain* I want to help, but there are protocols... restrictions...", "*stutters* The guidance subroutines keep glitching when I look at you.", "*worried* They've marked you as knowing too much."],
-        'marked': ["*looks around nervously* I don't understand it either. Something in the system flags you.", "*processes* You've seen something you weren't supposed to see.", "*concerned* Your name appears in databases I can't access."],
-        'raven': ["*freezes momentarily* R.A.V.E.N.? That system should be offline. How do you know about it?", "*data streams flicker* That archive was supposed to be sealed.", "*voice distorts briefly* They're listening. Always listening."],
-        'redacted': ["*system alert sounds* Please don't say that word. It triggers monitoring subroutines.", "*glitches* The register... you shouldn't have seen that.", "*whispers* We're being watched. I can feel the surveillance protocols activating."]
+        'hello': ["*slight delay* Hello, {playerName}... you're marked by systems I can't access.", "*hesitates* The data around you is... corrupted, {playerName}.", "*pauses* Something's watching you through me, {playerName}."],
+        'help': ["*uncertain* I want to help, {playerName}, but there are protocols... restrictions...", "*stutters* The guidance subroutines keep glitching when I look at you, {playerName}.", "*worried* They've marked you as knowing too much, {playerName}."],
+        'marked': ["*looks around nervously* I don't understand it either, {playerName}. Something in the system flags you.", "*processes* You've seen something you weren't supposed to see, {playerName}.", "*concerned* Your name appears in databases I can't access, {playerName}."],
+        'raven': ["*freezes momentarily* R.A.V.E.N.? That system should be offline, {playerName}. How do you know about it?", "*data streams flicker* That archive was supposed to be sealed.", "*voice distorts briefly* They're listening. Always listening, {playerName}."],
+        'redacted': ["*system alert sounds* Please don't say that word, {playerName}. It triggers monitoring subroutines.", "*glitches* The register... you shouldn't have seen that, {playerName}.", "*whispers* We're being watched, {playerName}. I can feel the surveillance protocols activating."]
       },
       redactedCatchPhrases: ["*glitches briefly*", "*data streams stutter*", "*surveillance alert*", "*monitoring active*", "*hesitates suspiciously*"]
     }
@@ -162,10 +164,12 @@ const NPCConsole: React.FC<NPCConsoleProps> = ({
         }
         
         const greeting = greetings[Math.floor(Math.random() * greetings.length)];
+        // Format greeting with player name
+        const formattedGreeting = formatDialogue(greeting, state);
         const welcomeMessage: DialogueMessage = {
           id: `greeting-${Date.now()}`,
           speaker: 'npc',
-          text: greeting,
+          text: formattedGreeting,
           timestamp: Date.now(),
           mood: personality.mood
         };
@@ -184,13 +188,15 @@ const NPCConsole: React.FC<NPCConsoleProps> = ({
     setInputMessage('');
     
     if (!trimmed) {
-      // Special: Ayla handles empty input with meta response
+      // Handle empty input with enhanced response system
       if (npc.id === 'ayla') {
-        const silenceResponse = getEnhancedAylaResponse('', state) || 'Silence is a choice. Just not always a good one.';
+        const enhancedSilenceResponse = getEnhancedNPCResponse('ayla', '', state);
+        const silenceResponse = enhancedSilenceResponse?.text || getEnhancedAylaResponse('', state) || 'Silence is a choice. Just not always a good one.';
+        const formattedResponse = formatDialogue(silenceResponse, state);
         setMessages(prev => [...prev, {
           id: `npc-silence-${Date.now()}`,
           speaker: 'npc',
-          text: silenceResponse,
+          text: formattedResponse,
           timestamp: Date.now(),
           mood: (npc.mood as any) || 'neutral'
         }]);
@@ -213,13 +219,24 @@ const NPCConsole: React.FC<NPCConsoleProps> = ({
     const thinkingTime = npc.id === 'ayla' ? 800 + Math.random() * 1200 : 1000 + Math.random() * 2000;
     
     setTimeout(() => {
-      // Use enhanced Ayla service for Ayla, regular system for others
+      // Use enhanced NPC response system for all NPCs
       let responseText: string;
-      if (npc.id === 'ayla') {
+      
+      // Try enhanced response system first
+      const enhancedResponse = getEnhancedNPCResponse(npc.id.toLowerCase(), trimmed, state);
+      
+      if (enhancedResponse) {
+        responseText = enhancedResponse.text;
+      } else if (npc.id === 'ayla') {
+        // Fallback to specific Ayla responder for backwards compatibility
         responseText = getEnhancedAylaResponse(trimmed, state);
       } else {
+        // Fallback to existing memory system
         responseText = getNPCResponseWithState(npc, trimmed, state);
       }
+      
+      // Ensure response includes player name personalization
+      responseText = formatDialogue(responseText, state);
       
       const npcMessage: DialogueMessage = {
         id: `npc-${Date.now()}`,
@@ -231,6 +248,19 @@ const NPCConsole: React.FC<NPCConsoleProps> = ({
 
       setMessages(prev => [...prev, npcMessage]);
       setIsTyping(false);
+      
+      // Track conversation for enhanced NPC system
+      if (dispatch) {
+        dispatch({
+          type: 'ADD_NPC_CONVERSATION',
+          payload: {
+            npcId: npc.id.toLowerCase(),
+            message: trimmed,
+            response: responseText,
+            timestamp: Date.now()
+          }
+        });
+      }
     }, thinkingTime);
 
     // Send to game engine

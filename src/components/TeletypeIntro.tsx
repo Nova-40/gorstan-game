@@ -103,7 +103,7 @@ const TeletypeIntro: React.FC<TeletypeIntroProps> = ({ playerName, onComplete })
         setShowChoices(true);
         startWaitTimer();
       }
-    }, 30);
+    }, 50); // Extended from 30ms to 50ms for longer intro
 
 // JSX return block or main return
     return () => clearTimeout(timeout);

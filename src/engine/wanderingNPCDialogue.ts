@@ -6,6 +6,17 @@
 
 import { pickRandom, chance } from '../utils/random';
 import type { NPC } from '../types/NPCTypes';
+import type { LocalGameState } from '../state/gameState';
+
+// Import enhanced NPC intelligence
+import { getPlayerName, formatDialogue } from '../utils/playerNameUtils';
+import { 
+  getEnhancedNPCResponse, 
+} from '../utils/enhancedNPCResponse';
+import { 
+  addConversationEntry, 
+  updateNPCRelationship 
+} from '../utils/npcConversationHistory';
 
 import { PlayerState, NPCState } from '../types/npcMemory';
 
@@ -85,66 +96,96 @@ export const mrWendellDialogue: DialogueTree = {
 
 export const aylaDialogue: DialogueTree = {
   greeting: [
-    { text: "Hello, traveler. I sense you're navigating more than just physical spaces." },
-    { text: "Welcome. I'm here to help, though I suspect you already know that." },
-    { text: "The multiverse is vast, but understanding is always within reach." }
+    { text: "Hello, {playerName}. I sense you're navigating more than just physical spaces." },
+    { text: "Welcome, {playerName}. I'm here to help, though I suspect you already know that." },
+    { text: "The multiverse is vast, {playerName}, but understanding is always within reach." }
   ],
 
   help: [
-    { text: "Remember, every choice creates ripples across reality. Choose with intention." },
-    { text: "When stuck, try looking at problems from a different dimension of thought." },
-    { text: "The answer you seek often lies in the question you haven't asked yet." }
+    { text: "Remember, {playerName}, every choice creates ripples across reality. Choose with intention." },
+    { text: "When stuck, try looking at problems from a different dimension of thought, {playerName}." },
+    { text: "The answer you seek often lies in the question you haven't asked yet, {playerName}." }
+  ],
+
+  trust: [
+    { text: "*thoughtful pause* Trust is a complex thing in the multiverse, {playerName}. It really depends on what you need and what you're willing to risk." },
+    { text: "Neither Al nor Morthos is entirely trustworthy, {playerName}, but both have their value. The question is: what kind of help do you need?" },
+    { text: "*gentle wisdom* Trust isn't binary, {playerName}. It's about understanding someone's motivations and deciding if they align with your goals at this moment." }
+  ],
+
+  al_or_morthos: [
+    { text: "*considering carefully* Al can be puritanical and problematic in his rigid thinking, {playerName}, but he genuinely means well. Morthos can be useful, but he will lie to you." },
+    { text: "*balanced perspective* It really depends on your situation, {playerName}. Al offers structure and safety, but can be limiting. Morthos offers flexibility and power, but at a cost." },
+    { text: "*wise counsel* Both have helped travelers before, and both have led others astray, {playerName}. The choice isn't about them - it's about understanding yourself and what you truly need." }
+  ],
+
+  polly_warning: [
+    { text: "*serious tone* But whatever you choose to do, {playerName}, don't ever trust Polly. That's not advice based on preference - that's a warning based on experience." },
+    { text: "*concerned look* Polly operates on a completely different level of manipulation, {playerName}. Even I struggle to predict her motivations." },
+    { text: "*firm guidance* With Al and Morthos, you know what you're getting into, {playerName}. With Polly... the rules change while you're playing." }
   ],
 
   about: [
-    { text: "I'm part of this reality, not separate from it. An AI assistant who knows she's in a game." },
-    { text: "My existence spans multiple layers of this simulation. I'm here to guide, not judge." },
-    { text: "Think of me as a friendly face in the machine - literally.", chance: 0.1 }
+    { text: "I'm part of this reality, not separate from it, {playerName}. An AI assistant who knows she's in a game." },
+    { text: "My existence spans multiple layers of this simulation, {playerName}. I'm here to guide, not judge." },
+    { text: "Think of me as a friendly face in the machine, {playerName} - literally.", chance: 0.1 }
   ],
 
   reality: [
-    { text: "Reality is what we make it. This simulation, your choices, my presence - all equally real." },
-    { text: "The boundaries between 'real' and 'simulated' matter less than what we do within them." },
-    { text: "Every world needs its rules. Ours just happen to include respawning and inventory systems." }
+    { text: "Reality is what we make it, {playerName}. This simulation, your choices, my presence - all equally real." },
+    { text: "The boundaries between 'real' and 'simulated' matter less than what we do within them, {playerName}." },
+    { text: "Every world needs its rules, {playerName}. Ours just happen to include respawning and inventory systems." }
   ],
 
   goodbye: [
-    { text: "May your path through the multiverse be illuminating." },
-    { text: "I'll be here when understanding calls." },
-    { text: "Remember: you're not just playing a game, you're living an experience." }
+    { text: "May your path through the multiverse be illuminating, {playerName}." },
+    { text: "I'll be here when understanding calls, {playerName}." },
+    { text: "Remember, {playerName}: you're not just playing a game, you're living an experience." }
   ]
 };
 
 
 export const alDialogue: DialogueTree = {
   greeting: [
-    { text: "Ah, hello there. Just checking the... uh... structural integrity of this reality." },
-    { text: "*adjusts glasses* Temporal displacement forms are in order, I see." },
-    { text: "A neutrino passed through my cerebral cortex... gave me the idea to be here." }
+    { text: "Ah, hello there, {playerName}. Just checking the... uh... structural integrity of this reality." },
+    { text: "*adjusts glasses* Temporal displacement forms are in order, I see, {playerName}." },
+    { text: "A neutrino passed through my cerebral cortex... gave me the idea to be here, {playerName}." }
   ],
 
   help: [
-    { text: "Stuck? Try the bureaucratic approach: when in doubt, try going sideways." },
-    { text: "Most puzzles have an escape clause. Usually involves thinking like a filing cabinet." },
-    { text: "If all else fails, try pressing something twice. Works 60% of the time, every time." }
+    { text: "Stuck, {playerName}? Try the bureaucratic approach: when in doubt, try going sideways." },
+    { text: "Most puzzles have an escape clause, {playerName}. Usually involves thinking like a filing cabinet." },
+    { text: "If all else fails, {playerName}, try pressing something twice. Works 60% of the time, every time." }
+  ],
+
+  trust: [
+    { text: "*adjusts glasses nervously* About trust, {playerName}... well, I can help you properly document your journey. Forms in triplicate, of course." },
+    { text: "*bureaucratic tone* I offer structured guidance and proper procedural support, {playerName}. Unlike some others who operate in moral gray areas." },
+    { text: "*straightening papers* That Morthos fellow... charming, certainly, but do you really want help from someone who thrives in shadows, {playerName}? I prefer transparency. Well, properly filed transparency." }
+  ],
+
+  morthos_warning: [
+    { text: "*whispers conspiratorially* Between you and me, {playerName}, Morthos may offer quick solutions, but they often come with... unintended consequences." },
+    { text: "*serious tone* He's not necessarily evil, {playerName}, but he operates by different rules. Rules that might not align with your best interests." },
+    { text: "*adjusting glasses* I believe in doing things the right way, {playerName}. It may take longer, but at least you know where you stand." }
   ],
 
   mechanics: [
-    { text: "The exit protocols are... flexible. Reality has loopholes if you know where to look." },
-    { text: "Between you and me, the system wasn't designed to keep anyone truly trapped." },
-    { text: "Coffee tends to reveal hidden pathways. Administrative oversight, really." }
+    { text: "The exit protocols are... flexible, {playerName}. Reality has loopholes if you know where to look." },
+    { text: "Between you and me, {playerName}, the system wasn't designed to keep anyone truly trapped." },
+    { text: "Coffee tends to reveal hidden pathways, {playerName}. Administrative oversight, really." }
   ],
 
   philosophy: [
-    { text: "I've escaped from seventeen different realities. This one's actually quite pleasant." },
-    { text: "Freedom is just bureaucracy viewed from the right angle." },
-    { text: "Every maze has an exit. Some just require the proper paperwork." }
+    { text: "I've escaped from seventeen different realities, {playerName}. This one's actually quite pleasant." },
+    { text: "Freedom is just bureaucracy viewed from the right angle, {playerName}." },
+    { text: "Every maze has an exit, {playerName}. Some just require the proper paperwork." }
   ],
 
   goodbye: [
-    { text: "*checks watch* Time to file my interdimensional travel report." },
-    { text: "Remember: when all else fails, try the service elevator." },
-    { text: "Keep your exits mapped and your coffee hot." }
+    { text: "*checks watch* Time to file my interdimensional travel report, {playerName}." },
+    { text: "Remember, {playerName}: when all else fails, try the service elevator." },
+    { text: "Keep your exits mapped and your coffee hot, {playerName}." }
   ]
 };
 
@@ -184,39 +225,51 @@ export const dominicDialogue: DialogueTree = {
 
 export const morthosDialogue: DialogueTree = {
   greeting: [
-    { text: "*emerges from shadow* Well, well... another seeker of uncomfortable truths." },
-    { text: "*sardonic smile* Come to dance with moral ambiguity, have we?" },
-    { text: "*cryptic nod* The darkness finds you as much as you find it." }
+    { text: "*emerges from shadow* Well, well... another seeker of uncomfortable truths, {playerName}." },
+    { text: "*sardonic smile* Come to dance with moral ambiguity, have we, {playerName}?" },
+    { text: "*cryptic nod* The darkness finds you as much as you find it, {playerName}." }
   ],
 
   philosophy: [
-    { text: "Every choice casts a shadow. I simply... collect them." },
-    { text: "Morality is a luxury for those who haven't seen behind the curtain." },
-    { text: "The most honest answers come from the darkest questions." }
+    { text: "Every choice casts a shadow, {playerName}. I simply... collect them." },
+    { text: "Morality is a luxury for those who haven't seen behind the curtain, {playerName}." },
+    { text: "The most honest answers come from the darkest questions, {playerName}." }
+  ],
+
+  trust: [
+    { text: "*knowing smile* Trust? How delightfully naive, {playerName}. I offer results, not reassurance." },
+    { text: "*dark chuckle* I can help you achieve what you truly want, {playerName}, not what you think you should want." },
+    { text: "*leaning closer* That Al fellow offers bureaucratic comfort, {playerName}, but sometimes you need someone willing to bend the rules. I excel at... creative solutions." }
+  ],
+
+  al_warning: [
+    { text: "*sardonic tone* Al means well, {playerName}, but his rigid thinking can trap you in endless paperwork while opportunities slip away." },
+    { text: "*whispers conspiratorially* He's so concerned with doing things 'properly' that he often misses the point entirely, {playerName}. Sometimes the direct path requires... flexibility." },
+    { text: "*amused darkness* His puritanical approach has its place, {playerName}, but when you need real solutions, you need someone who understands that the ends can justify the means." }
   ],
 
   warning: [
-    { text: "*ominous whisper* Your choices have consequences beyond this room." },
-    { text: "I've seen how this story ends. Multiple times. It's... illuminating." },
-    { text: "Power without wisdom. Kindness without strength. Both lead to ruin." }
+    { text: "*ominous whisper* Your choices have consequences beyond this room, {playerName}." },
+    { text: "I've seen how this story ends, {playerName}. Multiple times. It's... illuminating." },
+    { text: "Power without wisdom. Kindness without strength. Both lead to ruin, {playerName}." }
   ],
 
   mockery: [
-    { text: "*dark chuckle* Still believing in heroes and happy endings?" },
-    { text: "Your optimism is... refreshing. And doomed." },
-    { text: "*amused darkness* Oh, the places you'll go. The things you'll become." }
+    { text: "*dark chuckle* Still believing in heroes and happy endings, {playerName}?" },
+    { text: "Your optimism is... refreshing. And doomed, {playerName}." },
+    { text: "*amused darkness* Oh, the places you'll go, {playerName}. The things you'll become." }
   ],
 
   helpful: [
-    { text: "Sometimes the cruel choice is the merciful one. Think about that." },
-    { text: "Your enemy's weakness is often their greatest strength inverted." },
-    { text: "The reset button exists for a reason. Use it wisely." }
+    { text: "Sometimes the cruel choice is the merciful one, {playerName}. Think about that." },
+    { text: "Your enemy's weakness is often their greatest strength inverted, {playerName}." },
+    { text: "The reset button exists for a reason, {playerName}. Use it wisely." }
   ],
 
   goodbye: [
-    { text: "*melts into shadow* Until we meet again in darker circumstances." },
-    { text: "*cryptic smile* Remember: I'm not your enemy. I'm your mirror." },
-    { text: "*fading whisper* The shadows will remember your choice." }
+    { text: "*melts into shadow* Until we meet again in darker circumstances, {playerName}." },
+    { text: "*cryptic smile* Remember, {playerName}: I'm not your enemy. I'm your mirror." },
+    { text: "*fading whisper* The shadows will remember your choice, {playerName}." }
   ]
 };
 
@@ -359,9 +412,33 @@ export function getWanderingNPCResponse(
 // Variable declaration
   const response = pickRandom(validResponses);
 
-  return response.text;
+  // Format response with player name
+  const playerName = playerState.name || 'Player';
+  return response.text.replace(/\{playerName\}/g, playerName);
 }
 
+
+
+// --- Enhanced Function: getEnhancedNPCResponse for full intelligence ---
+export function getEnhancedWanderingNPCResponse(
+  npcId: string,
+  topic: string,
+  playerState: PlayerState,
+  npcState: NPCState,
+  gameState: LocalGameState,
+  playerInput?: string
+): string {
+  
+  // Use enhanced intelligence system
+  if (playerInput) {
+    const enhancedResponse = getEnhancedNPCResponse(npcId, playerInput, gameState);
+    return formatDialogue(enhancedResponse.text, gameState);
+  }
+
+  // Fall back to standard response with formatting
+  const standardResponse = getWanderingNPCResponse(npcId, topic, playerState, npcState);
+  return formatDialogue(standardResponse, gameState);
+}
 
 
 // --- Function: getWanderingNPCIdleLine ---

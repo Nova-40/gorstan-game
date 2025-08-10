@@ -56,7 +56,7 @@ COMMAND EXAMPLES:
 • "use [item]" — use or activate an item
 • "reset" — attempt a reality reset
 
-(If you're stuck, try the "Ask Ayla" button for hints.)`,
+(If you're stuck, try the "Talk to NPC/Help" button for hints.)`,
   `NAVIGATION & SHORTCUTS:
 • Use ← and → arrows to move between these help screens
 • Press ESC at any time to close instructions or cheat/debug mode

@@ -365,10 +365,10 @@ const QuickActionsPanel: React.FC<QuickActionsPanelProps> = ({
         icon={npcsInRoom.length > 0 ? <MessageCircle /> : <MessageCircleQuestion />}
         title={npcsInRoom.length > 0 ? 
           `Talk to ${npcsInRoom.length === 1 ? npcsInRoom[0].name || npcsInRoom[0] : 'NPCs'}` : 
-          "Ask Ayla for help"
+          "Talk to NPC/Help"
         }
         onClick={handleTalk}
-        aria-label={npcsInRoom.length > 0 ? "Talk to NPCs in the room" : "Talk to Ayla for guidance"}
+        aria-label={npcsInRoom.length > 0 ? "Talk to NPCs in the room" : "Talk to NPCs or get help"}
       />
     </>
   ), [onLookAround, onPickUp, onUse, onShowInventory, onPress, onCoffee, handleTalk, npcsInRoom]);

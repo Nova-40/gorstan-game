@@ -14,6 +14,7 @@ interface NPCSelectionModalProps {
   onSelectNPC: (npc: NPC) => void;
   onClose: () => void;
   onTalkToAll?: () => void; // Future feature for group conversations
+  onTalkToAyla?: () => void; // Option to switch to Ayla
 }
 
 const NPCSelectionModal: React.FC<NPCSelectionModalProps> = ({
@@ -21,7 +22,8 @@ const NPCSelectionModal: React.FC<NPCSelectionModalProps> = ({
   npcs,
   onSelectNPC,
   onClose,
-  onTalkToAll
+  onTalkToAll,
+  onTalkToAyla
 }) => {
   if (!isOpen) return null;
 
@@ -35,6 +37,7 @@ const NPCSelectionModal: React.FC<NPCSelectionModalProps> = ({
     'wendell': '/images/MrWendell.png',
     'ayla': '/images/Ayla.png',
     'al': '/images/Al.png',
+    'al_escape_artist': '/images/Al.png', // Al's escape artist persona
     'librarian': '/images/Librarian.png',
     'morthos': '/images/Morthos.png'
   };
@@ -96,16 +99,30 @@ const NPCSelectionModal: React.FC<NPCSelectionModalProps> = ({
           ))}
         </div>
 
-        {/* Future feature: Group conversation */}
+        {/* Group conversation feature */}
         {onTalkToAll && npcs.length > 1 && (
           <div className="group-conversation-section">
             <button 
               className="group-talk-button"
               onClick={onTalkToAll}
-              title="Start a group conversation (experimental)"
+              title="Start a group conversation"
             >
               <Users size={20} />
               Talk to Everyone
+            </button>
+          </div>
+        )}
+
+        {/* Ayla Helper Option */}
+        {onTalkToAyla && (
+          <div className="ayla-helper-section">
+            <button 
+              className="ayla-talk-button"
+              onClick={onTalkToAyla}
+              title="Switch to Ayla for help and guidance"
+            >
+              <MessageCircle size={18} />
+              Talk to Ayla (Help)
             </button>
           </div>
         )}

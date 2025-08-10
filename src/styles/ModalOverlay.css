@@ -1233,6 +1233,35 @@
   box-shadow: 0 4px 12px rgba(74, 158, 255, 0.3);
 }
 
+/* Ayla helper button styling */
+.ayla-helper-section {
+  padding: 12px 20px;
+  border-top: 1px solid #444;
+  background: #2a2a2a;
+}
+
+.ayla-talk-button {
+  width: 100%;
+  background: linear-gradient(135deg, #88cc88 0%, #66aa66 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.3s ease;
+}
+
+.ayla-talk-button:hover {
+  background: linear-gradient(135deg, #66aa66 0%, #559955 100%);
+  box-shadow: 0 3px 10px rgba(136, 204, 136, 0.3);
+}
+
 .modal-footer {
   padding: 12px 20px;
   background: #252525;

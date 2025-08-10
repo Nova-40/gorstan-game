@@ -11,6 +11,8 @@ import { unlockAchievement } from '../logic/achievementEngine';
 import { Room } from '../types/Room';
 import { Player, GameAction, GameMessage, MiniquestState } from '../types/GameTypes';
 import type { NPC } from '../types/NPCTypes';
+import type { ConversationThread } from '../types/dialogue';
+import { conversationsReducer } from '../reducers/conversations';
 
 // --- Util: Add Room Description To History ---
 function addRoomDescriptionToHistory(history: GameMessage[], room: Room | null, roomId: string): GameMessage[] {
@@ -105,6 +107,9 @@ export const initialGameState: LocalGameState = {
   },
   messages: [],
   inventory: [],
+  // Inter-NPC conversation system
+  conversations: {},
+  overhearNPCBanter: true,
 };
 
 // --- Helper: Blue Button Press ---
@@ -348,6 +353,14 @@ export const gameStateReducer = (state: LocalGameState, action: GameAction): Loc
           evaluateWanderingNPCs: true,
           triggerMorthosAlEncounter: encounterFlag
         },
+      };
+    }
+
+    case 'SET_NPCS_IN_ROOM': {
+      const npcs = action.payload as NPC[];
+      return {
+        ...state,
+        npcsInRoom: npcs,
       };
     }
 
@@ -825,6 +838,92 @@ export const gameStateReducer = (state: LocalGameState, action: GameAction): Loc
       };
     }
 
+    // --- NPC Conversation Tracking ---
+    case 'ADD_NPC_CONVERSATION': {
+      const { npcId, topic, playerInput, npcResponse, mood } = action.payload as {
+        npcId: string;
+        topic: string;
+        playerInput: string;
+        npcResponse: string;
+        mood?: string;
+      };
+      const currentHistory = (state.flags?.npcConversations as any) || {};
+      const npcHistory = currentHistory[npcId] || {
+        lastInteraction: 0,
+        totalInteractions: 0,
+        entries: [],
+        relationship: 0,
+        knownTopics: [],
+        unresolved: []
+      };
+
+      const newEntry = {
+        topic,
+        playerInput,
+        npcResponse,
+        timestamp: Date.now(),
+        mood
+      };
+
+      const updatedHistory = {
+        ...currentHistory,
+        [npcId]: {
+          ...npcHistory,
+          lastInteraction: Date.now(),
+          totalInteractions: npcHistory.totalInteractions + 1,
+          entries: [...npcHistory.entries.slice(-9), newEntry], // Keep last 10 entries
+          knownTopics: [...new Set([...npcHistory.knownTopics, topic])],
+          currentTopic: topic
+        }
+      };
+
+      return {
+        ...state,
+        flags: {
+          ...state.flags,
+          npcConversations: updatedHistory
+        }
+      };
+    }
+
+    case 'UPDATE_NPC_CONVERSATION_HISTORY': {
+      const { npcId, history } = action.payload as {
+        npcId: string;
+        history: any;
+      };
+      const currentHistory = (state.flags?.npcConversations as any) || {};
+      
+      return {
+        ...state,
+        flags: {
+          ...state.flags,
+          npcConversations: {
+            ...currentHistory,
+            [npcId]: history
+          }
+        }
+      };
+    }
+
+    // Inter-NPC conversation cases
+    case 'UPSERT_CONVERSATION':
+    case 'SET_OVERHEAR':
+    case 'CLEAR_CONVERSATION':
+    case 'MUTE_CONVERSATION':
+      return conversationsReducer(state, action);
+
+    // Settings updates
+    case 'UPDATE_SETTINGS': {
+      const { payload } = action as { type: 'UPDATE_SETTINGS'; payload: any };
+      return {
+        ...state,
+        settings: {
+          ...state.settings,
+          ...payload
+        }
+      };
+    }
+
     default:
       return state;
   }
@@ -910,6 +1009,9 @@ export interface LocalGameState {
   };
   messages: GameMessage[];
   inventory: string[];
+  // Inter-NPC conversation system
+  conversations: Record<string, ConversationThread>;
+  overhearNPCBanter: boolean;
   // Additional properties for compatibility
   playerName?: string;
   visitedRooms?: string[];

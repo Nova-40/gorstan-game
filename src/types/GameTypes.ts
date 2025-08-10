@@ -178,10 +178,12 @@ export type GameAction =
   | { type: 'SET_FLAG'; payload: { key: string; value: boolean | number | string } }
   | { type: 'CLEAR_FLAG'; payload: string }
   | { type: 'SET_FLAGS'; payload: Record<string, boolean | number | string> }
-  | { type: 'SET_NPCS_IN_ROOM'; payload: string[] }
+  | { type: 'SET_NPCS_IN_ROOM'; payload: NPC[] }
   | { type: 'ADD_NPC_TO_ROOM'; payload: string }
   | { type: 'REMOVE_NPC_FROM_ROOM'; payload: string }
   | { type: 'UPDATE_NPC_RELATIONSHIP'; payload: { npc: string; value: number } }
+  | { type: 'ADD_NPC_CONVERSATION'; payload: { npcId: string; topic: string; playerInput: string; npcResponse: string; mood?: string } }
+  | { type: 'UPDATE_NPC_CONVERSATION_HISTORY'; payload: { npcId: string; history: any } }
   | { type: 'ADD_TRAIT'; payload: string }
   | { type: 'REMOVE_TRAIT'; payload: string }
   | { type: 'SET_TRAITS'; payload: string[] }

@@ -47,6 +47,7 @@ import { handleRoomEntry } from '../engine/roomEventHandler';
 import { getAllRoomsAsObject } from '../utils/roomLoader';
 import { getFallbackRooms } from '../utils/roomLoaderFallback';
 import { performanceMonitor } from '../utils/performanceMonitor';
+import { onRoomEntry, periodicConversationCheck } from '../npc/triggers';
 
 import { UseItemModal } from "./UseItemModal";
 import { InventoryModal } from "./InventoryModal";
@@ -56,6 +57,7 @@ import SaveGameModal from './SaveGameModal';
 import NPCConsole from './NPCConsole';
 import NPCSelectionModal from './NPCSelectionModal';
 import { npcReact } from '../engine/npcEngine';
+import { npcRegistry } from '../npcs/npcMemory';
 import Modal from './Modal';
 import { itemDescriptions } from '../data/itemDescriptions';
 import PerformanceDashboard from './PerformanceDashboard';
@@ -209,7 +211,36 @@ const handleBackout = useCallback((): void => {
   }, [roomHistory, dispatch]);
   const playerName: string = useMemo(() => state.player?.name || 'Player', [state.player?.name]);
   const inventory: string[] = useMemo(() => state.player?.inventory || [], [state.player?.inventory]);
-  const npcsInRoom: NPC[] = useMemo(() => state.npcsInRoom || [], [state.npcsInRoom]);
+  const npcsInRoom: NPC[] = useMemo(() => {
+    // Convert NPC string IDs to actual NPC objects
+    const npcData = state.npcsInRoom || [];
+    return npcData.map((npcOrId: NPC | string) => {
+      if (typeof npcOrId === 'string') {
+        // Resolve string ID to NPC object from registry
+        const npcFromRegistry = npcRegistry.get(npcOrId);
+        if (npcFromRegistry) {
+          return npcFromRegistry;
+        }
+        // Fallback: create basic NPC object from string ID
+        return {
+          id: npcOrId,
+          name: npcOrId.charAt(0).toUpperCase() + npcOrId.slice(1).replace(/_/g, ' '),
+          location: state.currentRoomId || 'unknown',
+          description: `A character named ${npcOrId}`,
+          portrait: `/images/${npcOrId}.png`,
+          mood: 'neutral' as NPCMood,
+          memory: {
+            interactions: 0,
+            lastInteraction: Date.now(),
+            playerActions: [],
+            relationship: 50,
+            knownFacts: []
+          }
+        } as NPC;
+      }
+      return npcOrId as NPC;
+    }).filter(Boolean);
+  }, [state.npcsInRoom, state.currentRoomId]);
   const roomMap: Record<string, Room> = useMemo(() => state.roomMap || {}, [state.roomMap]);
   const currentRoomId: string = state.currentRoomId || 'controlnexus';
   const room: Room | undefined = roomMap[currentRoomId];
@@ -402,7 +433,34 @@ const handleBackout = useCallback((): void => {
   }, [npcsInRoom, openModal]);
 
   const handleAskAyla = useCallback(() => {
-    // Create Ayla NPC and open console directly
+    // Check if NPCs are present in the room
+    if (npcsInRoom.length > 0) {
+      // NPCs present - always show selection modal (includes option to talk to Ayla)
+      openModal('npcSelection');
+    } else {
+      // No NPCs present - show Ayla directly
+      const aylaHelper: NPC = {
+        id: 'ayla',
+        name: 'Ayla',
+        location: 'universal',
+        description: 'Your helpful guide through the game',
+        portrait: '/images/Ayla.png',
+        mood: 'helpful' as NPCMood,
+        memory: {
+          interactions: 0,
+          lastInteraction: Date.now(),
+          playerActions: [],
+          relationship: 50,
+          knownFacts: []
+        }
+      };
+      setSelectedNPC(aylaHelper);
+      openModal('npcConsole');
+    }
+  }, [npcsInRoom, openModal]);
+
+  const handleTalkToAyla = useCallback(() => {
+    // Switch from NPC selection to talking to Ayla directly
     const aylaHelper: NPC = {
       id: 'ayla',
       name: 'Ayla',
@@ -436,20 +494,125 @@ const handleBackout = useCallback((): void => {
     openModal('npcConsole');
   }, [openModal]);
 
-  // Handle group conversation (future feature)
+  // Handle group conversation
   const handleGroupConversation = useCallback(() => {
-    // Future implementation: Create a special group NPC or conversation system
+    // Create a special group NPC for managing group conversations
+    const groupNPC: NPC = {
+      id: 'group_conversation',
+      name: 'Group Chat',
+      location: 'current_room',
+      description: `Talking to: ${npcsInRoom.map(npc => npc.name).join(', ')}`,
+      mood: 'friendly',
+      health: 100,
+      maxHealth: 100,
+      memory: {
+        interactions: 0,
+        lastInteraction: Date.now(),
+        playerActions: [],
+        relationship: 50,
+        knownFacts: []
+      },
+      conversation: [
+        {
+          id: 'greeting',
+          text: `You've started a group conversation with ${npcsInRoom.map(npc => npc.name).join(', ')}. Everyone can hear what you say!`,
+          responses: [
+            { text: 'Hello everyone!', nextId: 'hello' },
+            { text: 'I need help', nextId: 'help' },
+            { text: 'Who should I trust?', nextId: 'trust' },
+            { text: 'What about Al and Morthos?', nextId: 'al_morthos' },
+            { text: 'Tell me about Polly', nextId: 'polly' },
+            { text: 'Goodbye', nextId: 'goodbye' }
+          ]
+        },
+        {
+          id: 'hello',
+          text: 'Everyone greets you warmly! The atmosphere in the room brightens.',
+          responses: [
+            { text: 'I need help', nextId: 'help' },
+            { text: 'Who should I trust?', nextId: 'trust' },
+            { text: 'What about Al and Morthos?', nextId: 'al_morthos' },
+            { text: 'Goodbye', nextId: 'goodbye' }
+          ]
+        },
+        {
+          id: 'help',
+          text: 'The group is ready to help you! Everyone nods encouragingly.',
+          responses: [
+            { text: 'Who should I trust?', nextId: 'trust' },
+            { text: 'What about Al and Morthos?', nextId: 'al_morthos' },
+            { text: 'Tell me about Polly', nextId: 'polly' },
+            { text: 'Thank you', nextId: 'goodbye' }
+          ]
+        },
+        {
+          id: 'trust',
+          text: npcsInRoom.some(npc => npc.id === 'ayla') 
+            ? 'Ayla speaks up: "Trust is earned, not given. Observe their actions, not just their words. Everyone here has their own motivations."'
+            : 'The group exchanges glances - trust is a complex matter in the multiverse.',
+          responses: [
+            { text: 'What about Al and Morthos specifically?', nextId: 'al_morthos' },
+            { text: 'And Polly?', nextId: 'polly' },
+            { text: 'Thank you for the advice', nextId: 'goodbye' }
+          ]
+        },
+        {
+          id: 'al_morthos',
+          text: npcsInRoom.some(npc => npc.id === 'ayla')
+            ? 'Ayla responds thoughtfully: "Both Al and Morthos have their strengths and flaws. Al can be puritanical and problematic in his rigid thinking, while Morthos may be charming but will lie to you. It really depends on what you need - but whatever you choose, never trust Polly."'
+            : 'The group seems hesitant to discuss Al and Morthos, but there\'s clear concern about making the wrong choice.',
+          responses: [
+            { text: 'Why shouldn\'t I trust Polly?', nextId: 'polly' },
+            { text: 'How do I choose between them?', nextId: 'choice' },
+            { text: 'Thank you', nextId: 'goodbye' }
+          ]
+        },
+        {
+          id: 'polly',
+          text: 'The entire group grows quiet and exchanges worried glances. "Polly is... dangerous," someone whispers. "She seems helpful but has her own agenda that doesn\'t align with anyone else\'s safety."',
+          responses: [
+            { text: 'What makes her dangerous?', nextId: 'polly_danger' },
+            { text: 'I understand', nextId: 'goodbye' }
+          ]
+        },
+        {
+          id: 'polly_danger',
+          text: 'The group shifts uncomfortably. "She manipulates situations for her own benefit, often putting others at risk. Trust your instincts if something feels wrong around her."',
+          responses: [
+            { text: 'I\'ll be careful', nextId: 'goodbye' }
+          ]
+        },
+        {
+          id: 'choice',
+          text: 'The group considers this carefully. "Think about what kind of help you need - structured guidance or flexible solutions - but remember both come with risks."',
+          responses: [
+            { text: 'I understand', nextId: 'goodbye' }
+          ]
+        },
+        {
+          id: 'goodbye',
+          text: 'The group bids you farewell. Everyone seems pleased with the group discussion.',
+          responses: []
+        }
+      ],
+      inventory: [],
+      flags: []
+    };
+
+    // Add group conversation history message
     dispatch({ 
       type: 'RECORD_MESSAGE', 
       payload: { 
-        id: `group-chat-${Date.now()}`, 
-        text: 'Group conversations are coming soon! For now, please select an individual NPC.', 
-        type: 'info', 
+        id: `group-chat-start-${Date.now()}`, 
+        text: `🗣️ You begin a group conversation with ${npcsInRoom.map(npc => npc.name).join(', ')}.`, 
+        type: 'narrative', 
         timestamp: Date.now() 
       } 
     });
-    closeModal();
-  }, [dispatch, closeModal]);
+
+    // Open the group conversation
+    handleSelectNPC(groupNPC);
+  }, [dispatch, npcsInRoom, handleSelectNPC]);
 
   // Monitor for NPC console flag
   useEffect(() => {
@@ -467,138 +630,17 @@ const handleBackout = useCallback((): void => {
     }
   }, [state.flags?.openNPCConsole, npcsInRoom, handleOpenNPCConsole, dispatch]);
 
-  // Auto-trigger NPC modal when NPCs are detected in room
-  useEffect(() => {
-    // Only trigger in game stage, not during intro/transitions
-    if (stage !== 'game' || modal) return;
-    
-    // Small delay to let room settle and avoid conflicts with other modals
-    const autoModalTimer = setTimeout(() => {
-      if (npcsInRoom.length > 0 && !modal) {
-        console.log('[AppCore] Auto-triggering NPC modal for NPCs:', npcsInRoom.map(npc => npc.name));
-        
-        if (npcsInRoom.length === 1) {
-          // Single NPC - open console directly
-          handleOpenNPCConsole(npcsInRoom[0]);
-        } else {
-          // Multiple NPCs - show selection modal
-          openModal('npcSelection');
-        }
-      }
-    }, 1500); // 1.5 second delay to avoid conflicts
-    
-    return () => clearTimeout(autoModalTimer);
-  }, [npcsInRoom, stage, modal, handleOpenNPCConsole, openModal]);
+  // Auto-trigger NPC modal when NPCs are detected in room - REMOVED
+  // Now using Ask Ayla button for NPC interaction initiation
 
-  // Special trigger for Morthos/Al encounter - flash speech bubble then show modal
-  useEffect(() => {
-    if (state.flags?.hasMetMorthosAl && stage === 'game' && npcsInRoom.length >= 2) {
-      // Wait for the "dimensional energy" message sequence to complete
-      const flashTimer = setTimeout(() => {
-        if (!modal) {
-          console.log('[AppCore] Post-encounter triggering NPC modal after dimensional energy message');
-          
-          // Flash a speech bubble indicator for visual feedback
-          const flashIndicator = document.createElement('div');
-          flashIndicator.style.cssText = `
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, #4a9eff 0%, #357abd 100%);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 25px;
-            font-size: 16px;
-            font-weight: 600;
-            z-index: 9999;
-            box-shadow: 0 4px 20px rgba(74, 158, 255, 0.4);
-            animation: speechBubbleFlash 1.5s ease-out forwards;
-            pointer-events: none;
-          `;
-          flashIndicator.innerHTML = '💬 NPCs want to talk!';
-          document.body.appendChild(flashIndicator);
-          
-          // Add the flash animation if it doesn't exist
-          if (!document.getElementById('speechBubbleAnimation')) {
-            const style = document.createElement('style');
-            style.id = 'speechBubbleAnimation';
-            style.textContent = `
-              @keyframes speechBubbleFlash {
-                0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
-                50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
-                100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
-              }
-            `;
-            document.head.appendChild(style);
-          }
-          
-          // Remove flash indicator and show modal
-          setTimeout(() => {
-            document.body.removeChild(flashIndicator);
-            openModal('npcSelection');
-          }, 1500);
-        }
-      }, 7000); // Wait for dimensional energy message sequence (6s) + 1s buffer
-      
-      return () => clearTimeout(flashTimer);
-    }
-  }, [state.flags?.hasMetMorthosAl, stage, npcsInRoom, modal, openModal]);
+  // Special trigger for Morthos/Al encounter - flash speech bubble then show modal - REMOVED
+  // Now using Ask Ayla button for NPC interaction
 
-  // Fallback: Trigger Ayla helper when no NPCs present
+  // Enhanced Ask Ayla button - shows NPCs when present, otherwise shows Ayla
   useEffect(() => {
-    if (stage === 'game' && npcsInRoom.length === 0 && !modal && !state.flags?.hasMetMorthosAl) {
-      // Flash speech bubble for Ayla helper
-      const aylaFlashTimer = setTimeout(() => {
-        const flashIndicator = document.createElement('div');
-        flashIndicator.style.cssText = `
-          position: fixed;
-          bottom: 20px;
-          right: 20px;
-          background: linear-gradient(135deg, #88cc88 0%, #66aa66 100%);
-          color: white;
-          padding: 10px 16px;
-          border-radius: 20px;
-          font-size: 14px;
-          font-weight: 600;
-          z-index: 9999;
-          box-shadow: 0 4px 15px rgba(136, 204, 136, 0.4);
-          animation: aylaFlash 2s ease-out forwards;
-          cursor: pointer;
-        `;
-        flashIndicator.innerHTML = '💡 Ask Ayla for help';
-        flashIndicator.onclick = () => {
-          document.body.removeChild(flashIndicator);
-          handleAskAyla();
-        };
-        document.body.appendChild(flashIndicator);
-        
-        // Add Ayla flash animation
-        if (!document.getElementById('aylaFlashAnimation')) {
-          const style = document.createElement('style');
-          style.id = 'aylaFlashAnimation';
-          style.textContent = `
-            @keyframes aylaFlash {
-              0% { opacity: 0; transform: translateY(10px) scale(0.9); }
-              20% { opacity: 1; transform: translateY(0) scale(1.05); }
-              80% { opacity: 1; transform: translateY(0) scale(1); }
-              100% { opacity: 0.7; transform: translateY(0) scale(1); }
-            }
-          `;
-          document.head.appendChild(style);
-        }
-        
-        // Auto-remove after 5 seconds
-        setTimeout(() => {
-          if (document.body.contains(flashIndicator)) {
-            document.body.removeChild(flashIndicator);
-          }
-        }, 5000);
-      }, 3000); // 3 second delay when no NPCs
-      
-      return () => clearTimeout(aylaFlashTimer);
-    }
-  }, [stage, npcsInRoom, modal, state.flags?.hasMetMorthosAl, handleAskAyla]);
+    // This effect just tracks NPC presence for the Ask Ayla button behavior
+    // The actual modal triggering is now manual via the Ask Ayla button
+  }, [npcsInRoom]);
 
   // Monitor for teleport test trigger
   useEffect(() => {
@@ -1050,6 +1092,17 @@ const handleBackout = useCallback((): void => {
     }
   }, [room, previousRoom]);
 
+  // Periodic conversation check for inter-NPC dialogue
+  useEffect(() => {
+    if (stage === 'game' && room && room.id) {
+      const interval = setInterval(() => {
+        periodicConversationCheck(state, dispatch, room.id);
+      }, 120000); // Check every 2 minutes
+
+      return () => clearInterval(interval);
+    }
+  }, [stage, room, state, dispatch]);
+
   // Handle transition stages by extracting transition type from stage
   useEffect(() => {
     if (stage.startsWith('transition_')) {
@@ -1191,6 +1244,8 @@ const handleBackout = useCallback((): void => {
       if (room.id) {
         handleRoomEntry(room, state, dispatch);
         handleRoomEntryForWanderingNPCs(room, state, dispatch);
+        // Trigger inter-NPC conversations on room entry
+        onRoomEntry(state, dispatch, room.id, state.previousRoomId);
       }
     }
   }, [room, lastShownRoomDescription, dispatch, state]);
@@ -1400,6 +1455,7 @@ const handleBackout = useCallback((): void => {
             onSelectNPC={handleSelectNPC}
             onClose={closeModal}
             onTalkToAll={handleGroupConversation}
+            onTalkToAyla={handleTalkToAyla}
           />
         );
       case 'look': 
