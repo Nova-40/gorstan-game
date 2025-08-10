@@ -29,6 +29,8 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^5.80.7",
+    "@vercel/analytics": "^1.5.0",
+    "@vercel/speed-insights": "^1.2.0",
     "ajv": "^8.17.1",
     "framer-motion": "^12.10.0",
     "lucide-react": "^0.507.0",
