@@ -219,6 +219,83 @@ const controlroom: Room = {
     },
   },
 
+  // Event handlers for room-specific events
+  eventHandlers: {
+    checkMorthosAlEncounter: (gameState: any) => {
+      if (gameState.flags?.hasMetMorthosAl) {
+        return null; // Encounter already happened
+      }
+
+      const messages = [];
+      
+      // Initial atmosphere
+      messages.push({
+        id: `encounter-start-${Date.now()}`,
+        text: '🌫️ The shadows in the control room suddenly deepen, and the air grows thick with tension...',
+        type: 'narrative',
+        timestamp: Date.now()
+      });
+
+      // Morthos appears
+      messages.push({
+        id: `morthos-appear-${Date.now()}`,
+        text: '🌑 From the darkest corner of the room, a figure emerges. Morthos steps forward, shadows writhing around his form like living things.',
+        type: 'narrative',
+        timestamp: Date.now() + 1000
+      });
+
+      messages.push({
+        id: `morthos-speak-${Date.now()}`,
+        text: '🗣️ MORTHOS: "So... another operator discovers our little sanctuary. How deliciously... inevitable."',
+        type: 'dialogue',
+        timestamp: Date.now() + 2000
+      });
+
+      // Al appears  
+      messages.push({
+        id: `al-appear-${Date.now()}`,
+        text: '📋 A bureaucratic figure in a slightly rumpled suit materializes near the monitoring stations, adjusting his glasses with practiced efficiency.',
+        type: 'narrative',
+        timestamp: Date.now() + 3000
+      });
+
+      messages.push({
+        id: `al-speak-${Date.now()}`,
+        text: '🗣️ AL: "Ah, excellent timing. We have protocols to discuss, forms to file, and reality to stabilize. In that order."',
+        type: 'dialogue',
+        timestamp: Date.now() + 4000
+      });
+
+      // The tension
+      messages.push({
+        id: `tension-build-${Date.now()}`,
+        text: '⚡ The room crackles with dimensional energy as these two powerful entities regard each other—and you—with interest.',
+        type: 'narrative',
+        timestamp: Date.now() + 5000
+      });
+
+      messages.push({
+        id: `encounter-complete-${Date.now()}`,
+        text: '✨ You sense this encounter will shape your journey through the multiverse...',
+        type: 'system',
+        timestamp: Date.now() + 6000
+      });
+
+      return {
+        messages,
+        updates: { 
+          flags: { 
+            hasMetMorthosAl: true,
+            metMorthos: true,
+            metAl: true,
+            firstEncounterComplete: true
+          },
+          npcsInRoom: [...(gameState.npcsInRoom || []), 'morthos', 'al_escape_artist']
+        }
+      };
+    }
+  },
+
   // Custom command handlers for this room
   customCommands: {
     'check morthos al encounter': {

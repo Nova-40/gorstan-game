@@ -103,10 +103,46 @@ function handleRoomEvent(
   gameState: LocalGameState,
   dispatch: Dispatch<GameAction>
 ): void {
+  // Check if room has custom event handlers
+  if (room.eventHandlers && room.eventHandlers[event]) {
+    const result = room.eventHandlers[event](gameState);
+    if (result) {
+      // Dispatch messages
+      if (result.messages) {
+        result.messages.forEach((message: any) => {
+          dispatch({
+            type: 'RECORD_MESSAGE',
+            payload: message
+          });
+        });
+      }
+      
+      // Apply updates
+      if (result.updates) {
+        if (result.updates.flags) {
+          Object.entries(result.updates.flags).forEach(([flag, value]) => {
+            dispatch({
+              type: 'SET_FLAG',
+              payload: { flag, value }
+            });
+          });
+        }
+        if (result.updates.npcsInRoom) {
+          dispatch({
+            type: 'SET_NPCS_IN_ROOM',
+            payload: result.updates.npcsInRoom
+          });
+        }
+      }
+    }
+    return;
+  }
+
+  // Fallback to generic event handling
   switch (event) {
     case 'checkMorthosAlEncounter':
-      // Encounter is now handled directly by the room file
-      console.log('[RoomEventHandler] Morthos/Al encounter delegated to room file');
+      // Encounter is handled by room's eventHandlers
+      console.log('[RoomEventHandler] Morthos/Al encounter should be handled by room eventHandlers');
       break;
     
     case 'showControlRoomIntro':
