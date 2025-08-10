@@ -40,6 +40,7 @@ import { initializeAchievementEngine } from '../logic/achievementEngine';
 import { initializeWanderingNPCs, handleRoomEntryForWanderingNPCs } from '../engine/wanderingNPCController';
 import { handleRoomEntry } from '../engine/roomEventHandler';
 import { getAllRoomsAsObject } from '../utils/roomLoader';
+import { getFallbackRooms } from '../utils/roomLoaderFallback';
 import { performanceMonitor } from '../utils/performanceMonitor';
 
 import { UseItemModal } from "./UseItemModal";
@@ -903,7 +904,25 @@ const handleBackout = useCallback((): void => {
   useEffect(() => {
     if (!state.roomMap || Object.keys(state.roomMap).length === 0) {
       try {
-        const loadedRoomMap: Record<string, Room> = getAllRoomsAsObject();
+        let loadedRoomMap: Record<string, Room> = getAllRoomsAsObject();
+        
+        // If no rooms loaded, use fallback
+        if (!loadedRoomMap || Object.keys(loadedRoomMap).length === 0) {
+          console.warn('[AppCore] No rooms loaded from main loader, using fallback rooms');
+          loadedRoomMap = getFallbackRooms();
+          
+          dispatch({ 
+            type: 'ADD_MESSAGE', 
+            payload: { 
+              id: Date.now().toString(), 
+              text: "Note: Running in limited mode with basic rooms only. Some features may be unavailable.", 
+              type: "warning", 
+              timestamp: Date.now() 
+            } 
+          });
+        }
+        
+        console.log('[AppCore] Loading room map with', Object.keys(loadedRoomMap).length, 'rooms');
         dispatch({ type: 'LOAD_ROOM_MAP', payload: loadedRoomMap });
         initializeAchievementEngine(dispatch);
         
@@ -956,15 +975,34 @@ const handleBackout = useCallback((): void => {
         initializeWanderingNPCs(state, dispatch);
       } catch (error: unknown) {
         console.error('Game initialization failed:', error);
-        dispatch({ 
-          type: 'ADD_MESSAGE', 
-          payload: { 
-            id: Date.now().toString(), 
-            text: "Game initialization failed.", 
-            type: "error", 
-            timestamp: Date.now() 
-          } 
-        });
+        
+        // Try fallback rooms as last resort
+        try {
+          const fallbackRooms = getFallbackRooms();
+          console.warn('[AppCore] Using fallback rooms due to initialization error');
+          dispatch({ type: 'LOAD_ROOM_MAP', payload: fallbackRooms });
+          
+          dispatch({ 
+            type: 'ADD_MESSAGE', 
+            payload: { 
+              id: Date.now().toString(), 
+              text: "Game loaded in emergency mode with limited rooms. Some features may be unavailable.", 
+              type: "warning", 
+              timestamp: Date.now() 
+            } 
+          });
+        } catch (fallbackError) {
+          console.error('Even fallback initialization failed:', fallbackError);
+          dispatch({ 
+            type: 'ADD_MESSAGE', 
+            payload: { 
+              id: Date.now().toString(), 
+              text: "Critical error: Unable to load game data. Please refresh the page.", 
+              type: "error", 
+              timestamp: Date.now() 
+            } 
+          });
+        }
       }
     }
   }, [state.roomMap, dispatch, loadModule, state]);

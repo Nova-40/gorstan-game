@@ -42,23 +42,13 @@ export default defineConfig({
           ],
           'game-logic': [
             './src/logic/achievementEngine',
-            './src/logic/codexTracker'
-          ],
-          'game-state': [
+            './src/logic/codexTracker',
             './src/state/scoreManager',
             './src/state/scoreEffects'
           ]
         }
       }
     }
-  },
-  // Optimize for production
-  define: {
-    'process.env.NODE_ENV': JSON.stringify('production')
-  },
-  // Enable compression
-  server: {
-    compression: true
   }
 });
 

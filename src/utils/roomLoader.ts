@@ -58,6 +58,9 @@ function isNonEmptyString(value: any): value is string {
 
 // --- Function: initializeRooms ---
 function initializeRooms(): void {
+  console.log('[roomLoader] Initializing rooms...');
+  console.log('[roomLoader] roomRegistry keys:', Object.keys(roomRegistry));
+  
   for (const [, room] of Object.entries(roomRegistry)) {
     
     if (!room || typeof room.id !== 'string') {
@@ -84,6 +87,11 @@ function initializeRooms(): void {
     }
 
     roomMap.set(roomId, room);
+  }
+  
+  console.log(`[roomLoader] Initialized ${roomMap.size} rooms`);
+  if (roomMap.size === 0) {
+    console.error('[roomLoader] No rooms were loaded! This is a critical error.');
   }
 }
 
@@ -123,6 +131,13 @@ export function validateRooms(): string[] {
 
 // --- Function: getAllRoomsAsObject ---
 export function getAllRoomsAsObject(): Record<string, Room> {
+  console.log('[roomLoader] getAllRoomsAsObject called, roomMap size:', roomMap.size);
+  
+  if (roomMap.size === 0) {
+    console.error('[roomLoader] roomMap is empty! Attempting to reinitialize...');
+    initializeRooms();
+  }
+  
   const obj: Record<string, Room> = {};
   for (const [id, room] of roomMap.entries()) {
     obj[id] = {
@@ -138,5 +153,7 @@ export function getAllRoomsAsObject(): Record<string, Room> {
       rooms: (room as any).rooms ?? [],
     };
   }
+  
+  console.log('[roomLoader] Returning', Object.keys(obj).length, 'rooms');
   return obj;
 }
