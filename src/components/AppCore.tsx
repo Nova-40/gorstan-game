@@ -37,6 +37,10 @@ import { useRoomTransition } from '../hooks/useRoomTransition';
 import { useWendellLogic } from '../hooks/useWendellLogic';
 
 import { initializeAchievementEngine } from '../logic/achievementEngine';
+import { initializeScoreManager } from '../state/scoreManager';
+import { initializeCodexTracker } from '../logic/codexTracker';
+import { initializeMiniquests } from '../engine/miniquestInitializer';
+import { loadCelebrationIndex } from '../celebrate/index';
 import { initializeWanderingNPCs, handleRoomEntryForWanderingNPCs } from '../engine/wanderingNPCController';
 import { handleRoomEntry } from '../engine/roomEventHandler';
 import { getAllRoomsAsObject } from '../utils/roomLoader';
@@ -926,50 +930,58 @@ const handleBackout = useCallback((): void => {
         dispatch({ type: 'LOAD_ROOM_MAP', payload: loadedRoomMap });
         initializeAchievementEngine(dispatch);
         
-        const modulePromises: Promise<any>[] = [
-          loadModule('../state/scoreManager')
-            .then(({ initializeScoreManager }) => initializeScoreManager(dispatch))
-            .catch((error: unknown) => {
-              console.warn('Failed to load score manager:', error);
-              dispatch({ 
-                type: 'ADD_MESSAGE', 
-                payload: { 
-                  id: Date.now().toString(), 
-                  text: "Failed to load score manager.", 
-                  type: "error", 
-                  timestamp: Date.now() 
-                } 
-              });
-            }),
-          loadModule('../logic/codexTracker')
-            .then(({ initializeCodexTracker }) => initializeCodexTracker(dispatch))
-            .catch((error: unknown) => {
-              console.warn('Failed to load codex tracker:', error);
-              dispatch({ 
-                type: 'ADD_MESSAGE', 
-                payload: { 
-                  id: Date.now().toString(), 
-                  text: "Failed to load codex tracker.", 
-                  type: "error", 
-                  timestamp: Date.now() 
-                } 
-              });
-            }),
-          loadModule('../engine/miniquestInitializer')
-            .then(({ initializeMiniquests }) => initializeMiniquests())
-            .catch((error: unknown) => {
-              console.warn('Failed to load miniquest initializer:', error);
-              dispatch({ 
-                type: 'ADD_MESSAGE', 
-                payload: { 
-                  id: Date.now().toString(), 
-                  text: "Failed to load miniquest initializer.", 
-                  type: "error", 
-                  timestamp: Date.now() 
-                } 
-              });
-            })
-        ];
+        const modulePromises: Promise<any>[] = [];
+        
+        try {
+          initializeScoreManager(dispatch);
+        } catch (error) {
+          console.warn('Failed to load score manager:', error);
+          dispatch({ 
+            type: 'ADD_MESSAGE', 
+            payload: { 
+              id: Date.now().toString(), 
+              text: "Failed to load score manager.", 
+              type: "error", 
+              timestamp: Date.now() 
+            } 
+          });
+        }
+
+        try {
+          initializeCodexTracker(dispatch);
+        } catch (error) {
+          console.warn('Failed to load codex tracker:', error);
+          dispatch({ 
+            type: 'ADD_MESSAGE', 
+            payload: { 
+              id: Date.now().toString(), 
+              text: "Failed to load codex tracker.", 
+              type: "error", 
+              timestamp: Date.now() 
+            } 
+          });
+        }
+
+        try {
+          initializeMiniquests();
+        } catch (error) {
+          console.warn('Failed to load miniquest initializer:', error);
+          dispatch({ 
+            type: 'ADD_MESSAGE', 
+            payload: { 
+              id: Date.now().toString(), 
+              text: "Failed to load miniquest initializer.", 
+              type: "error", 
+              timestamp: Date.now() 
+            } 
+          });
+        }
+
+        try {
+          loadCelebrationIndex();
+        } catch (error) {
+          console.warn('Could not load celebration index:', error);
+        }
         
         Promise.allSettled(modulePromises);
         initializeWanderingNPCs(state, dispatch);

@@ -1,8 +1,10 @@
-// src/limport { Achievement } from '../types/GameTypes';gic/codexTracker.ts
+// src/logic/codexTracker.ts
 // Gorstan Game Beta 1
 // Code Licence MIT
 // Gorstan and characters (c) Geoff Webster 2025
 // Game module.
+
+import { Achievement } from '../types/GameTypes';
 
 import { Dispatch } from 'react';
 

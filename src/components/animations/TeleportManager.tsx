@@ -26,18 +26,19 @@ const TeleportManager: React.FC<{
     return () => mediaQuery.removeEventListener('change', handler);
   }, [mediaQuery]);
 
-  // Optimized callback for reduced motion timeout
-  const handleReducedMotionComplete = useCallback(() => {
-    const timeout = setTimeout(onComplete, 100);
-    return () => clearTimeout(timeout);
-  }, [onComplete]);
+  // Handle reduced motion completion effect
+  useEffect(() => {
+    if (prefersReducedMotion && teleportType) {
+      const timeout = setTimeout(onComplete, 100);
+      return () => clearTimeout(timeout);
+    }
+  }, [prefersReducedMotion, teleportType, onComplete]);
 
   if (!teleportType) return null;
   
   // If user prefers reduced motion, skip animation
   if (prefersReducedMotion) {
     console.log('[TeleportManager] Skipping animation due to prefers-reduced-motion');
-    useEffect(handleReducedMotionComplete, [handleReducedMotionComplete]);
     
     return (
       <div className="fixed inset-0 z-50 bg-black flex items-center justify-center text-white text-xl">
