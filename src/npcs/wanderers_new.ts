@@ -19,7 +19,7 @@ import { NPC } from '../types/NPCTypes';
 export const al: NPC = {
   id: 'al',
   name: 'Al',
-  portrait: '/images/npcs/al.png',
+  portrait: '/images/Al.png',
   mood: 'neutral',
   memory: {
     interactions: 0,
@@ -34,7 +34,7 @@ export const al: NPC = {
 export const morthos: NPC = {
   id: 'morthos',
   name: 'Morthos',
-  portrait: '/images/npcs/morthos.png',
+  portrait: '/images/Morthos.png',
   mood: 'neutral',
   memory: {
     interactions: 0,
