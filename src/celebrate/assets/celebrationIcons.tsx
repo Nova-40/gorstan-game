@@ -1,3 +1,19 @@
+/*
+  Gorstan – Copyright © 2025 Geoff Webster. All Rights Reserved.
+  
+  You may play Gorstan for free for personal entertainment only.
+  You may NOT copy, redistribute, modify, or sell the game, its code, 
+  artwork, storyline, or any other part without written permission.
+  
+  Gorstan includes third-party libraries and assets:
+    - React © Meta Platforms, Inc. – MIT Licence
+    - Lucide Icons © Lucide Contributors – ISC Licence
+    - Flaticon icons © Flaticon.com – Free Licence with attribution
+    - Other packages under their respective licences (see package.json)
+
+  Full licence terms: see EULA.md in the project root.
+*/
+
 // src/celebrate/assets/celebrationIcons.tsx
 // SVG icons and decorations for different celebrations
 
@@ -12,7 +28,7 @@ interface IconProps {
 export const ChristmasIcon: React.FC<IconProps> = ({ className = '', size = 24 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" className={className}>
     <g fill="currentColor">
-      {/* Tree */}
+      {}
       <path d="M12 2l2 6h-4l2-6z" />
       <path d="M12 6l3 6H9l3-6z" />
       <path d="M12 10l4 6H8l4-6z" />

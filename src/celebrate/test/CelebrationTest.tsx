@@ -1,3 +1,19 @@
+/*
+  Gorstan – Copyright © 2025 Geoff Webster. All Rights Reserved.
+  
+  You may play Gorstan for free for personal entertainment only.
+  You may NOT copy, redistribute, modify, or sell the game, its code, 
+  artwork, storyline, or any other part without written permission.
+  
+  Gorstan includes third-party libraries and assets:
+    - React © Meta Platforms, Inc. – MIT Licence
+    - Lucide Icons © Lucide Contributors – ISC Licence
+    - Flaticon icons © Flaticon.com – Free Licence with attribution
+    - Other packages under their respective licences (see package.json)
+
+  Full licence terms: see EULA.md in the project root.
+*/
+
 // src/celebrate/test/CelebrationTest.tsx
 // Test component to verify celebration system functionality
 
@@ -72,7 +88,7 @@ export const CelebrationTest: React.FC = () => {
     <div className="p-4 bg-green-50 border border-green-200 rounded-lg space-y-4">
       <h3 className="font-bold text-green-800">🎉 Celebration System Test Results</h3>
       
-      {/* Index Info */}
+      {}
       <div className="bg-white p-3 rounded border">
         <h4 className="font-semibold text-gray-800">Celebration Index</h4>
         {index ? (

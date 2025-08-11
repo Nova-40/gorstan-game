@@ -1,6 +1,5 @@
 # .prettierignore — Files to exclude from Prettier formatting
-# Gorstan Game (Gorstan aspects (c) Geoff Webster 2025)
-# Code MIT Licence
+# Gorstan – Copyright © 2025 Geoff Webster. All Rights Reserved.
 
 # Dependencies
 node_modules/

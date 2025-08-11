@@ -1,3 +1,19 @@
+/*
+  Gorstan – Copyright © 2025 Geoff Webster. All Rights Reserved.
+  
+  You may play Gorstan for free for personal entertainment only.
+  You may NOT copy, redistribute, modify, or sell the game, its code, 
+  artwork, storyline, or any other part without written permission.
+  
+  Gorstan includes third-party libraries and assets:
+    - React © Meta Platforms, Inc. – MIT Licence
+    - Lucide Icons © Lucide Contributors – ISC Licence
+    - Flaticon icons © Flaticon.com – Free Licence with attribution
+    - Other packages under their respective licences (see package.json)
+
+  Full licence terms: see EULA.md in the project root.
+*/
+
 import React, { useEffect, useMemo } from "react";
 import BaseDialog from "./a11y/BaseDialog";
 import { usePrefersReducedMotion } from "./hooks/usePrefersReducedMotion";
@@ -42,7 +58,7 @@ export default function ChristmasOverlay({ onClose }: Props) {
       <div className="relative overflow-hidden">
         {!reduce && snowLayer}
         <div className="relative grid gap-3">
-          {/* Garland */}
+          {}
           <div className="flex justify-center gap-2 py-1">
             {Array.from({ length: 12 }).map((_, i) => (
               <span
