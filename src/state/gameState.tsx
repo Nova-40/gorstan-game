@@ -372,7 +372,44 @@ export const gameStateReducer = (state: LocalGameState, action: GameAction): Loc
     }
 
     case 'SET_NPCS_IN_ROOM': {
-      const npcs = action.payload as NPC[];
+      let npcs = action.payload as NPC[];
+      
+      // Check if player has an alliance and should have their ally appear
+      const playerAlliance = state.flags?.playerAlliance;
+      const allianceChosen = state.flags?.allianceChosen;
+      
+      if (allianceChosen && playerAlliance && Math.random() < 0.7) {
+        // 70% chance for ally to appear
+        const allyAlreadyPresent = npcs.some(npc => npc.id === playerAlliance);
+        
+        if (!allyAlreadyPresent) {
+          // Create the ally NPC and add to room
+          const allyNpc: NPC = {
+            id: playerAlliance,
+            name: playerAlliance === 'al' ? 'Al' : 'Morthos',
+            location: state.currentRoomId,
+            description: playerAlliance === 'al' 
+              ? 'Your multiversal guardian ally, ensuring order is maintained.'
+              : 'Your demonic engineer ally, using his power to assist you.',
+            mood: 'friendly',
+            health: 100,
+            maxHealth: 100,
+            memory: {
+              interactions: 0,
+              lastInteraction: Date.now(),
+              playerActions: [],
+              relationship: 100, // Maximum because they're allied
+              knownFacts: []
+            },
+            conversation: [],
+            inventory: [],
+            flags: ['ally', 'helpful']
+          };
+          
+          npcs = [...npcs, allyNpc];
+        }
+      }
+      
       return {
         ...state,
         npcsInRoom: npcs,
@@ -936,6 +973,56 @@ export const gameStateReducer = (state: LocalGameState, action: GameAction): Loc
           ...state.settings,
           ...payload
         }
+      };
+    }
+
+    // Alliance system
+    case 'SET_ALLIANCE': {
+      const { ally, points } = action.payload as { ally: string; points: number };
+      
+      // Award points
+      const currentScore = state.player.score || 0;
+      const newScore = currentScore + points;
+      
+      // Set alliance flag and update relationships
+      const newNpcRelationships = { ...state.player.npcRelationships };
+      
+      if (ally === 'morthos') {
+        newNpcRelationships['morthos'] = 100; // Full alliance
+        newNpcRelationships['al'] = -50; // Al becomes hostile
+      } else if (ally === 'al') {
+        newNpcRelationships['al'] = 100; // Full alliance
+        newNpcRelationships['morthos'] = -50; // Morthos becomes hostile
+      } else if (ally === 'both') {
+        // Player tried to choose both - both become negative
+        newNpcRelationships['al'] = -75;
+        newNpcRelationships['morthos'] = -75;
+      }
+
+      const allianceMessage: GameMessage = {
+        id: `alliance-${Date.now()}`,
+        text: ally === 'both' 
+          ? '⚠️ Both Al and Morthos look displeased. "Choose one, not both," they say in unison.'
+          : ally === 'morthos'
+          ? `🔥 You choose Morthos as your ally! (+${points} points) Al looks disappointed but respects your choice.`
+          : `⚖️ You choose Al as your ally! (+${points} points) Morthos nods grimly but accepts your decision.`,
+        type: ally === 'both' ? 'error' : 'system',
+        timestamp: Date.now(),
+      };
+
+      return {
+        ...state,
+        player: {
+          ...state.player,
+          score: newScore,
+          npcRelationships: newNpcRelationships
+        },
+        flags: {
+          ...state.flags,
+          playerAlliance: ally === 'both' ? null : ally,
+          allianceChosen: true
+        },
+        history: [...state.history, allianceMessage]
       };
     }
 

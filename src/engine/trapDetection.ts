@@ -39,13 +39,16 @@ export function detectTrapsOnEntry(
 ): TrapDetectionResult {
   
   // Check for procedural traps first
-  const proceduralTrap = checkForTrap(room.id, 'enter');
+  const proceduralTrap = checkForTrap(room.id);
   if (proceduralTrap) {
+    const trap = proceduralTrap as any; // Type assertion to work around interface conflicts
     return {
       detected: true,
-      warning: proceduralTrap,
+      warning: trap.description || 'Unknown trap detected',
       detectionMethod: 'basic_sense',
-      severity: 'medium'
+      severity: trap.severity === 'lethal' ? 'extreme' :
+                trap.severity === 'severe' ? 'high' :
+                trap.severity === 'light' ? 'low' : 'medium'
     };
   }
 

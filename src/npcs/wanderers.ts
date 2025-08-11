@@ -103,6 +103,66 @@ export const al: NPC = {
         { text: 'But don\'t some situations require flexibility?', nextId: 'flexibility_debate' },
         { text: 'What if both structure and intuition have their place?', nextId: 'balanced_approach' }
       ]
+    },
+    {
+      id: 'al_formal_pitch',
+      text: '*AL clears throat with bureaucratic authority* Ahem. *straightens clipboard* Very well. I offer systematic advancement through proven methodologies. Official documentation granting legitimate access to restricted areas. Emergency protocols that have saved countless operatives from dimensional hazards. *glances at Morthos* Unlike certain individuals who promise power but deliver only chaos and danger.',
+      responses: [
+        { text: 'That sounds much safer than Morthos\'s approach.', nextId: 'safety_priority' },
+        { text: 'But is safety worth limiting potential?', nextId: 'safety_vs_growth' },
+        { text: 'Morthos, how do you respond to that?', nextId: 'await_morthos_counter' },
+        { text: 'Can you two find any common ground?', nextId: 'mediation_attempt' }
+      ]
+    },
+    {
+      id: 'await_al_response',
+      text: '*AL adjusts spectacles with controlled irritation* Ahem. *addresses Morthos directly* When reality "unravels," as you so dramatically put it, proper emergency protocols are exactly what prevent catastrophic failure. Our documented procedures have prevented seventeen dimensional collapses this quarter alone. Your approach offers power, yes - the power to accidentally erase entire timelines.',
+      responses: [
+        { text: 'Al makes a good point about safety records.', nextId: 'support_al_logic' },
+        { text: 'Seventeen collapses? That sounds serious.', nextId: 'collapse_details' },
+        { text: 'Morthos, what\'s your counter-argument?', nextId: 'morthos_rebuttal_prompt' },
+        { text: 'This is fascinating. Keep debating.', nextId: 'encourage_debate' }
+      ]
+    },
+    {
+      id: 'mediation_attempt',
+      text: '*AL straightens his papers with diplomatic precision* Perhaps we can reach a... compromise. While I appreciate structure and Morthos values... experimentation... surely we can agree that the newcomer needs both safety AND growth opportunities? *looks hopefully between Morthos and the player*',
+      responses: [
+        { text: 'That\'s a wise approach, Al.', nextId: 'praise_diplomacy' },
+        { text: 'Morthos, do you agree with Al\'s suggestion?', nextId: 'morthos_compromise_check' },
+        { text: 'What would a compromise look like practically?', nextId: 'compromise_details' },
+        { text: 'I appreciate the effort, but I need to choose one path.', nextId: 'reject_compromise' }
+      ]
+    },
+    {
+      id: 'group_response_al',
+      text: '*AL speaks with measured authority* I must respectfully disagree with my... colleague\'s characterization. What he calls a "comfortable prison" is actually a support structure. Freedom without foundation leads to chaos. *adjusts glasses pointedly* I offer guidance based on proven methodologies, not reckless experimentation with forces beyond comprehension.',
+      responses: [
+        { text: 'Al, explain your methodologies.', nextId: 'methodology_explanation' },
+        { text: 'Morthos called you a bureaucrat. How do you respond?', nextId: 'bureaucrat_response' },
+        { text: 'What\'s your assessment of Morthos\'s approach?', nextId: 'al_vs_morthos' },
+        { text: 'Can\'t you both work together instead of competing?', nextId: 'cooperation_plea' }
+      ]
+    },
+    {
+      id: 'bureaucrat_response',
+      text: '*AL draws himself up with dignity* If \'bureaucrat\' means someone who maintains order, prevents disasters, and provides reliable support systems, then yes - I am proudly bureaucratic. *gestures toward Morthos* Better a helpful bureaucrat than a reckless revolutionary who promises the stars but delivers catastrophe.',
+      responses: [
+        { text: 'I respect your dedication to order.', nextId: 'order_respect' },
+        { text: 'But isn\'t some risk necessary for growth?', nextId: 'risk_necessity' },
+        { text: 'Morthos, how do you respond to being called reckless?', nextId: 'reckless_accusation' },
+        { text: 'You two really don\'t like each other, do you?', nextId: 'acknowledge_rivalry' }
+      ]
+    },
+    {
+      id: 'al_vs_morthos',
+      text: '*AL speaks with restrained professional criticism* Morthos operates on impulse and mysticism. He offers immediate gratification without considering long-term consequences. His \'power\' often leads to dimensional instabilities, temporal paradoxes, and reality fragmentation. *straightens papers* My approach may be less... theatrical... but it consistently produces sustainable results.',
+      responses: [
+        { text: 'Sustainable results sound important.', nextId: 'sustainability_value' },
+        { text: 'What kind of instabilities has Morthos caused?', nextId: 'morthos_disasters' },
+        { text: 'Morthos, is what Al says true?', nextId: 'truth_challenge' },
+        { text: 'You both have different strengths.', nextId: 'diplomatic_observation' }
+      ]
     }
   ],
   topics: [
@@ -217,6 +277,62 @@ export const morthos: NPC = {
         { text: 'You\'re right. I choose you.', nextId: 'alliance_morthos' },
         { text: 'I need more time to decide.', nextId: 'need_time' },
         { text: 'Why the pressure? That makes me suspicious.', nextId: 'pressure_suspicion' }
+      ]
+    },
+    {
+      id: 'ayla_warning',
+      text: '*voice drops to an ominous whisper* Before you choose sides, seeker, know this: that supposed \'guide\' Ayla is not what she seems. She pulls strings from behind the scenes, manipulating events to serve her own agenda. Trust her at your peril. *glances fondly in another direction* Now Polly... she\'s genuine. Chaotic, yes, but honest in her chaos. A kindred spirit who understands that rules are meant to be transcended.',
+      responses: [
+        { text: 'What do you mean about Ayla?', nextId: 'ayla_truth' },
+        { text: 'Why should I trust Polly over Ayla?', nextId: 'polly_vs_ayla' },
+        { text: 'You\'re trying to manipulate me too.', nextId: 'manipulation_accusation' },
+        { text: 'Tell me more about Polly.', nextId: 'polly_praise' }
+      ]
+    },
+    {
+      id: 'ayla_truth',
+      text: '*shadows coil menacingly* Ayla positions herself as your helpful assistant, but she controls the very fabric of this reality. She decides what you see, what you experience, even who you meet. The \'help\' she offers always serves her greater design. You are not her charge - you are her experiment.',
+      responses: [
+        { text: 'How can I tell if you\'re being truthful?', nextId: 'truth_test' },
+        { text: 'What does she want from me?', nextId: 'ayla_agenda' },
+        { text: 'If that\'s true, why are you telling me?', nextId: 'morthos_motive' }
+      ]
+    },
+    {
+      id: 'polly_praise',
+      text: '*eyes warm with genuine affection* Polly embodies the chaos of pure creation. She explores without fear, creates without permission, and lives without apology. Where Ayla calculates every interaction, Polly simply... is. Her energy is infectious, her curiosity boundless. In a multiverse of manipulation and hidden agendas, she remains beautifully, authentically chaotic.',
+      responses: [
+        { text: 'She sounds like trouble.', nextId: 'trouble_is_growth' },
+        { text: 'How do I find her?', nextId: 'finding_polly' },
+        { text: 'What about Al? Your thoughts on him?', nextId: 'al_assessment' }
+      ]
+    },
+    {
+      id: 'group_dynamic',
+      text: '*MORTHOS speaks, shadows writhing with amusement* How predictable. The moment you arrive, we begin our ancient dance - the bureaucrat offering safety, the shadow-dweller promising power. *gestures toward Al* Tell me, which cage appeals to you more, seeker? His comfortable prison of procedures, or the magnificent uncertainty of true freedom?',
+      responses: [
+        { text: 'I want to hear both of your arguments.', nextId: 'formal_debate' },
+        { text: 'Why are you two fighting over me?', nextId: 'competition_explanation' },
+        { text: 'What if I choose neither of you?', nextId: 'independence_choice' },
+        { text: 'Can\'t you two work together?', nextId: 'cooperation_suggestion' }
+      ]
+    },
+    {
+      id: 'formal_debate',
+      text: '*MORTHOS\'s voice takes on a theatrical tone* Very well, seeker. Let us lay bare our offerings. *turns toward Al with mock courtesy* Administrator, please... enlighten our new friend about the virtues of your... systematic approach. I shall await my turn to speak of real power.',
+      responses: [
+        { text: 'Al, tell me about your approach.', nextId: 'al_formal_pitch' },
+        { text: 'Actually, Morthos, you go first.', nextId: 'morthos_formal_pitch' },
+        { text: 'I want to hear you debate each other.', nextId: 'competitive_debate' }
+      ]
+    },
+    {
+      id: 'competitive_debate',
+      text: '*MORTHOS laughs darkly* Oh, this should be entertaining. *addresses Al directly* Come now, bureaucrat. Tell the seeker how your forms and procedures will help them when reality itself begins to unravel. Explain how following protocol serves them when the multiverse demands adaptation.',
+      responses: [
+        { text: 'Al, how do you respond to that?', nextId: 'await_al_response' },
+        { text: 'This is getting heated. Maybe we should calm down.', nextId: 'mediation_attempt' },
+        { text: 'Keep going. I want to see where this leads.', nextId: 'encourage_conflict' }
       ]
     }
   ],

@@ -433,19 +433,26 @@ export function getWanderingNPCResponse(
 
 
 // --- Enhanced Function: getEnhancedNPCResponse for full intelligence ---
-export function getEnhancedWanderingNPCResponse(
+export async function getEnhancedWanderingNPCResponse(
   npcId: string,
   topic: string,
   playerState: PlayerState,
   npcState: NPCState,
   gameState: LocalGameState,
   playerInput?: string
-): string {
+): Promise<string> {
   
   // Use enhanced intelligence system
   if (playerInput) {
-    const enhancedResponse = getEnhancedNPCResponse(npcId, playerInput, gameState);
-    return formatDialogue(enhancedResponse.text, gameState);
+    try {
+      const enhancedResponse = await getEnhancedNPCResponse(npcId, playerInput, gameState);
+      return formatDialogue(enhancedResponse.text, gameState);
+    } catch (error) {
+      console.warn('Enhanced wandering NPC response failed, using fallback:', error);
+      // Fall back to standard response
+      const standardResponse = getWanderingNPCResponse(npcId, topic, playerState, npcState);
+      return formatDialogue(standardResponse, gameState);
+    }
   }
 
   // Fall back to standard response with formatting

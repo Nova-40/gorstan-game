@@ -112,7 +112,7 @@ function scheduleNPCReply(
 
   const delay = 350 + Math.floor(Math.random() * 400); // Short, natural pause
   
-  setTimeout(() => {
+  setTimeout(async () => {
     try {
       // Co-location rule: unless AYLA or explicitly cross-room, require same room
       const requiresCoLocation = CO_LOCATED_ONLY.includes(from.id as any) && 
@@ -132,12 +132,17 @@ function scheduleNPCReply(
       let responseText: string;
       const promptFromNPC = buildPromptFromNPC(from.id, topic);
       
-      // Try enhanced system first
-      const enhancedResponse = getEnhancedNPCResponse(to.id, promptFromNPC, state);
-      if (enhancedResponse) {
-        responseText = enhancedResponse.text;
-      } else {
-        // Fallback to style-based generation
+      // Try enhanced system first (now async)
+      try {
+        const enhancedResponse = await getEnhancedNPCResponse(to.id, promptFromNPC, state);
+        if (enhancedResponse) {
+          responseText = enhancedResponse.text;
+        } else {
+          // Fallback to style-based generation
+          responseText = generateNPCResponse(from.id, to.id, topic, promptFromNPC);
+        }
+      } catch (error) {
+        console.warn('Enhanced conversation response failed, using fallback:', error);
         responseText = generateNPCResponse(from.id, to.id, topic, promptFromNPC);
       }
 

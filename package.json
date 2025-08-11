@@ -33,6 +33,7 @@
     "@vercel/speed-insights": "^1.2.0",
     "ajv": "^8.17.1",
     "framer-motion": "^12.23.12",
+    "groq-sdk": "^0.30.0",
     "lucide-react": "^0.539.0",
     "prop-types": "^15.8.1",
     "react": "^19.1.1",

@@ -30,6 +30,7 @@ import {
   getContextualGreeting, 
   getIntelligentFallback 
 } from './npcKnowledgeBase';
+import { groqAI } from '../services/groqAI';
 
 export interface EnhancedNPCResponse {
   text: string;
@@ -40,14 +41,35 @@ export interface EnhancedNPCResponse {
 }
 
 /**
- * Generate enhanced NPC response with intelligence and context
+ * Generate enhanced NPC response with AI and intelligence
  */
-export function getEnhancedNPCResponse(
+export async function getEnhancedNPCResponse(
   npcId: string,
   playerInput: string,
   state: LocalGameState,
   originalResponse?: string
-): EnhancedNPCResponse {
+): Promise<EnhancedNPCResponse> {
+  
+  // Try Groq AI first for dynamic, intelligent responses
+  try {
+    const aiResponse = await groqAI.generateNPCResponse(npcId, playerInput, state);
+    if (aiResponse) {
+      console.log(`[Enhanced NPC] 🤖 AI response for ${npcId}`);
+      return {
+        text: aiResponse,
+        mood: detectMoodFromText(aiResponse),
+        relationshipChange: calculateAIRelationshipChange(aiResponse),
+        followUpTopics: extractTopicsFromResponse(aiResponse),
+        context: { source: 'groq-ai', model: 'llama-3.3-70b' }
+      };
+    }
+  } catch (error: any) {
+    console.warn(`[Enhanced NPC] AI failed for ${npcId}, using scripted fallback:`, error?.message || 'Unknown error');
+  }
+
+  console.log(`[Enhanced NPC] 📜 Scripted response for ${npcId}`);
+  
+  // Fallback to existing enhanced scripted system
   const playerName = getPlayerName(state);
   const history = getNPCConversationHistory(state, npcId);
   
@@ -269,4 +291,50 @@ function calculateRelationshipChange(topic: string, npcId: string): number {
   const npcModifier = npcModifiers[npcId]?.[topic] || 0;
   
   return baseChange + npcModifier;
+}
+
+/**
+ * Detect mood from AI-generated text
+ */
+function detectMoodFromText(text: string): string {
+  const lowerText = text.toLowerCase();
+  if (lowerText.includes('!') || lowerText.includes('excited')) return 'excited';
+  if (lowerText.includes('*sigh') || lowerText.includes('unfortunately')) return 'sad';
+  if (lowerText.includes('*clank') || lowerText.includes('*whirr')) return 'mechanical';
+  if (lowerText.includes('careful') || lowerText.includes('warning')) return 'concerned';
+  if (lowerText.includes('*laugh') || lowerText.includes('amusing')) return 'amused';
+  if (lowerText.includes('formal') || lowerText.includes('procedure')) return 'professional';
+  if (lowerText.includes('*gaze') || lowerText.includes('thoughtful')) return 'mysterious';
+  return 'neutral';
+}
+
+/**
+ * Calculate relationship change from AI response content
+ */
+function calculateAIRelationshipChange(response: string): number {
+  const lowerResponse = response.toLowerCase();
+  if (lowerResponse.includes('thank') || lowerResponse.includes('appreciate')) return 2;
+  if (lowerResponse.includes('help') || lowerResponse.includes('guide')) return 1;
+  if (lowerResponse.includes('welcome') || lowerResponse.includes('glad')) return 1;
+  if (lowerResponse.includes('annoying') || lowerResponse.includes('bother')) return -1;
+  if (lowerResponse.includes('dangerous') || lowerResponse.includes('threat')) return -2;
+  return 0;
+}
+
+/**
+ * Extract follow-up topics from AI response
+ */
+function extractTopicsFromResponse(response: string): string[] {
+  const topics = [];
+  const lowerResponse = response.toLowerCase();
+  
+  if (lowerResponse.includes('puzzle') || lowerResponse.includes('solve')) topics.push('puzzles');
+  if (lowerResponse.includes('room') || lowerResponse.includes('door')) topics.push('navigation');
+  if (lowerResponse.includes('item') || lowerResponse.includes('inventory')) topics.push('items');
+  if (lowerResponse.includes('story') || lowerResponse.includes('past')) topics.push('lore');
+  if (lowerResponse.includes('help') || lowerResponse.includes('assist')) topics.push('help');
+  if (lowerResponse.includes('procedure') || lowerResponse.includes('form')) topics.push('bureaucracy');
+  if (lowerResponse.includes('power') || lowerResponse.includes('magic')) topics.push('magic');
+  
+  return topics;
 }

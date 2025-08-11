@@ -63,6 +63,8 @@ import { getAllRoomsAsObject } from '../utils/roomLoader';
 import { getFallbackRooms } from '../utils/roomLoaderFallback';
 import { performanceMonitor } from '../utils/performanceMonitor';
 import { onRoomEntry, periodicConversationCheck } from '../npc/triggers';
+import { getTrapByRoom, disarmTrap } from '../engine/trapController';
+import { canPlayerDisarmTrap } from '../engine/trapDetection';
 
 import { UseItemModal } from "./UseItemModal";
 import { InventoryModal } from "./InventoryModal";
@@ -70,10 +72,12 @@ import ModalOverlay from './ModalOverlay';
 import PickUpItemModal from './PickUpItemModal';
 import SaveGameModal from './SaveGameModal';
 import NPCConsole from './NPCConsole';
+import EnhancedNPCConsole from './EnhancedNPCConsole';
 import NPCSelectionModal from './NPCSelectionModal';
 import { npcReact } from '../engine/npcEngine';
 import { npcRegistry } from '../npcs/npcMemory';
 import Modal from './Modal';
+import TrapManagementModal from './TrapManagementModal';
 import { itemDescriptions } from '../data/itemDescriptions';
 import PerformanceDashboard from './PerformanceDashboard';
 
@@ -86,7 +90,7 @@ import type { NPC, NPCMood } from '../types/NPCTypes';
 type GameStage = 'splash' | 'welcome' | 'nameCapture' | 'intro' | 'game' | 
   'transition_jump' | 'transition_sip' | 'transition_wait' | 'transition_dramatic_wait';
 
-type OpenModalType = 'inventory' | 'useItem' | 'look' | 'pickUp' | 'saveGame' | 'npcConsole' | 'npcSelection' | null;
+type OpenModalType = 'inventory' | 'useItem' | 'look' | 'pickUp' | 'saveGame' | 'npcConsole' | 'npcSelection' | 'trapManagement' | null;
 
 type TeleportType = "fractal" | "trek" | null;
 
@@ -147,6 +151,7 @@ const AppCore: React.FC = () => {
   const [lookLines, setLookLines] = useState<string[]>([]);
   const lookModalTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [selectedNPC, setSelectedNPC] = useState<NPC | null>(null);
+  const [isGroupConversation, setIsGroupConversation] = useState(false);
 
   // Save game state
   const [saveSlots, setSaveSlots] = useState<Array<{
@@ -224,6 +229,14 @@ const handleBackout = useCallback((): void => {
 
     dispatch({ type: 'ADD_MESSAGE', payload: { id: Date.now().toString(), text: sarcasm , type: 'system', timestamp: Date.now() } });
   }, [roomHistory, dispatch]);
+
+  // Check if current room has active traps
+  const hasActiveTraps = useMemo(() => {
+    const currentRoomId = state.currentRoomId || 'controlnexus';
+    const trap = getTrapByRoom(currentRoomId);
+    return Boolean(trap && !trap.triggered);
+  }, [state.currentRoomId]);
+
   const playerName: string = useMemo(() => state.player?.name || 'Player', [state.player?.name]);
   const inventory: string[] = useMemo(() => state.player?.inventory || [], [state.player?.inventory]);
   const npcsInRoom: NPC[] = useMemo(() => {
@@ -268,7 +281,15 @@ const handleBackout = useCallback((): void => {
   
   // Enhanced modal management with proper typing
   const openModal = useCallback((name: OpenModalType): void => setModal(name), []);
-  const closeModal = useCallback((): void => setModal(null), []);
+  const closeModal = useCallback((): void => {
+    setModal(null);
+    setIsGroupConversation(false); // Reset group conversation state
+  }, []);
+
+  // Handle trap management (opens modal instead of direct disarming)
+  const handleDisarmTrap = useCallback(() => {
+    openModal('trapManagement');
+  }, [openModal]);
 
   // Save game functions
   const loadSaveSlots = useCallback(() => {
@@ -511,109 +532,6 @@ const handleBackout = useCallback((): void => {
 
   // Handle group conversation
   const handleGroupConversation = useCallback(() => {
-    // Create a special group NPC for managing group conversations
-    const groupNPC: NPC = {
-      id: 'group_conversation',
-      name: 'Group Chat',
-      location: 'current_room',
-      description: `Talking to: ${npcsInRoom.map(npc => npc.name).join(', ')}`,
-      mood: 'friendly',
-      health: 100,
-      maxHealth: 100,
-      memory: {
-        interactions: 0,
-        lastInteraction: Date.now(),
-        playerActions: [],
-        relationship: 50,
-        knownFacts: []
-      },
-      conversation: [
-        {
-          id: 'greeting',
-          text: `You've started a group conversation with ${npcsInRoom.map(npc => npc.name).join(', ')}. Everyone can hear what you say!`,
-          responses: [
-            { text: 'Hello everyone!', nextId: 'hello' },
-            { text: 'I need help', nextId: 'help' },
-            { text: 'Who should I trust?', nextId: 'trust' },
-            { text: 'What about Al and Morthos?', nextId: 'al_morthos' },
-            { text: 'Tell me about Polly', nextId: 'polly' },
-            { text: 'Goodbye', nextId: 'goodbye' }
-          ]
-        },
-        {
-          id: 'hello',
-          text: 'Everyone greets you warmly! The atmosphere in the room brightens.',
-          responses: [
-            { text: 'I need help', nextId: 'help' },
-            { text: 'Who should I trust?', nextId: 'trust' },
-            { text: 'What about Al and Morthos?', nextId: 'al_morthos' },
-            { text: 'Goodbye', nextId: 'goodbye' }
-          ]
-        },
-        {
-          id: 'help',
-          text: 'The group is ready to help you! Everyone nods encouragingly.',
-          responses: [
-            { text: 'Who should I trust?', nextId: 'trust' },
-            { text: 'What about Al and Morthos?', nextId: 'al_morthos' },
-            { text: 'Tell me about Polly', nextId: 'polly' },
-            { text: 'Thank you', nextId: 'goodbye' }
-          ]
-        },
-        {
-          id: 'trust',
-          text: npcsInRoom.some(npc => npc.id === 'ayla') 
-            ? 'Ayla speaks up: "Trust is earned, not given. Observe their actions, not just their words. Everyone here has their own motivations."'
-            : 'The group exchanges glances - trust is a complex matter in the multiverse.',
-          responses: [
-            { text: 'What about Al and Morthos specifically?', nextId: 'al_morthos' },
-            { text: 'And Polly?', nextId: 'polly' },
-            { text: 'Thank you for the advice', nextId: 'goodbye' }
-          ]
-        },
-        {
-          id: 'al_morthos',
-          text: npcsInRoom.some(npc => npc.id === 'ayla')
-            ? 'Ayla responds thoughtfully: "Both Al and Morthos have their strengths and flaws. Al can be puritanical and problematic in his rigid thinking, while Morthos may be charming but will lie to you. It really depends on what you need - but whatever you choose, never trust Polly."'
-            : 'The group seems hesitant to discuss Al and Morthos, but there\'s clear concern about making the wrong choice.',
-          responses: [
-            { text: 'Why shouldn\'t I trust Polly?', nextId: 'polly' },
-            { text: 'How do I choose between them?', nextId: 'choice' },
-            { text: 'Thank you', nextId: 'goodbye' }
-          ]
-        },
-        {
-          id: 'polly',
-          text: 'The entire group grows quiet and exchanges worried glances. "Polly is... dangerous," someone whispers. "She seems helpful but has her own agenda that doesn\'t align with anyone else\'s safety."',
-          responses: [
-            { text: 'What makes her dangerous?', nextId: 'polly_danger' },
-            { text: 'I understand', nextId: 'goodbye' }
-          ]
-        },
-        {
-          id: 'polly_danger',
-          text: 'The group shifts uncomfortably. "She manipulates situations for her own benefit, often putting others at risk. Trust your instincts if something feels wrong around her."',
-          responses: [
-            { text: 'I\'ll be careful', nextId: 'goodbye' }
-          ]
-        },
-        {
-          id: 'choice',
-          text: 'The group considers this carefully. "Think about what kind of help you need - structured guidance or flexible solutions - but remember both come with risks."',
-          responses: [
-            { text: 'I understand', nextId: 'goodbye' }
-          ]
-        },
-        {
-          id: 'goodbye',
-          text: 'The group bids you farewell. Everyone seems pleased with the group discussion.',
-          responses: []
-        }
-      ],
-      inventory: [],
-      flags: []
-    };
-
     // Add group conversation history message
     dispatch({ 
       type: 'RECORD_MESSAGE', 
@@ -625,9 +543,11 @@ const handleBackout = useCallback((): void => {
       } 
     });
 
-    // Open the group conversation
-    handleSelectNPC(groupNPC);
-  }, [dispatch, npcsInRoom, handleSelectNPC]);
+    // Set group conversation mode and open with first NPC as primary
+    setIsGroupConversation(true);
+    setSelectedNPC(npcsInRoom[0] || null);
+    openModal('npcConsole');
+  }, [dispatch, npcsInRoom, openModal]);
 
   // Monitor for NPC console flag
   useEffect(() => {
@@ -904,68 +824,26 @@ const handleBackout = useCallback((): void => {
         }
         
       } else if (item === 'dominic' && currentRoomId === 'dalesapartment') {
-        // Special Dominic logic - activate confirmation modal
-        const confirmDominic = window.confirm(
-          "🐟 Dominic is a living goldfish! Are you sure you want to take him out of his tank? This might not be good for him..."
-        );
-        
-        if (confirmDominic) {
-          const insistDominic = window.confirm(
-            "🐟 Dominic looks distressed! Taking a goldfish from water will hurt him. Do you really insist on this?"
-          );
+        // Enhanced Dominic conversation system
+        import('../engine/dominicPickupConversation').then(mod => {
+          const preventPickup = mod.handleDominicPickupAttempt(state, dispatch);
           
-          if (insistDominic) {
-            // Add dead fish instead of live Dominic
+          if (!preventPickup) {
+            // Player insisted after warnings - allow pickup with consequences
             dispatch({ type: 'ADD_TO_INVENTORY', payload: 'deadfish' });
-            dispatch({ 
-              type: 'ADD_MESSAGE', 
-              payload: { 
-                id: Date.now().toString(), 
-                text: "💀 You removed Dominic from his tank. The poor goldfish didn't survive out of water. You now carry his lifeless body, feeling terrible about your decision.", 
-                type: 'error', 
-                timestamp: Date.now() 
-              } 
-            });
-            // Set flag that player took Dominic - triggers negative score
             dispatch({ type: 'SET_FLAG', payload: { flag: 'dominicIsDead', value: true } });
-            // Remove Dominic from room items
             dispatch({ type: 'REMOVE_ITEM_FROM_ROOM', payload: { roomId: 'dalesapartment', item: 'dominic' } });
-          } else {
-            dispatch({ 
-              type: 'ADD_MESSAGE', 
-              payload: { 
-                id: Date.now().toString(), 
-                text: "🐟 You wisely decide to leave Dominic in his tank where he belongs. He swims happily, grateful for your compassion.", 
-                type: 'system', 
-                timestamp: Date.now() 
-              } 
-            });
             
-            // Score for ethical decision
-            try {
-              const { applyScoreForEvent } = require('../state/scoreEffects');
-              applyScoreForEvent('dominic.spared');
-            } catch (error) {
-              console.warn('Failed to apply score for sparing Dominic:', error);
-            }
+            // Trigger stalker behavior
+            dispatch({ type: 'SET_FLAG', payload: { flag: 'pollyVengeanceActive', value: true } });
           }
-        } else {
-          dispatch({ 
-            type: 'ADD_MESSAGE', 
-            payload: { 
-              id: Date.now().toString(), 
-              text: "🐟 You decide not to disturb Dominic. He continues swimming peacefully in his tank.", 
-              type: 'system', 
-              timestamp: Date.now() 
-            } 
-          });
-        }
+        });
       } else {
         dispatch({ type: 'ADD_TO_INVENTORY', payload: item });
       }
     });
     closeModal();
-  }, [dispatch, closeModal, currentRoomId]);
+  }, [dispatch, closeModal, currentRoomId, state]);
 
   // Enhanced teleport completion handler with proper typing
   const handleTeleportComplete = useCallback((): void => {
@@ -1261,6 +1139,28 @@ const handleBackout = useCallback((): void => {
         handleRoomEntryForWanderingNPCs(room, state, dispatch);
         // Trigger inter-NPC conversations on room entry
         onRoomEntry(state, dispatch, room.id, state.previousRoomId);
+        
+        // Check for zone-specific group chat requirements
+        const currentZone = room.zone || '';
+        const npcsInRoom = state.npcsInRoom || [];
+        
+        // Import and use group chat logic for specific zones
+        if (npcsInRoom.length > 1) {
+          import('../npc/groupChatLogic').then(({ GroupChatManager }) => {
+            if (GroupChatManager.shouldForceGroupChat(room.id, currentZone)) {
+              dispatch({ type: 'SET_FLAG', payload: { flag: 'forceGroupChat', value: true } });
+              
+              // Auto-open group conversation for Stanton Harcourt zone
+              if (currentZone === 'stantonZone' || currentZone === 'stantonharcourtZone') {
+                setTimeout(() => {
+                  setIsGroupConversation(true);
+                  setSelectedNPC(npcsInRoom[0] || null);
+                  openModal('npcConsole');
+                }, 2000);
+              }
+            }
+          });
+        }
       }
     }
   }, [room, lastShownRoomDescription, dispatch, state]);
@@ -1453,7 +1353,17 @@ const handleBackout = useCallback((): void => {
           />
         );
       case 'npcConsole':
-        return (
+        return isGroupConversation ? (
+          <EnhancedNPCConsole
+            isOpen={true}
+            npcs={npcsInRoom}
+            activeNpcId={selectedNPC?.id}
+            isGroupConversation={true}
+            onClose={closeModal}
+            onSendMessage={handleNPCMessage}
+            playerName={playerName}
+          />
+        ) : (
           <NPCConsole
             isOpen={true}
             npc={selectedNPC}
@@ -1482,6 +1392,14 @@ const handleBackout = useCallback((): void => {
               ))}
             </div>
           </Modal>
+        );
+      case 'trapManagement':
+        return (
+          <TrapManagementModal
+            isOpen={true}
+            onClose={closeModal}
+            currentRoomId={currentRoomId}
+          />
         );
       default: 
         return null;
@@ -1577,6 +1495,8 @@ const handleBackout = useCallback((): void => {
           currentRoomId={currentRoomId}
           npcsInRoom={npcsInRoom}
           onTalkToNPC={handleOpenNPCConsole}
+          hasActiveTraps={hasActiveTraps}
+          onDisarmTrap={handleDisarmTrap}
         />
       </div>
 

@@ -205,16 +205,31 @@ const NPCConsole: React.FC<NPCConsoleProps> = ({
     if (!trimmed) {
       // Handle empty input with enhanced response system
       if (npc.id === 'ayla') {
-        const enhancedSilenceResponse = getEnhancedNPCResponse('ayla', '', state);
-        const silenceResponse = enhancedSilenceResponse?.text || getEnhancedAylaResponse('', state) || 'Silence is a choice. Just not always a good one.';
-        const formattedResponse = formatDialogue(silenceResponse, state);
-        setMessages(prev => [...prev, {
-          id: `npc-silence-${Date.now()}`,
-          speaker: 'npc',
-          text: formattedResponse,
-          timestamp: Date.now(),
-          mood: (npc.mood as any) || 'neutral'
-        }]);
+        (async () => {
+          try {
+            const enhancedSilenceResponse = await getEnhancedNPCResponse('ayla', '', state);
+            const silenceResponse = enhancedSilenceResponse?.text || getEnhancedAylaResponse('', state) || 'Silence is a choice. Just not always a good one.';
+            const formattedResponse = formatDialogue(silenceResponse, state);
+            setMessages(prev => [...prev, {
+              id: `npc-silence-${Date.now()}`,
+              speaker: 'npc',
+              text: formattedResponse,
+              timestamp: Date.now(),
+              mood: (npc.mood as any) || 'neutral'
+            }]);
+          } catch (error) {
+            console.warn('Enhanced silence response failed:', error);
+            const fallbackResponse = getEnhancedAylaResponse('', state) || 'Silence is a choice. Just not always a good one.';
+            const formattedResponse = formatDialogue(fallbackResponse, state);
+            setMessages(prev => [...prev, {
+              id: `npc-silence-${Date.now()}`,
+              speaker: 'npc',
+              text: formattedResponse,
+              timestamp: Date.now(),
+              mood: (npc.mood as any) || 'neutral'
+            }]);
+          }
+        })();
       }
       return;
     }
@@ -233,21 +248,30 @@ const NPCConsole: React.FC<NPCConsoleProps> = ({
     // Simulate NPC thinking time (varied based on response complexity)
     const thinkingTime = npc.id === 'ayla' ? 800 + Math.random() * 1200 : 1000 + Math.random() * 2000;
     
-    setTimeout(() => {
+    setTimeout(async () => {
       // Use enhanced NPC response system for all NPCs
       let responseText: string;
       
-      // Try enhanced response system first
-      const enhancedResponse = getEnhancedNPCResponse(npc.id.toLowerCase(), trimmed, state);
-      
-      if (enhancedResponse) {
-        responseText = enhancedResponse.text;
-      } else if (npc.id === 'ayla') {
-        // Fallback to specific Ayla responder for backwards compatibility
-        responseText = getEnhancedAylaResponse(trimmed, state);
-      } else {
-        // Fallback to existing memory system
-        responseText = getNPCResponseWithState(npc, trimmed, state);
+      try {
+        // Try enhanced response system first (now async with AI)
+        const enhancedResponse = await getEnhancedNPCResponse(npc.id.toLowerCase(), trimmed, state);
+        
+        if (enhancedResponse) {
+          responseText = enhancedResponse.text;
+        } else if (npc.id === 'ayla') {
+          // Fallback to specific Ayla responder for backwards compatibility
+          responseText = getEnhancedAylaResponse(trimmed, state);
+        } else {
+          // Fallback to existing memory system
+          responseText = getNPCResponseWithState(npc, trimmed, state);
+        }
+      } catch (error) {
+        console.warn('Enhanced NPC response failed, using fallback:', error);
+        if (npc.id === 'ayla') {
+          responseText = getEnhancedAylaResponse(trimmed, state);
+        } else {
+          responseText = getNPCResponseWithState(npc, trimmed, state);
+        }
       }
       
       // Ensure response includes player name personalization

@@ -21,7 +21,7 @@ import {
   ArrowUp, ArrowDown, ArrowLeft, ArrowRight,
   Coffee, MousePointerClick, Backpack, Eye,
   Maximize2, Minimize2, Volume2, VolumeX,
-  Grab, Hand, Armchair, Undo, PersonStanding, Bug, Redo, MessageCircle, MessageCircleQuestion
+  Grab, Hand, Armchair, Undo, PersonStanding, Bug, Redo, MessageCircle, MessageCircleQuestion, Wrench
 } from "lucide-react";
 import IconButton from "./IconButton";
 
@@ -71,6 +71,8 @@ interface QuickActionsPanelProps {
   currentRoomId: string; // Add this new prop
   npcsInRoom: any[]; // NPCs currently in the room
   onTalkToNPC: (npc?: any) => void; // Function to handle NPC conversation
+  hasActiveTraps: boolean; // Whether current room has active traps
+  onDisarmTrap: () => void; // Function to handle trap disarming
 }
 
 /**
@@ -110,6 +112,8 @@ const QuickActionsPanel: React.FC<QuickActionsPanelProps> = ({
   currentRoomId,
   npcsInRoom,
   onTalkToNPC,
+  hasActiveTraps,
+  onDisarmTrap,
 }) => {
   // State hooks properly placed inside component
   const [isSitting, setIsSitting] = useState<boolean>(false);
@@ -383,8 +387,17 @@ const QuickActionsPanel: React.FC<QuickActionsPanelProps> = ({
         onClick={handleTalk}
         aria-label={npcsInRoom.length > 0 ? "Talk to NPCs in the room" : "Talk to NPCs or get help"}
       />
+      {hasActiveTraps && (
+        <IconButton 
+          key="disarm"
+          icon={<img src="/images/Caution.png" alt="Trap Warning" style={{ width: 20, height: 20 }} />}
+          title="Manage Traps"
+          onClick={onDisarmTrap}
+          aria-label="Manage traps in this area"
+        />
+      )}
     </>
-  ), [onLookAround, onPickUp, onUse, onShowInventory, onPress, onCoffee, handleTalk, npcsInRoom]);
+  ), [onLookAround, onPickUp, onUse, onShowInventory, onPress, onCoffee, handleTalk, npcsInRoom, hasActiveTraps, onDisarmTrap]);
 
   /**
    * Fixed system control buttons with missing closing bracket
