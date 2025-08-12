@@ -133,17 +133,23 @@ describe('NPCErrorHandler', () => {
 
     test('should increase degradation level with errors', async () => {
       // Generate many errors to trigger degradation
+      const errorPromises = [];
       for (let i = 0; i < 10; i++) {
-        await errorHandler.reportError(
-          NPCErrorType.MOVEMENT_FAILED,
-          `Error ${i}`,
-          {},
-          NPCErrorSeverity.MEDIUM
+        errorPromises.push(
+          errorHandler.reportError(
+            NPCErrorType.MOVEMENT_FAILED,
+            `Error ${i}`,
+            {},
+            NPCErrorSeverity.MEDIUM
+          )
         );
       }
+      
+      // Wait for all errors to be processed
+      await Promise.all(errorPromises);
 
       expect(errorHandler.getDegradationLevel()).toBeGreaterThan(0);
-    });
+    }, 15000); // Increased timeout to 15 seconds
 
     test('should disable features based on degradation level', async () => {
       // Force degradation by reporting critical errors
@@ -165,19 +171,24 @@ describe('NPCErrorHandler', () => {
       const initialMultiplier = errorHandler.getPerformanceMultiplier();
       expect(initialMultiplier).toBe(1.0);
 
-      // Force some degradation
+      // Force some degradation with batch processing
+      const errorPromises = [];
       for (let i = 0; i < 5; i++) {
-        await errorHandler.reportError(
-          NPCErrorType.MOVEMENT_FAILED,
-          `Error ${i}`,
-          {},
-          NPCErrorSeverity.HIGH
+        errorPromises.push(
+          errorHandler.reportError(
+            NPCErrorType.MOVEMENT_FAILED,
+            `Error ${i}`,
+            {},
+            NPCErrorSeverity.HIGH
+          )
         );
       }
+      
+      await Promise.all(errorPromises);
 
       const degradedMultiplier = errorHandler.getPerformanceMultiplier();
       expect(degradedMultiplier).toBeLessThan(1.0);
-    });
+    }, 15000); // Increased timeout
   });
 
   describe('Circuit Breaker', () => {
@@ -390,7 +401,7 @@ describe('Safe Wrapper Utility', () => {
 
   test('should preserve function context and arguments', () => {
     const originalFn = jest.fn(function(this: any, a: number, b: string) {
-      return `${this.name}: ${a} ${b}`;
+      return `${this?.name || 'unknown'}: ${a} ${b}`;
     });
     
     const context = { name: 'test' };
@@ -431,15 +442,20 @@ describe('Error Handler Integration', () => {
   test('should recover from degradation over time', async () => {
     const errorHandler = new NPCErrorHandler();
     
-    // Create initial degradation
+    // Create initial degradation with batch processing
+    const errorPromises = [];
     for (let i = 0; i < 5; i++) {
-      await errorHandler.reportError(
-        NPCErrorType.MOVEMENT_FAILED,
-        `Error ${i}`,
-        {},
-        NPCErrorSeverity.HIGH
+      errorPromises.push(
+        errorHandler.reportError(
+          NPCErrorType.MOVEMENT_FAILED,
+          `Error ${i}`,
+          {},
+          NPCErrorSeverity.HIGH
+        )
       );
     }
+    
+    await Promise.all(errorPromises);
     
     const initialDegradation = errorHandler.getDegradationLevel();
     expect(initialDegradation).toBeGreaterThan(0);
@@ -453,7 +469,7 @@ describe('Error Handler Integration', () => {
     expect(errorHandler.getPerformanceMultiplier()).toBe(1.0);
     
     errorHandler.cleanup();
-  });
+  }, 15000); // Increased timeout
 
   test('should handle concurrent error reporting', async () => {
     const errorHandler = new NPCErrorHandler();

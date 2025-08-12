@@ -116,7 +116,7 @@ const TeletypeIntro: React.FC<TeletypeIntroProps> = ({ playerName, onComplete })
         setShowChoices(true);
         startWaitTimer();
       }
-    }, 50); // Extended from 30ms to 50ms for longer intro
+    }, 75); // Extended to 75ms for more dramatic intro pacing
 
 // JSX return block or main return
     return () => clearTimeout(timeout);
@@ -153,7 +153,7 @@ const TeletypeIntro: React.FC<TeletypeIntroProps> = ({ playerName, onComplete })
         dramatic_wait: { route: 'dramatic_wait', targetRoom: 'crossing', inventoryBonus: ['quantum_coffee', 'dales_apartment_key'] }
       };
       onComplete(routeMap[choice]);
-    }, 300);
+    }, 800); // Increased from 300ms to 800ms for better pacing
   };
 
 // JSX return block or main return

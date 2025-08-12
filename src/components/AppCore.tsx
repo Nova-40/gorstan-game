@@ -78,6 +78,16 @@ import { npcReact } from '../engine/npcEngine';
 import { npcRegistry } from '../npcs/npcMemory';
 import Modal from './Modal';
 import TrapManagementModal from './TrapManagementModal';
+import AylaHintPopup from './AylaHintPopup';
+import UnifiedAIPopup from './UnifiedAIPopup';
+import AIMonitorDisplay from './AIMonitorDisplay';
+import { AylaHintSystem } from '../services/aylaHintSystem';
+import type { AylaHintResponse } from '../services/aylaHintSystem';
+import { unifiedAI } from '../services/unifiedAI';
+import type { AIGuidanceResponse } from '../services/unifiedAI';
+import { aiUsageMonitor } from '../services/aiUsageMonitor';
+import type { GameplayUpdate } from '../services/aiUsageMonitor';
+import { npcAI } from '../services/npcAI';
 import { itemDescriptions } from '../data/itemDescriptions';
 import PerformanceDashboard from './PerformanceDashboard';
 
@@ -152,6 +162,20 @@ const AppCore: React.FC = () => {
   const lookModalTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [selectedNPC, setSelectedNPC] = useState<NPC | null>(null);
   const [isGroupConversation, setIsGroupConversation] = useState(false);
+
+  // Ayla hint system state
+  const [currentHint, setCurrentHint] = useState<AylaHintResponse | null>(null);
+  const [currentGuidance, setCurrentGuidance] = useState<AIGuidanceResponse | null>(null);
+  const [commandHistory, setCommandHistory] = useState<string[]>([]);
+  const [failedCommands, setFailedCommands] = useState<string[]>([]);
+  const [roomEntryTime, setRoomEntryTime] = useState<number>(Date.now());
+  const hintCheckIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [aylaHintSystem] = useState(() => new AylaHintSystem());
+
+  // AI Usage Monitoring state
+  const [gameplayUpdates, setGameplayUpdates] = useState<GameplayUpdate[]>([]);
+  const [showAIMonitor, setShowAIMonitor] = useState<boolean>(false);
+  const [npcBehaviors, setNpcBehaviors] = useState<Record<string, string>>({});
 
   // Save game state
   const [saveSlots, setSaveSlots] = useState<Array<{
@@ -433,6 +457,77 @@ const handleBackout = useCallback((): void => {
     loadSaveSlots();
   }, [loadSaveSlots]);
 
+  // Setup AI Usage Monitoring and NPC AI Integration
+  useEffect(() => {
+    // Subscribe to AI usage updates
+    const unsubscribe = aiUsageMonitor.onUpdate((update) => {
+      setGameplayUpdates(prev => [...prev.slice(-19), update]); // Keep last 20 updates
+      
+      // Console logging for real-time monitoring
+      if (update.type === 'ai_interaction') {
+        console.log('[AI Monitor] AI Interaction:', update.data);
+      }
+    });
+
+    // Track initial room visit
+    if (currentRoomId) {
+      aiUsageMonitor.trackRoomVisit(currentRoomId, state);
+    }
+
+    return unsubscribe;
+  }, [currentRoomId, state]);
+
+  // NPC AI Behavior Generation
+  useEffect(() => {
+    const generateNPCBehaviors = async () => {
+      if (!room || npcsInRoom.length === 0) return;
+
+      for (const npc of npcsInRoom) {
+        try {
+          const npcProfile = npcAI.getAllNPCs().find(p => p.npcId === npc.id);
+          if (!npcProfile) continue;
+
+          const context = {
+            npcProfile,
+            currentRoom: room,
+            playerPresent: true,
+            gameState: state,
+            recentPlayerActions: commandHistory.slice(-5),
+            timeInRoom: Date.now() - roomEntryTime,
+            nearbyNPCs: npcsInRoom.map(n => n.id).filter(id => id !== npc.id)
+          };
+
+          const behavior = await npcAI.generateNPCBehavior(context);
+          if (behavior && behavior.shouldDisplay) {
+            setNpcBehaviors(prev => ({
+              ...prev,
+              [npc.id]: behavior.content
+            }));
+
+            // Display behavior in console if significant
+            if (behavior.priority === 'high' || behavior.type === 'callout') {
+              dispatch({
+                type: 'ADD_MESSAGE',
+                payload: {
+                  id: Date.now().toString(),
+                  text: `**${npc.name}**: ${behavior.content}`,
+                  type: 'npc',
+                  timestamp: Date.now()
+                }
+              });
+            }
+          }
+        } catch (error) {
+          console.warn(`[NPC AI] Behavior generation failed for ${npc.id}:`, error);
+        }
+      }
+    };
+
+    // Generate behaviors after a short delay when room/NPCs change
+    const timeout = setTimeout(generateNPCBehaviors, 2000);
+    return () => clearTimeout(timeout);
+  }, [room, npcsInRoom, commandHistory, roomEntryTime, state, dispatch]);
+
   // NPC Console functions
   const handleOpenNPCConsole = useCallback((npc?: NPC) => {
     if (npc) {
@@ -605,6 +700,10 @@ const handleBackout = useCallback((): void => {
         e.preventDefault();
         setShowPerformanceDashboard(true);
       }
+      if (e.ctrlKey && e.key === 'a') {
+        e.preventDefault();
+        setShowAIMonitor(!showAIMonitor);
+      }
       if (e.key.toLowerCase() === 't' && !modal && stage === 'game') {
         // Talk to NPC shortcut
         if (npcsInRoom.length === 1) {
@@ -700,9 +799,72 @@ const handleBackout = useCallback((): void => {
     lookModalTimeoutRef.current = setTimeout(closeModal, 6000);
   }, [room, npcsInRoom, openModal, closeModal]);
 
+  // Enhanced hint checking function with unified AI
+  const checkForHints = useCallback(async (cmd: string, lowerCmd: string) => {
+    if (!aylaHintSystem || currentHint || currentGuidance) return;
+
+    // Check if this was a failed command (we can check this by looking at recent messages)
+    const recentMessages = state.messages.slice(-3);
+    const hasFailureMessage = recentMessages.some(msg => 
+      msg.text.includes("don't understand") || 
+      msg.text.includes("can't") || 
+      msg.text.includes("no one") ||
+      msg.text.includes("don't see") ||
+      msg.text.includes("not here") ||
+      msg.type === 'error'
+    );
+
+    // Also check for repeated commands or signs of being stuck
+    const recentCommands = commandHistory.slice(-5);
+    const hasRepeatedCommands = recentCommands.filter(c => c === cmd).length >= 2;
+    const hasVariousFailedAttempts = recentCommands.length >= 3;
+
+    if (hasFailureMessage || hasRepeatedCommands || hasVariousFailedAttempts) {
+      try {
+        // Try unified AI first for comprehensive guidance
+        const unifiedContext = {
+          gameState: state,
+          currentRoom: room!,
+          recentCommands: commandHistory,
+          timeInRoom: Date.now() - roomEntryTime,
+          failedAttempts: hasFailureMessage ? [cmd] : []
+        };
+
+        const unifiedGuidance = await unifiedAI.getUnifiedGuidance(unifiedContext);
+        
+        if (unifiedGuidance) {
+          setCurrentGuidance(unifiedGuidance);
+          return;
+        }
+
+        // Fallback to traditional Ayla hint system
+        const context = {
+          currentRoom: room!,
+          gameState: state,
+          recentCommands: commandHistory,
+          timeInRoom: Date.now() - roomEntryTime,
+          failedAttempts: hasFailureMessage ? [cmd] : [],
+          stuckDuration: Date.now() - roomEntryTime
+        };
+
+        const hintResponse = await aylaHintSystem.shouldAylaInterrupt(context);
+
+        if (hintResponse) {
+          setCurrentHint(hintResponse);
+        }
+      } catch (error) {
+        console.warn('Failed to generate hint:', error);
+      }
+    }
+  }, [aylaHintSystem, currentHint, currentGuidance, state, commandHistory, room, roomEntryTime]);
+
   // Enhanced command handler with better type safety
   const handleCommand = useCallback((cmd: string): void => {
     const lowerCmd: string = cmd.toLowerCase().trim();
+    let commandSuccess: boolean = false;
+
+    // Track command for hint system
+    setCommandHistory(prev => [...prev.slice(-9), cmd]); // Keep last 10 commands
 
     // Enhanced NPC interaction with proper type handling
     if (lowerCmd.startsWith("talk to ")) {
@@ -806,6 +968,15 @@ const handleBackout = useCallback((): void => {
     }
 
     dispatch({ type: 'COMMAND_INPUT', payload: cmd });
+
+    // Track command execution for AI monitoring
+    const isSuccessfulCommand = !lowerCmd.includes('unknown') && 
+                               !lowerCmd.includes('can\'t') && 
+                               !lowerCmd.includes('invalid');
+    aiUsageMonitor.trackCommand(cmd, isSuccessfulCommand, currentRoomId);
+
+    // Check for hint opportunities after command processing
+    checkForHints(cmd, lowerCmd);
   }, [npcsInRoom, room, inventory, dispatch, handleLookAround, openModal, currentRoomId]);
 
   // Enhanced pickup handler with proper type safety and Dominic special logic
@@ -977,8 +1148,11 @@ const handleBackout = useCallback((): void => {
       if (!previousRoom) {
         // First room load - set as previous for future navigation
         setPreviousRoom(room);
+        setRoomEntryTime(Date.now());
       } else if (previousRoom.id !== room.id) {
-        // Room has changed - the previous room should remain as it was
+        // Room has changed - update entry time for hint system
+        setRoomEntryTime(Date.now());
+        // The previous room should remain as it was
         // This allows the backout functionality to work correctly
         // previousRoom is updated in handleCommand before dispatch
       }
@@ -1519,11 +1693,54 @@ const handleBackout = useCallback((): void => {
         onClose={() => dispatch({ type: 'DISMISS_BLUE_BUTTON_WARNING' })}
       />
 
+      {/* Ayla Hint Popup */}
+      {currentHint && (
+        <AylaHintPopup
+          hint={currentHint}
+          onDismiss={() => setCurrentHint(null)}
+          onTalkToAyla={() => {
+            // Open enhanced NPC console with Ayla
+            setSelectedNPC({ id: 'ayla', name: 'Ayla' } as NPC);
+            setIsGroupConversation(false);
+            openModal('npcConsole');
+            setCurrentHint(null);
+          }}
+        />
+      )}
+
+      {/* Unified AI Guidance Popup */}
+      {currentGuidance && (
+        <UnifiedAIPopup
+          guidance={currentGuidance}
+          onDismiss={() => setCurrentGuidance(null)}
+          onTalkToAyla={() => {
+            setSelectedNPC({ id: 'ayla', name: 'Ayla' } as NPC);
+            setIsGroupConversation(false);
+            openModal('npcConsole');
+            setCurrentGuidance(null);
+          }}
+          onOpenMiniquests={() => {
+            // Trigger miniquest command to open interface
+            handleCommand('miniquests');
+            setCurrentGuidance(null);
+          }}
+        />
+      )}
+
       {/* Performance Dashboard */}
       <PerformanceDashboard
         isVisible={showPerformanceDashboard}
         onClose={() => setShowPerformanceDashboard(false)}
       />
+
+      {/* AI Usage Monitor */}
+      {showAIMonitor && (
+        <AIMonitorDisplay
+          updates={gameplayUpdates}
+          npcBehaviors={npcBehaviors}
+          onClose={() => setShowAIMonitor(false)}
+        />
+      )}
 
       {/* Celebration System Active */}
     </div>

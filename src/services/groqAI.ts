@@ -515,6 +515,65 @@ class GroqAIService {
     this.config.enabled = enabled;
     console.log(`[Groq AI] ${enabled ? 'Enabled' : 'Disabled'}`);
   }
+
+  // General AI response method for non-NPC use cases
+  async generateAIResponse(
+    prompt: string,
+    context: string,
+    gameState: LocalGameState,
+    maxTokens: number = 500
+  ): Promise<string | null> {
+    if (!this.canMakeRequest()) {
+      console.log(`[Groq AI] Request limit reached or disabled for ${context}`);
+      return null;
+    }
+
+    try {
+      console.log(`[Groq AI] Generating ${context} response...`);
+
+      const systemPrompt = `You are an AI assistant for the Gorstan text adventure game. 
+      Current player location: ${gameState.currentRoomId}
+      Player score: ${gameState.player.score || 0}
+      Game context: ${context}
+      
+      Provide helpful, contextual responses in JSON format when requested, 
+      or clear text responses otherwise. Keep responses concise and relevant.`;
+
+      const chatCompletion = await Promise.race([
+        this.groq.chat.completions.create({
+          messages: [
+            {
+              role: "system",
+              content: systemPrompt
+            },
+            {
+              role: "user",
+              content: prompt
+            }
+          ],
+          model: "llama-3.3-70b-versatile",
+          temperature: 0.6,
+          max_tokens: maxTokens,
+          stream: false
+        }),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Timeout')), this.config.timeout)
+        ) as Promise<never>
+      ]);
+
+      const response = chatCompletion.choices[0]?.message?.content?.trim();
+      
+      if (response) {
+        this.incrementRequestCount();
+        return response;
+      }
+      
+      return null;
+    } catch (error) {
+      console.error(`[Groq AI] Error generating ${context} response:`, error);
+      return null;
+    }
+  }
 }
 
 export const groqAI = new GroqAIService();

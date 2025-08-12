@@ -25,6 +25,8 @@ import { MiniquestData, MiniquestProgress } from '../components/MiniquestInterfa
 
 import { MiniquestEngine } from '../engine/miniquestInitializer';
 
+import { aiMiniquestService, AIMiniquestRecommendation } from '../services/aiMiniquestService';
+
 
 
 
@@ -43,6 +45,13 @@ export interface MiniquestControllerResult {
   totalScore: number;
   completedCount: number;
   availableCount: number;
+  aiRecommendations?: AIMiniquestRecommendation[]; // AI-enhanced recommendations
+  aiAnalysis?: {
+    playerFrustrationLevel: number;
+    shouldOfferHelp: boolean;
+    personalizedEncouragement: string;
+    recommendedActions: string[];
+  };
 }
 
 export interface MiniquestSession extends MiniquestControllerResult {
@@ -53,6 +62,9 @@ export interface MiniquestSession extends MiniquestControllerResult {
 class MiniquestController {
   private static instance: MiniquestController;
   private dispatch: React.Dispatch<GameAction> | null = null;
+  private aiEnabled: boolean = true; // AI enhancement toggle
+  private lastAIUpdate: Date | null = null; // Track last AI update
+  private aiRecommendations: AIMiniquestRecommendation[] = []; // Store current AI recommendations
 
   public static getInstance(): MiniquestController {
     if (!MiniquestController.instance) {
@@ -63,6 +75,11 @@ class MiniquestController {
 
   public setDispatch(dispatch: React.Dispatch<GameAction>) {
     this.dispatch = dispatch;
+  }
+
+  public setAIEnabled(enabled: boolean) {
+    this.aiEnabled = enabled;
+    aiMiniquestService.setAIEnabled(enabled);
   }
 
   
@@ -79,23 +96,63 @@ class MiniquestController {
 // Variable declaration
     const allRoomQuests = this.getAllRoomQuests(roomId);
 
+    // Get AI recommendations and analysis if enabled
+    let aiRecommendations: AIMiniquestRecommendation[] | undefined;
+    let aiAnalysis: any;
+
+    if (this.aiEnabled) {
+      try {
+        [aiRecommendations, aiAnalysis] = await Promise.all([
+          aiMiniquestService.getRecommendedQuests(roomId, gameState, 3),
+          aiMiniquestService.analyzePlayerState(gameState)
+        ]);
+        
+        // Store AI recommendations and update timestamp
+        if (aiRecommendations) {
+          this.aiRecommendations = aiRecommendations;
+          this.lastAIUpdate = new Date();
+        }
+      } catch (error) {
+        console.warn('AI miniquest enhancement failed, using fallback:', error);
+        // AI failed, continue with standard system
+      }
+    }
+
     
-    const miniquests: MiniquestData[] = allRoomQuests.map(quest => ({
-      id: quest.id,
-      title: quest.title,
-      description: quest.description,
-      type: quest.type,
-      rewardPoints: quest.rewardPoints,
-      flagOnCompletion: quest.flagOnCompletion,
-      requiredItems: quest.requiredItems,
-      requiredConditions: quest.requiredConditions,
-      triggerAction: quest.triggerAction,
-      triggerText: quest.triggerText,
-      hint: quest.hint,
-      repeatable: quest.repeatable,
-      timeLimit: quest.timeLimit,
-      difficulty: quest.difficulty
-    }));
+    const miniquests: MiniquestData[] = allRoomQuests.map(quest => {
+      const baseQuest = {
+        id: quest.id,
+        title: quest.title,
+        description: quest.description,
+        type: quest.type,
+        rewardPoints: quest.rewardPoints,
+        flagOnCompletion: quest.flagOnCompletion,
+        requiredItems: quest.requiredItems,
+        requiredConditions: quest.requiredConditions,
+        triggerAction: quest.triggerAction,
+        triggerText: quest.triggerText,
+        hint: quest.hint,
+        repeatable: quest.repeatable,
+        timeLimit: quest.timeLimit,
+        difficulty: quest.difficulty
+      };
+
+      // Enhance with AI recommendations if available
+      const aiRec = aiRecommendations?.find(rec => rec.questId === quest.id);
+      if (aiRec) {
+        return {
+          ...baseQuest,
+          description: aiRec.adaptedDescription || baseQuest.description,
+          hint: aiRec.hints.join(' | ') || baseQuest.hint,
+          difficulty: aiRec.difficulty,
+          aiConfidence: aiRec.confidence,
+          aiReasoning: aiRec.reasoning,
+          estimatedTime: aiRec.estimatedCompletionTime
+        };
+      }
+
+      return baseQuest;
+    });
 
     
     const progress: { [questId: string]: MiniquestProgress } = {};
@@ -142,7 +199,9 @@ class MiniquestController {
       roomName,
       totalScore,
       completedCount,
-      availableCount
+      availableCount,
+      aiRecommendations,
+      aiAnalysis
     };
   }
 
@@ -151,11 +210,28 @@ class MiniquestController {
     questId: string,
     roomId: string,
     gameState: LocalGameState
-  ): Promise<{ success: boolean; message: string; scoreAwarded?: number }> {
+  ): Promise<{ success: boolean; message: string; scoreAwarded?: number; aiGuidance?: string }> {
 // Variable declaration
     const engine = MiniquestEngine.getInstance();
 
     try {
+      // Get AI difficulty adaptation if enabled
+      let aiGuidance: string | undefined;
+      
+      if (this.aiEnabled) {
+        try {
+          const quest = this.getAllRoomQuests(roomId).find(q => q.id === questId);
+          if (quest) {
+            const adaptation = await aiMiniquestService.getAdaptedDifficulty(quest, gameState);
+            aiGuidance = adaptation.reasoning;
+            
+            // Note: Future enhancement could modify quest difficulty based on AI recommendation
+          }
+        } catch (error) {
+          console.warn('AI difficulty adaptation failed:', error);
+        }
+      }
+
 // Variable declaration
       const result = engine.attemptQuest(questId, roomId, gameState as any);
 
@@ -201,12 +277,24 @@ class MiniquestController {
             }
           } as any);
         }
+
+        // Add AI guidance message if available
+        if (aiGuidance) {
+          this.dispatch({
+            type: 'ADD_MESSAGE',
+            payload: {
+              text: `💡 AI Insight: ${aiGuidance}`,
+              type: 'system'
+            }
+          } as any);
+        }
       }
 
       return {
         success: result.success,
         message: result.message,
-        scoreAwarded: result.scoreAwarded
+        scoreAwarded: result.scoreAwarded,
+        aiGuidance
       };
 
     } catch (error) {
@@ -228,6 +316,14 @@ class MiniquestController {
   }
 
   
+  public getAIStatus(): { enabled: boolean; lastUpdate: Date | null; recommendations: number } {
+// JSX return block or main return
+    return {
+      enabled: this.aiEnabled,
+      lastUpdate: this.lastAIUpdate,
+      recommendations: this.aiRecommendations.length
+    };
+  }
   private getRoomDisplayName(roomId: string, gameState: LocalGameState): string {
 // Variable declaration
     const room = gameState.roomMap[roomId];

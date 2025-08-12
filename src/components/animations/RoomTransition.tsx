@@ -78,11 +78,11 @@ const RoomTransition: React.FC<RoomTransitionProps> = ({
 // Variable declaration
   const getTransitionDuration = () => {
     switch (transitionType) {
-      case 'zone_change': return 2000;
-      case 'portal': return 1800;
-      case 'chair_portal': return 2200;
-      case 'normal': return 600;
-      default: return 800;
+      case 'zone_change': return 3000; // Increased from 2000ms
+      case 'portal': return 2500; // Increased from 1800ms
+      case 'chair_portal': return 3200; // Increased from 2200ms
+      case 'normal': return 1000; // Increased from 600ms
+      default: return 1200; // Increased from 800ms
     }
   };
 
