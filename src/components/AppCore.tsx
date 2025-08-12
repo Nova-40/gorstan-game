@@ -15,7 +15,7 @@
 */
 
 // src/components/AppCore.tsx
-// Gorstan Game Beta 1
+// Gorstan Game Beta 2
 // Gorstan and characters (c) Geoff Webster 2025
 // Main game controller UI and logic routing.
 

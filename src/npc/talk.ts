@@ -17,7 +17,7 @@
 // src/npc/talk.ts
 // Public API for Inter-NPC Conversations
 // High-level functions for scripted NPC dialogue
-// Gorstan Game Beta 1
+// Gorstan Game Beta 2
 
 import { sendNPCMessage, canStartConversation, recordConversationStart } from "./conversationBus";
 import { NPC_IDS } from "./registry";

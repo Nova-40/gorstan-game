@@ -821,6 +821,33 @@ const EnhancedNPCConsole: React.FC<EnhancedNPCConsoleProps> = ({
           
           return selectUniqueResponse(pollyResponses);
           
+        case 'librarian':
+          const librarianResponses = [
+            '*adjusts ancient tome* Ah, a seeker of knowledge approaches. I have catalogued the rise and fall of countless civilizations across all universes.',
+            '*peers over spectacles worn thin by eons* Your inquiry touches upon wisdom I have gathered since the Lattice itself was young.',
+            '*turns pages of a book written in shifting script* Every culture that has ever existed, in every instance of the multiverse, has passed through these archives.',
+            '*gestures to infinite shelves* The accumulated knowledge of all realities rests here. What fragment of this vast tapestry interests you?',
+            '*eyes gleaming with ancient memory* I remember when your kind first discovered fire, invented writing, reached for the stars... in so many different timelines.',
+            '*voice echoing with the weight of ages* Time is a river that I have watched flow since its source. What wisdom from its depths do you seek?',
+            '*carefully closing a chronicle of a dead world* Each civilization believes itself unique, yet I have seen the patterns repeat across infinite realities.',
+            '*stroking a manuscript that glows faintly* Knowledge is the only immortal thing in this multiverse. Everything else fades, but understanding endures.'
+          ];
+          
+          if (lowerMessage.includes('help') || lowerMessage.includes('knowledge')) {
+            return '*nods with infinite patience* Knowledge is meant to be shared, young seeker. I have witnessed the entire span of existence - ask, and I shall illuminate what you wish to understand.';
+          }
+          if (lowerMessage.includes('lattice') || lowerMessage.includes('multiverse')) {
+            return '*eyes distant with memory* I am as old as the Lattice itself. I watched its builders - who looked just like you humans - embed their technology into the very fabric of reality.';
+          }
+          if (lowerMessage.includes('civilization') || lowerMessage.includes('culture') || lowerMessage.includes('history')) {
+            return '*opens a tome that shows moving images* Every civilization, every culture, every moment of significance - all catalogued here. The patterns of rise and fall are... instructive.';
+          }
+          if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('hey')) {
+            return '*looks up from ancient scrolls* Greetings, young one. I am the Librarian, keeper of all knowledge that has ever been or ever will be. How may this old repository serve you?';
+          }
+          
+          return selectUniqueResponse(librarianResponses);
+          
         default:
           const defaultResponses = [
             'I understand your question. Let me think about how best to respond.',

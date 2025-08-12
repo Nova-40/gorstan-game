@@ -17,7 +17,7 @@
 // src/npc/conversationBus.ts
 // Inter-NPC Conversation Orchestrator
 // Manages NPC-to-NPC dialogue with cooldowns, co-location rules, and player visibility
-// Gorstan Game Beta 1
+// Gorstan Game Beta 2
 
 import { ConversationThread, NPCExchange, SpeakerRef } from "../types/dialogue";
 import { LocalGameState } from "../state/gameState";

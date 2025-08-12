@@ -83,7 +83,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
             `
           }}
         >
-          The Game vBeta 1.0
+          The Game Beta 2
         </p>
 
         {}
