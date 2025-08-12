@@ -42,7 +42,6 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onBegin, onLoadGame }) =>
       </h1>
       <p className="text-md md:text-lg text-center max-w-2xl mb-6">
         A multiverse simulation of coffee, consequence, and quantum possibility. Tread carefully. The rabbit is watching.
-        <span className="block text-yellow-300 text-sm mt-2 font-bold">🚀 DEPLOYMENT TEST v03 - LIVE CHECK 🚀</span>
       </p>
 
       <div className="flex flex-col items-center">

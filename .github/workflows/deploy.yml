@@ -1,17 +1,14 @@
-name: Deploy to Vercel
+name: Build and Test
 
 on:
   push:
     branches: [ main ]
+  pull_request:
+    branches: [ main ]
   workflow_dispatch:
-    inputs:
-      force_deploy:
-        description: 'Force deployment even without changes'
-        required: false
-        default: 'false'
 
 jobs:
-  deploy:
+  build-and-test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -29,16 +26,12 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: '--prod'
-          working-directory: ./
+      - name: Run tests (if available)
+        run: npm test --if-present
 
-      - name: Verify Deployment
+      - name: Deployment Instructions
         run: |
-          sleep 30
-          npm run verify:deployment
+          echo "✅ Build successful!"
+          echo "📋 To deploy manually:"
+          echo "   npm run deploy:manual"
+          echo "🌐 Target: https://gorstan-game.vercel.app"
