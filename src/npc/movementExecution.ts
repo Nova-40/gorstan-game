@@ -26,6 +26,7 @@ import { getZoneAwarenessProvider, ZoneSetupConfig } from './zoneAwareness';
 import { getPerformanceOptimizer } from './performanceOptimizer';
 import { getAccessibilityProvider } from './accessibilityProvider';
 import { getErrorHandler, NPCErrorType, NPCErrorSeverity, createSafeWrapper } from './errorHandling';
+import { getGameState } from '../state/gameState';
 
 export interface NPCMovementConfig {
   npcId: string;
@@ -597,8 +598,9 @@ export class MovementExecutor {
       }
     }
 
-    // TODO: Get player room from game state
-    const playerRoomId = 'player-room'; // Placeholder
+    // Get player room from game state
+    const gameState = getGameState();
+    const playerRoomId = gameState?.currentRoomId || 'controlnexus';
 
     return {
       currentRoom,
@@ -611,8 +613,8 @@ export class MovementExecutor {
       playerRoomId,
       roomCapacity,
       occupiedRooms,
-      questGates: {}, // TODO: Integrate with game state
-      lockedDoors: {} // TODO: Integrate with game state
+      questGates: gameState?.flags || {}, // Integrate with game state flags
+      lockedDoors: {} // Room exits are handled by room definitions
     };
   }
 

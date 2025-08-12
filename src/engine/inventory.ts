@@ -17,21 +17,61 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Core game engine module.
 
-// Mock function for getting item definition - needs proper implementation
+import { ITEMS } from './items';
+
+// Function for getting item definition from actual item registry
 function getItemDefinition(itemId: string): InventoryItem | null {
-  // This is a placeholder - should connect to actual item registry
+  const item = ITEMS.find(i => i.id === itemId);
+  if (!item) {
+    console.warn(`[Inventory] Item not found in registry: ${itemId}`);
+    return null;
+  }
+  
+  // Map item categories from items.ts to inventory categories
+  const categoryMap: Record<string, ItemCategory> = {
+    'functional': 'tool',
+    'valuable': 'artifact', 
+    'consumable': 'consumable',
+    'key': 'key',
+    'document': 'document',
+    'misc': 'misc'
+  };
+  
+  const rarityMap: Record<string, ItemRarity> = {
+    'common': 'common',
+    'uncommon': 'uncommon', 
+    'rare': 'rare',
+    'epic': 'epic',
+    'legendary': 'legendary'
+  };
+  
   return {
-    id: itemId,
-    name: itemId.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()),
-    stackable: true,
-    category: 'misc',
-    rarity: 'common'
+    id: item.id,
+    name: item.name,
+    stackable: item.stackable ?? true,
+    category: categoryMap[item.category || 'misc'] || 'misc',
+    rarity: rarityMap[item.rarity || 'common'] || 'common'
   };
 }
 
-// Mock function for getting category - needs proper implementation
+// Function for getting category from item registry
 function getCategoryForItem(itemId: string): ItemCategory {
-  return 'misc';
+  const item = ITEMS.find(i => i.id === itemId);
+  if (!item) {
+    return 'misc';
+  }
+  
+  // Map item categories from items.ts to inventory categories
+  const categoryMap: Record<string, ItemCategory> = {
+    'functional': 'tool',
+    'valuable': 'artifact',
+    'consumable': 'consumable', 
+    'key': 'key',
+    'document': 'document',
+    'misc': 'misc'
+  };
+  
+  return categoryMap[item.category || 'misc'] || 'misc';
 }
 
 export interface InventoryItem {
@@ -408,9 +448,29 @@ export function useItem(itemId: string, context?: InventoryContext): InventoryOp
 
     // Apply item effects
     let effectMessages = '';
-    if (item.effects) {
-      // Process effects here - placeholder for now
-      effectMessages = 'Effect applied';
+    if (item.effects && item.effects.length > 0) {
+      // Process each effect on the item
+      const processedEffects = item.effects.map(effect => {
+        switch (effect.type) {
+          case 'heal':
+            return `You feel refreshed (+${effect.value || 10} health)`;
+          case 'boost':
+            return `You feel empowered! (+${effect.value || 5} boost for ${effect.duration || 30}s)`;
+          case 'unlock':
+            return `You unlock something new!`;
+          case 'transform':
+            return `The ${itemId} transforms into something else!`;
+          case 'quest':
+            return `Quest progress updated`;
+          case 'special':
+            return effect.description || 'Something magical happens!';
+          default:
+            return effect.description || 'You use the item';
+        }
+      });
+      effectMessages = processedEffects.join(', ');
+    } else {
+      effectMessages = 'You use the item';
     }
 
     // Remove consumable items after use

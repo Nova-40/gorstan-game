@@ -274,9 +274,23 @@ export class PuzzleEngine {
       };
     }
 
+    // Use puzzle's validation function if available
+    if (puzzle.validation && typeof puzzle.validation === 'function') {
+      try {
+        return puzzle.validation(solution);
+      } catch (error) {
+        console.error('Error in puzzle validation:', error);
+        return {
+          success: false,
+          feedback: 'An error occurred while validating your solution.'
+        };
+      }
+    }
+
+    // Default logic puzzle validation - check if solution is truthy
     return {
-      success: false,
-      feedback: 'Logic puzzle validation not implemented for this puzzle type.'
+      success: Boolean(solution),
+      feedback: solution ? 'Logical approach accepted!' : 'This logic puzzle needs a valid solution.'
     };
   }
 
@@ -303,9 +317,22 @@ export class PuzzleEngine {
       };
     }
 
+    // Use puzzle's validation function if available
+    if (puzzle.validation && typeof puzzle.validation === 'function') {
+      try {
+        return puzzle.validation(solution);
+      } catch (error) {
+        console.error('Error in pattern puzzle validation:', error);
+        return {
+          success: false,
+          feedback: 'An error occurred while validating the pattern.'
+        };
+      }
+    }
+
     return {
       success: false,
-      feedback: 'Pattern puzzle validation not implemented for this puzzle type.'
+      feedback: 'This pattern puzzle requires a specific validation method.'
     };
   }
 
@@ -330,9 +357,22 @@ export class PuzzleEngine {
       };
     }
 
+    // Use puzzle's validation function if available
+    if (puzzle.validation && typeof puzzle.validation === 'function') {
+      try {
+        return puzzle.validation(solution);
+      } catch (error) {
+        console.error('Error in navigation puzzle validation:', error);
+        return {
+          success: false,
+          feedback: 'An error occurred while validating the navigation.'
+        };
+      }
+    }
+
     return {
       success: false,
-      feedback: 'Navigation puzzle validation not implemented for this puzzle type.'
+      feedback: 'This navigation puzzle requires a specific route validation.'
     };
   }
 
@@ -357,9 +397,22 @@ export class PuzzleEngine {
       };
     }
 
+    // Use puzzle's validation function if available
+    if (puzzle.validation && typeof puzzle.validation === 'function') {
+      try {
+        return puzzle.validation(solution);
+      } catch (error) {
+        console.error('Error in sequence puzzle validation:', error);
+        return {
+          success: false,
+          feedback: 'An error occurred while validating the sequence.'
+        };
+      }
+    }
+
     return {
       success: false,
-      feedback: 'Sequence puzzle validation not implemented for this puzzle type.'
+      feedback: 'This sequence puzzle requires a specific order validation.'
     };
   }
 

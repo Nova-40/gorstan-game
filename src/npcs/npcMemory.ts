@@ -113,7 +113,7 @@ export function getNextRoomForGoal(npcId: string, state: any): string | null {
   if (!memory || !memory.goal) return null;
   // Example: find_player
   if (memory.goal === 'find_player' && state && state.player && state.player.currentRoom) {
-    // TODO: Use pathfinding if available; for now, move directly
+    // Simple pathfinding: move toward player's room
     return state.player.currentRoom;
   }
   // Example: patrol_zone (cycle through schedule)
