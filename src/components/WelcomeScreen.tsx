@@ -24,7 +24,7 @@ interface WelcomeScreenProps {
 
 const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onBegin, onLoadGame }) => {
   return (
-    <div className="flex flex-col items-center justify-center min-h-[80vh] w-full max-w-4xl mx-auto px-4 border bg-gradient-to-b from-slate-900 to-black text-green-400 border-2 border-green-500 p-6 m-4 rounded-xl">
+    <div className="relative flex flex-col items-center justify-center min-h-[80vh] w-full max-w-4xl mx-auto px-4 border bg-gradient-to-b from-slate-900 to-black text-green-400 border-2 border-green-500 p-6 m-4 rounded-xl">
       <h1 className="text-4xl md:text-6xl font-bold mb-4 text-center flex items-center justify-center gap-4">
         <img
           src={"/images/gorstanicon.png"}
@@ -86,6 +86,11 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onBegin, onLoadGame }) =>
           </div>
           <div></div>
         </div>
+      </div>
+      
+      {/* Hidden build version - same color as background for tracking deployments */}
+      <div className="absolute bottom-2 right-2 text-slate-900 text-xs opacity-20 select-none">
+        build: 01
       </div>
     </div>
   );
