@@ -16,6 +16,7 @@
 
 // src/components/WelcomeScreen.tsx
 import React from "react";
+import { getVersionString } from "../config/version";
 
 interface WelcomeScreenProps {
   onBegin: () => void;
@@ -23,6 +24,11 @@ interface WelcomeScreenProps {
 }
 
 const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onBegin, onLoadGame }) => {
+  // Log version info to console for debugging
+  React.useEffect(() => {
+    console.log(`%c🎮 Gorstan Game - ${getVersionString()}`, 'color: #10b981; font-weight: bold;');
+  }, []);
+
   return (
     <div className="relative flex flex-col items-center justify-center min-h-[80vh] w-full max-w-4xl mx-auto px-4 border bg-gradient-to-b from-slate-900 to-black text-green-400 border-2 border-green-500 p-6 m-4 rounded-xl">
       <h1 className="text-4xl md:text-6xl font-bold mb-4 text-center flex items-center justify-center gap-4">
@@ -88,9 +94,14 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onBegin, onLoadGame }) =>
         </div>
       </div>
       
-      {/* Hidden build version - same color as background for tracking deployments */}
-      <div className="absolute bottom-2 right-2 text-slate-900 text-xs opacity-20 select-none">
-        build: 01
+      {/* Build version - visible for deployment verification */}
+      <div className="absolute bottom-2 right-2 text-green-300 text-xs opacity-60 select-none font-mono">
+        {getVersionString()}
+      </div>
+      
+      {/* Backup version indicator - always visible */}
+      <div className="absolute bottom-2 left-2 text-green-400 text-xs opacity-40 select-none">
+        Gorstan Live
       </div>
     </div>
   );
