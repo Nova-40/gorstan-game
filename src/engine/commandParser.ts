@@ -130,6 +130,70 @@ export function processCommand({
       return { messages: [{ text: "You can't go that way.", type: 'error' }] };
     }
 
+    case 'ally': {
+      // Handle alliance choices
+      if (gameState.flags?.awaitingAllianceChoice) {
+        // Import and use the group chat logic
+        const { GroupChatManager } = require('../npc/groupChatLogic');
+        const context = {
+          state: gameState,
+          dispatch: (action: any) => {
+            // Apply the action to updates
+            if (action.type === 'SET_FLAG') {
+              updates.flags = { ...gameState.flags, [action.payload.flag]: action.payload.value };
+            }
+          },
+          roomId: gameState.currentRoomId,
+          npcsInRoom: gameState.npcsInRoom
+        };
+        
+        const wasProcessed = GroupChatManager.processAllianceChoice(input, context);
+        if (wasProcessed) {
+          return { 
+            messages: [{ text: `You consider your alliance carefully...`, type: 'lore' }],
+            updates 
+          };
+        }
+      }
+      
+      return { 
+        messages: [{ text: "You can choose an ally when the opportunity arises.", type: 'info' }] 
+      };
+    }
+
+    case 'cost': 
+    case 'price': {
+      // Handle asking about Morthos's cost
+      if (gameState.flags?.alliancePitchStarted && !gameState.flags?.allianceChosen) {
+        const hasAl = gameState.npcsInRoom.some(npc => npc.id === 'al');
+        const hasMorthos = gameState.npcsInRoom.some(npc => npc.id === 'morthos');
+        
+        if (hasAl && hasMorthos) {
+          const { GroupChatManager } = require('../npc/groupChatLogic');
+          const context = {
+            state: gameState,
+            dispatch: (action: any) => {
+              if (action.type === 'SET_FLAG') {
+                updates.flags = { ...gameState.flags, [action.payload.flag]: action.payload.value };
+              }
+            },
+            roomId: gameState.currentRoomId,
+            npcsInRoom: gameState.npcsInRoom
+          };
+          
+          GroupChatManager.handleMorthosCostInquiry(context);
+          return { 
+            messages: [{ text: "You press Morthos about the cost of his alliance...", type: 'lore' }],
+            updates 
+          };
+        }
+      }
+      
+      return { 
+        messages: [{ text: "You're not sure what you're asking about the cost of.", type: 'info' }] 
+      };
+    }
+
     case 'look': {
       const descriptionLines = Array.isArray(currentRoom.description)
         ? currentRoom.description

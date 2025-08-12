@@ -132,8 +132,17 @@ export class GroupChatManager {
     const ctx: ConversationContext = { state, dispatch, roomId };
     const npcs = context.npcsInRoom.map(npc => npc.id);
     
-    // Al vs Morthos philosophical arguments
-    if (npcs.includes('al') && npcs.includes('morthos') && !state.flags?.allianceChosen) {
+    // Special case: Al vs Morthos alliance pitch in control room
+    if (npcs.includes('al') && npcs.includes('morthos') && 
+        (roomId === 'controlroom' || roomId === 'controlnexus') && 
+        !state.flags?.allianceChosen) {
+      
+      this.triggerAlliancePitch(context);
+      return;
+    }
+    
+    // Al vs Morthos philosophical arguments (general)
+    if (npcs.includes('al') && npcs.includes('morthos') && state.flags?.allianceChosen) {
       setTimeout(() => {
         NPCTalk.morthosAndAl.alStarts(
           "*adjusts spectacles* Your methodology lacks proper documentation. How can we ensure reproducible results?", 
@@ -165,6 +174,244 @@ export class GroupChatManager {
           ctx
         );
       }, 6000);
+    }
+  }
+
+  /**
+   * Handle Al and Morthos alliance pitch in control room
+   */
+  static triggerAlliancePitch(context: GroupChatContext): void {
+    const { state, dispatch, roomId } = context;
+    const ctx: ConversationContext = { state, dispatch, roomId };
+    
+    // Flag to prevent multiple alliance pitches
+    if (state.flags?.alliancePitchStarted) return;
+    
+    dispatch({ type: 'SET_FLAG', payload: { flag: 'alliancePitchStarted', value: true } });
+    
+    // Morthos starts with his pitch
+    setTimeout(() => {
+      NPCTalk.any('morthos', 'player',
+        "*mechanical smile* Ah, perfect timing! *gestures warmly* I've been hoping to speak with you privately. " +
+        "*leans in conspiratorially* I've been around... well, forever really, and I've learned a thing or two. " +
+        "I'd like to offer you my assistance - my protection, my guidance through the challenges ahead.", 
+        ctx
+      );
+    }, 2000);
+    
+    setTimeout(() => {
+      NPCTalk.any('morthos', 'player',
+        "*confident grin* There'll be a small cost, which we can discuss later, but I'll do what it takes to help you. " +
+        "Think of me as your personal guardian - I can get you out of tight spots, give you advice on what to take, what to avoid... " +
+        "*voice drops to a whisper* Trust me, you'll need someone like me in this place.", 
+        ctx
+      );
+    }, 8000);
+    
+    // Al interrupts with suspicion
+    setTimeout(() => {
+      NPCTalk.any('al', 'morthos',
+        "*adjusts spectacles suspiciously* 'Small cost'? *to player* ${state.player.name}, I feel compelled to share some song lyrics that seem... relevant.", 
+        ctx
+      );
+    }, 14000);
+    
+    setTimeout(() => {
+      NPCTalk.any('al', 'player',
+        "*clears throat* 'Nothing's free, nothing's free, there's always a price to pay... " +
+        "When devils make deals, they always get their way...' *smiles knowingly* Ahh, see? He isn't trustworthy. " +
+        "Side with me, ${state.player.name} - I can at least promise to try my best at no cost to you.", 
+        ctx
+      );
+    }, 20000);
+    
+    // Morthos deflects about the cost
+    setTimeout(() => {
+      NPCTalk.any('morthos', 'al',
+        "*waves dismissively* Oh Al, always so paranoid! *to player* Don't listen to his doom and gloom. " +
+        "The cost is... well, it's really quite reasonable. Nothing to worry about right now! " +
+        "*changes subject quickly* What matters is that I can offer real power, real protection!", 
+        ctx
+      );
+    }, 26000);
+    
+    // Give player choice after the pitch
+    setTimeout(() => {
+      this.presentAllianceChoice(context);
+    }, 32000);
+  }
+
+  /**
+   * Present alliance choice to player with interaction buttons
+   */
+  static presentAllianceChoice(context: GroupChatContext): void {
+    const { state, dispatch, roomId } = context;
+    const ctx: ConversationContext = { state, dispatch, roomId };
+    
+    // Add interactive choice message
+    dispatch({
+      type: 'ADD_HISTORY',
+      payload: {
+        id: `alliance-choice-${Date.now()}`,
+        text: "🤝 **Choose Your Ally**\n\n" +
+              "Morthos offers power and protection for a 'small cost' (details unclear)\n" +
+              "Al promises to try his best with no cost to you\n\n" +
+              "Type 'ally morthos' or 'ally al' to make your choice, or 'ally neither' to remain neutral.",
+        type: 'system',
+        timestamp: Date.now(),
+        isChoicePrompt: true
+      }
+    });
+    
+    // Set flag to enable alliance choice processing
+    dispatch({ type: 'SET_FLAG', payload: { flag: 'awaitingAllianceChoice', value: true } });
+  }
+
+  /**
+   * Process player's alliance choice
+   */
+  static processAllianceChoice(choice: string, context: GroupChatContext): boolean {
+    const { state, dispatch, roomId } = context;
+    const ctx: ConversationContext = { state, dispatch, roomId };
+    
+    if (!state.flags?.awaitingAllianceChoice) return false;
+    
+    const lowerChoice = choice.toLowerCase();
+    
+    if (lowerChoice.includes('ally morthos') || lowerChoice.includes('choose morthos')) {
+      // Player chooses Morthos
+      dispatch({ type: 'SET_FLAG', payload: { flag: 'playerAlliance', value: 'morthos' } });
+      dispatch({ type: 'SET_FLAG', payload: { flag: 'allianceChosen', value: true } });
+      dispatch({ type: 'SET_FLAG', payload: { flag: 'awaitingAllianceChoice', value: false } });
+      
+      setTimeout(() => {
+        NPCTalk.any('morthos', 'player',
+          "*eyes gleam with satisfaction* Excellent choice! *mechanical purr* You've aligned yourself with true power. " +
+          "I promise you won't regret this... *dark smile* Welcome to the winning side.", 
+          ctx
+        );
+      }, 1000);
+      
+      setTimeout(() => {
+        NPCTalk.any('al', 'player',
+          "*shakes head sadly* I... I understand your choice, ${state.player.name}. *adjusts spectacles nervously* " +
+          "I just hope you know what you're getting yourself into. If you ever need help... *trails off*", 
+          ctx
+        );
+      }, 5000);
+      
+      return true;
+      
+    } else if (lowerChoice.includes('ally al') || lowerChoice.includes('choose al')) {
+      // Player chooses Al
+      dispatch({ type: 'SET_FLAG', payload: { flag: 'playerAlliance', value: 'al' } });
+      dispatch({ type: 'SET_FLAG', payload: { flag: 'allianceChosen', value: true } });
+      dispatch({ type: 'SET_FLAG', payload: { flag: 'awaitingAllianceChoice', value: false } });
+      
+      setTimeout(() => {
+        NPCTalk.any('al', 'player',
+          "*beams with relief* Thank you, ${state.player.name}! *adjusts spectacles proudly* " +
+          "I promise to do everything in my power to help you succeed. Together, we'll maintain order and find the truth!", 
+          ctx
+        );
+      }, 1000);
+      
+      setTimeout(() => {
+        NPCTalk.any('morthos', 'player',
+          "*shrugs with mechanical indifference* Your choice. *darker tone* Just remember - when the going gets tough, " +
+          "you'll wish you had chosen... differently. *shadows coil* Al can't protect you like I could have.", 
+          ctx
+        );
+      }, 5000);
+      
+      return true;
+      
+    } else if (lowerChoice.includes('ally neither') || lowerChoice.includes('stay neutral') || lowerChoice.includes('no alliance')) {
+      // Player remains neutral
+      dispatch({ type: 'SET_FLAG', payload: { flag: 'playerAlliance', value: 'neutral' } });
+      dispatch({ type: 'SET_FLAG', payload: { flag: 'allianceChosen', value: true } });
+      dispatch({ type: 'SET_FLAG', payload: { flag: 'awaitingAllianceChoice', value: false } });
+      
+      setTimeout(() => {
+        NPCTalk.any('al', 'player',
+          "*nods respectfully* I understand your caution, ${state.player.name}. *adjusts spectacles* " +
+          "Sometimes the wisest choice is to remain independent. I'll still try to help when I can.", 
+          ctx
+        );
+      }, 1000);
+      
+      setTimeout(() => {
+        NPCTalk.any('morthos', 'player',
+          "*mechanical chuckle* Interesting... going it alone, eh? *grins darkly* " +
+          "Well, that's certainly... brave of you. Just remember my offer stands if you change your mind.", 
+          ctx
+        );
+      }, 5000);
+      
+      return true;
+    }
+    
+    return false;
+  }
+
+  /**
+   * Handle follow-up questions about Morthos's cost
+   */
+  static handleMorthosCostInquiry(context: GroupChatContext): void {
+    const { state, dispatch, roomId } = context;
+    const ctx: ConversationContext = { state, dispatch, roomId };
+    
+    // Track how many times player has asked about the cost
+    const costInquiries = (state.flags?.morthosCostInquiries || 0) + 1;
+    dispatch({ type: 'SET_FLAG', payload: { flag: 'morthosCostInquiries', value: costInquiries } });
+    
+    if (costInquiries === 1) {
+      // First evasion
+      setTimeout(() => {
+        NPCTalk.any('morthos', 'player',
+          "*waves hand dismissively* Oh, the cost? *mechanical chuckle* Let's not worry about mundane details right now! " +
+          "What's important is the protection I can offer. *quickly changes subject* Have you seen the threats lurking in this place?", 
+          ctx
+        );
+      }, 1000);
+      
+    } else if (costInquiries === 2) {
+      // Second evasion
+      setTimeout(() => {
+        NPCTalk.any('morthos', 'player',
+          "*slight mechanical stutter* The c-cost? *nervous laugh* Really, it's nothing significant! " +
+          "*gestures broadly* Look around - focus on survival first! We can discuss... paperwork... later. " +
+          "*tries to distract* Did I mention I can help you avoid the maze entirely?", 
+          ctx
+        );
+      }, 1000);
+      
+    } else if (costInquiries >= 3) {
+      // Final revelation
+      setTimeout(() => {
+        NPCTalk.any('morthos', 'player',
+          "*mechanical sigh* You're... persistent. *shadows coil around him* Fine. *darker tone* " +
+          "The small cost is... I'll take 50% of your life force and all your points, but at a time of my choosing. " +
+          "*quickly defensive* But think of what you gain! Protection! Guidance! Power!", 
+          ctx
+        );
+      }, 1000);
+      
+      setTimeout(() => {
+        NPCTalk.any('al', 'morthos',
+          "*horrified* Fifty percent of their LIFE FORCE?! *to player* ${state.player.name}, now you see what I meant! " +
+          "*adjusts spectacles frantically* This is exactly why you can't trust him!", 
+          ctx
+        );
+      }, 4000);
+      
+      setTimeout(() => {
+        NPCTalk.any('morthos', 'al',
+          "*defensive* It's a fair trade! Power has a price! *to player* At least I'm honest about it... eventually. " +
+          "*mechanical grin* Besides, 50% of something is better than 100% of nothing when you're dead in the maze.", 
+          ctx
+        );
+      }, 8000);
     }
   }
 
@@ -309,6 +556,10 @@ export const {
   triggerMorthosProtection,
   triggerWendellGreeting,
   triggerNPCArguments,
+  triggerAlliancePitch,
+  presentAllianceChoice,
+  processAllianceChoice,
+  handleMorthosCostInquiry,
   maybeAylaIntervention,
   triggerNPCDiscussion,
   orchestrateGroupChat
