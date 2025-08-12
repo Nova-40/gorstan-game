@@ -47,7 +47,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onBegin, onLoadGame }) =>
       <div className="flex flex-col items-center">
         <div className="grid grid-cols-3 gap-4 mb-6">
           <a
-            href="https://buymeacoffee.com/geoffwebster"
+            href="https://buymeacoffee.com/gorstan"
             target="_blank"
             rel="noopener noreferrer"
             className="bg-yellow-400 text-black px-6 py-3 rounded-xl hover:bg-yellow-300 text-center min-w-[180px] transition-all"
@@ -55,7 +55,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onBegin, onLoadGame }) =>
             ☕ Buy Geoff a Coffee
           </a>
           <a
-            href="https://gorstanbooks.com"
+            href="https://geoffwebsterbooks.com"
             target="_blank"
             rel="noopener noreferrer"
             className="bg-purple-600 text-white px-6 py-3 rounded-xl hover:bg-purple-500 text-center min-w-[180px] transition-all"
@@ -63,7 +63,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onBegin, onLoadGame }) =>
             📚 Explore the Books
           </a>
           <a
-            href="https://gorstanchronicles.com"
+            href="https://thegorstanchronicles.com"
             target="_blank"
             rel="noopener noreferrer"
             className="bg-indigo-500 text-white px-6 py-3 rounded-xl hover:bg-indigo-400 text-center min-w-[180px] transition-all"

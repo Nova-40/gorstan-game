@@ -49,6 +49,9 @@ const EnhancedNPCConsole: React.FC<EnhancedNPCConsoleProps> = ({
   const [isTyping, setIsTyping] = useState(false);
   const [typingNpcId, setTypingNpcId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const [responseHistory, setResponseHistory] = useState<Record<string, string[]>>({});
 
   // Filter out fake group conversation NPCs
   const realNpcs = npcs.filter(npc => npc.id !== 'group_conversation' && npc.id !== 'group_chat');
@@ -359,6 +362,19 @@ const EnhancedNPCConsole: React.FC<EnhancedNPCConsoleProps> = ({
       console.log(`[Enhanced NPC Console] Individual chat - ${primaryNpc?.name} (${primaryNpc?.id}) will respond`);
     }
 
+    // Guaranteed typing state timeout - this will ALWAYS clear typing state after 12 seconds
+    typingTimeoutRef.current = setTimeout(() => {
+      console.log(`[Enhanced NPC Console] 🚨 GUARANTEED typing timeout triggered - force clearing typing state`);
+      setIsTyping(false);
+      setTypingNpcId(null);
+      typingTimeoutRef.current = null;
+      
+      // Force focus back to input after timeout
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
+    }, 12000);
+
     // Send message to game system
     onSendMessage(trimmed, activeNpcId || primaryNpc.id);
 
@@ -375,33 +391,91 @@ const EnhancedNPCConsole: React.FC<EnhancedNPCConsoleProps> = ({
 
     // Simulate NPC response after delay
     setTimeout(async () => {
-      setIsTyping(false);
-      setTypingNpcId(null);
-      
-      if (isGroupConversation) {
-        await handleGroupResponse(trimmed);
-      } else {
-        await handleSingleResponse(trimmed);
+      try {
+        if (isGroupConversation) {
+          await handleGroupResponse(trimmed);
+        } else {
+          await handleSingleResponse(trimmed);
+        }
+      } catch (error) {
+        console.error('[Enhanced NPC Console] Error in response handling:', error);
+        // Always clear typing state on error
+        const errorMessage: EnhancedDialogueMessage = {
+          id: `error-${Date.now()}`,
+          speaker: 'npc',
+          npcId: 'system',
+          npcName: 'System',
+          text: 'Sorry, I seem to be having trouble responding right now. Please try again.',
+          timestamp: Date.now(),
+          mood: 'confused'
+        };
+        setMessages(prev => [...prev, errorMessage]);
+      } finally {
+        // Always clear typing state
+        setIsTyping(false);
+        setTypingNpcId(null);
       }
     }, 1500 + Math.random() * 1000);
+    
+    // Safety timeout to clear typing state if response takes too long
+    setTimeout(() => {
+      setIsTyping(false);
+      setTypingNpcId(null);
+    }, 15000); // 15 second safety timeout
   };
 
   // Determine which NPC should respond in group conversations
   const determineRespondingNpc = (message: string): string => {
     const lowerMessage = message.toLowerCase();
     
-    // Direct address
+    // Direct address (highest priority)
     if (lowerMessage.includes('al')) return 'al';
     if (lowerMessage.includes('morthos')) return 'morthos';
     if (lowerMessage.includes('ayla')) return 'ayla';
+    if (lowerMessage.includes('polly')) return 'polly';
     
-    // Topic-based routing
-    if (lowerMessage.includes('form') || lowerMessage.includes('rule') || lowerMessage.includes('procedure')) return 'al';
-    if (lowerMessage.includes('power') || lowerMessage.includes('magic') || lowerMessage.includes('shadow')) return 'morthos';
-    if (lowerMessage.includes('help') || lowerMessage.includes('guide')) return 'ayla';
+    // Topic-based routing (medium priority)
+    if (lowerMessage.includes('form') || lowerMessage.includes('rule') || lowerMessage.includes('procedure') || lowerMessage.includes('official')) return 'al';
+    if (lowerMessage.includes('power') || lowerMessage.includes('magic') || lowerMessage.includes('shadow') || lowerMessage.includes('chaos')) return 'morthos';
+    if (lowerMessage.includes('help') || lowerMessage.includes('guide') || lowerMessage.includes('advice') || lowerMessage.includes('wisdom')) return 'ayla';
+    if (lowerMessage.includes('fun') || lowerMessage.includes('exciting') || lowerMessage.includes('adventure') || lowerMessage.includes('wild')) return 'polly';
     
-    // Default to primary NPC or random selection
-    return activeNpcId || realNpcs[Math.floor(Math.random() * realNpcs.length)].id;
+    // For greetings and general questions, use weighted random selection
+    if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('hey') || 
+        lowerMessage.includes('what') || lowerMessage.includes('how') || lowerMessage.includes('everyone')) {
+      
+      // Weighted selection to ensure variety - track last responder
+      const npcWeights: Record<string, number> = {
+        'al': 25,       // Slightly higher for official greetings
+        'morthos': 20,  // Lower to avoid always being him
+        'ayla': 30,     // Higher for helpful responses
+        'polly': 25     // Equal chance for energy
+      };
+      
+      // Get available NPCs in room
+      const availableNpcs = realNpcs.map(npc => npc.id).filter(id => npcWeights[id] !== undefined);
+      
+      // Random weighted selection
+      const totalWeight = Object.values(npcWeights).reduce((sum, weight) => sum + weight, 0);
+      let random = Math.random() * totalWeight;
+      
+      for (const npcId of availableNpcs) {
+        const weight = npcWeights[npcId];
+        if (weight) {
+          random -= weight;
+          if (random <= 0) {
+            console.log(`[Enhanced NPC Console] 🎲 Weighted random selection chose: ${npcId}`);
+            return npcId;
+          }
+        }
+      }
+    }
+    
+    // Default fallback to truly random selection
+    const fallbackNpcs = realNpcs.map(npc => npc.id);
+    const randomNpc = fallbackNpcs[Math.floor(Math.random() * fallbackNpcs.length)];
+    console.log(`[Enhanced NPC Console] 🎯 Fallback random selection chose: ${randomNpc}`);
+    return randomNpc;
   };
 
   const handleGroupResponse = async (playerMessage: string) => {
@@ -409,11 +483,50 @@ const EnhancedNPCConsole: React.FC<EnhancedNPCConsoleProps> = ({
     const respondingNpc = realNpcs.find(n => n.id === respondingNpcId);
     
     console.log(`[Enhanced NPC Console] Group response - ${respondingNpc?.name} (${respondingNpcId}) responding to: "${playerMessage}"`);
+    console.log(`[Enhanced NPC Console] Available NPCs:`, realNpcs.map(n => `${n.name}(${n.id})`));
     
     if (respondingNpc) {
       try {
+        console.log(`[Enhanced NPC Console] 🎬 Calling generateContextualResponse for ${respondingNpc.name}`);
         const response = await generateContextualResponse(respondingNpcId, playerMessage);
-        console.log(`[Enhanced NPC Console] Group response from ${respondingNpc.name}: ${response}`);
+        console.log(`[Enhanced NPC Console] 📝 Generated response from ${respondingNpc.name}:`, response);
+        
+        if (!response || response.trim().length === 0) {
+          console.error(`[Enhanced NPC Console] ❌ Empty response from generateContextualResponse for ${respondingNpc.name}`);
+          
+          // FORCE a response - this should NEVER fail
+          const forceResponse = `*${respondingNpc.name} nods* I understand what you're saying. Let me share my thoughts on that.`;
+          console.log(`[Enhanced NPC Console] 🚨 FORCING response for ${respondingNpc.name}: ${forceResponse}`);
+          
+          const npcMessage: EnhancedDialogueMessage = {
+            id: `forced-${Date.now()}`,
+            speaker: 'npc',
+            npcId: respondingNpcId,
+            npcName: respondingNpc.name,
+            text: forceResponse,
+            timestamp: Date.now(),
+            isGroupConversation: true,
+            speakerContext: getConversationContext(respondingNpcId)
+          };
+          
+          setMessages(prev => [...prev, npcMessage]);
+          
+          // Clear typing state
+          setIsTyping(false);
+          setTypingNpcId(null);
+          if (typingTimeoutRef.current) {
+            clearTimeout(typingTimeoutRef.current);
+            typingTimeoutRef.current = null;
+          }
+          
+          setTimeout(() => {
+            inputRef.current?.focus();
+          }, 100);
+          
+          return; // Exit early with forced response
+        }
+        
+        console.log(`[Enhanced NPC Console] ✅ Valid response from ${respondingNpc.name}: ${response}`);
         
         const npcMessage: EnhancedDialogueMessage = {
           id: `npc-${Date.now()}`,
@@ -427,7 +540,23 @@ const EnhancedNPCConsole: React.FC<EnhancedNPCConsoleProps> = ({
         };
         
         setMessages(prev => [...prev, npcMessage]);
+        console.log(`[Enhanced NPC Console] 💬 Added message to state from ${respondingNpc.name}`);
         
+        // Clear typing state on successful response
+        setIsTyping(false);
+        setTypingNpcId(null);
+        if (typingTimeoutRef.current) {
+          clearTimeout(typingTimeoutRef.current);
+          typingTimeoutRef.current = null;
+        }
+
+        // Force focus back to input
+        setTimeout(() => {
+          inputRef.current?.focus();
+        }, 100);
+
+        console.log(`[Enhanced NPC Console] ✅ Typing state cleared for successful group response from ${respondingNpc.name}`);
+
         // Trigger potential inter-NPC exchange
         if (shouldTriggerInterNPCExchange(respondingNpcId, playerMessage)) {
           setTimeout(async () => {
@@ -450,6 +579,25 @@ const EnhancedNPCConsole: React.FC<EnhancedNPCConsoleProps> = ({
         }
       } catch (error) {
         console.error('Group response generation failed:', error);
+        // Clear typing state and show error message
+        setIsTyping(false);
+        setTypingNpcId(null);
+        if (typingTimeoutRef.current) {
+          clearTimeout(typingTimeoutRef.current);
+          typingTimeoutRef.current = null;
+        }
+        
+        const errorMessage: EnhancedDialogueMessage = {
+          id: `group-error-${Date.now()}`,
+          speaker: 'npc',
+          npcId: respondingNpcId,
+          npcName: respondingNpc.name,
+          text: `*${respondingNpc.name} seems to be having trouble responding right now*`,
+          timestamp: Date.now(),
+          isGroupConversation: true,
+          mood: 'confused'
+        };
+        setMessages(prev => [...prev, errorMessage]);
       }
     }
   };
@@ -472,68 +620,225 @@ const EnhancedNPCConsole: React.FC<EnhancedNPCConsoleProps> = ({
       };
       
       setMessages(prev => [...prev, npcMessage]);
+      
+      // Clear typing state on successful response
+      setIsTyping(false);
+      setTypingNpcId(null);
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+        typingTimeoutRef.current = null;
+      }
+      
+      // Force focus back to input
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
+      
+      console.log(`[Enhanced NPC Console] ✅ Typing state cleared for successful single response from ${primaryNpc!.name}`);
     } catch (error) {
       console.error('Single response generation failed:', error);
+      // Clear typing state and show error message
+      setIsTyping(false);
+      setTypingNpcId(null);
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+        typingTimeoutRef.current = null;
+      }
+      
+      // Force focus back to input on error
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
+      
+      const errorMessage: EnhancedDialogueMessage = {
+        id: `single-error-${Date.now()}`,
+        speaker: 'npc',
+        npcId: primaryNpc!.id,
+        npcName: primaryNpc!.name,
+        text: `*${primaryNpc!.name} seems to be having trouble responding right now*`,
+        timestamp: Date.now(),
+        isGroupConversation: false,
+        mood: 'confused'
+      };
+      setMessages(prev => [...prev, errorMessage]);
     }
   };
 
   // Generate contextual responses using AI-enhanced system
   const generateContextualResponse = async (npcId: string, playerMessage: string): Promise<string> => {
-    console.log(`[Enhanced NPC Console] Generating response for ${npcId} to: "${playerMessage}"`);
+    console.log(`[Enhanced NPC Console] 🎬 Generating response for ${npcId} to: "${playerMessage}"`);
     
+    // First try AI response with shorter timeout
     try {
-      // Use the enhanced AI system for dynamic responses
-      console.log(`[Enhanced NPC Console] Calling getEnhancedNPCResponse for ${npcId}`);
-      const enhancedResponse = await getEnhancedNPCResponse(npcId, playerMessage, state);
-      console.log(`[Enhanced NPC Console] Enhanced response:`, enhancedResponse);
+      console.log(`[Enhanced NPC Console] 🤖 Attempting AI response for ${npcId}`);
       
-      if (enhancedResponse?.text) {
-        console.log(`[Enhanced NPC Console] ✅ Using AI response for ${npcId}: ${enhancedResponse.text}`);
+      // Create a shorter timeout for faster fallback
+      const enhancedResponsePromise = getEnhancedNPCResponse(npcId, playerMessage, state);
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => {
+          console.log(`[Enhanced NPC Console] ⏰ AI timeout for ${npcId} after 5 seconds - falling back to scripted`);
+          reject(new Error(`AI timeout for ${npcId} after 5 seconds`));
+        }, 5000); // Shorter timeout for faster fallback
+      });
+      
+      const enhancedResponse = await Promise.race([enhancedResponsePromise, timeoutPromise]);
+      
+      if (enhancedResponse?.text && enhancedResponse.text.trim().length > 0) {
+        console.log(`[Enhanced NPC Console] ✅ AI response success for ${npcId}: ${enhancedResponse.text}`);
         return enhancedResponse.text;
       } else {
-        console.log(`[Enhanced NPC Console] ⚠️ No text in enhanced response for ${npcId}`);
+        console.log(`[Enhanced NPC Console] ⚠️ AI response empty for ${npcId}, using scripted fallback`);
       }
     } catch (error) {
-      console.error(`Enhanced response failed for ${npcId}:`, error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.log(`[Enhanced NPC Console] 🔄 AI failed for ${npcId} (${errorMessage}), using scripted fallback`);
     }
     
-    // Fallback to contextual scripted responses
+    // GUARANTEED fallback to scripted responses - this should NEVER fail
+    console.log(`[Enhanced NPC Console] � Using scripted response for ${npcId}`);
+    
     const lowerMessage = playerMessage.toLowerCase();
     
-    switch (npcId) {
-      case 'al':
-        if (lowerMessage.includes('help') || lowerMessage.includes('assist')) {
-          return '*adjusts documentation* Certainly! I can provide proper guidance through official channels. *glances at Morthos* Unlike some who offer... less structured assistance.';
-        }
-        if (lowerMessage.includes('morthos') || lowerMessage.includes('shadow')) {
-          return '*adjusts glasses disapprovingly* That individual operates outside proper protocols. I strongly advise against trusting his... unconventional methods.';
-        }
-        return '*stamps form officially* I understand your inquiry. Let me provide you with the appropriate documentation and procedures for your situation.';
+    // Create a fallback response function that always returns something
+    const getScriptedResponse = (npcId: string, lowerMessage: string): string => {
+      
+      // Track response history to prevent repetition
+      const npcHistory = responseHistory[npcId] || [];
+      
+      const selectUniqueResponse = (responses: string[]): string => {
+        const availableResponses = responses.filter(response => 
+          !npcHistory.includes(response) || npcHistory.length >= responses.length
+        );
         
-      case 'morthos':
-        if (lowerMessage.includes('help') || lowerMessage.includes('power')) {
-          return '*mechanical whirring* Ah, you seek true assistance... not the hollow promises of bureaucratic forms. *clank* I can offer genuine understanding of how things actually work.';
-        }
-        if (lowerMessage.includes('al') || lowerMessage.includes('bureaucrat')) {
-          return '*sparks fly* *dark chuckle* The form-pusher would have you believe safety lies in following rules. But when did true progress ever come from staying within prescribed boundaries?';
-        }
-        if (lowerMessage.includes('ayla')) {
-          return '*mechanical growling* Beware the supposed guide. Ayla weaves webs of control while claiming to help. Trust not her orchestrated assistance.';
-        }
-        return '*shadows dance mysteriously* *whirr* An interesting question, seeker. The answer lies not in what I tell you, but in what you dare to discover.';
+        const selectedResponse = availableResponses.length > 0 
+          ? availableResponses[Math.floor(Math.random() * availableResponses.length)]
+          : responses[Math.floor(Math.random() * responses.length)];
         
-      case 'ayla':
-        if (lowerMessage.includes('help')) {
-          return '*thoughtful gaze* I can certainly guide you, though these two seem determined to turn every interaction into a recruitment opportunity.';
-        }
-        if (lowerMessage.includes('al') || lowerMessage.includes('morthos')) {
-          return '*observes the dynamics* Both have their merits and their blind spots. Al offers structure but can be rigid. Morthos provides insight but tends toward chaos.';
-        }
-        return '*nods knowingly* An intriguing perspective. Let me help you navigate this situation with clarity rather than partisan advocacy.';
+        // Update history
+        const newHistory = [...npcHistory, selectedResponse].slice(-3); // Keep last 3 responses
+        setResponseHistory(prev => ({
+          ...prev,
+          [npcId]: newHistory
+        }));
         
-      default:
-        return 'I understand your question. Let me think about how best to respond.';
-    }
+        return selectedResponse;
+      };
+      
+      switch (npcId) {
+        case 'al':
+          const alResponses = [
+            '*adjusts documentation* I understand your inquiry. Let me provide you with the appropriate documentation and procedures for your situation.',
+            '*stamps form officially* That\'s an interesting question. Allow me to consult the proper protocols for guidance.',
+            '*straightens papers* I see you require assistance. Let me outline the correct procedural approach to your situation.',
+            '*reviews documentation* Your request falls under section 4.7 of the standard procedures. I\'ll guide you through the proper channels.',
+            '*adjusts glasses* An excellent question! The official response can be found in our comprehensive guidelines.',
+            '*files paperwork efficiently* Every inquiry deserves a thorough and systematic response. Let me process this correctly.',
+            '*consults manual* According to established protocols, your question requires careful consideration of regulatory frameworks.',
+            '*organizes desk* Structure and order are essential. Allow me to address your concern through proper administrative channels.'
+          ];
+          
+          if (lowerMessage.includes('help') || lowerMessage.includes('assist')) {
+            return '*adjusts documentation* Certainly! I can provide proper guidance through official channels. *glances at Morthos* Unlike some who offer... less structured assistance.';
+          }
+          if (lowerMessage.includes('morthos') || lowerMessage.includes('shadow')) {
+            return '*adjusts glasses disapprovingly* That individual operates outside proper protocols. I strongly advise against trusting his... unconventional methods.';
+          }
+          if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('hey')) {
+            return '*tips hat formally* Greetings! I\'m here to ensure all procedures are followed correctly. How may I assist you today?';
+          }
+          
+          return selectUniqueResponse(alResponses);
+          
+        case 'morthos':
+          const morthosResponses = [
+            '*shadows dance mysteriously* *whirr* An interesting question, seeker. The answer lies not in what I tell you, but in what you dare to discover.',
+            '*mechanical clicking* *dark chuckle* You seek understanding beyond the surface? How... refreshing. Most prefer comfortable lies.',
+            '*sparks fly* True knowledge requires stepping beyond the boundaries others set for you. Are you prepared for such... revelations?',
+            '*gears whir ominously* The bureaucrats would have you believe in simple answers. But reality is far more complex... and interesting.',
+            '*shadows shift* Power flows to those who understand that rules are merely... suggestions for the unimaginative.',
+            '*mechanical humming* *eyes glow* The fabric of reality bends to those who comprehend its true nature. Do you seek such understanding?',
+            '*clank* *whispers echo* Between the lines of official doctrine lies the actual truth. Few have the courage to read it.',
+            '*dark energy crackles* Order and chaos... such simplistic concepts. True wisdom lies in transcending both limitations.'
+          ];
+          
+          if (lowerMessage.includes('help') || lowerMessage.includes('power')) {
+            return '*mechanical whirring* Ah, you seek true assistance... not the hollow promises of bureaucratic forms. *clank* I can offer genuine understanding of how things actually work.';
+          }
+          if (lowerMessage.includes('al') || lowerMessage.includes('bureaucrat')) {
+            return '*sparks fly* *dark chuckle* The form-pusher would have you believe safety lies in following rules. But when did true progress ever come from staying within prescribed boundaries?';
+          }
+          if (lowerMessage.includes('ayla')) {
+            return '*mechanical growling* Beware the supposed guide. Ayla weaves webs of control while claiming to help. Trust not her orchestrated assistance.';
+          }
+          if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('hey')) {
+            return '*shadows shift* *mechanical hum* Greetings, seeker. You\'ve entered a realm where true power beckons to those brave enough to seize it.';
+          }
+          
+          return selectUniqueResponse(morthosResponses);
+          
+        case 'ayla':
+          const aylaResponses = [
+            '*nods knowingly* An intriguing perspective. Let me help you navigate this situation with clarity rather than partisan advocacy.',
+            '*thoughtful expression* That\'s a nuanced question that deserves a thoughtful response. Let\'s explore the different aspects together.',
+            '*calm demeanor* I can see why you might be curious about that. Allow me to offer some balanced insight.',
+            '*wise smile* There are multiple ways to approach your question. Let me share what might be most helpful for your specific situation.',
+            '*gentle guidance* Your inquiry touches on something important. Let me help you think through this systematically.',
+            '*serene presence* True understanding comes from seeing all perspectives. Let me help you find that balance.',
+            '*compassionate listening* Every question reflects a deeper need. Let me address both the surface and underlying concerns.',
+            '*mindful consideration* Wisdom isn\'t about having all the answers, but asking the right questions. What\'s really behind your inquiry?'
+          ];
+          
+          if (lowerMessage.includes('help')) {
+            return '*thoughtful gaze* I can certainly guide you, though these two seem determined to turn every interaction into a recruitment opportunity.';
+          }
+          if (lowerMessage.includes('al') || lowerMessage.includes('morthos')) {
+            return '*observes the dynamics* Both have their merits and their blind spots. Al offers structure but can be rigid. Morthos provides insight but tends toward chaos.';
+          }
+          if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('hey')) {
+            return '*warm smile* Hello there! I\'m glad you\'ve joined our conversation. I try to offer balanced perspective amidst all the... competing philosophies here.';
+          }
+          
+          return selectUniqueResponse(aylaResponses);
+          
+        case 'polly':
+          const pollyResponses = [
+            'Oh wow, that\'s such an interesting question! *bounces excitedly* I have SO many thoughts about this!',
+            '*spins around* Ooh, I love talking about stuff like this! It\'s like, there are so many possibilities, you know?',
+            '*claps hands* That\'s exactly the kind of thing I was just thinking about! Well, sort of. My thoughts bounce around a lot!',
+            '*giggles* You know what? That reminds me of something completely different but also totally related! Isn\'t that weird how thoughts work?',
+            'OMG yes! *gestures wildly* I mean, there\'s like a million ways to look at that question! Want to explore them all?',
+            '*jumps up and down* This is so exciting! I love when people ask questions because it makes my brain all sparkly and creative!',
+            '*twirls* You know what I think? I think thinking is like dancing - sometimes you just gotta let your ideas move around!',
+            '*beams with enthusiasm* Questions are like little adventures waiting to happen! Where should this one take us?'
+          ];
+          
+          if (lowerMessage.includes('help')) {
+            return '*bounces enthusiastically* Oh, I\'d love to help! Though I might get distracted and suggest seventeen different approaches. Is that okay?';
+          }
+          if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('hey')) {
+            return '*waves enthusiastically* Hi hi hi! Oh my gosh, I\'m so glad you\'re here! This place can get so serious with all the rule-talk and shadow-stuff!';
+          }
+          
+          return selectUniqueResponse(pollyResponses);
+          
+        default:
+          const defaultResponses = [
+            'I understand your question. Let me think about how best to respond.',
+            'That\'s an interesting point you\'ve raised. I appreciate you bringing it up.',
+            'Your question deserves a thoughtful response. Give me a moment to consider it.',
+            'I can see why you\'d be curious about that. Let me share my perspective.',
+            'Thanks for asking! That\'s something worth discussing.',
+            'You\'ve touched on something important there. Let me offer my thoughts.',
+            'I appreciate your curiosity about this topic. Here\'s what I think...',
+            'That\'s a good question that deserves careful consideration.'
+          ];
+          return selectUniqueResponse(defaultResponses);
+      }
+    };
+    
+    const scriptedResponse = getScriptedResponse(npcId, lowerMessage);
+    console.log(`[Enhanced NPC Console] 📝 Scripted response for ${npcId}: ${scriptedResponse}`);
+    return scriptedResponse;
   };
 
   // Generate NPC-to-NPC AI conversations
@@ -743,6 +1048,7 @@ const EnhancedNPCConsole: React.FC<EnhancedNPCConsoleProps> = ({
           <div className="input-area">
             <div className="input-container">
               <textarea
+                ref={inputRef}
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
@@ -750,7 +1056,7 @@ const EnhancedNPCConsole: React.FC<EnhancedNPCConsoleProps> = ({
                   ? `Address ${realNpcs.map(npc => npc.name).join(', ')} or ask a general question...`
                   : `Talk to ${primaryNpc?.name}...`
                 }
-                className="message-input"
+                className="message-input full-width"
                 rows={2}
                 disabled={isTyping}
               />

@@ -63,11 +63,11 @@ const CreditsScreen: React.FC<CreditsScreenProps> = ({ onRestart }) => {
         {visibleLines.map((line, i) => (
           <div key={i} className="mb-2 text-center">
             {line === "☕ Buy Geoff a Coffee" ? (
-              <a href="https://buymeacoffee.com/geoffwebster" target="_blank" rel="noopener noreferrer" className="text-yellow-400 hover:text-yellow-300 underline">
+              <a href="https://buymeacoffee.com/gorstan" target="_blank" rel="noopener noreferrer" className="text-yellow-400 hover:text-yellow-300 underline">
                 {line}
               </a>
             ) : line === "📚 Buy the Books" ? (
-              <a href="https://geoffwebster.com/books" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 underline">
+              <a href="https://geoffwebsterbooks.com" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 underline">
                 {line}
               </a>
             ) : line === "🔁 Play Again?" ? (
