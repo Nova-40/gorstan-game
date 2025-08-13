@@ -606,9 +606,9 @@ export function createSafeWrapper<T extends (...args: any[]) => any>(
   errorType: NPCErrorType,
   context: Record<string, any> = {}
 ): T {
-  return ((...args: any[]) => {
+  return (function(this: any, ...args: any[]) {
     try {
-      const result = fn(...args);
+      const result = fn.apply(this, args);
       
       // Handle promises
       if (result && typeof result.catch === 'function') {
