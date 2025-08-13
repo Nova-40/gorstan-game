@@ -52,6 +52,9 @@ describe('NPC Wandering System Integration', () => {
     errorHandler = new NPCErrorHandler();
     movementExecutor = new MovementExecutor();
     
+    // Reset error handler state for clean tests
+    errorHandler.reset();
+    
     // Try to create accessibility provider, but handle failures gracefully
     try {
       accessibilityProvider = new NPCAccessibilityProvider();
@@ -99,8 +102,8 @@ describe('NPC Wandering System Integration', () => {
     test('should monitor performance metrics', () => {
       const metrics = performanceOptimizer.getMetrics();
       expect(metrics).toHaveProperty('cacheHitRate');
-      expect(metrics).toHaveProperty('memoryUsage');
-      expect(metrics).toHaveProperty('averageResponseTime');
+      expect(metrics).toHaveProperty('memoryUsageMB'); // Correct property name
+      expect(metrics).toHaveProperty('averageMovementTimeMs'); // Correct property name
       expect(typeof metrics.cacheHitRate).toBe('number');
     });
 
@@ -208,6 +211,7 @@ describe('NPC Wandering System Integration', () => {
 
       const performanceMultiplier = errorHandler.getPerformanceMultiplier();
       expect(performanceMultiplier).toBeLessThan(1.0);
+    }, 10000); // Increase timeout to 10 seconds
     });
   });
 

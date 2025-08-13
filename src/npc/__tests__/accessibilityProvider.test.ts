@@ -50,33 +50,27 @@ const mockDocumentElement = {
   }
 };
 
-// Mock document and window
-Object.defineProperty(global, 'document', {
-  value: {
-    createElement: jest.fn().mockReturnValue(mockDiv),
-    body: mockBody,
-    documentElement: mockDocumentElement,
-    querySelectorAll: jest.fn().mockReturnValue([]),
-    activeElement: null
-  }
-});
-
-Object.defineProperty(global, 'window', {
-  value: {
-    matchMedia: jest.fn().mockReturnValue({ matches: false }),
-    speechSynthesis: undefined,
-    navigator: { userAgent: 'TestAgent' },
-    dispatchEvent: jest.fn()
-  }
-});
-
 describe('NPCAccessibilityProvider', () => {
   let provider: NPCAccessibilityProvider;
 
   beforeEach(() => {
+    // Reset and setup fresh mocks for each test
+    jest.clearAllMocks();
+    
+    // Mock createElement to return our mock div
+    jest.spyOn(document, 'createElement').mockReturnValue(mockDiv as any);
+    
+    // Mock document.body methods
+    if (document.body) {
+      jest.spyOn(document.body, 'appendChild').mockImplementation(jest.fn());
+      jest.spyOn(document.body, 'removeChild').mockImplementation(jest.fn());
+    }
+    
+    // Mock querySelectorAll
+    jest.spyOn(document, 'querySelectorAll').mockReturnValue([] as any);
+    
     resetAccessibilityProvider();
     provider = new NPCAccessibilityProvider();
-    jest.clearAllMocks();
   });
 
   afterEach(() => {
@@ -159,13 +153,18 @@ describe('NPCAccessibilityProvider', () => {
     test('should apply settings when enabled', () => {
       provider.enable();
       
+      // Mock classList methods properly
+      const toggleSpy = jest.spyOn(document.body.classList, 'toggle');
+      
       provider.updateSettings({
         highContrast: true,
         largeText: true
       });
 
-      // Should trigger DOM updates (mocked)
-      expect(mockBody.classList.toggle).toHaveBeenCalled();
+      // Should trigger DOM updates (since we're setting visual accessibility options)
+      expect(toggleSpy).toHaveBeenCalled();
+      
+      toggleSpy.mockRestore();
     });
   });
 
@@ -266,6 +265,11 @@ describe('NPCAccessibilityProvider', () => {
 
   describe('Movement Speed Adjustment', () => {
     test('should return normal speed by default', () => {
+      // Ensure provider starts with default settings (no accessibility features)
+      provider.updateSettings({ 
+        reduceMotion: false,
+        slowMovement: false 
+      });
       provider.enable();
       const multiplier = provider.getMovementSpeedMultiplier();
       expect(multiplier).toBe(1.0);
@@ -273,7 +277,10 @@ describe('NPCAccessibilityProvider', () => {
 
     test('should reduce speed for slow movement setting', () => {
       provider.enable();
-      provider.updateSettings({ slowMovement: true });
+      provider.updateSettings({ 
+        slowMovement: true,
+        reduceMotion: false // Ensure only slow movement affects speed
+      });
       
       const multiplier = provider.getMovementSpeedMultiplier();
       expect(multiplier).toBe(0.5);
@@ -452,6 +459,22 @@ describe('NPCAccessibilityProvider', () => {
     });
 
     test('should provide standard status when no features active', () => {
+      // Reset all accessibility features to defaults
+      provider.updateSettings({
+        reduceMotion: false,
+        highContrast: false,
+        largeText: false,
+        slowMovement: false,
+        clickToMove: false,
+        screenReaderEnabled: false,
+        verboseDescriptions: false,
+        spatialAudio: false,
+        simplifiedInterface: false,
+        extendedTimeouts: false,
+        confirmationPrompts: false,
+        pauseOnFocus: false // This defaults to true, so explicitly set to false
+      });
+      
       const status = provider.getAccessibilityStatus();
       expect(status).toBe('Standard accessibility');
     });

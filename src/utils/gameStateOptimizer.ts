@@ -393,7 +393,7 @@ STATUS: ${metrics.stateSize > 1000000 ? '⚠️ Large state detected' : '✅ Sta
 export const gameStateOptimizer = new GameStateOptimizer();
 
 // Auto-start in development
-if (process.env.NODE_ENV === 'development') {
+if (import.meta.env.DEV) {
   gameStateOptimizer.startAutoOptimization();
   
   // Add global commands

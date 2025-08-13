@@ -204,7 +204,7 @@ class PerformanceMonitor {
     }
     
     // Log critical warnings
-    if (process.env.NODE_ENV === 'development') {
+  if (import.meta.env.DEV) {
       console.warn('[PerformanceMonitor]', warning);
     }
   }
@@ -313,7 +313,7 @@ THRESHOLDS:
 export const performanceMonitor = new PerformanceMonitor();
 
 // Automatic monitoring in development
-if (process.env.NODE_ENV === 'development') {
+if (import.meta.env.DEV) {
   performanceMonitor.startMonitoring();
   
   // Add global performance commands for debugging

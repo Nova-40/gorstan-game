@@ -17,7 +17,7 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Controls full multiverse reset logic.
 
-import '../styles/ResetScreen.css'; 
+// Using inline styles + Tailwind 
 
 import React, { useEffect, useState } from 'react';
 

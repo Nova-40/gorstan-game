@@ -8,7 +8,7 @@
   Groq AI integration for enhanced NPC conversations
 */
 
-import Groq from 'groq-sdk';
+// Groq SDK will be imported dynamically inside the constructor
 import type { LocalGameState } from '../state/gameState';
 
 interface GroqConfig {
@@ -20,15 +20,19 @@ interface GroqConfig {
 }
 
 class GroqAIService {
-  private groq: Groq;
+  private groq: any;
   private config: GroqConfig;
 
   constructor() {
-    this.groq = new Groq({
-      apiKey: import.meta.env.VITE_GROQ_API_KEY || 'your-groq-api-key-here',
-      dangerouslyAllowBrowser: true // Allow in browser for client-side usage
-    });
-    
+    // Only load Groq if API key is present and not SSR
+    if (import.meta.env.VITE_GROQ_API_KEY && !import.meta.env.SSR) {
+      import('groq-sdk').then(({ default: Groq }) => {
+        this.groq = new Groq({
+          apiKey: import.meta.env.VITE_GROQ_API_KEY,
+          dangerouslyAllowBrowser: true
+        });
+      });
+    }
     this.config = {
       enabled: true,
       dailyLimit: 14000, // Groq free tier limit

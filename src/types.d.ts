@@ -17,7 +17,7 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Game module.
 
-import { Direction, Room, RoomCollection } from './RoomTypes';
+import { Direction, Room, RoomCollection } from './types/RoomTypes';
 
 import { NPC, NPCMood, NPCMemory } from './NPCTypes';
 

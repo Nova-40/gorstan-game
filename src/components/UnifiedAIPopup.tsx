@@ -158,7 +158,7 @@ const UnifiedAIPopup: React.FC<UnifiedAIPopupProps> = ({
           </div>
 
           {/* Metadata for debugging (only in dev mode) */}
-          {process.env.NODE_ENV === 'development' && guidance.metadata && (
+          {import.meta.env.DEV && guidance.metadata && (
             <div className="mt-3 pt-2 border-t border-gray-600/30">
               <div className="text-xs text-gray-500">
                 <div>Source: {guidance.source}</div>

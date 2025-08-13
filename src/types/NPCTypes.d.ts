@@ -14,10 +14,8 @@
   Full licence terms: see EULA.md in the project root.
 */
 
-import { NPC } from '../types/NPCTypes';
-
-import { GameState } from '../state/GameStateTypes';
-import { RoomDefinition } from './RoomTypes';
+import type { GameState } from '../state/gameState';
+import { Definition } from './RoomTypes';
 
 export interface NPCMemoryState {
   [topic: string]: string | number | boolean;
@@ -29,7 +27,7 @@ export interface NPC {
   portrait: string;
   memory: NPCMemoryState;
   react: (topic: string) => string;
-  shouldBeVisible?: (state: GameState, room: RoomDefinition) => boolean;
+  shouldBeVisible?: (state: GameState, room: Definition) => boolean;
   wanderRoute?: string[]; // list of room ids
   currentRoom?: string;   // current location if wandering
 }

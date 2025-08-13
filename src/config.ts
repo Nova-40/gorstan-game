@@ -19,7 +19,7 @@
 
 export const config = {
   // Game settings
-  debug: process.env.NODE_ENV === 'development',
+  debug: import.meta.env.DEV,
   version: '1.0.0',
   
   // Feature flags
@@ -37,8 +37,8 @@ export const config = {
   defaultTheme: 'dark' as 'dark' | 'light',
   
   // Development overrides
-  ...(process.env.NODE_ENV === 'development' && {
+  ...(import.meta.env.DEV && {
     // Add dev-specific overrides here
-    forceSeason: process.env.VITE_FORCE_SEASON as null | "easter" | "christmas" | "may13"
+    forceSeason: import.meta.env.VITE_FORCE_SEASON as null | "easter" | "christmas" | "may13"
   })
 };

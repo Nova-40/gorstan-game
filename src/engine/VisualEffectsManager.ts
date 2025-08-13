@@ -175,7 +175,7 @@ export class VisualEffectsManager {
 
     this.activeEffects.set(effectName, effectState);
 
-    if (process.env.NODE_ENV === 'development') {
+  if (import.meta.env.DEV) {
       console.log(`[VisualEffectsManager] Applied effect: ${effectName}`, effectConfig);
     }
 
@@ -226,7 +226,7 @@ export class VisualEffectsManager {
     // Remove from active effects
     this.activeEffects.delete(effectName);
 
-    if (process.env.NODE_ENV === 'development') {
+  if (import.meta.env.DEV) {
       console.log(`[VisualEffectsManager] Removed effect: ${effectName}`);
     }
 
@@ -263,7 +263,7 @@ export class VisualEffectsManager {
       this.removeEffect(effectName);
     });
 
-    if (process.env.NODE_ENV === 'development') {
+  if (import.meta.env.DEV) {
       console.log(`[VisualEffectsManager] Cleared ${effectsToRemove.length} effects`);
     }
   }
@@ -299,7 +299,7 @@ export class VisualEffectsManager {
       }, delay);
     });
 
-    if (process.env.NODE_ENV === 'development') {
+  if (import.meta.env.DEV) {
       console.log(`[VisualEffectsManager] Applied effect sequence:`, effects);
     }
   }

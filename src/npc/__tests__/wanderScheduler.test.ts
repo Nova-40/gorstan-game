@@ -17,7 +17,7 @@
 // src/npc/__tests__/wanderScheduler.test.ts
 // Unit tests for the wandering scheduler
 
-import { getWanderScheduler, WanderSchedulerConfig } from '../wanderScheduler';
+import { WanderScheduler, WanderSchedulerConfig } from '../wanderScheduler';
 
 // Mock timers
 jest.useFakeTimers();
@@ -32,21 +32,12 @@ describe('WanderScheduler', () => {
   });
 
   afterEach(() => {
-    // Clean up global scheduler
-    const scheduler = getWanderScheduler();
-    scheduler.stop('test cleanup');
-    
-    // Unregister all NPCs to prevent test pollution
-    const stats = scheduler.getStats();
-    const registeredNPCs = (scheduler as any).npcs || new Map();
-    for (const npcId of registeredNPCs.keys()) {
-      scheduler.unregisterNPC(npcId);
-    }
+    jest.clearAllTimers();
   });
 
   describe('Basic Operations', () => {
     test('should start and stop scheduler', () => {
-      const scheduler = getWanderScheduler();
+      const scheduler = new WanderScheduler();
       
       expect(scheduler.getStats().isRunning).toBe(false);
       
@@ -58,7 +49,7 @@ describe('WanderScheduler', () => {
     });
 
     test('should register and unregister NPCs', () => {
-      const scheduler = getWanderScheduler();
+      const scheduler = new WanderScheduler();
       
       scheduler.registerNPC('test-npc', mockMoveCallback);
       expect(scheduler.getStats().registeredNPCs).toBe(1);
@@ -77,7 +68,7 @@ describe('WanderScheduler', () => {
         jitterRangeMs: [0, 0] // No jitter for predictable testing
       };
       
-      const scheduler = getWanderScheduler(config);
+      const scheduler = new WanderScheduler(config);
       
       // Register multiple NPCs
       scheduler.registerNPC('npc1', mockMoveCallback);
@@ -86,11 +77,11 @@ describe('WanderScheduler', () => {
       
       scheduler.start();
       
-      // Advance time by one tick
-      jest.advanceTimersByTime(100);
+      // Advance time by more than one tick to trigger moves
+      jest.advanceTimersByTime(150);
       
-      // Wait for any pending promises
-      await new Promise(resolve => setImmediate(resolve));
+      // Process all pending microtasks
+      await Promise.resolve();
       
       const stats = scheduler.getStats();
       expect(stats.totalTicks).toBe(1);
@@ -104,7 +95,7 @@ describe('WanderScheduler', () => {
       // Advance another tick
       mockMoveCallback.mockClear();
       jest.advanceTimersByTime(100);
-      await new Promise(resolve => setImmediate(resolve));
+      await Promise.resolve();
       
       // Should move again
       expect(mockMoveCallback).toHaveBeenCalledTimes(3);
@@ -120,7 +111,7 @@ describe('WanderScheduler', () => {
         jitterRangeMs: [0, 0]
       };
       
-      const scheduler = getWanderScheduler(config);
+      const scheduler = new WanderScheduler(config);
       scheduler.registerNPC('test-npc', mockMoveCallback);
       scheduler.start();
       
@@ -129,8 +120,8 @@ describe('WanderScheduler', () => {
       expect(scheduler.getStats().pausedNPCs).toBe(1);
       
       // Advance time - should not move
-      jest.advanceTimersByTime(100);
-      await new Promise(resolve => setTimeout(resolve, 0));
+      jest.advanceTimersByTime(150);
+      await Promise.resolve();
       expect(mockMoveCallback).not.toHaveBeenCalled();
       
       // Resume
@@ -138,8 +129,8 @@ describe('WanderScheduler', () => {
       expect(scheduler.getStats().pausedNPCs).toBe(0);
       
       // Advance time - should move
-      jest.advanceTimersByTime(100);
-      await new Promise(resolve => setTimeout(resolve, 0));
+      jest.advanceTimersByTime(100); // Exactly one tick
+      await Promise.resolve();
       expect(mockMoveCallback).toHaveBeenCalledTimes(1);
     });
 
@@ -149,7 +140,7 @@ describe('WanderScheduler', () => {
         jitterRangeMs: [0, 0]
       };
       
-      const scheduler = getWanderScheduler(config);
+      const scheduler = new WanderScheduler(config);
       
       const callback1 = jest.fn().mockResolvedValue(undefined);
       const callback2 = jest.fn().mockResolvedValue(undefined);
@@ -162,7 +153,7 @@ describe('WanderScheduler', () => {
       scheduler.pause({ npcIds: ['npc1'], reason: 'test selective pause' });
       
       jest.advanceTimersByTime(100);
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await Promise.resolve();
       
       // Only npc2 should move
       expect(callback1).not.toHaveBeenCalled();
@@ -175,7 +166,7 @@ describe('WanderScheduler', () => {
       callback2.mockClear();
       
       jest.advanceTimersByTime(100);
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await Promise.resolve();
       
       // Both should move now
       expect(callback1).toHaveBeenCalledTimes(1);
@@ -185,7 +176,7 @@ describe('WanderScheduler', () => {
     }, 10000);
 
     test('should handle multiple overlapping pause scopes', async () => {
-      const scheduler = getWanderScheduler();
+      const scheduler = new WanderScheduler();
       scheduler.registerNPC('test-npc', mockMoveCallback);
       
       // Apply multiple pauses
@@ -212,21 +203,21 @@ describe('WanderScheduler', () => {
       };
       
       const failingCallback = jest.fn().mockRejectedValue(new Error('Move failed'));
-      const scheduler = getWanderScheduler(config);
+      const scheduler = new WanderScheduler(config);
       
       scheduler.registerNPC('failing-npc', failingCallback);
       scheduler.start();
       
       // Should not throw
       jest.advanceTimersByTime(100);
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await Promise.resolve();
       
       expect(failingCallback).toHaveBeenCalledTimes(1);
       
       // Should try again on next tick (with backoff)
       failingCallback.mockClear();
-      jest.advanceTimersByTime(200); // Double backoff time
-      await new Promise(resolve => setTimeout(resolve, 0));
+      jest.advanceTimersByTime(200); // More time to handle backoff
+      await Promise.resolve();
       
       expect(failingCallback).toHaveBeenCalledTimes(1);
       
@@ -241,12 +232,12 @@ describe('WanderScheduler', () => {
         jitterRangeMs: [100, 300]
       };
       
-      const scheduler1 = getWanderScheduler(config);
+      const scheduler1 = new WanderScheduler(config);
       scheduler1.registerNPC('test-npc', mockMoveCallback);
       const state1 = scheduler1.getNPCState('test-npc');
       
       // Create new scheduler with same seed
-      const scheduler2 = getWanderScheduler(config);
+      const scheduler2 = new WanderScheduler(config);
       scheduler2.registerNPC('test-npc', mockMoveCallback);
       const state2 = scheduler2.getNPCState('test-npc');
       
@@ -257,7 +248,7 @@ describe('WanderScheduler', () => {
 
   describe('Statistics and Monitoring', () => {
     test('should track scheduler statistics correctly', () => {
-      const scheduler = getWanderScheduler();
+      const scheduler = new WanderScheduler();
       
       // Ensure clean state
       const registeredNPCs = (scheduler as any).npcs || new Map();

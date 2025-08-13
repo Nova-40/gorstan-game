@@ -284,7 +284,7 @@ export function executeReset(
     updateResetStats(resetType, reasonCode);
 
     // Log reset for debugging
-    if (process.env.NODE_ENV === 'development') {
+  if (import.meta.env.DEV) {
       console.log(`[ResetEngine] Executed ${resetType} reset:`, {
         entryPoint,
         preserveAchievements,
@@ -571,7 +571,7 @@ export function cleanupOldSaves(maxAge: number = 7 * 24 * 60 * 60 * 1000): void 
 
     keysToRemove.forEach(key => localStorage.removeItem(key));
     
-    if (process.env.NODE_ENV === 'development') {
+  if (import.meta.env.DEV) {
       console.log(`[ResetEngine] Cleaned up ${keysToRemove.length} old saves`);
     }
   } catch (error) {

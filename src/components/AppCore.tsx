@@ -1385,7 +1385,7 @@ const handleBackout = useCallback((): void => {
 
   // Enhanced guard rails with proper type checking
   if (!state.currentRoomId || !state.roomMap || !state.roomMap[state.currentRoomId]) {
-    if (process.env.NODE_ENV === 'development') {
+  if (import.meta.env.DEV) {
       console.log('Guard rails:', {
         currentRoomId: state.currentRoomId,
         roomMapLoaded: Boolean(state.roomMap),
