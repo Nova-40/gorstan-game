@@ -26,6 +26,7 @@ import QuestLog from './components/QuestLog';
 import QuickMap from './components/QuickMap';
 import { playSFX } from './utils/sfxManager';
 import AylaResponseIndicator from "./components/AylaResponseIndicator";
+import DevOverlay from "./devtools/DevOverlay";
 
 import React from "react";
 import './styles/animations.css';
@@ -70,6 +71,7 @@ const App: React.FC = () => {
         <button onClick={() => handleAction('teleport')}>Test Teleport SFX</button>
         <div className="fade-in">This fades in!</div>
         <div className="slide-in">This slides in!</div>
+        {process.env.DEV_ONLY && <DevOverlay />}
       </div>
     </GameStateProvider>
   );
