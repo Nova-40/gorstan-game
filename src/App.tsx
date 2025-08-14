@@ -20,6 +20,8 @@
 import AppCore from "./components/AppCore";
 import { CelebrationController } from "./celebrate";
 import DebugOverlay from './components/DebugOverlay';
+import TooltipSystem from './components/TooltipSystem';
+import SessionGoalBanner from './components/SessionGoalBanner';
 
 import React from "react";
 
@@ -32,6 +34,8 @@ const App: React.FC = () => {
       <CelebrationController>
         <AppCore />
         {process.env.NODE_ENV === 'development' && <DebugOverlay />}
+        <TooltipSystem />
+        <SessionGoalBanner />
       </CelebrationController>
     </GameStateProvider>
   );
