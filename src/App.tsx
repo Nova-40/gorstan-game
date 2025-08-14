@@ -24,8 +24,10 @@ import TooltipSystem from './components/TooltipSystem';
 import SessionGoalBanner from './components/SessionGoalBanner';
 import QuestLog from './components/QuestLog';
 import QuickMap from './components/QuickMap';
+import { playSFX } from './utils/sfxManager';
 
 import React from "react";
+import './styles/animations.css';
 
 import { GameStateProvider } from "./state/gameState";
 
@@ -38,6 +40,16 @@ const App: React.FC = () => {
 
   const currentRoomId = 'room1';
 
+  const handleAction = (action: string) => {
+    if (action === 'success') {
+      playSFX('success');
+    } else if (action === 'failure') {
+      playSFX('failure');
+    } else if (action === 'teleport') {
+      playSFX('teleport');
+    }
+  };
+
   // JSX return block or main return
   return (
     <GameStateProvider>
@@ -48,6 +60,11 @@ const App: React.FC = () => {
         <SessionGoalBanner />
         <QuestLog />
         <QuickMap rooms={rooms} currentRoomId={currentRoomId} />
+        <button onClick={() => handleAction('success')}>Test Success SFX</button>
+        <button onClick={() => handleAction('failure')}>Test Failure SFX</button>
+        <button onClick={() => handleAction('teleport')}>Test Teleport SFX</button>
+        <div className="fade-in">This fades in!</div>
+        <div className="slide-in">This slides in!</div>
       </CelebrationController>
     </GameStateProvider>
   );
