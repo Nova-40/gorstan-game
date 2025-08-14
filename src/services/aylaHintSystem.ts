@@ -9,6 +9,7 @@
 import { groqAI } from "./groqAI";
 import type { LocalGameState } from "../state/gameState";
 import type { Room } from "../types/Room";
+import { formatInteractable, formatExits } from '../utils/roomAffordances';
 
 export interface AylaHintContext {
   currentRoom: Room;
@@ -500,6 +501,24 @@ Respond with just the hint text, in Ayla's voice with appropriate cosmic imagery
     this.idleTimer = setTimeout(() => {
       console.log("If you need a nudge, type HINT for a gentle steer.");
     }, 45000);
+  }
+
+  private enhanceRoomDescription(room: Room): string {
+    const formattedExits = formatExits(Object.keys(room.exits || {}));
+    const interactables = room.items?.map(formatInteractable).join(', ') || 'None';
+
+    return `Room: ${room.title}\nDescription: ${room.description}\nInteractables: ${interactables}\n${formattedExits}`;
+  }
+
+  public getEnhancedHint(context: AylaHintContext): AylaHintResponse {
+    const enhancedDescription = this.enhanceRoomDescription(context.currentRoom);
+
+    return {
+      shouldInterrupt: false,
+      hintText: `You are in ${context.currentRoom.title}.\n${enhancedDescription}`,
+      urgency: 'low',
+      hintType: 'navigation',
+    };
   }
 }
 

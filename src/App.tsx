@@ -22,12 +22,22 @@ import { CelebrationController } from "./celebrate";
 import DebugOverlay from './components/DebugOverlay';
 import TooltipSystem from './components/TooltipSystem';
 import SessionGoalBanner from './components/SessionGoalBanner';
+import QuestLog from './components/QuestLog';
+import QuickMap from './components/QuickMap';
 
 import React from "react";
 
 import { GameStateProvider } from "./state/gameState";
 
 const App: React.FC = () => {
+  const rooms = [
+    { id: 'room1', title: 'Starting Area', unlocked: true },
+    { id: 'room2', title: 'Control Room', unlocked: false },
+    { id: 'room3', title: 'Puzzle Chamber', unlocked: true },
+  ];
+
+  const currentRoomId = 'room1';
+
   // JSX return block or main return
   return (
     <GameStateProvider>
@@ -36,6 +46,8 @@ const App: React.FC = () => {
         {process.env.NODE_ENV === 'development' && <DebugOverlay />}
         <TooltipSystem />
         <SessionGoalBanner />
+        <QuestLog />
+        <QuickMap rooms={rooms} currentRoomId={currentRoomId} />
       </CelebrationController>
     </GameStateProvider>
   );
