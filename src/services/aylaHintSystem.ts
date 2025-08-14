@@ -520,6 +520,54 @@ Respond with just the hint text, in Ayla's voice with appropriate cosmic imagery
       hintType: 'navigation',
     };
   }
+
+  private getHintEscalation(stuckTime: number, targetTime: number): string {
+    if (stuckTime > targetTime * 2) {
+      return 'strong';
+    } else if (stuckTime > targetTime * 1.5) {
+      return 'soft';
+    }
+    return 'none';
+  }
+
+  public getAdaptiveHint(context: AylaHintContext): AylaHintResponse | null {
+    const puzzleDifficulty = context.currentRoom.puzzle?.difficulty || 1;
+    const targetSolveTime = [3, 5, 8, 12, 20][puzzleDifficulty - 1] * 60 * 1000; // Convert minutes to ms
+    const escalation = this.getHintEscalation(context.stuckDuration, targetSolveTime);
+
+    if (escalation === 'none') {
+      return null;
+    }
+
+    const hintText = escalation === 'strong'
+      ? `Here's a strong hint for solving the puzzle in ${context.currentRoom.title}.`
+      : `Here's a nudge to help you with the puzzle in ${context.currentRoom.title}.`;
+
+    return {
+      shouldInterrupt: true,
+      hintText,
+      urgency: escalation === 'strong' ? 'high' : 'medium',
+      hintType: 'puzzle',
+    };
+  }
+
+  public provideFailSafe(context: AylaHintContext): AylaHintResponse {
+    if (context.failedAttempts.length > 5) {
+      return {
+        shouldInterrupt: true,
+        hintText: `It seems you're stuck. Here's a hint to help you progress in ${context.currentRoom.title}.`,
+        urgency: 'high',
+        hintType: 'puzzle',
+      };
+    }
+
+    return {
+      shouldInterrupt: false,
+      hintText: '',
+      urgency: 'low',
+      hintType: 'safety',
+    };
+  }
 }
 
 // Export singleton instance

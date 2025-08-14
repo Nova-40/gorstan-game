@@ -84,7 +84,7 @@ export interface Puzzle {
   id: string;
   name: string;
   solved: boolean;
-  difficulty?: "simple" | "hard" | "expert";
+  difficulty?: 1 | 2 | 3 | 4 | 5; // Numeric tiers for difficulty
   [key: string]: unknown;
 }
 
