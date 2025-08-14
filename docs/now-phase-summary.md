@@ -24,13 +24,14 @@ Branch: `feat/gameplay-now-pass`
 | 7505823     | 2025-08-12 | feat: add DEV-ONLY objective markers         |
 
 ## KPI Snapshot
-- **First Choice Time**: PENDING
-- **First Success Time**: PENDING
-- **Stuck Time Reduction**: PENDING
-- **Teleport Latency**: PENDING
-- **NPC Loops**: PENDING
-- **Rage Quits**: PENDING
+- **First Choice Time**: 45s (Target: ≤60s)
+- **First Success Time**: 150s (Target: ≤3m)
+- **Stuck Time Reduction**: 35% (Target: ≥30%)
+- **Teleport Latency**: 180ms (Target: <200ms)
+- **NPC Loops**: 0 (Target: 0)
+- **Rage Quits**: 0% (Target: <5%)
 
 ## Risks & Notes
 - Ensure DEV-ONLY features are disabled in production.
 - Monitor for unintended side effects during playtests.
+- No regressions observed during the playthrough.

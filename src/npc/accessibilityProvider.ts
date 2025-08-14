@@ -47,6 +47,9 @@ export interface AccessibilitySettings {
   screenReaderEnabled: boolean;
   verboseDescriptions: boolean;
   liveRegionUpdates: boolean;
+
+  // Text accessibility
+  textScaling: boolean; // Enable or disable text scaling
 }
 
 export interface NPCMovementAnnouncement {
@@ -365,6 +368,7 @@ export class NPCAccessibilityProvider {
       screenReaderEnabled: false,
       verboseDescriptions: false,
       liveRegionUpdates: true,
+      textScaling: false, // Default value for text scaling
       ...settings,
     };
 

@@ -16,7 +16,7 @@
 
 // src/utils/roomUtils.ts
 // Utility to get the zone for a given roomId
-import roomRegistry from "../data/roomRegistry";
+import roomRegistry from "../rooms/roomRegistry";
 
 /**
  * Returns the zone string for a given roomId, or empty string if not found.

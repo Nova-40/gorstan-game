@@ -17,6 +17,8 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Renders room descriptions and image logic.
 
+import { FLAGS } from '../config/flags';
+
 import aevirawarehouse from "./newyorkZone_aevirawarehouse";
 
 import ancientslibrary from "./offgorstanZone_ancientslibrary";
@@ -180,7 +182,7 @@ export const villagegreen = {
 };
 
 // Ensure all references use the consolidated import from services/rooms.
-export default {
+export const roomRegistry = {
   elfhame,
   faeglade,
   faelake,
@@ -255,8 +257,10 @@ export default {
   villagegreen,
 };
 
+export default roomRegistry;
+
 // DEV-ONLY: Objective markers for early rooms
 if (FLAGS.DEV_ONLY && FLAGS.ENABLE_OBJECTIVE_MARKERS) {
-  roomRegistry["controlRoom"].objectiveMarker = "Find the control panel to activate the system.";
-  roomRegistry["introZone"].objectiveMarker = "Explore the area to find your first task.";
+  (roomRegistry as any)["controlroom"].objectiveMarker = "Find the control panel to activate the system.";
+  (roomRegistry as any)["introstart"].objectiveMarker = "Explore the area to find your first task.";
 }

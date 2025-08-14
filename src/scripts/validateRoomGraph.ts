@@ -18,7 +18,7 @@
 // Script to validate room graph integrity
 // Gorstan Game Beta 1
 
-import roomRegistry from "../data/roomRegistry";
+import roomRegistry from "../rooms/roomRegistry";
 import { RoomGraphValidator } from "../utils/roomGraphValidator";
 
 /**

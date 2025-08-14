@@ -26,3 +26,10 @@ export function playNpcAudio(npcName: string): void {
     audio.play();
   }
 }
+
+// --- Function: playSound ---
+export function playSound(soundFile: string): void {
+  const audio = new Audio(`/audio/${soundFile}`);
+  audio.volume = 0.6;
+  audio.play();
+}

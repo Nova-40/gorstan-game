@@ -1,4 +1,6 @@
 // Telemetry system for gameplay metrics (DEV_ONLY)
+import { playSound } from '../audio/audioMap';
+import { triggerCelebrationAnimation } from '../ui/celebrationEffects';
 
 export interface TelemetryMetrics {
   time_to_first_interaction?: number;
@@ -44,6 +46,10 @@ export function logPuzzleSuccess(): void {
   if (!telemetry.time_to_first_puzzle_success) {
     telemetry.time_to_first_puzzle_success = Date.now() - (sessionStartTime || Date.now());
   }
+
+  // Trigger celebratory effects
+  playSound('success.wav');
+  triggerCelebrationAnimation();
 }
 
 export function logStuckTime(roomId: string, idleTime: number): void {
