@@ -254,3 +254,9 @@ export default {
   stantonharcourt,
   villagegreen,
 };
+
+// DEV-ONLY: Objective markers for early rooms
+if (FLAGS.DEV_ONLY && FLAGS.ENABLE_OBJECTIVE_MARKERS) {
+  roomRegistry["controlRoom"].objectiveMarker = "Find the control panel to activate the system.";
+  roomRegistry["introZone"].objectiveMarker = "Explore the area to find your first task.";
+}
