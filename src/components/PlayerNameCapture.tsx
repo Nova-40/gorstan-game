@@ -19,22 +19,9 @@
 
 import React, { useState, useCallback, useEffect, useRef } from "react";
 
-import { NPC } from '../types/NPCTypes';
+import { NPC } from "../types/NPCTypes";
 
 import { useGameState } from "../state/gameState";
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // Variable declaration
 const GorstanIcon = () => (
@@ -96,60 +83,44 @@ Available commands and toggles (cheat/debug mode only):
 WARNING: Using cheat/debug mode may irreversibly alter your story state, and summon Aevira auditors or make Albie sigh pointedly.
 `;
 
-const PlayerNameCapture: React.FC<{ onNameSubmit: (name: string) => void }> = ({ onNameSubmit }) => {
+const PlayerNameCapture: React.FC<{ onNameSubmit: (name: string) => void }> = ({
+  onNameSubmit,
+}) => {
   const { state, dispatch } = useGameState();
-// React state declaration
+  // React state declaration
   const [name, setName] = useState(state.player?.name || "");
   const [modal, setModal] = useState<null | "instructions" | "cheat">(null);
-// React state declaration
+  // React state declaration
   const [screen, setScreen] = useState(0);
 
-// Variable declaration
+  // Variable declaration
   const closeModal = useCallback(() => {
     setModal(null);
-    setScreen(0);
-  }, []);
+    if (!modal) {
+      return;
+    }
+  }, [modal]);
 
-  
-// React effect hook
-  useEffect(() => {
-    if (!modal) return;
-// Variable declaration
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        closeModal();
-      } else if (modal === "instructions") {
-        if (e.key === "ArrowRight") {
-          setScreen((s) => Math.min(s + 1, instructionsScreens.length - 1));
-        } else if (e.key === "ArrowLeft") {
-          setScreen((s) => Math.max(s - 1, 0));
-        }
-      }
-    };
-    window.addEventListener("keydown", handleKey);
-// JSX return block or main return
-    return () => window.removeEventListener("keydown", handleKey);
-  }, [modal, closeModal]);
-
-// Variable declaration
+  // Variable declaration
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (name.trim()) onNameSubmit(name.trim());
+    if (name.trim()) {
+      onNameSubmit(name.trim());
+    }
   };
 
-  
-// Variable declaration
+  // Variable declaration
   const handleInstructionsClick = (e: React.MouseEvent) => {
     if (e.ctrlKey || e.metaKey) {
       setModal("cheat");
-      
-      dispatch({ type: 'ENABLE_DEBUG_MODE' });
+
+      dispatch({ type: "ENABLE_DEBUG_MODE" });
     } else {
       setModal("instructions");
     }
   };
 
-// JSX return block or main return
+  // JSX return block or main return
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#060f17]">
       <div className="rounded-2xl border border-green-400 bg-[#101B24] shadow-xl max-w-md w-full p-8 relative">
@@ -218,9 +189,7 @@ const PlayerNameCapture: React.FC<{ onNameSubmit: (name: string) => void }> = ({
                         <span
                           key={i}
                           className={`inline-block w-2 h-2 rounded-full ${
-                            i === screen
-                              ? "bg-green-400"
-                              : "bg-green-900"
+                            i === screen ? "bg-green-400" : "bg-green-900"
                           }`}
                         ></span>
                       ))}

@@ -39,17 +39,23 @@ export function getPlayerLocation(): Promise<PlayerLocation> {
   return new Promise((resolve) => {
     // Simulate location detection with fake data for game narrative
     const mockLocations: PlayerLocation[] = [
-      { city: 'London', country: 'UK', timezone: 'GMT', weather: 'rainy' },
-      { city: 'New York', country: 'USA', timezone: 'EST', weather: 'cloudy' },
-      { city: 'Tokyo', country: 'Japan', timezone: 'JST', weather: 'clear' },
-      { city: 'Sydney', country: 'Australia', timezone: 'AEST', weather: 'sunny' },
-      { city: 'Toronto', country: 'Canada', timezone: 'EST', weather: 'snowy' },
-      { city: 'Berlin', country: 'Germany', timezone: 'CET', weather: 'foggy' },
+      { city: "London", country: "UK", timezone: "GMT", weather: "rainy" },
+      { city: "New York", country: "USA", timezone: "EST", weather: "cloudy" },
+      { city: "Tokyo", country: "Japan", timezone: "JST", weather: "clear" },
+      {
+        city: "Sydney",
+        country: "Australia",
+        timezone: "AEST",
+        weather: "sunny",
+      },
+      { city: "Toronto", country: "Canada", timezone: "EST", weather: "snowy" },
+      { city: "Berlin", country: "Germany", timezone: "CET", weather: "foggy" },
     ];
 
     // Randomly select a location for narrative purposes
-    const randomLocation = mockLocations[Math.floor(Math.random() * mockLocations.length)];
-    
+    const randomLocation =
+      mockLocations[Math.floor(Math.random() * mockLocations.length)];
+
     // Simulate async location detection
     setTimeout(() => {
       resolve(randomLocation);
@@ -61,7 +67,15 @@ export function getPlayerLocation(): Promise<PlayerLocation> {
  * Get current weather for narrative purposes
  */
 export function getCurrentWeather(): string {
-  const weatherOptions = ['rainy', 'sunny', 'cloudy', 'snowy', 'foggy', 'clear', 'stormy'];
+  const weatherOptions = [
+    "rainy",
+    "sunny",
+    "cloudy",
+    "snowy",
+    "foggy",
+    "clear",
+    "stormy",
+  ];
   return weatherOptions[Math.floor(Math.random() * weatherOptions.length)];
 }
 

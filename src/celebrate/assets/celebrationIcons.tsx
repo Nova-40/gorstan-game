@@ -17,7 +17,7 @@
 // src/celebrate/assets/celebrationIcons.tsx
 // SVG icons and decorations for different celebrations
 
-import React from 'react';
+import React from "react";
 
 interface IconProps {
   className?: string;
@@ -25,7 +25,10 @@ interface IconProps {
 }
 
 // Christian celebrations
-export const ChristmasIcon: React.FC<IconProps> = ({ className = '', size = 24 }) => (
+export const ChristmasIcon: React.FC<IconProps> = ({
+  className = "",
+  size = 24,
+}) => (
   <svg width={size} height={size} viewBox="0 0 24 24" className={className}>
     <g fill="currentColor">
       {}
@@ -40,7 +43,10 @@ export const ChristmasIcon: React.FC<IconProps> = ({ className = '', size = 24 }
   </svg>
 );
 
-export const EasterIcon: React.FC<IconProps> = ({ className = '', size = 24 }) => (
+export const EasterIcon: React.FC<IconProps> = ({
+  className = "",
+  size = 24,
+}) => (
   <svg width={size} height={size} viewBox="0 0 24 24" className={className}>
     <g fill="currentColor">
       {/* Cross */}
@@ -54,29 +60,40 @@ export const EasterIcon: React.FC<IconProps> = ({ className = '', size = 24 }) =
 );
 
 // Islamic celebrations
-export const EidIcon: React.FC<IconProps> = ({ className = '', size = 24 }) => (
+export const EidIcon: React.FC<IconProps> = ({ className = "", size = 24 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" className={className}>
     <g fill="currentColor">
       {/* Crescent moon */}
       <path d="M12 2C8 2 5 5 5 9s3 7 7 7c1 0 2-.2 3-.6C13.8 16.2 13 15.1 13 14c0-2.8 2.2-5 5-5 .4 0 .8.1 1.2.2C18.4 5.8 15.5 2 12 2z" />
       {/* Star */}
-      <polygon points="19,8 20,10 22,10 20.5,11.5 21,14 19,12.5 17,14 17.5,11.5 16,10 18,10" fill="#FFD700" />
+      <polygon
+        points="19,8 20,10 22,10 20.5,11.5 21,14 19,12.5 17,14 17.5,11.5 16,10 18,10"
+        fill="#FFD700"
+      />
     </g>
   </svg>
 );
 
 // Jewish celebrations
-export const JewishIcon: React.FC<IconProps> = ({ className = '', size = 24 }) => (
+export const JewishIcon: React.FC<IconProps> = ({
+  className = "",
+  size = 24,
+}) => (
   <svg width={size} height={size} viewBox="0 0 24 24" className={className}>
     <g fill="currentColor">
       {/* Star of David */}
-      <path d="M12 2l2.5 4.5H19l-2.5 4.5L19 16h-4.5L12 20.5 9.5 16H5l2.5-4.5L5 7h4.5L12 2z" 
-            fillRule="evenodd" />
+      <path
+        d="M12 2l2.5 4.5H19l-2.5 4.5L19 16h-4.5L12 20.5 9.5 16H5l2.5-4.5L5 7h4.5L12 2z"
+        fillRule="evenodd"
+      />
     </g>
   </svg>
 );
 
-export const MenorahIcon: React.FC<IconProps> = ({ className = '', size = 24 }) => (
+export const MenorahIcon: React.FC<IconProps> = ({
+  className = "",
+  size = 24,
+}) => (
   <svg width={size} height={size} viewBox="0 0 24 24" className={className}>
     <g fill="currentColor">
       {/* Menorah base */}
@@ -88,7 +105,7 @@ export const MenorahIcon: React.FC<IconProps> = ({ className = '', size = 24 }) 
       {/* Side candles */}
       {Array.from({ length: 8 }, (_, i) => {
         const x = 6 + i * 1.5;
-        if (i === 4) return null; // Skip center position
+        if (i === 4) {return null;} // Skip center position
         return (
           <g key={i}>
             <rect x={x} y="8" width="1" height="10" />
@@ -101,7 +118,10 @@ export const MenorahIcon: React.FC<IconProps> = ({ className = '', size = 24 }) 
 );
 
 // Chinese celebrations
-export const DragonIcon: React.FC<IconProps> = ({ className = '', size = 24 }) => (
+export const DragonIcon: React.FC<IconProps> = ({
+  className = "",
+  size = 24,
+}) => (
   <svg width={size} height={size} viewBox="0 0 24 24" className={className}>
     <g fill="currentColor">
       {/* Dragon body */}
@@ -115,7 +135,10 @@ export const DragonIcon: React.FC<IconProps> = ({ className = '', size = 24 }) =
   </svg>
 );
 
-export const LanternIcon: React.FC<IconProps> = ({ className = '', size = 24 }) => (
+export const LanternIcon: React.FC<IconProps> = ({
+  className = "",
+  size = 24,
+}) => (
   <svg width={size} height={size} viewBox="0 0 24 24" className={className}>
     <g fill="currentColor">
       {/* Lantern body */}
@@ -125,21 +148,37 @@ export const LanternIcon: React.FC<IconProps> = ({ className = '', size = 24 }) 
       <rect x="10" y="5" width="4" height="1" />
       <rect x="10" y="18" width="4" height="1" />
       {/* Tassel */}
-      <line x1="12" y1="19" x2="12" y2="21" stroke="currentColor" strokeWidth="1" />
+      <line
+        x1="12"
+        y1="19"
+        x2="12"
+        y2="21"
+        stroke="currentColor"
+        strokeWidth="1"
+      />
     </g>
   </svg>
 );
 
 // Hindu celebrations
-export const DiwalIcon: React.FC<IconProps> = ({ className = '', size = 24 }) => (
+export const DiwalIcon: React.FC<IconProps> = ({
+  className = "",
+  size = 24,
+}) => (
   <svg width={size} height={size} viewBox="0 0 24 24" className={className}>
     <g fill="currentColor">
       {/* Oil lamp (diya) */}
       <ellipse cx="12" cy="16" rx="6" ry="2" />
       <ellipse cx="12" cy="15" rx="5" ry="1.5" fill="#D4A574" />
       {/* Flame */}
-      <path d="M12 15c0-3 1-5 2-5s2 2 2 5c0 1-1 2-2 2s-2-1-2-2z" fill="#FF6B35" />
-      <path d="M12.5 15c0-2 0.5-3.5 1-3.5s1 1.5 1 3.5c0 0.5-0.5 1-1 1s-1-0.5-1-1z" fill="#FFD700" />
+      <path
+        d="M12 15c0-3 1-5 2-5s2 2 2 5c0 1-1 2-2 2s-2-1-2-2z"
+        fill="#FF6B35"
+      />
+      <path
+        d="M12.5 15c0-2 0.5-3.5 1-3.5s1 1.5 1 3.5c0 0.5-0.5 1-1 1s-1-0.5-1-1z"
+        fill="#FFD700"
+      />
       {/* Wick */}
       <rect x="11.5" y="14" width="1" height="2" fill="#8B4513" />
     </g>
@@ -147,7 +186,10 @@ export const DiwalIcon: React.FC<IconProps> = ({ className = '', size = 24 }) =>
 );
 
 // Buddhist celebrations
-export const LotusIcon: React.FC<IconProps> = ({ className = '', size = 24 }) => (
+export const LotusIcon: React.FC<IconProps> = ({
+  className = "",
+  size = 24,
+}) => (
   <svg width={size} height={size} viewBox="0 0 24 24" className={className}>
     <g fill="currentColor">
       {/* Lotus petals */}
@@ -164,21 +206,33 @@ export const LotusIcon: React.FC<IconProps> = ({ className = '', size = 24 }) =>
 );
 
 // Seasonal celebrations
-export const SunIcon: React.FC<IconProps> = ({ className = '', size = 24 }) => (
+export const SunIcon: React.FC<IconProps> = ({ className = "", size = 24 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" className={className}>
     <g fill="currentColor">
       {/* Sun center */}
       <circle cx="12" cy="12" r="4" />
       {/* Rays */}
-      <path d="M12 2v4M12 18v4M2 12h4M18 12h4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83" 
-            stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <path
+        d="M12 2v4M12 18v4M2 12h4M18 12h4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
     </g>
   </svg>
 );
 
-export const SnowflakeIcon: React.FC<IconProps> = ({ className = '', size = 24 }) => (
+export const SnowflakeIcon: React.FC<IconProps> = ({
+  className = "",
+  size = 24,
+}) => (
   <svg width={size} height={size} viewBox="0 0 24 24" className={className}>
-    <g fill="currentColor" stroke="currentColor" strokeWidth="1" strokeLinecap="round">
+    <g
+      fill="currentColor"
+      stroke="currentColor"
+      strokeWidth="1"
+      strokeLinecap="round"
+    >
       {/* Main lines */}
       <line x1="12" y1="2" x2="12" y2="22" />
       <line x1="2" y1="12" x2="22" y2="12" />
@@ -203,7 +257,7 @@ export const celebrationIcons = {
   diya: DiwalIcon,
   lotus: LotusIcon,
   sun: SunIcon,
-  snowflake: SnowflakeIcon
+  snowflake: SnowflakeIcon,
 };
 
 export type CelebrationIconName = keyof typeof celebrationIcons;

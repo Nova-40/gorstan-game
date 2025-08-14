@@ -17,17 +17,9 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Renders room descriptions and image logic.
 
-import { NPC } from '../types/NPCTypes';
+import { NPC } from "../types/NPCTypes";
 
-import { Room } from '../types/Room';
-
-
-
-
-
-
-
-
+import { Room } from "../types/Room";
 
 const latticeobservatory: Room = {
   id: "latticeobservatory",
@@ -37,7 +29,7 @@ const latticeobservatory: Room = {
     "You enter the Lattice Observatory, a vast chamber with transparent walls offering a panoramic view of the crystalline lattice structure.",
     "Intricate observation equipment hovers in the air, tracking energy flows and shifting patterns within the lattice.",
     "Soft lights pulse in time with the resonance of the structure, and data streams scroll across floating displays.",
-    "A sense of awe and discovery fills the space, as if you are witnessing the living heart of the lattice."
+    "A sense of awe and discovery fills the space, as if you are witnessing the living heart of the lattice.",
   ],
   image: "offmultiverseZone_observationroom.png",
   ambientAudio: "observatory_ambience.mp3",
@@ -46,42 +38,37 @@ const latticeobservatory: Room = {
     ">> LATTICE OBSERVATORY - PANORAMIC VIEW",
     ">> Observation systems: ONLINE",
     ">> Energy readings: FLUCTUATING",
-    ">> Tip: Use the equipment to analyze lattice patterns and discover hidden phenomena."
+    ">> Tip: Use the equipment to analyze lattice patterns and discover hidden phenomena.",
   ],
 
   exits: {
     north: "latticeZone_latticeobservationdeck",
-    south: "latticeZone_latticehub"
+    south: "latticeZone_latticehub",
   },
 
-  items: [
-    "observation_log",
-    "energy_lens",
-    "pattern_chart",
-    "crystal_sample"
-  ],
+  items: ["observation_log", "energy_lens", "pattern_chart", "crystal_sample"],
 
   interactables: {
-    "observation_scope": {
-      description: "A floating scope that allows detailed analysis of the lattice structure.",
+    observation_scope: {
+      description:
+        "A floating scope that allows detailed analysis of the lattice structure.",
       actions: ["examine", "analyze", "adjust_focus"],
       requires: [],
     },
-    "data_terminal": {
-      description: "A terminal displaying real-time data and historical records of lattice phenomena.",
+    data_terminal: {
+      description:
+        "A terminal displaying real-time data and historical records of lattice phenomena.",
       actions: ["access", "download", "compare_data"],
       requires: [],
     },
-    "energy_monitor": {
+    energy_monitor: {
       description: "A device tracking energy fluctuations within the lattice.",
       actions: ["observe", "record", "stabilize"],
       requires: [],
-    }
+    },
   },
 
-  npcs: [
-    
-  ],
+  npcs: [],
 
   events: {
     onEnter: ["showObservatoryIntro", "activateEquipment"],
@@ -90,7 +77,7 @@ const latticeobservatory: Room = {
       observation_scope: ["analyzeLattice", "adjustFocus"],
       data_terminal: ["downloadData", "compareRecords", "summonCurator"],
       energy_monitor: ["recordFluctuations", "attemptStabilize"],
-    }
+    },
   },
 
   flags: {
@@ -106,20 +93,16 @@ const latticeobservatory: Room = {
       "Analyze the Lattice with the Observation Scope",
       "Download Data from the Terminal",
       "Stabilize Energy Fluctuations",
-      "Meet the Observatory Curator"
-    ]
+      "Meet the Observatory Curator",
+    ],
   },
 
   environmental: {
     lighting: "soft_pulsing_glow",
     temperature: "cool_and_stable",
     airQuality: "ionized_and_clear",
-    soundscape: [
-      "soft_resonance",
-      "equipment_hum",
-      "data_streams"
-    ],
-    hazards: ["energy_spikes", "data_overload"]
+    soundscape: ["soft_resonance", "equipment_hum", "data_streams"],
+    hazards: ["energy_spikes", "data_overload"],
   },
 
   security: {
@@ -127,7 +110,7 @@ const latticeobservatory: Room = {
     accessRequirements: [],
     alarmTriggers: ["unauthorized_data_download"],
     surveillanceActive: true,
-    surveillanceType: "observatory_sensors"
+    surveillanceType: "observatory_sensors",
   },
 
   metadata: {
@@ -142,37 +125,38 @@ const latticeobservatory: Room = {
       "Panoramic lattice view",
       "Scientific analysis equipment",
       "Holographic curator NPC",
-      "Energy and data puzzles"
-    ]
+      "Energy and data puzzles",
+    ],
   },
 
   secrets: {
     hidden_pattern: {
-      description: "A concealed pattern in the lattice, revealed by adjusting the observation scope.",
+      description:
+        "A concealed pattern in the lattice, revealed by adjusting the observation scope.",
       requirements: ["adjust_focus", "analyzeLattice"],
       rewards: ["pattern_insight", "unique_item"],
     },
     curator_memory: {
-      description: "A memory fragment from the curator, unlocked by comparing historical data.",
+      description:
+        "A memory fragment from the curator, unlocked by comparing historical data.",
       requirements: ["compare_data", "talk to observatory_curator"],
       rewards: ["curator_story", "special_access"],
-    }
+    },
   },
 
   customActions: {
-    "synchronize_observations": {
-      description: "Synchronize all observation equipment for a comprehensive analysis.",
+    synchronize_observations: {
+      description:
+        "Synchronize all observation equipment for a comprehensive analysis.",
       requirements: ["observation_log", "energy_lens"],
       effects: ["reveal_hidden_pattern", "stabilize_energy"],
     },
-    "run_simulation": {
+    run_simulation: {
       description: "Run a simulation of lattice energy flows.",
       requirements: ["pattern_chart"],
       effects: ["predict_fluctuations", "gain_insight"],
-    }
-  }
+    },
+  },
 };
 
 export default latticeobservatory;
-
-

@@ -18,20 +18,20 @@
 // Alliance memory system for NPCs to remember cross-run alliances
 // Step 5: Alliance Memory Model (Morthos & Al)
 
-import { getGameState } from '../state/gameState';
+import { getGameState } from "../state/gameState";
 
 /**
  * Types of alliance interactions that can be remembered
  */
 export type AllianceInteractionType =
-  | 'cooperation'     // Helped each other
-  | 'betrayal'        // One betrayed the other
-  | 'rescue'          // One rescued the other
-  | 'sacrifice'       // One sacrificed for the other
-  | 'shared-secret'   // Shared confidential information
-  | 'mutual-support'  // Provided mutual support
-  | 'conflict'        // Had a conflict
-  | 'reconciliation'; // Made up after conflict
+  | "cooperation" // Helped each other
+  | "betrayal" // One betrayed the other
+  | "rescue" // One rescued the other
+  | "sacrifice" // One sacrificed for the other
+  | "shared-secret" // Shared confidential information
+  | "mutual-support" // Provided mutual support
+  | "conflict" // Had a conflict
+  | "reconciliation"; // Made up after conflict
 
 /**
  * Context for where an alliance event occurred
@@ -42,7 +42,7 @@ export interface AllianceContext {
   otherNPCsPresent: string[];
   playerActions: string[];
   timeOfDay?: string;
-  emotionalState?: 'positive' | 'negative' | 'neutral';
+  emotionalState?: "positive" | "negative" | "neutral";
 }
 
 /**
@@ -72,7 +72,7 @@ export interface AllianceRelationship {
   betrayalCount: number;
   recentInteractionType: AllianceInteractionType | null;
   lastInteractionTimestamp: number;
-  relationshipTrajectory: 'improving' | 'stable' | 'declining';
+  relationshipTrajectory: "improving" | "stable" | "declining";
   significantEvents: AllianceEvent[]; // Most important events
   currentRunEvents: AllianceEvent[]; // Events from current run
 }
@@ -81,7 +81,12 @@ export interface AllianceRelationship {
  * Conditions that can trigger alliance memory recall
  */
 export interface MemoryTrigger {
-  condition: 'location' | 'npc-present' | 'player-action' | 'keyword' | 'emotional-state';
+  condition:
+    | "location"
+    | "npc-present"
+    | "player-action"
+    | "keyword"
+    | "emotional-state";
   value: string;
   threshold?: number; // For relevance scoring
 }
@@ -93,7 +98,7 @@ export interface RecalledMemory {
   sourceEvent: AllianceEvent;
   relevanceScore: number; // 0-1, how relevant to current situation
   triggerReason: string;
-  emotionalImpact: 'positive' | 'negative' | 'mixed' | 'neutral';
+  emotionalImpact: "positive" | "negative" | "mixed" | "neutral";
   suggestedDialogue?: string[];
   suggestedBehaviorChange?: string;
 }
@@ -115,7 +120,7 @@ const DEFAULT_MEMORY_CONFIG: AllianceMemoryConfig = {
   memoryDecayRate: 0.05, // 5% decay per game session
   recallThreshold: 0.3,
   trustUpdateRate: 0.1,
-  significanceThreshold: 0.6
+  significanceThreshold: 0.6,
 };
 
 /**
@@ -142,7 +147,7 @@ export class AllianceMemorySystem {
     context: AllianceContext,
     intensity: number,
     description: string,
-    consequences: string[] = []
+    consequences: string[] = [],
   ): AllianceEvent {
     const event: AllianceEvent = {
       id: this.generateEventId(),
@@ -154,7 +159,7 @@ export class AllianceMemorySystem {
       context,
       intensity: Math.max(0, Math.min(1, intensity)),
       description,
-      consequences
+      consequences,
     };
 
     // Store the event
@@ -163,7 +168,9 @@ export class AllianceMemorySystem {
     // Update the relationship
     this.updateRelationship(event);
 
-    console.log(`[AllianceMemory] Recorded ${type} between ${npcA} and ${npcB} (intensity: ${intensity})`);
+    console.log(
+      `[AllianceMemory] Recorded ${type} between ${npcA} and ${npcB} (intensity: ${intensity})`,
+    );
 
     return event;
   }
@@ -184,24 +191,29 @@ export class AllianceMemorySystem {
         betrayalCount: 0,
         recentInteractionType: null,
         lastInteractionTimestamp: 0,
-        relationshipTrajectory: 'stable',
+        relationshipTrajectory: "stable",
         significantEvents: [],
-        currentRunEvents: []
+        currentRunEvents: [],
       };
     }
 
     // Update counters
-    if (['cooperation', 'rescue', 'mutual-support', 'reconciliation'].includes(event.type)) {
+    if (
+      ["cooperation", "rescue", "mutual-support", "reconciliation"].includes(
+        event.type,
+      )
+    ) {
       relationship.cooperationCount++;
-    } else if (['betrayal', 'conflict'].includes(event.type)) {
+    } else if (["betrayal", "conflict"].includes(event.type)) {
       relationship.betrayalCount++;
     }
 
     // Update trust level
     const trustChange = this.calculateTrustChange(event);
-    relationship.overallTrustLevel = Math.max(-1, Math.min(1, 
-      relationship.overallTrustLevel + trustChange
-    ));
+    relationship.overallTrustLevel = Math.max(
+      -1,
+      Math.min(1, relationship.overallTrustLevel + trustChange),
+    );
 
     // Update recent interaction
     relationship.recentInteractionType = event.type;
@@ -213,9 +225,12 @@ export class AllianceMemorySystem {
     // Add to significant events if important enough
     if (event.intensity >= this.config.significanceThreshold) {
       relationship.significantEvents.push(event);
-      
+
       // Keep only the most recent significant events
-      if (relationship.significantEvents.length > this.config.maxEventsPerRelationship) {
+      if (
+        relationship.significantEvents.length >
+        this.config.maxEventsPerRelationship
+      ) {
         relationship.significantEvents = relationship.significantEvents
           .sort((a, b) => b.timestamp - a.timestamp)
           .slice(0, this.config.maxEventsPerRelationship);
@@ -223,7 +238,8 @@ export class AllianceMemorySystem {
     }
 
     // Calculate trajectory
-    relationship.relationshipTrajectory = this.calculateTrajectory(relationship);
+    relationship.relationshipTrajectory =
+      this.calculateTrajectory(relationship);
 
     this.relationships.set(relationshipKey, relationship);
   }
@@ -234,24 +250,24 @@ export class AllianceMemorySystem {
   private calculateTrustChange(event: AllianceEvent): number {
     const baseChange = this.config.trustUpdateRate;
     const intensityMultiplier = event.intensity;
-    
+
     let directionMultiplier = 1;
     switch (event.type) {
-      case 'cooperation':
-      case 'rescue':
-      case 'mutual-support':
+      case "cooperation":
+      case "rescue":
+      case "mutual-support":
         directionMultiplier = 1;
         break;
-      case 'betrayal':
+      case "betrayal":
         directionMultiplier = -2; // Betrayal hurts more than cooperation helps
         break;
-      case 'conflict':
+      case "conflict":
         directionMultiplier = -0.5;
         break;
-      case 'reconciliation':
+      case "reconciliation":
         directionMultiplier = 1.5; // Making up is powerful
         break;
-      case 'sacrifice':
+      case "sacrifice":
         directionMultiplier = 2; // Sacrifice is very meaningful
         break;
       default:
@@ -264,30 +280,40 @@ export class AllianceMemorySystem {
   /**
    * Calculate relationship trajectory
    */
-  private calculateTrajectory(relationship: AllianceRelationship): 'improving' | 'stable' | 'declining' {
+  private calculateTrajectory(
+    relationship: AllianceRelationship,
+  ): "improving" | "stable" | "declining" {
     const recentEvents = relationship.currentRunEvents.slice(-3); // Last 3 events
-    
+
     if (recentEvents.length < 2) {
-      return 'stable';
+      return "stable";
     }
 
     let positiveCount = 0;
     let negativeCount = 0;
-    
+
     for (const event of recentEvents) {
-      if (['cooperation', 'rescue', 'mutual-support', 'reconciliation', 'sacrifice'].includes(event.type)) {
+      if (
+        [
+          "cooperation",
+          "rescue",
+          "mutual-support",
+          "reconciliation",
+          "sacrifice",
+        ].includes(event.type)
+      ) {
         positiveCount++;
-      } else if (['betrayal', 'conflict'].includes(event.type)) {
+      } else if (["betrayal", "conflict"].includes(event.type)) {
         negativeCount++;
       }
     }
 
     if (positiveCount > negativeCount) {
-      return 'improving';
+      return "improving";
     } else if (negativeCount > positiveCount) {
-      return 'declining';
+      return "declining";
     } else {
-      return 'stable';
+      return "stable";
     }
   }
 
@@ -297,14 +323,22 @@ export class AllianceMemorySystem {
   recallMemories(
     npcId: string,
     currentContext: Partial<AllianceContext>,
-    triggers: MemoryTrigger[]
+    triggers: MemoryTrigger[],
   ): RecalledMemory[] {
-    const relevantEvents = this.findRelevantEvents(npcId, currentContext, triggers);
+    const relevantEvents = this.findRelevantEvents(
+      npcId,
+      currentContext,
+      triggers,
+    );
     const memories: RecalledMemory[] = [];
 
     for (const event of relevantEvents) {
-      const relevanceScore = this.calculateRelevance(event, currentContext, triggers);
-      
+      const relevanceScore = this.calculateRelevance(
+        event,
+        currentContext,
+        triggers,
+      );
+
       if (relevanceScore >= this.config.recallThreshold) {
         const memory: RecalledMemory = {
           sourceEvent: event,
@@ -312,9 +346,9 @@ export class AllianceMemorySystem {
           triggerReason: this.getTriggerReason(event, triggers),
           emotionalImpact: this.getEmotionalImpact(event),
           suggestedDialogue: this.generateDialogueSuggestions(event),
-          suggestedBehaviorChange: this.generateBehaviorSuggestion(event)
+          suggestedBehaviorChange: this.generateBehaviorSuggestion(event),
         };
-        
+
         memories.push(memory);
       }
     }
@@ -331,9 +365,9 @@ export class AllianceMemorySystem {
   private findRelevantEvents(
     npcId: string,
     currentContext: Partial<AllianceContext>,
-    triggers: MemoryTrigger[]
+    triggers: MemoryTrigger[],
   ): AllianceEvent[] {
-    return this.allEvents.filter(event => {
+    return this.allEvents.filter((event) => {
       // Must involve the NPC
       if (event.npcA !== npcId && event.npcB !== npcId) {
         return false;
@@ -347,7 +381,10 @@ export class AllianceMemorySystem {
       }
 
       // Check context similarity
-      if (currentContext.location && event.context.location === currentContext.location) {
+      if (
+        currentContext.location &&
+        event.context.location === currentContext.location
+      ) {
         return true;
       }
 
@@ -358,19 +395,24 @@ export class AllianceMemorySystem {
   /**
    * Check if an event matches a memory trigger
    */
-  private eventMatchesTrigger(event: AllianceEvent, trigger: MemoryTrigger): boolean {
+  private eventMatchesTrigger(
+    event: AllianceEvent,
+    trigger: MemoryTrigger,
+  ): boolean {
     switch (trigger.condition) {
-      case 'location':
+      case "location":
         return event.context.location === trigger.value;
-      case 'npc-present':
+      case "npc-present":
         return event.context.otherNPCsPresent.includes(trigger.value);
-      case 'player-action':
-        return event.context.playerActions.some(action => 
-          action.toLowerCase().includes(trigger.value.toLowerCase())
+      case "player-action":
+        return event.context.playerActions.some((action) =>
+          action.toLowerCase().includes(trigger.value.toLowerCase()),
         );
-      case 'keyword':
-        return event.description.toLowerCase().includes(trigger.value.toLowerCase());
-      case 'emotional-state':
+      case "keyword":
+        return event.description
+          .toLowerCase()
+          .includes(trigger.value.toLowerCase());
+      case "emotional-state":
         return event.context.emotionalState === trigger.value;
       default:
         return false;
@@ -383,7 +425,7 @@ export class AllianceMemorySystem {
   private calculateRelevance(
     event: AllianceEvent,
     currentContext: Partial<AllianceContext>,
-    triggers: MemoryTrigger[]
+    triggers: MemoryTrigger[],
   ): number {
     let score = 0;
 
@@ -396,8 +438,9 @@ export class AllianceMemorySystem {
     }
 
     // Recent events are more relevant
-    const daysSinceEvent = (Date.now() - event.timestamp) / (1000 * 60 * 60 * 24);
-    const recencyBonus = Math.max(0, 0.3 - (daysSinceEvent * 0.01));
+    const daysSinceEvent =
+      (Date.now() - event.timestamp) / (1000 * 60 * 60 * 24);
+    const recencyBonus = Math.max(0, 0.3 - daysSinceEvent * 0.01);
     score += recencyBonus;
 
     // Trigger matches
@@ -413,32 +456,37 @@ export class AllianceMemorySystem {
   /**
    * Get the reason why a memory was triggered
    */
-  private getTriggerReason(event: AllianceEvent, triggers: MemoryTrigger[]): string {
+  private getTriggerReason(
+    event: AllianceEvent,
+    triggers: MemoryTrigger[],
+  ): string {
     for (const trigger of triggers) {
       if (this.eventMatchesTrigger(event, trigger)) {
         return `${trigger.condition}: ${trigger.value}`;
       }
     }
-    return 'context similarity';
+    return "context similarity";
   }
 
   /**
    * Determine emotional impact of recalled memory
    */
-  private getEmotionalImpact(event: AllianceEvent): 'positive' | 'negative' | 'mixed' | 'neutral' {
+  private getEmotionalImpact(
+    event: AllianceEvent,
+  ): "positive" | "negative" | "mixed" | "neutral" {
     switch (event.type) {
-      case 'cooperation':
-      case 'rescue':
-      case 'mutual-support':
-      case 'sacrifice':
-        return 'positive';
-      case 'betrayal':
-      case 'conflict':
-        return 'negative';
-      case 'reconciliation':
-        return 'mixed'; // Complex emotions
+      case "cooperation":
+      case "rescue":
+      case "mutual-support":
+      case "sacrifice":
+        return "positive";
+      case "betrayal":
+      case "conflict":
+        return "negative";
+      case "reconciliation":
+        return "mixed"; // Complex emotions
       default:
-        return 'neutral';
+        return "neutral";
     }
   }
 
@@ -447,22 +495,28 @@ export class AllianceMemorySystem {
    */
   private generateDialogueSuggestions(event: AllianceEvent): string[] {
     const suggestions: string[] = [];
-    
+
     switch (event.type) {
-      case 'cooperation':
-        suggestions.push(`Remember when we worked together in ${event.context.location}?`);
+      case "cooperation":
+        suggestions.push(
+          `Remember when we worked together in ${event.context.location}?`,
+        );
         suggestions.push("You've proven trustworthy before.");
         break;
-      case 'betrayal':
+      case "betrayal":
         suggestions.push("Last time I trusted you, it didn't end well.");
-        suggestions.push(`I haven't forgotten what happened in ${event.context.location}.`);
+        suggestions.push(
+          `I haven't forgotten what happened in ${event.context.location}.`,
+        );
         break;
-      case 'rescue':
+      case "rescue":
         suggestions.push("You saved me before. I owe you.");
         suggestions.push("I remember your courage when I needed help.");
         break;
-      case 'reconciliation':
-        suggestions.push("We've had our differences, but we worked through them.");
+      case "reconciliation":
+        suggestions.push(
+          "We've had our differences, but we worked through them.",
+        );
         suggestions.push("Perhaps we can find common ground again.");
         break;
     }
@@ -475,19 +529,19 @@ export class AllianceMemorySystem {
    */
   private generateBehaviorSuggestion(event: AllianceEvent): string {
     switch (event.type) {
-      case 'cooperation':
-      case 'rescue':
-        return 'increase_cooperation_chance';
-      case 'betrayal':
-        return 'increase_suspicion';
-      case 'mutual-support':
-        return 'offer_help_first';
-      case 'conflict':
-        return 'be_more_cautious';
-      case 'reconciliation':
-        return 'attempt_diplomatic_approach';
+      case "cooperation":
+      case "rescue":
+        return "increase_cooperation_chance";
+      case "betrayal":
+        return "increase_suspicion";
+      case "mutual-support":
+        return "offer_help_first";
+      case "conflict":
+        return "be_more_cautious";
+      case "reconciliation":
+        return "attempt_diplomatic_approach";
       default:
-        return 'maintain_current_stance';
+        return "maintain_current_stance";
     }
   }
 
@@ -504,13 +558,13 @@ export class AllianceMemorySystem {
    */
   getNPCRelationships(npcId: string): AllianceRelationship[] {
     const results: AllianceRelationship[] = [];
-    
+
     for (const relationship of this.relationships.values()) {
       if (relationship.npcA === npcId || relationship.npcB === npcId) {
         results.push(relationship);
       }
     }
-    
+
     return results;
   }
 
@@ -544,7 +598,7 @@ export class AllianceMemorySystem {
     for (const relationship of this.relationships.values()) {
       relationship.currentRunEvents = [];
     }
-    
+
     this.currentRunId = this.generateRunId();
     console.log(`[AllianceMemory] Started new run: ${this.currentRunId}`);
   }
@@ -557,7 +611,7 @@ export class AllianceMemorySystem {
       relationships: Array.from(this.relationships.entries()),
       allEvents: this.allEvents,
       currentRunId: this.currentRunId,
-      version: '1.0'
+      version: "1.0",
     };
   }
 
@@ -565,12 +619,14 @@ export class AllianceMemorySystem {
    * Import memory data from persistence
    */
   importMemoryData(data: any): void {
-    if (data.version === '1.0') {
+    if (data.version === "1.0") {
       this.relationships = new Map(data.relationships);
       this.allEvents = data.allEvents || [];
       this.currentRunId = data.currentRunId || this.generateRunId();
-      
-      console.log(`[AllianceMemory] Imported ${this.allEvents.length} events and ${this.relationships.size} relationships`);
+
+      console.log(
+        `[AllianceMemory] Imported ${this.allEvents.length} events and ${this.relationships.size} relationships`,
+      );
     }
   }
 }
@@ -581,7 +637,9 @@ let globalAllianceMemory: AllianceMemorySystem | null = null;
 /**
  * Get the global alliance memory system
  */
-export function getAllianceMemory(config?: Partial<AllianceMemoryConfig>): AllianceMemorySystem {
+export function getAllianceMemory(
+  config?: Partial<AllianceMemoryConfig>,
+): AllianceMemorySystem {
   if (!globalAllianceMemory) {
     globalAllianceMemory = new AllianceMemorySystem(config);
   }
@@ -592,35 +650,65 @@ export function getAllianceMemory(config?: Partial<AllianceMemoryConfig>): Allia
  * Quick helper functions for common alliance events
  */
 
-export function recordCooperation(npcA: string, npcB: string, location: string, description: string): AllianceEvent {
+export function recordCooperation(
+  npcA: string,
+  npcB: string,
+  location: string,
+  description: string,
+): AllianceEvent {
   return getAllianceMemory().recordEvent(
-    'cooperation',
+    "cooperation",
     npcA,
     npcB,
-    { location, gamePhase: 'exploration', otherNPCsPresent: [], playerActions: [] },
+    {
+      location,
+      gamePhase: "exploration",
+      otherNPCsPresent: [],
+      playerActions: [],
+    },
     0.7,
-    description
+    description,
   );
 }
 
-export function recordBetrayal(npcA: string, npcB: string, location: string, description: string): AllianceEvent {
+export function recordBetrayal(
+  npcA: string,
+  npcB: string,
+  location: string,
+  description: string,
+): AllianceEvent {
   return getAllianceMemory().recordEvent(
-    'betrayal',
+    "betrayal",
     npcA,
     npcB,
-    { location, gamePhase: 'exploration', otherNPCsPresent: [], playerActions: [] },
+    {
+      location,
+      gamePhase: "exploration",
+      otherNPCsPresent: [],
+      playerActions: [],
+    },
     0.9, // Betrayals are very significant
-    description
+    description,
   );
 }
 
-export function recordRescue(rescuer: string, rescued: string, location: string, description: string): AllianceEvent {
+export function recordRescue(
+  rescuer: string,
+  rescued: string,
+  location: string,
+  description: string,
+): AllianceEvent {
   return getAllianceMemory().recordEvent(
-    'rescue',
+    "rescue",
     rescuer,
     rescued,
-    { location, gamePhase: 'exploration', otherNPCsPresent: [], playerActions: [] },
+    {
+      location,
+      gamePhase: "exploration",
+      otherNPCsPresent: [],
+      playerActions: [],
+    },
     0.8,
-    description
+    description,
   );
 }

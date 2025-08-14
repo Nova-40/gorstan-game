@@ -17,12 +17,14 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Game module.
 
-
 // --- Function: pushConsoleMessage ---
 export function pushConsoleMessage(
-  dispatch: (action: { type: string; payload: { text: string; type: string } }) => void,
+  dispatch: (action: {
+    type: string;
+    payload: { text: string; type: string };
+  }) => void,
   text: string,
-  type: string = 'default'
+  type: string = "default",
 ): void {
-  dispatch({ type: 'ADD_MESSAGE', payload: { text, type } });
+  dispatch({ type: "ADD_MESSAGE", payload: { text, type } });
 }

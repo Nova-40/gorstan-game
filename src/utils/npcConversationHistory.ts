@@ -17,7 +17,7 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // NPC conversation history and intelligence system
 
-import type { LocalGameState } from '../state/gameState';
+import type { LocalGameState } from "../state/gameState";
 
 export interface ConversationEntry {
   topic: string;
@@ -44,18 +44,21 @@ export interface NPCConversationHistory {
  * Get conversation history for a specific NPC
  */
 export function getNPCConversationHistory(
-  state: LocalGameState, 
-  npcId: string
+  state: LocalGameState,
+  npcId: string,
 ): NPCConversationHistory[string] {
-  const history = (state.flags?.npcConversations as NPCConversationHistory) || {};
-  return history[npcId] || {
-    lastInteraction: 0,
-    totalInteractions: 0,
-    entries: [],
-    relationship: 0,
-    knownTopics: [],
-    unresolved: []
-  };
+  const history =
+    (state.flags?.npcConversations as NPCConversationHistory) || {};
+  return (
+    history[npcId] || {
+      lastInteraction: 0,
+      totalInteractions: 0,
+      entries: [],
+      relationship: 0,
+      knownTopics: [],
+      unresolved: [],
+    }
+  );
 }
 
 /**
@@ -64,21 +67,22 @@ export function getNPCConversationHistory(
 export function addConversationEntry(
   state: LocalGameState,
   npcId: string,
-  entry: Omit<ConversationEntry, 'timestamp'>
+  entry: Omit<ConversationEntry, "timestamp">,
 ): NPCConversationHistory {
-  const currentHistory = (state.flags?.npcConversations as NPCConversationHistory) || {};
+  const currentHistory =
+    (state.flags?.npcConversations as NPCConversationHistory) || {};
   const npcHistory = currentHistory[npcId] || {
     lastInteraction: 0,
     totalInteractions: 0,
     entries: [],
     relationship: 0,
     knownTopics: [],
-    unresolved: []
+    unresolved: [],
   };
 
   const newEntry: ConversationEntry = {
     ...entry,
-    timestamp: Date.now()
+    timestamp: Date.now(),
   };
 
   const updatedHistory = {
@@ -89,8 +93,8 @@ export function addConversationEntry(
       totalInteractions: npcHistory.totalInteractions + 1,
       entries: [...npcHistory.entries.slice(-9), newEntry], // Keep last 10 entries
       knownTopics: [...new Set([...npcHistory.knownTopics, entry.topic])],
-      currentTopic: entry.topic
-    }
+      currentTopic: entry.topic,
+    },
   };
 
   return updatedHistory;
@@ -102,7 +106,7 @@ export function addConversationEntry(
 export function hasDiscussedTopic(
   state: LocalGameState,
   npcId: string,
-  topic: string
+  topic: string,
 ): boolean {
   const history = getNPCConversationHistory(state, npcId);
   return history.knownTopics.includes(topic);
@@ -113,10 +117,12 @@ export function hasDiscussedTopic(
  */
 export function getLastConversation(
   state: LocalGameState,
-  npcId: string
+  npcId: string,
 ): ConversationEntry | null {
   const history = getNPCConversationHistory(state, npcId);
-  return history.entries.length > 0 ? history.entries[history.entries.length - 1] : null;
+  return history.entries.length > 0
+    ? history.entries[history.entries.length - 1]
+    : null;
 }
 
 /**
@@ -125,26 +131,26 @@ export function getLastConversation(
 export function shouldVaryResponse(
   state: LocalGameState,
   npcId: string,
-  topic: string
+  topic: string,
 ): boolean {
   const history = getNPCConversationHistory(state, npcId);
   const recentEntries = history.entries.slice(-3); // Check last 3 entries
-  return recentEntries.filter(entry => entry.topic === topic).length > 1;
+  return recentEntries.filter((entry) => entry.topic === topic).length > 1;
 }
 
 /**
  * Get relationship level description
  */
 export function getRelationshipLevel(relationship: number): string {
-  if (relationship >= 80) return 'close friend';
-  if (relationship >= 60) return 'friend';
-  if (relationship >= 40) return 'acquaintance';
-  if (relationship >= 20) return 'neutral';
-  if (relationship >= 0) return 'wary';
-  if (relationship >= -20) return 'suspicious';
-  if (relationship >= -40) return 'unfriendly';
-  if (relationship >= -60) return 'hostile';
-  return 'enemy';
+  if (relationship >= 80) {return "close friend";}
+  if (relationship >= 60) {return "friend";}
+  if (relationship >= 40) {return "acquaintance";}
+  if (relationship >= 20) {return "neutral";}
+  if (relationship >= 0) {return "wary";}
+  if (relationship >= -20) {return "suspicious";}
+  if (relationship >= -40) {return "unfriendly";}
+  if (relationship >= -60) {return "hostile";}
+  return "enemy";
 }
 
 /**
@@ -153,9 +159,12 @@ export function getRelationshipLevel(relationship: number): string {
 export function updateNPCRelationship(
   state: LocalGameState,
   npcId: string,
-  change: number
+  change: number,
 ): number {
   const currentRelationship = state.player?.npcRelationships?.[npcId] || 0;
-  const newRelationship = Math.max(-100, Math.min(100, currentRelationship + change));
+  const newRelationship = Math.max(
+    -100,
+    Math.min(100, currentRelationship + change),
+  );
   return newRelationship;
 }

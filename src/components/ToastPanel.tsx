@@ -17,32 +17,36 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Toast notification panel component
 
-import React, { useEffect } from 'react';
+import React, { useEffect } from "react";
 
 type ToastPanelProps = {
   message: string;
-  type?: 'success' | 'error' | 'info';
+  type?: "success" | "error" | "info";
   onClear: () => void;
 };
 
-const styleMap: Record<'success' | 'error' | 'info', string> = {
-  success: 'bg-green-700',
-  error: 'bg-red-700',
-  info: 'bg-blue-700',
+const styleMap: Record<"success" | "error" | "info", string> = {
+  success: "bg-green-700",
+  error: "bg-red-700",
+  info: "bg-blue-700",
 };
 
-export default function ToastPanel({ message, type = 'info', onClear }: ToastPanelProps) {
+export default function ToastPanel({
+  message,
+  type = "info",
+  onClear,
+}: ToastPanelProps) {
   useEffect(() => {
     if (message) {
       const timeout = setTimeout(() => {
         onClear();
       }, 3000);
-      
+
       return () => clearTimeout(timeout);
     }
   }, [message, onClear]);
 
-  if (!message) return null;
+  if (!message) {return null;}
 
   return (
     <div

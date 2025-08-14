@@ -23,10 +23,16 @@ interface WelcomeScreenProps {
   onLoadGame: () => void;
 }
 
-const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onBegin, onLoadGame }) => {
+const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
+  onBegin,
+  onLoadGame,
+}) => {
   // Log version info to console for debugging
   React.useEffect(() => {
-    console.log(`%c🎮 Gorstan Game - ${getVersionString()}`, 'color: #10b981; font-weight: bold;');
+    console.log(
+      `%c🎮 Gorstan Game - ${getVersionString()}`,
+      "color: #10b981; font-weight: bold;",
+    );
   }, []);
 
   return (
@@ -41,7 +47,8 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onBegin, onLoadGame }) =>
         <span className="text-lg text-yellow-400 ml-2">(Beta 2)</span>
       </h1>
       <p className="text-md md:text-lg text-center max-w-2xl mb-6">
-        A multiverse simulation of coffee, consequence, and quantum possibility. Tread carefully. The rabbit is watching.
+        A multiverse simulation of coffee, consequence, and quantum possibility.
+        Tread carefully. The rabbit is watching.
       </p>
 
       <div className="flex flex-col items-center">
@@ -94,7 +101,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onBegin, onLoadGame }) =>
           <div></div>
         </div>
       </div>
-      
+
       {/* Build version - visible for deployment verification */}
       <div className="absolute bottom-2 right-2 text-green-300 text-xs opacity-60 select-none font-mono">
         {getVersionString()}

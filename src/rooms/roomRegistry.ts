@@ -17,161 +17,170 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Renders room descriptions and image logic.
 
-import aevirawarehouse from './newyorkZone_aevirawarehouse';
+import aevirawarehouse from "./newyorkZone_aevirawarehouse";
 
-import ancientslibrary from './offgorstanZone_ancientslibrary';
+import ancientslibrary from "./offgorstanZone_ancientslibrary";
 
-import ancientsroom from './offgorstanZone_ancientsroom';
+import ancientsroom from "./offgorstanZone_ancientsroom";
 
-import ancientvault from './offgorstanZone_ancientvault';
+import ancientvault from "./offgorstanZone_ancientvault";
 
-import anothermazeroom from './mazeZone_anothermazeroom';
+import anothermazeroom from "./mazeZone_anothermazeroom";
 
-import arbitercore from './offgorstanZone_arbitercore';
+import arbitercore from "./offgorstanZone_arbitercore";
 
-import ascendantStanton from './stantonZone_ascendantStanton';
+import ascendantStanton from "./stantonZone_ascendantStanton";
 
-import burgerjoint from './newyorkZone_burgerjoint';
+import burgerjoint from "./newyorkZone_burgerjoint";
 
-import cafeoffice from './londonZone_cafeoffice';
+import cafeoffice from "./londonZone_cafeoffice";
 
-import carronspire from './gorstanZone_carronspire';
+import carronspire from "./gorstanZone_carronspire";
 
-import centralpark from './newyorkZone_centralpark';
+import centralpark from "./newyorkZone_centralpark";
 
-import controlnexus from './introZone_controlnexus';
+import controlnexus from "./introZone_controlnexus";
 
-import controlroom from './introZone_controlroom';
+import controlroom from "./introZone_controlroom";
 
-import crossing from './introZone_crossing';
+import crossing from "./introZone_crossing";
 
-import dalesapartment from './londonZone_dalesapartment';
+import dalesapartment from "./londonZone_dalesapartment";
 
-import datavoid from './glitchZone_datavoid';
+import datavoid from "./glitchZone_datavoid";
 
-import echochamber from './offgorstanZone_echochamber';
+import echochamber from "./offgorstanZone_echochamber";
 
-import elfhame from './elfhameZone_elfhame';
+import elfhame from "./elfhameZone_elfhame";
 
-import faeglade from './elfhameZone_faeglade';
+import faeglade from "./elfhameZone_faeglade";
 
-import faelake from './elfhameZone_faelake';
+import faelake from "./elfhameZone_faelake";
 
-import faelakenorthshore from './elfhameZone_faelakenorthshore';
+import faelakenorthshore from "./elfhameZone_faelakenorthshore";
 
-import faepalacedungeons from './elfhameZone_faepalacedungeons';
+import faepalacedungeons from "./elfhameZone_faepalacedungeons";
 
-import faepalacemainhall from './elfhameZone_faepalacemainhall';
+import faepalacemainhall from "./elfhameZone_faepalacemainhall";
 
-import faepalacerhianonsroom from './elfhameZone_faepalacerhianonsroom';
+import faepalacerhianonsroom from "./elfhameZone_faepalacerhianonsroom";
 
-import failure from './glitchZone_failure';
+import failure from "./glitchZone_failure";
 
-import findlaters from './londonZone_findlaters';
+import findlaters from "./londonZone_findlaters";
 
-import findlaterscornercoffeeshop from './londonZone_findlaterscornercoffeeshop';
+import findlaterscornercoffeeshop from "./londonZone_findlaterscornercoffeeshop";
 
-import forgottenchamber from './mazeZone_forgottenchamber';
+import forgottenchamber from "./mazeZone_forgottenchamber";
 
-import glitchinguniverse from './glitchZone_glitchinguniverse';
+import glitchinguniverse from "./glitchZone_glitchinguniverse";
 
-import glitchStanton from './stantonZone_glitchStanton';
+import glitchStanton from "./stantonZone_glitchStanton";
 
-import gorstanhub from './gorstanZone_gorstanhub';
+import gorstanhub from "./gorstanZone_gorstanhub";
 
-import gorstanvillage from './gorstanZone_gorstanvillage';
+import gorstanvillage from "./gorstanZone_gorstanvillage";
 
-import greasystoreroom from './newyorkZone_greasystoreroom';
+import greasystoreroom from "./newyorkZone_greasystoreroom";
 
-import hiddenlab from './introZone_hiddenlab';
+import hiddenlab from "./introZone_hiddenlab";
 
-import hiddenlibrary from './latticeZone_hiddenlibrary';
+import hiddenlibrary from "./latticeZone_hiddenlibrary";
 
-import introreset from './introZone_introreset';
+import introreset from "./introZone_introreset";
 
-import introstart from './introZone_introstart';
+import introstart from "./introZone_introstart";
 
-import issuesdetected from './glitchZone_issuesdetected';
+import issuesdetected from "./glitchZone_issuesdetected";
 
-import labyrinthbend from './mazeZone_labyrinthbend';
+import labyrinthbend from "./mazeZone_labyrinthbend";
 
-import lattice from './latticeZone_lattice';
+import lattice from "./latticeZone_lattice";
 
-import latticehub from './latticeZone_latticehub';
+import latticehub from "./latticeZone_latticehub";
 
-import latticelibrary from './latticeZone_latticelibrary';
+import latticelibrary from "./latticeZone_latticelibrary";
 
-import latticeobservationentrance from './latticeZone_latticeobservationentrance';
+import latticeobservationentrance from "./latticeZone_latticeobservationentrance";
 
-import latticeobservatory from './latticeZone_latticeobservatory';
+import latticeobservatory from "./latticeZone_latticeobservatory";
 
-import latticespire from './latticeZone_latticespire';
+import latticespire from "./latticeZone_latticespire";
 
-import libraryofnine from './latticeZone_libraryofnine';
+import libraryofnine from "./latticeZone_libraryofnine";
 
-import liminalhub from './multiZone_liminalhub';
+import liminalhub from "./multiZone_liminalhub";
 
-import londonhub from './londonZone_londonhub';
+import londonhub from "./londonZone_londonhub";
 
-import manhattanhub from './newyorkZone_manhattanhub';
+import manhattanhub from "./newyorkZone_manhattanhub";
 
-import mazeecho from './mazeZone_mazeecho';
+import mazeecho from "./mazeZone_mazeecho";
 
-import mazehub from './mazeZone_mazehub';
+import mazehub from "./mazeZone_mazehub";
 
-import mazeroom from './mazeZone_mazeroom';
+import mazeroom from "./mazeZone_mazeroom";
 
-import mirrorhall from './mazeZone_mirrorhall';
+import mirrorhall from "./mazeZone_mirrorhall";
 
-import misleadchamber from './mazeZone_misleadchamber';
+import misleadchamber from "./mazeZone_misleadchamber";
 
-import moreissues from './glitchZone_moreissues';
+import moreissues from "./glitchZone_moreissues";
 
-import peacefulStanton from './stantonZone_peacefulStanton';
+import peacefulStanton from "./stantonZone_peacefulStanton";
 
-import pollysbay from './mazeZone_pollysbay';
+import pollysbay from "./mazeZone_pollysbay";
 
-import secretmazeentry from './mazeZone_secretmazeentry';
+import secretmazeentry from "./mazeZone_secretmazeentry";
 
-import secrettunnel from './mazeZone_secrettunnel';
+import secrettunnel from "./mazeZone_secrettunnel";
 
-import shatteredrealm from './offmultiverseZone_shatteredrealm';
+import shatteredrealm from "./offmultiverseZone_shatteredrealm";
 
-import silentStanton from './stantonZone_silentStanton';
+import silentStanton from "./stantonZone_silentStanton";
 
-import stantonharcourt from './stantonZone_stantonharcourt';
+import stantonharcourt from "./stantonZone_stantonharcourt";
 
-import stillamazeroom from './mazeZone_stillamazeroom';
+import stillamazeroom from "./mazeZone_stillamazeroom";
 
-import stkatherinesdock from './londonZone_stkatherinesdock';
+import stkatherinesdock from "./londonZone_stkatherinesdock";
 
-import storagechamber from './mazeZone_storagechamber';
+import storagechamber from "./mazeZone_storagechamber";
 
-import torridon from './gorstanZone_torridon';
+import torridon from "./gorstanZone_torridon";
 
-import torridoninn from './gorstanZone_torridoninn';
+import torridoninn from "./gorstanZone_torridoninn";
 
-import torridoninthepast from './gorstanZone_torridoninthepast';
+import torridoninthepast from "./gorstanZone_torridoninthepast";
 
-import trentpark from './londonZone_trentpark';
+import trentpark from "./londonZone_trentpark";
 
-import villagegreen from './stantonZone_villagegreen';
-
-import windingpath from './mazeZone_windingpath';
-
-
-
-
-
-
-
-
-
-
-
+import windingpath from "./mazeZone_windingpath";
 
 // Variable declaration
-const roomRegistry = {
+export const villagegreen = {
+  id: "villagegreen",
+  image: "stantonZone_villagegreen.png",
+  description: [
+    "The Village Green is a serene expanse of lush grass surrounded by towering oak trees. The air is filled with the sound of chirping birds and the occasional rustle of leaves.",
+    "A cobblestone path winds through the green, leading to a quaint gazebo at its center. The gazebo is adorned with hanging lanterns that sway gently in the breeze.",
+    "To the north, a small pond glimmers under the sunlight, its surface dotted with lily pads. To the south, the path leads back to the heart of Stanton Harcourt.",
+    "The atmosphere here is tranquil, yet there is a sense of anticipation, as if the green holds secrets waiting to be uncovered.",
+  ],
+  zone: "stantonZone",
+  title: "Village Green",
+  consoleIntro: [
+    ">> VILLAGE GREEN - TRANQUIL AREA - DIMENSIONAL ANCHOR ESTABLISHED",
+    ">> Location: PRIMARY STANTON TERRITORY - NEUTRAL GROUND",
+    ">> Magical resonance: LOW - Proceed with ease",
+    ">> Temporal flow: STABLE - Time flows normally here",
+    ">> Gazebo: ACTIVE - Potential for interaction detected",
+    ">> WARNING: Interaction with the pond may trigger unknown effects",
+  ],
+};
+
+// Ensure all references use the consolidated import from services/rooms.
+export default {
   elfhame,
   faeglade,
   faelake,
@@ -237,7 +246,6 @@ const roomRegistry = {
   arbitercore,
   echochamber,
 
-
   shatteredrealm,
   ascendantStanton,
   glitchStanton,
@@ -246,7 +254,3 @@ const roomRegistry = {
   stantonharcourt,
   villagegreen,
 };
-
-export default roomRegistry;
-
-

@@ -18,19 +18,29 @@
 // Movement execution layer that orchestrates NPC movement decisions and updates
 // Integrates WanderScheduler, MovePolicy, and NPCPresence systems
 
-import { getWanderScheduler } from './wanderScheduler';
-import { getNPCPresenceProvider } from './npcPresence';
-import { decideMove, createDefaultPolicy, NPCMoveContext, MovePolicyConfig } from './movePolicy';
-import { getWanderActivationController } from './wanderActivation';
-import { getZoneAwarenessProvider, ZoneSetupConfig } from './zoneAwareness';
-import { getPerformanceOptimizer } from './performanceOptimizer';
-import { getAccessibilityProvider } from './accessibilityProvider';
-import { getErrorHandler, NPCErrorType, NPCErrorSeverity, createSafeWrapper } from './errorHandling';
-import { getGameState } from '../state/gameState';
+import { getWanderScheduler } from "./wanderScheduler";
+import { getNPCPresenceProvider } from "./npcPresence";
+import {
+  decideMove,
+  createDefaultPolicy,
+  NPCMoveContext,
+  MovePolicyConfig,
+} from "./movePolicy";
+import { getWanderActivationController } from "./wanderActivation";
+import { getZoneAwarenessProvider, ZoneSetupConfig } from "./zoneAwareness";
+import { getPerformanceOptimizer } from "./performanceOptimizer";
+import { getAccessibilityProvider } from "./accessibilityProvider";
+import {
+  getErrorHandler,
+  NPCErrorType,
+  NPCErrorSeverity,
+  createSafeWrapper,
+} from "./errorHandling";
+import { getGameState } from "../state/gameState";
 
 export interface NPCMovementConfig {
   npcId: string;
-  npcType: 'wanderer' | 'guard' | 'seeker' | 'hermit';
+  npcType: "wanderer" | "guard" | "seeker" | "hermit";
   homeRoom?: string;
   roamRadius?: number;
   preferRooms?: string[];
@@ -74,11 +84,11 @@ export class MovementExecutor {
     successfulMoves: 0,
     failedMoves: 0,
     teleportMoves: 0,
-    lastUpdateTime: Date.now()
+    lastUpdateTime: Date.now(),
   };
 
   constructor() {
-    console.log('[MovementExecution] Initialized movement executor');
+    console.log("[MovementExecution] Initialized movement executor");
   }
 
   /**
@@ -86,12 +96,12 @@ export class MovementExecutor {
    */
   start(): void {
     if (this.isRunning) {
-      console.warn('[MovementExecution] Already running');
+      console.warn("[MovementExecution] Already running");
       return;
     }
 
     this.isRunning = true;
-    
+
     // Start dependent systems with error handling
     try {
       const scheduler = getWanderScheduler();
@@ -99,13 +109,13 @@ export class MovementExecutor {
       const zoneAwareness = getZoneAwarenessProvider();
       const optimizer = getPerformanceOptimizer();
       const accessibility = getAccessibilityProvider();
-      
+
       // Initialize performance monitoring
       optimizer.startMonitoring();
-      
+
       // Enable accessibility features
       accessibility.enable();
-      
+
       // Note: WanderActivationController doesn't have start/stop methods
       // It operates reactively based on game state updates
 
@@ -113,13 +123,13 @@ export class MovementExecutor {
       scheduler.start();
       zoneAwareness.initialize();
 
-      console.log('[MovementExecution] Started movement execution system');
+      console.log("[MovementExecution] Started movement execution system");
     } catch (error) {
       getErrorHandler().reportError(
         NPCErrorType.CONFIGURATION_ERROR,
         `Failed to start movement execution: ${(error as Error).message}`,
         { error },
-        NPCErrorSeverity.HIGH
+        NPCErrorSeverity.HIGH,
       );
       this.isRunning = false;
       throw error;
@@ -143,18 +153,18 @@ export class MovementExecutor {
       const optimizer = getPerformanceOptimizer();
       const accessibility = getAccessibilityProvider();
 
-      scheduler.stop('MovementExecutor stopped');
+      scheduler.stop("MovementExecutor stopped");
       presence.stop();
       optimizer.stopMonitoring();
       accessibility.disable();
 
-      console.log('[MovementExecution] Stopped movement execution system');
+      console.log("[MovementExecution] Stopped movement execution system");
     } catch (error) {
       getErrorHandler().reportError(
         NPCErrorType.CONFIGURATION_ERROR,
         `Error during shutdown: ${(error as Error).message}`,
         { error },
-        NPCErrorSeverity.MEDIUM
+        NPCErrorSeverity.MEDIUM,
       );
     }
   }
@@ -164,16 +174,22 @@ export class MovementExecutor {
    */
   registerNPC(config: NPCMovementConfig): void {
     if (!this.isRunning) {
-      console.warn('[MovementExecution] Cannot register NPC while stopped');
+      console.warn("[MovementExecution] Cannot register NPC while stopped");
       return;
     }
 
     // Store configuration
-    this.npcConfigs.set(config.npcId, { ...config, isActive: config.isActive ?? true });
+    this.npcConfigs.set(config.npcId, {
+      ...config,
+      isActive: config.isActive ?? true,
+    });
 
     // Get current room from presence provider or use home room
     const presence = getNPCPresenceProvider();
-    const currentRoom = presence.getNPCState(config.npcId)?.currentRoom || config.homeRoom || 'unknown';
+    const currentRoom =
+      presence.getNPCState(config.npcId)?.currentRoom ||
+      config.homeRoom ||
+      "unknown";
 
     // Register with presence provider
     presence.registerNPC(config.npcId, currentRoom);
@@ -183,7 +199,9 @@ export class MovementExecutor {
     scheduler.registerNPC(config.npcId, (npcId) => this.executeMovement(npcId));
 
     this.updateStats();
-    console.log(`[MovementExecution] Registered NPC ${config.npcId} (type: ${config.npcType})`);
+    console.log(
+      `[MovementExecution] Registered NPC ${config.npcId} (type: ${config.npcType})`,
+    );
   }
 
   /**
@@ -225,7 +243,9 @@ export class MovementExecutor {
    */
   setRoomAdjacency(roomId: string, adjacentRooms: string[]): void {
     this.roomRegistry.set(roomId, [...adjacentRooms]);
-    console.log(`[MovementExecution] Set adjacency for room ${roomId}: ${adjacentRooms.length} connections`);
+    console.log(
+      `[MovementExecution] Set adjacency for room ${roomId}: ${adjacentRooms.length} connections`,
+    );
   }
 
   /**
@@ -236,7 +256,9 @@ export class MovementExecutor {
     Object.entries(registry).forEach(([roomId, adjacent]) => {
       this.roomRegistry.set(roomId, [...adjacent]);
     });
-    console.log(`[MovementExecution] Set room registry with ${Object.keys(registry).length} rooms`);
+    console.log(
+      `[MovementExecution] Set room registry with ${Object.keys(registry).length} rooms`,
+    );
   }
 
   /**
@@ -257,20 +279,29 @@ export class MovementExecutor {
   /**
    * Check if an NPC can move to a specific room (includes zone restrictions)
    */
-  canNPCMoveToRoom(npcId: string, fromRoom: string, toRoom: string): {
+  canNPCMoveToRoom(
+    npcId: string,
+    fromRoom: string,
+    toRoom: string,
+  ): {
     allowed: boolean;
     reason?: string;
     alternative?: string[];
   } {
     const config = this.npcConfigs.get(npcId);
     if (!config) {
-      return { allowed: false, reason: 'NPC not registered' };
+      return { allowed: false, reason: "NPC not registered" };
     }
 
     // Check zone restrictions
     const zoneAwareness = getZoneAwarenessProvider();
-    const zoneResult = zoneAwareness.canNPCMoveToRoom(npcId, config.npcType, fromRoom, toRoom);
-    
+    const zoneResult = zoneAwareness.canNPCMoveToRoom(
+      npcId,
+      config.npcType,
+      fromRoom,
+      toRoom,
+    );
+
     if (!zoneResult.allowed) {
       return zoneResult;
     }
@@ -321,16 +352,16 @@ export class MovementExecutor {
   clear(): void {
     this.npcConfigs.clear();
     this.roomRegistry.clear();
-    
+
     // Clear dependent systems
     const scheduler = getWanderScheduler();
     const presence = getNPCPresenceProvider();
-    
+
     presence.clear();
     // Note: scheduler doesn't have a clear method, unregister individually
-    
+
     this.resetStats();
-    console.log('[MovementExecution] Cleared all movement data');
+    console.log("[MovementExecution] Cleared all movement data");
   }
 
   // Private methods
@@ -342,23 +373,24 @@ export class MovementExecutor {
     const startTime = performance.now();
     const optimizer = getPerformanceOptimizer();
     const accessibility = getAccessibilityProvider();
-    
+
     try {
       // Check if movement should be slowed for accessibility
       const speedMultiplier = accessibility.getMovementSpeedMultiplier();
       if (speedMultiplier < 1.0) {
-        const delay = (1000 * (1 - speedMultiplier));
-        await new Promise(resolve => setTimeout(resolve, delay));
+        const delay = 1000 * (1 - speedMultiplier);
+        await new Promise((resolve) => setTimeout(resolve, delay));
       }
 
       // Execute movement with performance monitoring
       const result = await this.attemptMovement(npcId);
-      
+
       // Record performance metrics
       const executionTime = performance.now() - startTime;
-      optimizer.getMetrics().averageMovementTimeMs = 
-        (optimizer.getMetrics().averageMovementTimeMs * 0.9) + (executionTime * 0.1);
-      
+      optimizer.getMetrics().averageMovementTimeMs =
+        optimizer.getMetrics().averageMovementTimeMs * 0.9 +
+        executionTime * 0.1;
+
       if (result.success) {
         this.stats.successfulMoves++;
         if (result.requiresTeleport) {
@@ -366,43 +398,49 @@ export class MovementExecutor {
         }
 
         // Announce movement for accessibility
-        if (result.fromRoom && result.toRoom && result.fromRoom !== result.toRoom) {
+        if (
+          result.fromRoom &&
+          result.toRoom &&
+          result.fromRoom !== result.toRoom
+        ) {
           accessibility.announceNPCMovement(
             npcId,
             npcId, // Use npcId as display name for now
             result.fromRoom,
             result.toRoom,
-            'transit'
+            "transit",
           );
         }
       } else {
         this.stats.failedMoves++;
-        
+
         // Report error for tracking
         getErrorHandler().reportError(
           NPCErrorType.MOVEMENT_FAILED,
-          result.reason || 'Unknown movement failure',
+          result.reason || "Unknown movement failure",
           { npcId, fromRoom: result.fromRoom, toRoom: result.toRoom },
-          NPCErrorSeverity.LOW
+          NPCErrorSeverity.LOW,
         );
       }
 
       this.stats.lastUpdateTime = Date.now();
       this.updateStats();
 
-      console.log(`[MovementExecution] ${npcId}: ${result.reason} (${result.fromRoom} -> ${result.toRoom}) [${executionTime.toFixed(1)}ms]`);
+      console.log(
+        `[MovementExecution] ${npcId}: ${result.reason} (${result.fromRoom} -> ${result.toRoom}) [${executionTime.toFixed(1)}ms]`,
+      );
     } catch (error) {
       const executionTime = performance.now() - startTime;
       console.error(`[MovementExecution] Movement error for ${npcId}:`, error);
-      
+
       // Report critical error
       getErrorHandler().reportError(
         NPCErrorType.MOVEMENT_FAILED,
         `Critical movement error: ${(error as Error).message}`,
         { npcId, executionTime, error },
-        NPCErrorSeverity.HIGH
+        NPCErrorSeverity.HIGH,
       );
-      
+
       this.stats.failedMoves++;
     }
   }
@@ -410,7 +448,9 @@ export class MovementExecutor {
   /**
    * Attempt to move an NPC
    */
-  private async attemptMovement(npcId: string): Promise<MovementExecutionResult> {
+  private async attemptMovement(
+    npcId: string,
+  ): Promise<MovementExecutionResult> {
     const config = this.npcConfigs.get(npcId);
     const presence = getNPCPresenceProvider();
     const currentState = presence.getNPCState(npcId);
@@ -422,24 +462,24 @@ export class MovementExecutor {
       return {
         success: false,
         npcId,
-        fromRoom: currentState?.currentRoom || 'unknown',
+        fromRoom: currentState?.currentRoom || "unknown",
         toRoom: null,
-        reason: 'NPC inactive or not found',
+        reason: "NPC inactive or not found",
         requiresTeleport: false,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
     }
 
     // Check if system is degraded and movement should be limited
-    if (!errorHandler.isFeatureEnabled('random-movement')) {
+    if (!errorHandler.isFeatureEnabled("random-movement")) {
       return {
         success: false,
         npcId,
         fromRoom: currentState.currentRoom,
         toRoom: null,
-        reason: 'Movement disabled due to system degradation',
+        reason: "Movement disabled due to system degradation",
         requiresTeleport: false,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
     }
 
@@ -450,26 +490,35 @@ export class MovementExecutor {
         npcId,
         fromRoom: currentState.currentRoom,
         toRoom: null,
-        reason: 'Already moving',
+        reason: "Already moving",
         requiresTeleport: false,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
     }
 
     // Build movement context with performance optimization
-    const context = this.buildMoveContext(npcId, config, currentState.currentRoom);
-    
+    const context = this.buildMoveContext(
+      npcId,
+      config,
+      currentState.currentRoom,
+    );
+
     // Get movement policy
     const policy = config.customPolicy || createDefaultPolicy(config.npcType);
-    
+
     // Use optimized pathfinding if available and feature enabled
     let decision;
-    if (errorHandler.isFeatureEnabled('complex-pathfinding')) {
-      decision = await this.decideOptimizedMovement(context, policy, npcId, currentState.currentRoom);
+    if (errorHandler.isFeatureEnabled("complex-pathfinding")) {
+      decision = await this.decideOptimizedMovement(
+        context,
+        policy,
+        npcId,
+        currentState.currentRoom,
+      );
     } else {
       decision = decideMove(context, policy);
     }
-    
+
     if (!decision.targetRoom) {
       return {
         success: false,
@@ -478,37 +527,41 @@ export class MovementExecutor {
         toRoom: null,
         reason: decision.reason,
         requiresTeleport: false,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
     }
 
     // Execute the movement
-    const moveStarted = presence.startMove(npcId, currentState.currentRoom, decision.targetRoom);
-    
+    const moveStarted = presence.startMove(
+      npcId,
+      currentState.currentRoom,
+      decision.targetRoom,
+    );
+
     if (!moveStarted) {
       return {
         success: false,
         npcId,
         fromRoom: currentState.currentRoom,
         toRoom: decision.targetRoom,
-        reason: 'Could not start move (room full or other constraint)',
+        reason: "Could not start move (room full or other constraint)",
         requiresTeleport: decision.requiresTeleport || false,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
     }
 
     // Complete the movement immediately (for now, could add animation delay)
     const moveCompleted = presence.completeMove(npcId);
-    
+
     if (!moveCompleted) {
       return {
         success: false,
         npcId,
         fromRoom: currentState.currentRoom,
         toRoom: decision.targetRoom,
-        reason: 'Could not complete move',
+        reason: "Could not complete move",
         requiresTeleport: decision.requiresTeleport || false,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
     }
 
@@ -519,7 +572,7 @@ export class MovementExecutor {
       toRoom: decision.targetRoom,
       reason: decision.reason,
       requiresTeleport: decision.requiresTeleport || false,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
   }
 
@@ -527,16 +580,20 @@ export class MovementExecutor {
    * Performance optimized movement decision using cached pathfinding
    */
   private async decideOptimizedMovement(
-    context: NPCMoveContext, 
-    policy: MovePolicyConfig, 
-    npcId: string, 
-    currentRoom: string
-  ): Promise<{ targetRoom: string | null; reason: string; requiresTeleport?: boolean }> {
+    context: NPCMoveContext,
+    policy: MovePolicyConfig,
+    npcId: string,
+    currentRoom: string,
+  ): Promise<{
+    targetRoom: string | null;
+    reason: string;
+    requiresTeleport?: boolean;
+  }> {
     const optimizer = getPerformanceOptimizer();
-    
+
     // First try normal movement decision
     const basicDecision = decideMove(context, policy);
-    
+
     if (!basicDecision.targetRoom) {
       return basicDecision;
     }
@@ -549,9 +606,9 @@ export class MovementExecutor {
       });
 
       const optimizedPath = optimizer.getOptimizedRoomPath(
-        currentRoom, 
-        basicDecision.targetRoom, 
-        roomRegistry
+        currentRoom,
+        basicDecision.targetRoom,
+        roomRegistry,
       );
 
       if (optimizedPath && optimizedPath.length > 1) {
@@ -560,7 +617,7 @@ export class MovementExecutor {
         return {
           targetRoom: nextRoom,
           reason: `Optimized path: ${currentRoom} -> ${nextRoom} (${optimizedPath.length} steps to ${basicDecision.targetRoom})`,
-          requiresTeleport: basicDecision.requiresTeleport
+          requiresTeleport: basicDecision.requiresTeleport,
         };
       }
     } catch (error) {
@@ -568,7 +625,7 @@ export class MovementExecutor {
         NPCErrorType.PATHFINDING_ERROR,
         `Pathfinding optimization failed: ${(error as Error).message}`,
         { npcId, currentRoom, targetRoom: basicDecision.targetRoom },
-        NPCErrorSeverity.LOW
+        NPCErrorSeverity.LOW,
       );
     }
 
@@ -579,16 +636,20 @@ export class MovementExecutor {
   /**
    * Build movement context for an NPC
    */
-  private buildMoveContext(npcId: string, config: NPCMovementConfig, currentRoom: string): NPCMoveContext {
+  private buildMoveContext(
+    npcId: string,
+    config: NPCMovementConfig,
+    currentRoom: string,
+  ): NPCMoveContext {
     const presence = getNPCPresenceProvider();
-    
+
     // Get adjacent rooms
     const allowedAdjacency = this.roomRegistry.get(currentRoom) || [];
-    
+
     // Get room occupancy data
     const occupiedRooms: Record<string, string[]> = {};
     const roomCapacity: Record<string, number> = {};
-    
+
     // Build occupancy map for capacity checking
     const allRooms = presence.getAllRoomOccupancy();
     for (const [roomId, occupancy] of allRooms) {
@@ -600,7 +661,7 @@ export class MovementExecutor {
 
     // Get player room from game state
     const gameState = getGameState();
-    const playerRoomId = gameState?.currentRoomId || 'controlnexus';
+    const playerRoomId = gameState?.currentRoomId || "controlnexus";
 
     return {
       currentRoom,
@@ -608,13 +669,14 @@ export class MovementExecutor {
       homeRoom: config.homeRoom,
       roamRadius: config.roamRadius,
       allowedAdjacency,
+      roomGraph: Object.fromEntries(Array.from(this.roomRegistry.entries())),
       avoidRooms: config.avoidRooms || [],
       preferRooms: config.preferRooms || [],
       playerRoomId,
       roomCapacity,
       occupiedRooms,
       questGates: gameState?.flags || {}, // Integrate with game state flags
-      lockedDoors: {} // Room exits are handled by room definitions
+      lockedDoors: {}, // Room exits are handled by room definitions
     };
   }
 
@@ -622,7 +684,9 @@ export class MovementExecutor {
    * Update internal statistics
    */
   private updateStats(): void {
-    const activeNPCs = Array.from(this.npcConfigs.values()).filter(c => c.isActive).length;
+    const activeNPCs = Array.from(this.npcConfigs.values()).filter(
+      (c) => c.isActive,
+    ).length;
     const presence = getNPCPresenceProvider();
     const presenceStats = presence.getStats();
 
@@ -642,7 +706,7 @@ export class MovementExecutor {
       successfulMoves: 0,
       failedMoves: 0,
       teleportMoves: 0,
-      lastUpdateTime: Date.now()
+      lastUpdateTime: Date.now(),
     };
   }
 }
@@ -678,30 +742,38 @@ export function setupNPCMovement(options: {
   roomRegistry: Record<string, string[]>;
   npcs: NPCMovementConfig[];
   roomCapacities?: Record<string, number>;
-  zoneConfig?: Omit<ZoneSetupConfig, 'config'>;
+  zoneConfig?: Omit<ZoneSetupConfig, "config">;
 }): void {
   const executor = getMovementExecutor();
-  
+
   // Set up zones if provided
   if (options.zoneConfig) {
     const zoneAwareness = getZoneAwarenessProvider();
     zoneAwareness.initialize();
-    
-    options.zoneConfig.zones.forEach(zone => zoneAwareness.registerZone(zone));
-    options.zoneConfig.roomMappings.forEach(mapping => zoneAwareness.mapRoomToZone(mapping));
-    
+
+    options.zoneConfig.zones.forEach((zone) =>
+      zoneAwareness.registerZone(zone),
+    );
+    options.zoneConfig.roomMappings.forEach((mapping) =>
+      zoneAwareness.mapRoomToZone(mapping),
+    );
+
     if (options.zoneConfig.transitionRules) {
-      options.zoneConfig.transitionRules.forEach(rule => zoneAwareness.addTransitionRule(rule));
+      options.zoneConfig.transitionRules.forEach((rule) =>
+        zoneAwareness.addTransitionRule(rule),
+      );
     }
-    
+
     if (options.zoneConfig.npcPreferences) {
-      options.zoneConfig.npcPreferences.forEach(pref => zoneAwareness.setNPCZonePreference(pref));
+      options.zoneConfig.npcPreferences.forEach((pref) =>
+        zoneAwareness.setNPCZonePreference(pref),
+      );
     }
   }
-  
+
   // Set up room data
   executor.setRoomRegistry(options.roomRegistry);
-  
+
   // Set room capacities if provided
   if (options.roomCapacities) {
     const presence = getNPCPresenceProvider();
@@ -709,16 +781,18 @@ export function setupNPCMovement(options: {
       presence.setRoomCapacity(roomId, capacity);
     });
   }
-  
+
   // Start the system
   executor.start();
-  
+
   // Register NPCs
-  options.npcs.forEach(npcConfig => {
+  options.npcs.forEach((npcConfig) => {
     executor.registerNPC(npcConfig);
   });
-  
-  console.log(`[MovementExecution] Set up movement system with ${options.npcs.length} NPCs and ${Object.keys(options.roomRegistry).length} rooms`);
+
+  console.log(
+    `[MovementExecution] Set up movement system with ${options.npcs.length} NPCs and ${Object.keys(options.roomRegistry).length} rooms`,
+  );
 }
 
 /**
@@ -728,5 +802,5 @@ export function shutdownNPCMovement(): void {
   const executor = getMovementExecutor();
   executor.stop();
   resetMovementExecutor();
-  console.log('[MovementExecution] Shut down NPC movement system');
+  console.log("[MovementExecution] Shut down NPC movement system");
 }

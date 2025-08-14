@@ -55,55 +55,59 @@ export interface ContextSnapshot {
  */
 export function getContextSnapshot(gameState: any): ContextSnapshot {
   const currentRoom = gameState.roomMap?.[gameState.currentRoomId];
-  const zone = currentRoom?.zone || 'unknown';
-  
+  const zone = currentRoom?.zone || "unknown";
+
   // Extract nearby NPCs
-  const nearbyNPCs = (gameState.npcsInRoom || []).map((npc: any) => npc.id || npc.name);
-  
+  const nearbyNPCs = (gameState.npcsInRoom || []).map(
+    (npc: any) => npc.id || npc.name,
+  );
+
   // Get player inventory
   const inventory = gameState.player?.inventory || [];
-  
+
   // Check for active timers
-  const timers: ContextSnapshot['timers'] = {};
-  
+  const timers: ContextSnapshot["timers"] = {};
+
   // Polly Takeover timer (example implementation)
   if (gameState.flags?.pollyTakeoverActive) {
     timers.pollyTakeover = {
       active: true,
-      timeRemaining: gameState.flags?.pollyTakeoverTimeRemaining || 0
+      timeRemaining: gameState.flags?.pollyTakeoverTimeRemaining || 0,
     };
   }
-  
+
   // Extract recent console messages for context
   const recentConsoleEvents = (gameState.history || [])
     .slice(-5)
     .map((msg: any) => msg.text)
     .filter((text: string) => text && text.length > 0);
-  
+
   // Get available exits
-  const availableExits = currentRoom?.exits ? Object.keys(currentRoom.exits) : [];
-  
+  const availableExits = currentRoom?.exits
+    ? Object.keys(currentRoom.exits)
+    : [];
+
   // Get room items
   const roomItems = currentRoom?.items || [];
-  
+
   // Determine environmental cues
-  const environmentalCues: ContextSnapshot['environmentalCues'] = {
+  const environmentalCues: ContextSnapshot["environmentalCues"] = {
     ambientAudio: currentRoom?.ambientAudio,
     roomMood: determineRoomMood(currentRoom, gameState),
     lightLevel: determineLightLevel(zone, currentRoom),
-    temperature: determineTemperature(zone)
+    temperature: determineTemperature(zone),
   };
-  
+
   // Session information
-  const sessionInfo: ContextSnapshot['sessionInfo'] = {
+  const sessionInfo: ContextSnapshot["sessionInfo"] = {
     playTime: gameState.metadata?.playTime || 0,
     roomVisitCount: gameState.roomVisitCount?.[gameState.currentRoomId] || 0,
-    lastAction: gameState.metadata?.lastAction || 'unknown',
-    idleTime: Date.now() - (gameState.metadata?.lastActionTime || Date.now())
+    lastAction: gameState.metadata?.lastAction || "unknown",
+    idleTime: Date.now() - (gameState.metadata?.lastActionTime || Date.now()),
   };
-  
+
   return {
-    roomId: gameState.currentRoomId || 'unknown',
+    roomId: gameState.currentRoomId || "unknown",
     zone,
     nearbyNPCs,
     inventory,
@@ -111,14 +115,14 @@ export function getContextSnapshot(gameState: any): ContextSnapshot {
     activeQuests: extractActiveQuests(gameState),
     recentConsoleEvents,
     playerFlags: gameState.flags || {},
-    gameStage: gameState.stage || 'unknown',
-    roomDescription: Array.isArray(currentRoom?.description) 
-      ? currentRoom.description.join(' ') 
-      : currentRoom?.description || '',
+    gameStage: gameState.stage || "unknown",
+    roomDescription: Array.isArray(currentRoom?.description)
+      ? currentRoom.description.join(" ")
+      : currentRoom?.description || "",
     availableExits,
     roomItems,
     environmentalCues,
-    sessionInfo
+    sessionInfo,
   };
 }
 
@@ -126,50 +130,50 @@ export function getContextSnapshot(gameState: any): ContextSnapshot {
  * Determine room mood based on various factors
  */
 function determineRoomMood(room: any, gameState: any): string {
-  if (!room) return 'neutral';
-  
+  if (!room) {return "neutral";}
+
   const zone = room.zone;
   const roomId = room.id;
-  
+
   // Zone-based moods
-  if (zone === 'glitchZone') return 'chaotic';
-  if (zone === 'gorstanZone') return 'mystical';
-  if (zone === 'introZone') return 'technological';
-  if (zone === 'latticeZone') return 'scholarly';
-  
+  if (zone === "glitchZone") {return "chaotic";}
+  if (zone === "gorstanZone") {return "mystical";}
+  if (zone === "introZone") {return "technological";}
+  if (zone === "latticeZone") {return "scholarly";}
+
   // Specific room moods
-  if (roomId.includes('reset')) return 'urgent';
-  if (roomId.includes('cafe') || roomId.includes('kitchen')) return 'cozy';
-  if (roomId.includes('library')) return 'quiet';
-  if (roomId.includes('maze')) return 'confusing';
-  
+  if (roomId.includes("reset")) {return "urgent";}
+  if (roomId.includes("cafe") || roomId.includes("kitchen")) {return "cozy";}
+  if (roomId.includes("library")) {return "quiet";}
+  if (roomId.includes("maze")) {return "confusing";}
+
   // State-dependent moods
-  if (gameState.flags?.pollyTakeoverActive) return 'tense';
-  if (gameState.flags?.dominicKilled) return 'somber';
-  
-  return 'neutral';
+  if (gameState.flags?.pollyTakeoverActive) {return "tense";}
+  if (gameState.flags?.dominicKilled) {return "somber";}
+
+  return "neutral";
 }
 
 /**
  * Determine light level based on zone and room
  */
 function determineLightLevel(zone: string, room: any): string {
-  if (zone === 'glitchZone') return 'flickering';
-  if (zone === 'introZone') return 'artificial';
-  if (zone === 'latticeZone') return 'soft';
-  if (room?.id?.includes('hidden')) return 'dim';
-  if (room?.id?.includes('lab')) return 'bright';
-  return 'normal';
+  if (zone === "glitchZone") {return "flickering";}
+  if (zone === "introZone") {return "artificial";}
+  if (zone === "latticeZone") {return "soft";}
+  if (room?.id?.includes("hidden")) {return "dim";}
+  if (room?.id?.includes("lab")) {return "bright";}
+  return "normal";
 }
 
 /**
  * Determine temperature based on zone
  */
 function determineTemperature(zone: string): string {
-  if (zone === 'glitchZone') return 'unstable';
-  if (zone === 'gorstanZone') return 'cool';
-  if (zone === 'introZone') return 'controlled';
-  return 'moderate';
+  if (zone === "glitchZone") {return "unstable";}
+  if (zone === "gorstanZone") {return "cool";}
+  if (zone === "introZone") {return "controlled";}
+  return "moderate";
 }
 
 /**
@@ -177,14 +181,15 @@ function determineTemperature(zone: string): string {
  */
 function extractActiveQuests(gameState: any): string[] {
   const quests: string[] = [];
-  
+
   // Check various flags that indicate active quests
-  if (gameState.flags?.seekingResetRoom) quests.push('find_reset_room');
-  if (gameState.flags?.pollyTakeoverActive) quests.push('stop_polly');
-  if (gameState.flags?.hasSchrodingerCoin && !gameState.flags?.coinUsed) quests.push('use_coin');
-  if (gameState.flags?.needsLibraryAccess) quests.push('access_library');
-  if (gameState.flags?.lookingForDominic) quests.push('find_dominic');
-  
+  if (gameState.flags?.seekingResetRoom) {quests.push("find_reset_room");}
+  if (gameState.flags?.pollyTakeoverActive) {quests.push("stop_polly");}
+  if (gameState.flags?.hasSchrodingerCoin && !gameState.flags?.coinUsed)
+    {quests.push("use_coin");}
+  if (gameState.flags?.needsLibraryAccess) {quests.push("access_library");}
+  if (gameState.flags?.lookingForDominic) {quests.push("find_dominic");}
+
   return quests;
 }
 
@@ -193,21 +198,24 @@ function extractActiveQuests(gameState: any): string[] {
  */
 export function isPuzzleCritical(context: ContextSnapshot): boolean {
   // Time pressure situations
-  if (context.timers.pollyTakeover?.active && context.timers.pollyTakeover.timeRemaining < 60000) {
+  if (
+    context.timers.pollyTakeover?.active &&
+    context.timers.pollyTakeover.timeRemaining < 60000
+  ) {
     return true;
   }
-  
+
   // Critical rooms
-  const criticalRooms = ['introreset', 'resetroom', 'blueswitch'];
-  if (criticalRooms.some(room => context.roomId.includes(room))) {
+  const criticalRooms = ["introreset", "resetroom", "blueswitch"];
+  if (criticalRooms.some((room) => context.roomId.includes(room))) {
     return true;
   }
-  
+
   // Puzzle zones
-  if (context.zone === 'glitchZone' && context.sessionInfo.idleTime > 30000) {
+  if (context.zone === "glitchZone" && context.sessionInfo.idleTime > 30000) {
     return true;
   }
-  
+
   return false;
 }
 
@@ -221,47 +229,54 @@ export function analyzePlayerBehavior(context: ContextSnapshot): {
   needsGuidance: boolean;
   confidenceLevel: number;
 } {
-  const recentEvents = context.recentConsoleEvents.join(' ').toLowerCase();
+  const recentEvents = context.recentConsoleEvents.join(" ").toLowerCase();
   const idleTime = context.sessionInfo.idleTime;
-  
+
   // Check if player is exploring
-  const isExploring = context.availableExits.length > 1 && 
-                     context.sessionInfo.roomVisitCount < 3 &&
-                     !recentEvents.includes('help');
-  
+  const isExploring =
+    context.availableExits.length > 1 &&
+    context.sessionInfo.roomVisitCount < 3 &&
+    !recentEvents.includes("help");
+
   // Check if player seems stuck
-  const isStuck = idleTime > 30000 || 
-                  recentEvents.includes('help') ||
-                  recentEvents.includes('stuck') ||
-                  (context.recentConsoleEvents.length > 2 && 
-                   context.recentConsoleEvents.every(event => event === context.recentConsoleEvents[0]));
-  
+  const isStuck =
+    idleTime > 30000 ||
+    recentEvents.includes("help") ||
+    recentEvents.includes("stuck") ||
+    (context.recentConsoleEvents.length > 2 &&
+      context.recentConsoleEvents.every(
+        (event) => event === context.recentConsoleEvents[0],
+      ));
+
   // Check if player is rushing
-  const isRushing = context.sessionInfo.playTime > 0 && 
-                    context.sessionInfo.roomVisitCount > 10 && 
-                    !recentEvents.includes('look') &&
-                    idleTime < 5000;
-  
+  const isRushing =
+    context.sessionInfo.playTime > 0 &&
+    context.sessionInfo.roomVisitCount > 10 &&
+    !recentEvents.includes("look") &&
+    idleTime < 5000;
+
   // Check if player needs guidance
-  const needsGuidance = isStuck || 
-                        (context.timers.pollyTakeover?.active && context.timers.pollyTakeover.timeRemaining < 120000) ||
-                        recentEvents.includes('?');
-  
+  const needsGuidance =
+    isStuck ||
+    (context.timers.pollyTakeover?.active &&
+      context.timers.pollyTakeover.timeRemaining < 120000) ||
+    recentEvents.includes("?");
+
   // Calculate confidence level
   let confidenceLevel = 0.5;
-  if (isExploring && !isStuck) confidenceLevel += 0.3;
-  if (isStuck) confidenceLevel -= 0.4;
-  if (isRushing && !isStuck) confidenceLevel += 0.2;
-  if (needsGuidance) confidenceLevel -= 0.2;
-  
+  if (isExploring && !isStuck) {confidenceLevel += 0.3;}
+  if (isStuck) {confidenceLevel -= 0.4;}
+  if (isRushing && !isStuck) {confidenceLevel += 0.2;}
+  if (needsGuidance) {confidenceLevel -= 0.2;}
+
   confidenceLevel = Math.max(0, Math.min(1, confidenceLevel));
-  
+
   return {
     isExploring,
     isStuck,
     isRushing,
     needsGuidance,
-    confidenceLevel
+    confidenceLevel,
   };
 }
 
@@ -270,32 +285,37 @@ export function analyzePlayerBehavior(context: ContextSnapshot): {
  */
 export function getLocationHints(context: ContextSnapshot): string[] {
   const hints: string[] = [];
-  
+
   // Zone-specific hints
   switch (context.zone) {
-    case 'glitchZone':
-      hints.push('reality_unstable', 'expect_glitches');
+    case "glitchZone":
+      hints.push("reality_unstable", "expect_glitches");
       break;
-    case 'latticeZone':
-      hints.push('knowledge_focus', 'library_access');
+    case "latticeZone":
+      hints.push("knowledge_focus", "library_access");
       break;
-    case 'gorstanZone':
-      hints.push('mystical_realm', 'ancient_wisdom');
+    case "gorstanZone":
+      hints.push("mystical_realm", "ancient_wisdom");
       break;
-    case 'introZone':
-      hints.push('control_center', 'tutorial_space');
+    case "introZone":
+      hints.push("control_center", "tutorial_space");
       break;
   }
-  
+
   // Room-specific hints
-  if (context.roomId.includes('reset')) hints.push('critical_choice', 'point_of_no_return');
-  if (context.roomId.includes('library')) hints.push('research_needed', 'information_available');
-  if (context.roomId.includes('cafe')) hints.push('social_space', 'rest_area');
-  if (context.roomId.includes('maze')) hints.push('navigation_challenge', 'patience_required');
-  
+  if (context.roomId.includes("reset"))
+    {hints.push("critical_choice", "point_of_no_return");}
+  if (context.roomId.includes("library"))
+    {hints.push("research_needed", "information_available");}
+  if (context.roomId.includes("cafe")) {hints.push("social_space", "rest_area");}
+  if (context.roomId.includes("maze"))
+    {hints.push("navigation_challenge", "patience_required");}
+
   // Item-based hints
-  if (context.inventory.includes('schrodingerCoin')) hints.push('quantum_paradox', 'choice_matters');
-  if (context.inventory.includes('napkin')) hints.push('research_clue', 'library_relevant');
-  
+  if (context.inventory.includes("schrodingerCoin"))
+    {hints.push("quantum_paradox", "choice_matters");}
+  if (context.inventory.includes("napkin"))
+    {hints.push("research_clue", "library_relevant");}
+
   return hints;
 }

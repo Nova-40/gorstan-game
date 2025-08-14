@@ -15,15 +15,15 @@
 */
 
 // Test setup for Jest
-import 'jest-environment-jsdom';
+import "jest-environment-jsdom";
 
 // Basic test environment setup
 // (Timer mocking handled per test as needed)
 
 // Mock window.matchMedia which is not available in jsdom
-Object.defineProperty(window, 'matchMedia', {
+Object.defineProperty(window, "matchMedia", {
   writable: true,
-  value: jest.fn().mockImplementation(query => ({
+  value: jest.fn().mockImplementation((query) => ({
     matches: false,
     media: query,
     onchange: null,
@@ -36,7 +36,7 @@ Object.defineProperty(window, 'matchMedia', {
 });
 
 // Mock speechSynthesis if needed
-Object.defineProperty(window, 'speechSynthesis', {
+Object.defineProperty(window, "speechSynthesis", {
   writable: true,
   value: undefined,
 });

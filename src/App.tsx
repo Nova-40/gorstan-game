@@ -17,31 +17,21 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Game module.
 
-import AppCore from './components/AppCore';
-import { CelebrationController } from './celebrate';
+import AppCore from "./components/AppCore";
+import { CelebrationController } from "./celebrate";
+import DebugOverlay from './components/DebugOverlay';
 
-import React from 'react';
+import React from "react";
 
-import { GameStateProvider } from './state/gameState'; 
-
-
-
-
-
-
-
-
-
-
-
-
+import { GameStateProvider } from "./state/gameState";
 
 const App: React.FC = () => {
-// JSX return block or main return
+  // JSX return block or main return
   return (
     <GameStateProvider>
       <CelebrationController>
         <AppCore />
+        {process.env.NODE_ENV === 'development' && <DebugOverlay />}
       </CelebrationController>
     </GameStateProvider>
   );

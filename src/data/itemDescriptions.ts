@@ -18,35 +18,62 @@
 // Holds human-readable descriptions for inventory items
 
 export const itemDescriptions: Record<string, string> = {
-  torch: "A flickering torch with a faint smell of oil. Looks like it’s been used to read cryptic messages.",
-  napkin: "A greasy napkin. Surprisingly stiff. Feels more like a key than a serviette.",
-  dominic: "A small goldfish with big, worried eyes. He looks at you as if he knows the ending.",
+  torch:
+    "A flickering torch with a faint smell of oil. Looks like it’s been used to read cryptic messages.",
+  napkin:
+    "A greasy napkin. Surprisingly stiff. Feels more like a key than a serviette.",
+  dominic:
+    "A small goldfish with big, worried eyes. He looks at you as if he knows the ending.",
   coffee: "Still warm. Smells of hazelnut and misplaced ambition.",
-  batteries: "Two AA batteries, still charged. There's a tiny rabbit logo on the side.",
-  mirror: "A tall, ornate mirror with a frame that shimmers strangely. It doesn't always reflect what's in front of it.",
+  batteries:
+    "Two AA batteries, still charged. There's a tiny rabbit logo on the side.",
+  mirror:
+    "A tall, ornate mirror with a frame that shimmers strangely. It doesn't always reflect what's in front of it.",
   moss: "A soft green moss that covers the stones like memory clinging to forgotten places.",
-  portal: "A shimmering veil of light that pulses softly. It hums with multiversal energy.",
-  bookshelf: "Creaky, dust-lined shelves brimming with unreadable tomes and unspoken secrets.",
-  bookshelf2: "This one is empty. Or was. There's a faint outline where something heavy once rested.",
-  books: "Tomes bound in skin, time, and bureaucracy. They whisper if you’re too close.",
-  trolley: "A rusty trolley with one wonky wheel. It’s currently home to a very opinionated goldfish.",
-  console: "An old terminal blinking sporadically. Commands scrawl themselves across it when no one's watching.",
-  button: "A large blue button with a tiny note: ‘Do not press again.’ It dares you.",
+  portal:
+    "A shimmering veil of light that pulses softly. It hums with multiversal energy.",
+  bookshelf:
+    "Creaky, dust-lined shelves brimming with unreadable tomes and unspoken secrets.",
+  bookshelf2:
+    "This one is empty. Or was. There's a faint outline where something heavy once rested.",
+  books:
+    "Tomes bound in skin, time, and bureaucracy. They whisper if you’re too close.",
+  trolley:
+    "A rusty trolley with one wonky wheel. It’s currently home to a very opinionated goldfish.",
+  console:
+    "An old terminal blinking sporadically. Commands scrawl themselves across it when no one's watching.",
+  button:
+    "A large blue button with a tiny note: ‘Do not press again.’ It dares you.",
   coin: "A cursed coin from another realm. It feels oddly warm in your hand, like it remembers things.",
-  mirrorhall: "A corridor of mirrors, each one slightly out of sync with your reflection. Best not to linger.",
-  silver: "The bark of a tree glows silver under the starlight, untouched by decay or logic.",
-  remote: "A slightly worn remote control with buttons labelled in symbols you don’t recognise. It hums faintly when pointed at certain objects.",
-  machine: "A whirring device. Possibly vital. Possibly decorative. Certainly ominous.",
-  runbag: "A government-issued survival pack with reinforced zippers. Doubles as an emotional support item.",
-  deadfish: "A lifeless goldfish. You’re not sure if it’s Dominic. That makes it worse.",
-  keycard: "A thin plastic card with faded lettering. It smells faintly of stress and printer toner.",
-  notebook: "A spiral-bound notebook filled with anxious handwriting and half-redacted ideas.",
-  scroll_constitution: "A vellum scroll embossed with luminous text. You feel like it’s watching you back.",
-  mirror_shard: "A jagged piece of mirror. It reflects things you haven't done yet.",
-  circuit: "A burnt-out fragment of alien circuitry. You think it just blinked.",
-  ai_core: "A pulsing crystal orb encased in steel. It murmurs logic in your peripheral hearing.",
-  watch: "A cracked watch. Time moves when you’re not looking — just not always forward.",
-  dustyfile: "An old personnel file marked ‘CLASSIFIED’. Most of it has been aggressively redacted.",
-  terminal: "A miniature console node. It’s offline, but your name flashes briefly on the screen.",
+  mirrorhall:
+    "A corridor of mirrors, each one slightly out of sync with your reflection. Best not to linger.",
+  silver:
+    "The bark of a tree glows silver under the starlight, untouched by decay or logic.",
+  remote:
+    "A slightly worn remote control with buttons labelled in symbols you don’t recognise. It hums faintly when pointed at certain objects.",
+  machine:
+    "A whirring device. Possibly vital. Possibly decorative. Certainly ominous.",
+  runbag:
+    "A government-issued survival pack with reinforced zippers. Doubles as an emotional support item.",
+  deadfish:
+    "A lifeless goldfish. You’re not sure if it’s Dominic. That makes it worse.",
+  keycard:
+    "A thin plastic card with faded lettering. It smells faintly of stress and printer toner.",
+  notebook:
+    "A spiral-bound notebook filled with anxious handwriting and half-redacted ideas.",
+  scroll_constitution:
+    "A vellum scroll embossed with luminous text. You feel like it’s watching you back.",
+  mirror_shard:
+    "A jagged piece of mirror. It reflects things you haven't done yet.",
+  circuit:
+    "A burnt-out fragment of alien circuitry. You think it just blinked.",
+  ai_core:
+    "A pulsing crystal orb encased in steel. It murmurs logic in your peripheral hearing.",
+  watch:
+    "A cracked watch. Time moves when you’re not looking — just not always forward.",
+  dustyfile:
+    "An old personnel file marked ‘CLASSIFIED’. Most of it has been aggressively redacted.",
+  terminal:
+    "A miniature console node. It’s offline, but your name flashes briefly on the screen.",
   rubberchicken: "Exactly what it sounds like. Why is this even here?",
 };

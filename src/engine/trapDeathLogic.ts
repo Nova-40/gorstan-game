@@ -17,10 +17,9 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Handles trap logic and room-based dangers.
 
-import { triggerDeath } from './deathEngine';
-import { logAchievement } from './achievementEngine';
-import { appendToConsole } from '../ui/TerminalConsole';
-
+import { triggerDeath } from "./deathEngine";
+import { logAchievement } from "./achievementEngine";
+import { appendToConsole } from "../ui/TerminalConsole";
 
 // --- Function: deathByCoin ---
 export function deathByCoin() {
@@ -30,7 +29,6 @@ export function deathByCoin() {
   logAchievement("coinDeath");
 }
 
-
 // --- Function: deathByGreed ---
 export function deathByGreed() {
   appendToConsole("You reached for treasure that wasn’t yours.");
@@ -38,7 +36,6 @@ export function deathByGreed() {
   triggerDeath("Killed by Greed");
   logAchievement("greedDeath");
 }
-
 
 // --- Function: deathByDominicRevenge ---
 export function deathByDominicRevenge() {

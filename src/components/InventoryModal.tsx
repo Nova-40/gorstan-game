@@ -17,28 +17,31 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Game module.
 
-import React from 'react';
-import { XCircle, Package, Search } from 'lucide-react';
+import React from "react";
+import { XCircle, Package, Search } from "lucide-react";
 
 interface InventoryModalProps {
   items: string[];
   onClose: () => void;
 }
 
-export const InventoryModal: React.FC<InventoryModalProps> = ({ items, onClose }) => {
-  const [searchFilter, setSearchFilter] = React.useState('');
+export const InventoryModal: React.FC<InventoryModalProps> = ({
+  items,
+  onClose,
+}) => {
+  const [searchFilter, setSearchFilter] = React.useState("");
 
   // React effect hook
   React.useEffect(() => {
     // Variable declaration
-    const handler = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
-    window.addEventListener('keydown', handler);
+    const handler = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", handler);
     // JSX return block or main return
-    return () => window.removeEventListener('keydown', handler);
+    return () => window.removeEventListener("keydown", handler);
   }, [onClose]);
 
-  const filteredItems = items.filter(item => 
-    item.toLowerCase().includes(searchFilter.toLowerCase())
+  const filteredItems = items.filter((item) =>
+    item.toLowerCase().includes(searchFilter.toLowerCase()),
   );
 
   // JSX return block or main return
@@ -54,7 +57,7 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({ items, onClose }
             <XCircle className="close-icon" />
           </button>
         </div>
-        
+
         {items.length > 0 && (
           <div className="search-container">
             <Search className="search-icon" />
@@ -72,7 +75,11 @@ export const InventoryModal: React.FC<InventoryModalProps> = ({ items, onClose }
           {filteredItems.length > 0 ? (
             <div className="inventory-grid">
               {filteredItems.map((item, i) => (
-                <div key={i} className="inventory-item" title={`Details about ${item}`}>
+                <div
+                  key={i}
+                  className="inventory-item"
+                  title={`Details about ${item}`}
+                >
                   <div className="item-icon">📦</div>
                   <span className="item-name">{item}</span>
                 </div>

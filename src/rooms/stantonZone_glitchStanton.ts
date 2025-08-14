@@ -17,72 +17,64 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Renders room descriptions and image logic.
 
-import { Room } from '../types/Room';
-
-
-
-
-
-
-
-
+import { Room } from "../types/Room";
 
 export const glitchStanton: Room = {
-  image: 'stantonZone_glitchStanton.png',
+  image: "stantonZone_glitchStanton.png",
   description: [
-    'Glitch Stanton is a fractured version of the village, where reality itself seems to be unraveling.',
-    'The streets flicker and shift, alternating between cobblestone paths and jagged voids.',
-    'Cottages appear and disappear, their forms distorted and unstable.',
-    'A strange hum fills the air, resonating with the glitches that ripple through the environment.',
-    'At the center of this chaos stands a shimmering portal, its edges crackling with energy.',
+    "Glitch Stanton is a fractured version of the village, where reality itself seems to be unraveling.",
+    "The streets flicker and shift, alternating between cobblestone paths and jagged voids.",
+    "Cottages appear and disappear, their forms distorted and unstable.",
+    "A strange hum fills the air, resonating with the glitches that ripple through the environment.",
+    "At the center of this chaos stands a shimmering portal, its edges crackling with energy.",
   ],
-  zone: 'stantonZone',
-  title: 'Glitch Stanton',
+  zone: "stantonZone",
+  title: "Glitch Stanton",
 
   consoleIntro: [
-    '>> GLITCH STANTON - FRACTURED AREA - DIMENSIONAL ANCHOR UNSTABLE',
-    '>> Location: PRIMARY STANTON TERRITORY - NEUTRAL GROUND',
-    '>> Magical resonance: EXTREME - Proceed with caution',
-    '>> Temporal flow: UNSTABLE - Time anomalies detected',
-    '>> Portal: ACTIVE - Potential for interaction detected',
-    '>> WARNING: Prolonged exposure to glitches may affect physical form',
+    ">> GLITCH STANTON - FRACTURED AREA - DIMENSIONAL ANCHOR UNSTABLE",
+    ">> Location: PRIMARY STANTON TERRITORY - NEUTRAL GROUND",
+    ">> Magical resonance: EXTREME - Proceed with caution",
+    ">> Temporal flow: UNSTABLE - Time anomalies detected",
+    ">> Portal: ACTIVE - Potential for interaction detected",
+    ">> WARNING: Prolonged exposure to glitches may affect physical form",
   ],
 
   exits: {
-    north: 'stantonharcourt',
-    south: 'peacefulStanton',
-    east: 'silentStanton',
-    west: 'ascendantStanton',
+    north: "stantonharcourt",
+    south: "peacefulStanton",
+    east: "silentStanton",
+    west: "ascendantStanton",
   },
 
   items: [
-    'glitch_fragment',
-    'portal_shard',
-    'unstable_rune',
-    'dimensional_anchor',
+    "glitch_fragment",
+    "portal_shard",
+    "unstable_rune",
+    "dimensional_anchor",
   ],
 
   interactables: {
-    'portal': {
-      description: 'A shimmering portal crackling with unstable energy.',
-      actions: ['examine', 'enter', 'stabilize'],
+    portal: {
+      description: "A shimmering portal crackling with unstable energy.",
+      actions: ["examine", "enter", "stabilize"],
       requires: [],
     },
-    'glitching_streets': {
-      description: 'Streets flickering and shifting between cobblestone paths and voids.',
-      actions: ['examine', 'walk', 'repair'],
+    glitching_streets: {
+      description:
+        "Streets flickering and shifting between cobblestone paths and voids.",
+      actions: ["examine", "walk", "repair"],
       requires: [],
     },
-    'unstable_cottages': {
-      description: 'Cottages appearing and disappearing, their forms distorted.',
-      actions: ['examine', 'enter', 'stabilize'],
+    unstable_cottages: {
+      description:
+        "Cottages appearing and disappearing, their forms distorted.",
+      actions: ["examine", "enter", "stabilize"],
       requires: [],
     },
   },
 
-  id: 'glitchStanton',
+  id: "glitchStanton",
 };
 
 export default glitchStanton;
-
-

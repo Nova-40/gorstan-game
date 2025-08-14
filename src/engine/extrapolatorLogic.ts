@@ -14,7 +14,6 @@
   Full licence terms: see EULA.md in the project root.
 */
 
-
 interface GameFlags {
   schrCoinSeen?: boolean;
   schrCoinPicked?: boolean;
@@ -29,12 +28,12 @@ interface GameState {
 
 export function canUseExtrapolator(state: GameState): boolean {
   const { flags } = state;
-  return Boolean(flags.schrCoinSeen) && !Boolean(flags.schrCoinPicked);
+  return Boolean(flags.schrCoinSeen) && !flags.schrCoinPicked;
 }
 
 export function runExtrapolator(state: GameState): string {
   if (state.flags.schrCoinPicked) {
-    import('./specialDeathEffects').then(mod => mod.paradoxDeathSequence());
+    import("./specialDeathEffects").then((mod) => mod.paradoxDeathSequence());
     return "The extrapolator emits a grinding sound... then explodes. You've broken causality.";
   }
   if (!canUseExtrapolator(state)) {

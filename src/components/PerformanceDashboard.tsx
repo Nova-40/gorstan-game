@@ -16,26 +16,35 @@
 
 // (c) Geoff Webster 2025
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { performanceMonitor } from '../utils/performanceMonitor';
-import { gameStateOptimizer } from '../utils/gameStateOptimizer';
-import { getCacheStatus, getLoadingMetrics } from '../utils/optimizedRoomLoader';
+import React, { useState, useEffect, useCallback } from "react";
+import { performanceMonitor } from "../utils/performanceMonitor";
+import { gameStateOptimizer } from "../utils/gameStateOptimizer";
+import {
+  getCacheStatus,
+  getLoadingMetrics,
+} from "../utils/optimizedRoomLoader";
 
 interface PerformanceDashboardProps {
   isVisible: boolean;
   onClose: () => void;
 }
 
-const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ isVisible, onClose }) => {
+const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({
+  isVisible,
+  onClose,
+}) => {
   const [metrics, setMetrics] = useState(performanceMonitor.getMetrics());
-  const [optimizerMetrics, setOptimizerMetrics] = useState(gameStateOptimizer.getMetrics());
+  const [optimizerMetrics, setOptimizerMetrics] = useState(
+    gameStateOptimizer.getMetrics(),
+  );
   const [roomCacheStatus, setRoomCacheStatus] = useState(getCacheStatus());
-  const [roomLoadingMetrics, setRoomLoadingMetrics] = useState(getLoadingMetrics());
+  const [roomLoadingMetrics, setRoomLoadingMetrics] =
+    useState(getLoadingMetrics());
   const [warnings, setWarnings] = useState<string[]>([]);
 
   // Update metrics every second
   useEffect(() => {
-    if (!isVisible) return;
+    if (!isVisible) {return;}
 
     const interval = setInterval(() => {
       setMetrics(performanceMonitor.getMetrics());
@@ -51,17 +60,20 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ isVisible, 
   const generateReport = useCallback(() => {
     const report = performanceMonitor.generateReport();
     const optimizerReport = gameStateOptimizer.generateReport();
-    
+
     const fullReport = `${report}\n\n${optimizerReport}`;
-    
+
     // Copy to clipboard
-    navigator.clipboard.writeText(fullReport).then(() => {
-      alert('Performance report copied to clipboard!');
-    }).catch(() => {
-      // Fallback: show in console
-      console.log(fullReport);
-      alert('Performance report logged to console');
-    });
+    navigator.clipboard
+      .writeText(fullReport)
+      .then(() => {
+        alert("Performance report copied to clipboard!");
+      })
+      .catch(() => {
+        // Fallback: show in console
+        console.log(fullReport);
+        alert("Performance report logged to console");
+      });
   }, []);
 
   const clearWarnings = useCallback(() => {
@@ -69,18 +81,24 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ isVisible, 
     setWarnings([]);
   }, []);
 
-  if (!isVisible) return null;
+  if (!isVisible) {return null;}
 
   const summary = performanceMonitor.getPerformanceSummary();
-  const statusColor = summary.status === 'good' ? 'text-green-400' : 
-                     summary.status === 'warning' ? 'text-yellow-400' : 'text-red-400';
+  const statusColor =
+    summary.status === "good"
+      ? "text-green-400"
+      : summary.status === "warning"
+        ? "text-yellow-400"
+        : "text-red-400";
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
       <div className="bg-gray-900 text-white p-6 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-blue-400">Performance Dashboard</h2>
+          <h2 className="text-2xl font-bold text-blue-400">
+            Performance Dashboard
+          </h2>
           <div className="flex gap-2">
             <button
               onClick={generateReport}
@@ -113,7 +131,9 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ isVisible, 
 
           <div className="bg-gray-800 p-4 rounded">
             <h3 className="text-lg font-semibold mb-2">Frame Rate</h3>
-            <div className={`text-2xl font-bold ${metrics.frameRate < 30 ? 'text-red-400' : 'text-green-400'}`}>
+            <div
+              className={`text-2xl font-bold ${metrics.frameRate < 30 ? "text-red-400" : "text-green-400"}`}
+            >
               {metrics.frameRate} FPS
             </div>
             <div className="text-sm text-gray-400">Target: 60 FPS</div>
@@ -121,7 +141,9 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ isVisible, 
 
           <div className="bg-gray-800 p-4 rounded">
             <h3 className="text-lg font-semibold mb-2">Memory Usage</h3>
-            <div className={`text-2xl font-bold ${metrics.memoryUsage > 100 ? 'text-red-400' : 'text-green-400'}`}>
+            <div
+              className={`text-2xl font-bold ${metrics.memoryUsage > 100 ? "text-red-400" : "text-green-400"}`}
+            >
               {metrics.memoryUsage} MB
             </div>
             <div className="text-sm text-gray-400">Limit: 100 MB</div>
@@ -136,7 +158,13 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ isVisible, 
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span>Render Time:</span>
-                <span className={metrics.renderTime > 16.67 ? 'text-red-400' : 'text-green-400'}>
+                <span
+                  className={
+                    metrics.renderTime > 16.67
+                      ? "text-red-400"
+                      : "text-green-400"
+                  }
+                >
                   {metrics.renderTime.toFixed(2)}ms
                 </span>
               </div>
@@ -146,7 +174,13 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ isVisible, 
               </div>
               <div className="flex justify-between">
                 <span>NPC Processing:</span>
-                <span className={metrics.npcProcessingTime > 10 ? 'text-red-400' : 'text-green-400'}>
+                <span
+                  className={
+                    metrics.npcProcessingTime > 10
+                      ? "text-red-400"
+                      : "text-green-400"
+                  }
+                >
                   {metrics.npcProcessingTime.toFixed(2)}ms
                 </span>
               </div>
@@ -159,7 +193,13 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ isVisible, 
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span>Cache Hit Rate:</span>
-                <span className={roomCacheStatus.hitRate > 80 ? 'text-green-400' : 'text-yellow-400'}>
+                <span
+                  className={
+                    roomCacheStatus.hitRate > 80
+                      ? "text-green-400"
+                      : "text-yellow-400"
+                  }
+                >
                   {roomCacheStatus.hitRate.toFixed(1)}%
                 </span>
               </div>
@@ -197,10 +237,11 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ isVisible, 
               <div className="flex justify-between">
                 <span>Last Optimization:</span>
                 <span>
-                  {optimizerMetrics.lastOptimization 
-                    ? new Date(optimizerMetrics.lastOptimization).toLocaleTimeString()
-                    : 'Never'
-                  }
+                  {optimizerMetrics.lastOptimization
+                    ? new Date(
+                        optimizerMetrics.lastOptimization,
+                      ).toLocaleTimeString()
+                    : "Never"}
                 </span>
               </div>
             </div>
@@ -213,12 +254,14 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ isVisible, 
               <div className="flex justify-between">
                 <span>User Agent:</span>
                 <span className="truncate max-w-40" title={navigator.userAgent}>
-                  {navigator.userAgent.split(' ')[0]}
+                  {navigator.userAgent.split(" ")[0]}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span>Viewport:</span>
-                <span>{window.innerWidth}x{window.innerHeight}</span>
+                <span>
+                  {window.innerWidth}x{window.innerHeight}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span>Device Pixel Ratio:</span>
@@ -226,8 +269,12 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ isVisible, 
               </div>
               <div className="flex justify-between">
                 <span>Online:</span>
-                <span className={navigator.onLine ? 'text-green-400' : 'text-red-400'}>
-                  {navigator.onLine ? 'Yes' : 'No'}
+                <span
+                  className={
+                    navigator.onLine ? "text-green-400" : "text-red-400"
+                  }
+                >
+                  {navigator.onLine ? "Yes" : "No"}
                 </span>
               </div>
             </div>
@@ -238,7 +285,9 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ isVisible, 
         {warnings.length > 0 && (
           <div className="bg-red-900 bg-opacity-20 border border-red-400 p-4 rounded mb-6">
             <div className="flex justify-between items-center mb-2">
-              <h3 className="text-lg font-semibold text-red-400">Performance Warnings</h3>
+              <h3 className="text-lg font-semibold text-red-400">
+                Performance Warnings
+              </h3>
               <button
                 onClick={clearWarnings}
                 className="px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-sm"
@@ -266,11 +315,11 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ isVisible, 
           </button>
           <button
             onClick={() => {
-              if ('gc' in window) {
+              if ("gc" in window) {
                 (window as any).gc();
-                alert('Garbage collection triggered');
+                alert("Garbage collection triggered");
               } else {
-                alert('Garbage collection not available');
+                alert("Garbage collection not available");
               }
             }}
             className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded text-sm"
@@ -281,7 +330,7 @@ const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({ isVisible, 
             onClick={() => {
               localStorage.clear();
               sessionStorage.clear();
-              alert('Storage cleared');
+              alert("Storage cleared");
             }}
             className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded text-sm"
           >

@@ -16,4 +16,3 @@
 
 // Gorstan and characters (c) Geoff Webster 2025
 // Handles trap logic and room-based dangers.
-

@@ -20,8 +20,8 @@
 
 export type SpeakerKind = "PLAYER" | "NPC";
 
-export interface SpeakerRef { 
-  kind: SpeakerKind; 
+export interface SpeakerRef {
+  kind: SpeakerKind;
   id: string; // id: "ayla" | "morthos" | "al" | playerId
 }
 
@@ -30,7 +30,7 @@ export interface NPCExchange {
   to: SpeakerRef;
   text: string;
   ts: number;
-  topic?: string;       // "hint","lore","banter","quest"
+  topic?: string; // "hint","lore","banter","quest"
   visibleToPlayer: boolean; // whether to print in console
 }
 
@@ -46,8 +46,8 @@ export interface ConversationThread {
 
 // Voice profile for NPC personality during conversations
 export interface Voice {
-  formality: number;    // 0-2: casual to formal
-  humor: number;        // 0-2: serious to humorous
-  terseness: number;    // 0-2: verbose to terse
-  tics?: string[];      // characteristic phrases/sounds
+  formality: number; // 0-2: casual to formal
+  humor: number; // 0-2: serious to humorous
+  terseness: number; // 0-2: verbose to terse
+  tics?: string[]; // characteristic phrases/sounds
 }

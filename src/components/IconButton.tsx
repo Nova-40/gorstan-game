@@ -25,8 +25,14 @@ type IconButtonProps = {
   disabled?: boolean;
 };
 
-const IconButton: React.FC<IconButtonProps> = ({ icon, label, title, onClick, disabled }) => {
-// JSX return block or main return
+const IconButton: React.FC<IconButtonProps> = ({
+  icon,
+  label,
+  title,
+  onClick,
+  disabled,
+}) => {
+  // JSX return block or main return
   return (
     <button
       className="p-2 bg-transparent rounded-xl hover:bg-green-800 text-green-300 disabled:opacity-30"

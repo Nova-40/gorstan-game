@@ -19,10 +19,15 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Game module.
 
-import type { NPC } from './NPCTypes';
-import type { Room } from './Room';
+import type { NPC } from "./NPCTypes";
+import type { Room } from "./Room";
 
-export type MiniquestType = 'dynamic' | 'structured' | 'puzzle' | 'social' | 'exploration';
+export type MiniquestType =
+  | "dynamic"
+  | "structured"
+  | "puzzle"
+  | "social"
+  | "exploration";
 
 export interface Miniquest {
   readonly id: string;
@@ -37,8 +42,8 @@ export interface Miniquest {
   readonly triggerText?: string;
   readonly hint?: string;
   readonly repeatable?: boolean;
-  readonly timeLimit?: number; 
-  readonly difficulty?: 'trivial' | 'easy' | 'medium' | 'hard';
+  readonly timeLimit?: number;
+  readonly difficulty?: "trivial" | "easy" | "medium" | "hard";
 }
 
 export interface MiniquestProgress {
@@ -75,22 +80,13 @@ export interface RoomMiniquests {
 
 export type Achievement = string;
 
-
 export interface Puzzle {
   id: string;
   name: string;
   solved: boolean;
-  difficulty?: 'simple' | 'hard' | 'expert';
-  [key: string]: any;
+  difficulty?: "simple" | "hard" | "expert";
+  [key: string]: unknown;
 }
-
-
-
-
-
-
-
-
 
 export interface Player {
   id: string;
@@ -108,7 +104,6 @@ export interface Player {
   playTime?: number;
   lastSave?: string;
 }
-
 
 export interface PlayerState extends Player {
   strength?: number;
@@ -132,22 +127,30 @@ export interface PlayerState extends Player {
 export interface GameMessage {
   id: string;
   text: string;
-  type: 'narrative' | 'action' | 'dialogue' | 'system' | 'error' | 'warning' | 'success' | 'achievement';
+  type:
+    | "narrative"
+    | "action"
+    | "dialogue"
+    | "system"
+    | "error"
+    | "warning"
+    | "success"
+    | "achievement";
   timestamp: number;
   speaker?: string;
   metadata?: Record<string, unknown>;
 }
 
 export interface GameSettings {
-  difficulty: 'easy' | 'normal' | 'hard' | 'nightmare';
+  difficulty: "easy" | "normal" | "hard" | "nightmare";
   autoSave: boolean;
   autoSaveInterval: number;
   soundEnabled: boolean;
   musicEnabled: boolean;
   animationsEnabled: boolean;
   textSpeed: number;
-  fontSize: 'small' | 'medium' | 'large';
-  theme: 'light' | 'dark' | 'auto';
+  fontSize: "small" | "medium" | "large";
+  theme: "light" | "dark" | "auto";
   debugMode: boolean;
   fullscreen: boolean;
   cheatMode: boolean;
@@ -172,55 +175,79 @@ export interface GameActionContext {
 }
 
 export type GameAction =
-  | { type: 'SET_PLAYER_NAME'; payload: string }
-  | { type: 'UPDATE_PLAYER'; payload: Partial<Player> }
-  | { type: 'SET_PLAYER_HEALTH'; payload: number }
-  | { type: 'HEAL_PLAYER'; payload: number }
-  | { type: 'DAMAGE_PLAYER'; payload: number }
-  | { type: 'ADD_SCORE'; payload: number }
-  | { type: 'SET_SCORE'; payload: number }
-  | { type: 'UPDATE_SCORE'; payload: number }
-  | { type: 'RESET_SCORE' }
-  | { type: 'UPDATE_CODEX_ENTRY'; payload: { itemId: string; entry: any; isFirstDiscovery: boolean } }
-  | { type: 'UNLOCK_ACHIEVEMENT'; payload: string }
-  | { type: 'ADD_ITEM'; payload: string }
-  | { type: 'REMOVE_ITEM'; payload: string }
-  | { type: 'SET_INVENTORY'; payload: string[] }
-  | { type: 'CLEAR_INVENTORY' }
-  | { type: 'CHANGE_ROOM'; payload: string }
-  | { type: 'SET_CURRENT_ROOM'; payload: string }
-  | { type: 'ADD_VISITED_ROOM'; payload: string }
-  | { type: 'SET_FLAG'; payload: { key: string; value: boolean | number | string } }
-  | { type: 'CLEAR_FLAG'; payload: string }
-  | { type: 'SET_FLAGS'; payload: Record<string, boolean | number | string> }
-  | { type: 'SET_NPCS_IN_ROOM'; payload: NPC[] }
-  | { type: 'ADD_NPC_TO_ROOM'; payload: string }
-  | { type: 'REMOVE_NPC_FROM_ROOM'; payload: string }
-  | { type: 'UPDATE_NPC_RELATIONSHIP'; payload: { npc: string; value: number } }
-  | { type: 'ADD_NPC_CONVERSATION'; payload: { npcId: string; topic: string; playerInput: string; npcResponse: string; mood?: string } }
-  | { type: 'UPDATE_NPC_CONVERSATION_HISTORY'; payload: { npcId: string; history: any } }
-  | { type: 'ADD_TRAIT'; payload: string }
-  | { type: 'REMOVE_TRAIT'; payload: string }
-  | { type: 'SET_TRAITS'; payload: string[] }
-  | { type: 'ADD_MESSAGE'; payload: GameMessage }
-  | { type: 'PRESS_BLUE_BUTTON' }
-  | { type: 'DISMISS_BLUE_BUTTON_WARNING' }
-  | { type: 'PRESS_ACTION' }
-  | { type: 'START_MULTIVERSE_REBOOT' }
-  | { type: 'SHOW_RESET_SEQUENCE' }
-  | { type: 'ADD_HISTORY'; payload: string }
-  | { type: 'CLEAR_HISTORY' }
-  | { type: 'SET_HISTORY'; payload: GameMessage[] }
-  | { type: 'SET_FLAG'; payload: { flag: string; value: boolean | number | string } }
-  | { type: 'REMOVE_ITEM_FROM_ROOM'; payload: { roomId: string; item: string } }
-  | { type: 'START_QUEST'; payload: string }
-  | { type: 'COMPLETE_QUEST'; payload: string }
-  | { type: 'UPDATE_QUEST_PROGRESS'; payload: { quest: string; progress: unknown } }
-  | { type: 'RESET' }
-  | { type: 'LOAD_GAME'; payload: GameState }
-  | { type: 'SAVE_GAME' }
-  | { type: 'UPDATE_SETTINGS'; payload: Partial<GameSettings> }
-  | { type: 'ENABLE_DEBUG_MODE' }
+  | { type: "SET_PLAYER_NAME"; payload: string }
+  | { type: "UPDATE_PLAYER"; payload: Partial<Player> }
+  | { type: "SET_PLAYER_HEALTH"; payload: number }
+  | { type: "HEAL_PLAYER"; payload: number }
+  | { type: "DAMAGE_PLAYER"; payload: number }
+  | { type: "ADD_SCORE"; payload: number }
+  | { type: "SET_SCORE"; payload: number }
+  | { type: "UPDATE_SCORE"; payload: number }
+  | { type: "RESET_SCORE" }
+  | {
+      type: "UPDATE_CODEX_ENTRY";
+      payload: { itemId: string; entry: any; isFirstDiscovery: boolean };
+    }
+  | { type: "UNLOCK_ACHIEVEMENT"; payload: string }
+  | { type: "ADD_ITEM"; payload: string }
+  | { type: "REMOVE_ITEM"; payload: string }
+  | { type: "SET_INVENTORY"; payload: string[] }
+  | { type: "CLEAR_INVENTORY" }
+  | { type: "CHANGE_ROOM"; payload: string }
+  | { type: "SET_CURRENT_ROOM"; payload: string }
+  | { type: "ADD_VISITED_ROOM"; payload: string }
+  | {
+      type: "SET_FLAG";
+      payload: { key: string; value: boolean | number | string };
+    }
+  | { type: "CLEAR_FLAG"; payload: string }
+  | { type: "SET_FLAGS"; payload: Record<string, boolean | number | string> }
+  | { type: "SET_NPCS_IN_ROOM"; payload: NPC[] }
+  | { type: "ADD_NPC_TO_ROOM"; payload: string }
+  | { type: "REMOVE_NPC_FROM_ROOM"; payload: string }
+  | { type: "UPDATE_NPC_RELATIONSHIP"; payload: { npc: string; value: number } }
+  | {
+      type: "ADD_NPC_CONVERSATION";
+      payload: {
+        npcId: string;
+        topic: string;
+        playerInput: string;
+        npcResponse: string;
+        mood?: string;
+      };
+    }
+  | {
+      type: "UPDATE_NPC_CONVERSATION_HISTORY";
+      payload: { npcId: string; history: any };
+    }
+  | { type: "ADD_TRAIT"; payload: string }
+  | { type: "REMOVE_TRAIT"; payload: string }
+  | { type: "SET_TRAITS"; payload: string[] }
+  | { type: "ADD_MESSAGE"; payload: GameMessage }
+  | { type: "PRESS_BLUE_BUTTON" }
+  | { type: "DISMISS_BLUE_BUTTON_WARNING" }
+  | { type: "PRESS_ACTION" }
+  | { type: "START_MULTIVERSE_REBOOT" }
+  | { type: "SHOW_RESET_SEQUENCE" }
+  | { type: "ADD_HISTORY"; payload: string }
+  | { type: "CLEAR_HISTORY" }
+  | { type: "SET_HISTORY"; payload: GameMessage[] }
+  | {
+      type: "SET_FLAG";
+      payload: { flag: string; value: boolean | number | string };
+    }
+  | { type: "REMOVE_ITEM_FROM_ROOM"; payload: { roomId: string; item: string } }
+  | { type: "START_QUEST"; payload: string }
+  | { type: "COMPLETE_QUEST"; payload: string }
+  | {
+      type: "UPDATE_QUEST_PROGRESS";
+      payload: { quest: string; progress: unknown };
+    }
+  | { type: "RESET" }
+  | { type: "LOAD_GAME"; payload: GameState }
+  | { type: "SAVE_GAME" }
+  | { type: "UPDATE_SETTINGS"; payload: Partial<GameSettings> }
+  | { type: "ENABLE_DEBUG_MODE" }
   | { type: string; payload?: unknown };
 
 export interface GameEvent {
@@ -247,11 +274,20 @@ export interface CommandHandler {
   aliases?: string[];
   description: string;
   usage?: string;
-  handler: (context: GameActionContext, args: string[]) => Promise<CommandResult> | CommandResult;
+  handler: (
+    context: GameActionContext,
+    args: string[],
+  ) => Promise<CommandResult> | CommandResult;
   requiresArgs?: boolean;
   minArgs?: number;
   maxArgs?: number;
-  category?: 'movement' | 'interaction' | 'inventory' | 'system' | 'social' | 'combat';
+  category?:
+    | "movement"
+    | "interaction"
+    | "inventory"
+    | "system"
+    | "social"
+    | "combat";
 }
 
 export interface SaveData {
@@ -298,52 +334,49 @@ export interface ValidationResult {
   warnings: string[];
 }
 
-
 // --- Function: isPlayer ---
 export function isPlayer(obj: unknown): obj is Player {
-  if (!obj || typeof obj !== 'object') return false;
-// Variable declaration
+  if (!obj || typeof obj !== "object") {return false;}
+  // Variable declaration
   const player = obj as Player;
-// JSX return block or main return
+  // JSX return block or main return
   return (
-    typeof player.id === 'string' &&
-    typeof player.name === 'string' &&
-    typeof player.health === 'number' &&
+    typeof player.id === "string" &&
+    typeof player.name === "string" &&
+    typeof player.health === "number" &&
     Array.isArray(player.inventory)
   );
 }
 
-
 // --- Function: isGameState ---
 export function isGameState(obj: unknown): obj is GameState {
-  if (!obj || typeof obj !== 'object') return false;
-// JSX return block or main return
+  if (!obj || typeof obj !== "object") {return false;}
+  // JSX return block or main return
   return (
     isPlayer((obj as any).player) &&
-    typeof (obj as any).currentRoomId === 'string' &&
+    typeof (obj as any).currentRoomId === "string" &&
     Array.isArray((obj as any).history) &&
-    typeof (obj as any).flags === 'object'
+    typeof (obj as any).flags === "object"
   );
 }
 
-
 // --- Function: isGameMessage ---
 export function isGameMessage(obj: unknown): obj is GameMessage {
-  if (!obj || typeof obj !== 'object') return false;
-// JSX return block or main return
+  if (!obj || typeof obj !== "object") {return false;}
+  // JSX return block or main return
   return (
-    typeof (obj as any).id === 'string' &&
-    typeof (obj as any).text === 'string' &&
-    typeof (obj as any).type === 'string' &&
-    typeof (obj as any).timestamp === 'number'
+    typeof (obj as any).id === "string" &&
+    typeof (obj as any).text === "string" &&
+    typeof (obj as any).type === "string" &&
+    typeof (obj as any).timestamp === "number"
   );
 }
 
 export const GameUtils = {
   createDefaultPlayer(): Player {
     return {
-      id: 'player_' + Date.now(),
-      name: 'Player',
+      id: "player_" + Date.now(),
+      name: "Player",
       health: 100,
       inventory: [],
     };
@@ -351,9 +384,9 @@ export const GameUtils = {
 
   createDefaultGameState(config?: Partial<GameConfig>): GameState {
     return {
-      stage: 'main',
+      stage: "main",
       player: GameUtils.createDefaultPlayer(),
-      currentRoomId: config?.startingRoom || 'start',
+      currentRoomId: config?.startingRoom || "start",
       history: [],
       flags: {},
       npcsInRoom: [],
@@ -367,21 +400,21 @@ export const GameUtils = {
         timeScale: 1,
       },
       settings: {
-        difficulty: 'normal',
+        difficulty: "normal",
         autoSave: true,
         autoSaveInterval: 300000,
         soundEnabled: true,
         musicEnabled: true,
         animationsEnabled: true,
         textSpeed: 50,
-        fontSize: 'medium',
-        theme: 'auto',
+        fontSize: "medium",
+        theme: "auto",
         debugMode: false,
         fullscreen: false,
         cheatMode: false,
       },
       metadata: {
-        version: '6.1.0',
+        version: "6.1.0",
         playTime: 0,
         resetCount: 0,
         lastSaved: null,
@@ -391,20 +424,24 @@ export const GameUtils = {
   },
 
   validatePlayer(player: unknown): ValidationResult {
-    const result: ValidationResult = { isValid: true, errors: [], warnings: [] };
+    const result: ValidationResult = {
+      isValid: true,
+      errors: [],
+      warnings: [],
+    };
     if (!isPlayer(player)) {
       result.isValid = false;
-      result.errors.push('Invalid player object structure');
+      result.errors.push("Invalid player object structure");
       return result;
     }
     if (player.health < 0) {
-      result.warnings.push('Player health is negative');
+      result.warnings.push("Player health is negative");
     }
     if (player.health > (player.maxHealth || 100)) {
-      result.warnings.push('Player health exceeds maximum');
+      result.warnings.push("Player health exceeds maximum");
     }
     if (player.inventory.length > 100) {
-      result.warnings.push('Player inventory is very large');
+      result.warnings.push("Player inventory is very large");
     }
     return result;
   },
@@ -414,14 +451,14 @@ export const GAME_CONSTANTS = {
   MAX_INVENTORY_SIZE: 100,
   MAX_HISTORY_SIZE: 500,
   DEFAULT_PLAYER_HEALTH: 100,
-  DEFAULT_DIFFICULTY: 'normal',
-  DEFAULT_THEME: 'auto',
+  DEFAULT_DIFFICULTY: "normal",
+  DEFAULT_THEME: "auto",
 } as const;
 
-export type MessageType = GameMessage['type'];
-export type Difficulty = GameSettings['difficulty'];
-export type Theme = GameSettings['theme'];
-export type FontSize = GameSettings['fontSize'];
+export type MessageType = GameMessage["type"];
+export type Difficulty = GameSettings["difficulty"];
+export type Theme = GameSettings["theme"];
+export type FontSize = GameSettings["fontSize"];
 
 export interface GameMetadata {
   version: string;
@@ -431,7 +468,7 @@ export interface GameMetadata {
   achievements?: string[];
 }
 
-export type GameTransition = 'jump' | 'wait' | 'sip' | null;
+export type GameTransition = "jump" | "wait" | "sip" | null;
 
 export interface GameTime {
   day: number;
@@ -442,15 +479,13 @@ export interface GameTime {
   timeScale: number;
 }
 
-
-
 export interface GameState {
   stage: string;
   transition?: GameTransition | null;
   player: Player;
   history: GameMessage[];
   currentRoomId: string;
-  
+
   flags: {
     resetButtonPressCount?: number;
     triggerResetEscalation?: boolean;
@@ -462,20 +497,19 @@ export interface GameState {
   settings: GameSettings;
   metadata: GameMetadata;
   roomMap: Record<string, Room>;
+
+  roomFlags?: Record<string, string | number | boolean | null>;
 }
-
-
 
 export interface GameFlags {
   resetButtonPressCount?: number;
   triggerResetEscalation?: boolean;
-  
+
   [key: string]: any;
 }
 export interface GameStateWithFlags extends GameState {
   flags: GameFlags;
 }
-
 
 // --- MERGED FROM src/GameTypes.ts ---
 // src/GameTypes.ts
@@ -484,3 +518,48 @@ export interface GameStateWithFlags extends GameState {
 // Gorstan and characters (c) Geoff Webster 2025
 // Game module.
 
+export interface LocalGameState {
+  stage: string;
+  transition: string;
+  player: Player;
+  history: string[];
+  inventory: string[];
+  flags: Record<string, boolean>;
+  currentRoomId: string;
+  roomMap: Record<string, Room>;
+  npcsInRoom: NPC[];
+  roomVisitCount: Record<string, number>;
+  gameTime: {
+    day: number;
+    hour: number;
+    minute: number;
+    startTime: number;
+    currentTime: number;
+    timeScale: number;
+  };
+  settings: {
+    soundEnabled: boolean;
+    fullscreen: boolean;
+    cheatMode: boolean;
+    difficulty: string;
+    autoSave: boolean;
+    autoSaveInterval: number;
+    musicEnabled: boolean;
+    animationsEnabled: boolean;
+    textSpeed: number;
+    fontSize: string;
+    theme: string;
+    debugMode: boolean;
+  };
+  metadata: {
+    resetCount: number;
+    version: string;
+    lastSaved: string | null;
+    playTime: number;
+    achievements: string[];
+    codexEntries: Record<string, any>;
+  };
+  messages: string[];
+  conversations: Record<string, any>;
+  overhearNPCBanter: boolean;
+}

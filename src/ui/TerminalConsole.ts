@@ -17,7 +17,7 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Terminal console utility functions
 
-import { GameAction } from '../types/GameTypes';
+import { GameAction } from "../types/GameTypes";
 
 /**
  * Dispatch function type for console operations
@@ -40,11 +40,11 @@ export function setConsoleDispatch(dispatch: DispatchFunction): void {
 export function appendToConsole(message: string): void {
   if (globalDispatch) {
     globalDispatch({
-      type: 'ADD_CONSOLE_LINE',
-      payload: message
+      type: "ADD_CONSOLE_LINE",
+      payload: message,
     });
   } else {
-    console.warn('Console dispatch not available:', message);
+    console.warn("Console dispatch not available:", message);
   }
 }
 
@@ -52,5 +52,5 @@ export function appendToConsole(message: string): void {
  * Append multiple lines to the console
  */
 export function appendLinesToConsole(lines: string[]): void {
-  lines.forEach(line => appendToConsole(line));
+  lines.forEach((line) => appendToConsole(line));
 }

@@ -17,55 +17,69 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Game module.
 
-import { FlagMap } from '../state/flagRegistry';
-
-import { useFlags } from './useFlags';
-
-
-
-
-
-
-
-
-
+import { FlagMap } from "../state/flagRegistry";
+import { useFlags } from "./useFlags";
+import type { LocalGameState } from "../state/gameState";
+import type { GameAction } from "../types/GameTypes";
+import type { Dispatch } from "react";
+import type { Room } from "../types/Room";
 
 export const useWendellLogic = (
-  state: any,
-  dispatch: React.Dispatch<any>,
-  room: any,
-  loadModule: (path: string) => Promise<any>
+  state: LocalGameState,
+  dispatch: Dispatch<GameAction>,
+  room: Room | undefined,
+  loadModule: (path: string) => Promise<unknown>,
 ) => {
   const { hasFlag, clearFlag } = useFlags();
 
-// Variable declaration
+  // Variable declaration
   const handleWendell = () => {
     if (hasFlag(FlagMap.npc.pendingWendellCommand)) {
-      loadModule('../engine/mrWendellController').then(({ handleWendellInteraction }) => {
-        handleWendellInteraction(state, dispatch);
+      loadModule("../engine/mrWendellController").then((mod) => {
+        const { handleWendellInteraction } =
+          (mod as typeof import("../engine/mrWendellController")) || {};
+        if (typeof handleWendellInteraction === "function") {
+          // Note: pending command value is handled elsewhere; this is a convenience trigger
+          handleWendellInteraction("", state, dispatch);
+        }
         clearFlag(FlagMap.npc.pendingWendellCommand);
       });
     }
   };
 
-// Variable declaration
+  // Variable declaration
   const spawnWendellIfFlagged = () => {
     if (hasFlag(FlagMap.npc.forceWendellSpawn) && room) {
-      loadModule('../engine/mrWendellController').then((module) => {
-        module.spawnWendell(room, state, dispatch);
-        console.log('[DEBUG] Mr. Wendell forcibly spawned.');
+      loadModule("../engine/mrWendellController").then((module) => {
+        const { spawnWendell } = module as any as {
+          spawnWendell?: (
+            room: Room,
+            state: LocalGameState,
+            dispatch: Dispatch<GameAction>,
+          ) => void;
+        };
+        spawnWendell?.(room, state, dispatch);
+        console.log("[DEBUG] Mr. Wendell forcibly spawned.");
         clearFlag(FlagMap.npc.forceWendellSpawn);
       });
     }
   };
 
-// Variable declaration
+  // Variable declaration
   const checkWendellStatus = () => {
     if (hasFlag(FlagMap.npc.checkWendellStatus)) {
-      loadModule('../engine/mrWendellController').then(({ isWendellActive, getWendellRoom }) => {
-        console.log('[DEBUG] Mr. Wendell Status:');
-        console.log('- Active:', isWendellActive());
-        console.log('- Current Room:', getWendellRoom());
+      loadModule("../engine/mrWendellController").then((mod) => {
+        const { isWendellActive, getWendellRoom } =
+          (mod as typeof import("../engine/mrWendellController")) || {};
+        console.log("[DEBUG] Mr. Wendell Status:");
+        console.log(
+          "- Active:",
+          typeof isWendellActive === "function" ? isWendellActive() : false,
+        );
+        console.log(
+          "- Current Room:",
+          typeof getWendellRoom === "function" ? getWendellRoom() : undefined,
+        );
         clearFlag(FlagMap.npc.checkWendellStatus);
       });
     }
@@ -74,6 +88,6 @@ export const useWendellLogic = (
   return {
     handleWendell,
     spawnWendellIfFlagged,
-    checkWendellStatus
+    checkWendellStatus,
   };
 };

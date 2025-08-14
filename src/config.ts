@@ -20,25 +20,37 @@
 export const config = {
   // Game settings
   debug: import.meta.env.DEV,
-  version: '1.0.0',
-  
+  version: "1.0.0",
+
   // Feature flags
   enableSeasonal: true,
   forceSeason: null as null | "easter" | "christmas" | "may13",
-  
+  // Preview features
+  // Globally gate the GPT-5 preview experience. Defaults to enabled for all clients
+  // but can be disabled via VITE_GPT5_PREVIEW=false
+  enableGpt5Preview: (import.meta.env.VITE_GPT5_PREVIEW ?? "true") === "true",
+  // Optional: allow specifying a preview model name via env for future provider routing
+  // Note: Current provider is Groq; unsupported models will be safely ignored at runtime
+  gpt5PreviewModel:
+    (import.meta.env.VITE_GPT5_MODEL as string | undefined) || "gpt-5-preview",
+
   // Audio settings
   sfxEnabled: true,
   musicEnabled: true,
-  
+
   // Performance settings
   maxConcurrentAnimations: 20,
-  
+
   // UI settings
-  defaultTheme: 'dark' as 'dark' | 'light',
-  
+  defaultTheme: "dark" as "dark" | "light",
+
   // Development overrides
   ...(import.meta.env.DEV && {
     // Add dev-specific overrides here
-    forceSeason: import.meta.env.VITE_FORCE_SEASON as null | "easter" | "christmas" | "may13"
-  })
+    forceSeason: import.meta.env.VITE_FORCE_SEASON as
+      | null
+      | "easter"
+      | "christmas"
+      | "may13",
+  }),
 };

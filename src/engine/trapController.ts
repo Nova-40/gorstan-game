@@ -10,8 +10,8 @@ export interface Trap {
   description: string;
   triggered: boolean;
   disarmable: boolean;
-  type: 'environmental' | 'magical' | 'mechanical';
-  severity: 'light' | 'severe' | 'lethal';
+  type: "environmental" | "magical" | "mechanical";
+  severity: "light" | "severe" | "lethal";
 }
 
 // Global trap registry
@@ -22,38 +22,38 @@ const initializeTraps = () => {
   // Example traps for demonstration
   const commonTraps: Trap[] = [
     {
-      id: 'spike_pit_maze',
-      roomId: 'mazehub',
-      name: 'Spike Pit',
-      description: 'A concealed spike pit trap',
+      id: "spike_pit_maze",
+      roomId: "mazehub",
+      name: "Spike Pit",
+      description: "A concealed spike pit trap",
       triggered: false,
       disarmable: true,
-      type: 'mechanical',
-      severity: 'severe'
+      type: "mechanical",
+      severity: "severe",
     },
     {
-      id: 'pressure_plate_dungeon',
-      roomId: 'faepalacedungeon',
-      name: 'Ward Plate',
-      description: 'A magical pressure plate that triggers ward spells',
+      id: "pressure_plate_dungeon",
+      roomId: "faepalacedungeon",
+      name: "Ward Plate",
+      description: "A magical pressure plate that triggers ward spells",
       triggered: false,
       disarmable: true,
-      type: 'magical',
-      severity: 'light'
+      type: "magical",
+      severity: "light",
     },
     {
-      id: 'unstable_floor_void',
-      roomId: 'datavoid',
-      name: 'Unstable Floor',
-      description: 'Unstable digital floor that could collapse',
+      id: "unstable_floor_void",
+      roomId: "datavoid",
+      name: "Unstable Floor",
+      description: "Unstable digital floor that could collapse",
       triggered: false,
       disarmable: false,
-      type: 'environmental',
-      severity: 'lethal'
-    }
+      type: "environmental",
+      severity: "lethal",
+    },
   ];
 
-  commonTraps.forEach(trap => {
+  commonTraps.forEach((trap) => {
     trapRegistry.set(trap.roomId, trap);
   });
 };
@@ -79,7 +79,7 @@ export function checkForTrap(roomId: string): Trap | null {
  * Get all active (non-triggered) traps
  */
 export function getActiveTraps(): Trap[] {
-  return Array.from(trapRegistry.values()).filter(trap => !trap.triggered);
+  return Array.from(trapRegistry.values()).filter((trap) => !trap.triggered);
 }
 
 /**
@@ -89,16 +89,20 @@ export function disarmTrap(roomId: string, method?: string): boolean {
   const trap = trapRegistry.get(roomId);
   if (trap && trap.disarmable && !trap.triggered) {
     trap.triggered = true;
-    const usedMethod = method || 'careful manipulation';
-    console.log(`[Trap Controller] ✅ Disarmed trap in ${roomId} using ${usedMethod}: ${trap.description}`);
+    const usedMethod = method || "careful manipulation";
+    console.log(
+      `[Trap Controller] ✅ Disarmed trap in ${roomId} using ${usedMethod}: ${trap.description}`,
+    );
     return true;
   }
-  
+
   if (trap && !trap.disarmable) {
-    console.log(`[Trap Controller] ❌ Cannot disarm trap in ${roomId}: ${trap.description} (not disarmable)`);
+    console.log(
+      `[Trap Controller] ❌ Cannot disarm trap in ${roomId}: ${trap.description} (not disarmable)`,
+    );
     return false;
   }
-  
+
   console.log(`[Trap Controller] ⚠️ No active trap found in ${roomId}`);
   return false;
 }
@@ -110,10 +114,12 @@ export function triggerTrap(roomId: string): Trap | null {
   const trap = trapRegistry.get(roomId);
   if (trap && !trap.triggered) {
     trap.triggered = true;
-    console.log(`[Trap Controller] 💥 Triggered trap in ${roomId}: ${trap.description}`);
+    console.log(
+      `[Trap Controller] 💥 Triggered trap in ${roomId}: ${trap.description}`,
+    );
     return trap;
   }
-  
+
   return null;
 }
 
@@ -124,10 +130,12 @@ export function resetTrap(roomId: string): boolean {
   const trap = trapRegistry.get(roomId);
   if (trap) {
     trap.triggered = false;
-    console.log(`[Trap Controller] 🔄 Reset trap in ${roomId}: ${trap.description}`);
+    console.log(
+      `[Trap Controller] 🔄 Reset trap in ${roomId}: ${trap.description}`,
+    );
     return true;
   }
-  
+
   return false;
 }
 
@@ -136,7 +144,9 @@ export function resetTrap(roomId: string): boolean {
  */
 export function addTrap(trap: Trap): void {
   trapRegistry.set(trap.roomId, trap);
-  console.log(`[Trap Controller] ➕ Added trap to ${trap.roomId}: ${trap.description}`);
+  console.log(
+    `[Trap Controller] ➕ Added trap to ${trap.roomId}: ${trap.description}`,
+  );
 }
 
 /**

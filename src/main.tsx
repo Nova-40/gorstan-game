@@ -19,37 +19,26 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Game module.
 
-import './tailwind.css';
+import "./tailwind.css";
 
-import App from './App';
+import App from "./App";
 
-import React from 'react';
+import React from "react";
 
-import { createRoot } from 'react-dom/client';
-import { SpeedInsights } from '@vercel/speed-insights/react';
-import { Analytics } from '@vercel/analytics/react';
-
-
-
-
-
-
-
-
-
-
-
-
+import { createRoot } from "react-dom/client";
+import { SpeedInsights } from "@vercel/speed-insights/react";
+import { Analytics } from "@vercel/analytics/react";
 
 console.log("🔥 Gorstan main.tsx executing...");
 
 // Variable declaration
-const rootElement = document.getElementById('root');
+const rootElement = document.getElementById("root");
 // Variable declaration
-const errorMessage = "Root element not found. Is index.html missing a <div id='root'>?";
+const errorMessage =
+  "Root element not found. Is index.html missing a <div id='root'>?";
 
 if (!rootElement) {
-  console.error('[Gorstan]', errorMessage);
+  console.error("[Gorstan]", errorMessage);
 
   document.body.innerHTML = `
     <div style="
@@ -73,7 +62,6 @@ if (!rootElement) {
   throw new Error(errorMessage);
 }
 
-
 // Variable declaration
 const root = createRoot(rootElement);
 root.render(
@@ -81,5 +69,5 @@ root.render(
     <App />
     <SpeedInsights />
     <Analytics />
-  </>
+  </>,
 );

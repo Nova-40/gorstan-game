@@ -17,16 +17,8 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Renders room descriptions and image logic.
 
-import { NPC } from '../types/NPCTypes';
-import { Room } from '../types/Room';
-
-
-
-
-
-
-
-
+import { NPC } from "../types/NPCTypes";
+import { Room } from "../types/Room";
 
 const moreissues: Room = {
   id: "moreissues",
@@ -36,7 +28,7 @@ const moreissues: Room = {
     "You have entered a sector where errors multiply and diagnostics spiral out of control. The air is thick with static, and the walls are covered in cascading warning messages.",
     "Every surface flickers with unresolved exceptions and recursive error codes. The ground feels unstable, as if the logic holding this place together is on the verge of collapse.",
     "Occasionally, you spot ghostly figures—remnants of failed processes—wandering aimlessly, muttering about lost packets and corrupted stacks.",
-    "A central pillar of red light pulses with each new issue detected, sending ripples of instability through the environment."
+    "A central pillar of red light pulses with each new issue detected, sending ripples of instability through the environment.",
   ],
   image: "glitchZone_moreissues.png",
   ambientAudio: "error_loop.mp3",
@@ -46,44 +38,40 @@ const moreissues: Room = {
     ">> Issue count: INCREASING",
     ">> Diagnostics: UNSTABLE",
     ">> Recovery: NOT POSSIBLE",
-    ">> Recommendation: Isolate and resolve critical failures before proceeding."
+    ">> Recommendation: Isolate and resolve critical failures before proceeding.",
   ],
 
   exits: {
     north: "glitchinguniverse",
     south: "failure",
     east: "datavoid",
-    west: "issuesdetected"
+    west: "issuesdetected",
   },
 
-  items: [
-    "error_patch",
-    "recursive_log",
-    "unstable_stack",
-    "ghost_packet"
-  ],
+  items: ["error_patch", "recursive_log", "unstable_stack", "ghost_packet"],
 
   interactables: {
-    "error_pillar": {
-      description: "A towering pillar of red light that pulses with every new error detected in the system.",
+    error_pillar: {
+      description:
+        "A towering pillar of red light that pulses with every new error detected in the system.",
       actions: ["examine", "analyze", "attempt_stabilize"],
       requires: [],
     },
-    "ghost_process": {
-      description: "A translucent figure endlessly repeating the same failed operation.",
+    ghost_process: {
+      description:
+        "A translucent figure endlessly repeating the same failed operation.",
       actions: ["observe", "debug", "free"],
       requires: [],
     },
-    "warning_wall": {
-      description: "A wall covered in scrolling warning messages and exception traces.",
+    warning_wall: {
+      description:
+        "A wall covered in scrolling warning messages and exception traces.",
       actions: ["read", "trace", "patch"],
       requires: [],
-    }
+    },
   },
 
-  npcs: [
-    
-  ],
+  npcs: [],
 
   events: {
     onEnter: ["triggerErrorCascade", "showWarningMessages"],
@@ -92,7 +80,7 @@ const moreissues: Room = {
       error_pillar: ["analyzePillar", "attemptStabilize"],
       ghost_process: ["attemptDebug", "freeProcess"],
       warning_wall: ["traceWarnings", "applyPatch"],
-    }
+    },
   },
 
   flags: {
@@ -108,8 +96,8 @@ const moreissues: Room = {
       "Free the Ghost Process",
       "Stabilize the Error Pillar",
       "Apply a Patch to the Warning Wall",
-      "Collect a Ghost Packet"
-    ]
+      "Collect a Ghost Packet",
+    ],
   },
 
   environmental: {
@@ -120,9 +108,9 @@ const moreissues: Room = {
       "error_buzz",
       "recursive_beeps",
       "warning_chimes",
-      "ghostly_whispers"
+      "ghostly_whispers",
     ],
-    hazards: ["logic_loops", "error_cascade", "unstable_ground"]
+    hazards: ["logic_loops", "error_cascade", "unstable_ground"],
   },
 
   security: {
@@ -144,8 +132,8 @@ const moreissues: Room = {
       "Error cascade hazards",
       "Debugging and patching mechanics",
       "Ghost process NPC",
-      "Recursive logic challenges"
-    ]
+      "Recursive logic challenges",
+    ],
   },
 
   secrets: {
@@ -158,23 +146,21 @@ const moreissues: Room = {
       description: "The true cause of the ghost process's failure.",
       requirements: ["debug ghost_process", "free ghost_process"],
       rewards: ["ghost_backstory", "unique_item"],
-    }
+    },
   },
 
   customActions: {
-    "apply_patch": {
+    apply_patch: {
       description: "Apply a patch to a critical error in the system.",
       requirements: ["error_patch"],
       effects: ["reduce_error_cascade", "unlock_exit"],
     },
-    "break_loop": {
+    break_loop: {
       description: "Attempt to break a recursive logic loop.",
       requirements: ["recursive_log"],
       effects: ["free_ghost_process", "reduce_hazards"],
-    }
-  }
+    },
+  },
 };
 
 export default moreissues;
-
-

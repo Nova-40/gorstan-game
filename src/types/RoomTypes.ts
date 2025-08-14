@@ -17,55 +17,103 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Renders room descriptions and image logic.
 
-import { NPC, NPCMemory, NPCMood } from './NPCTypes';
-import { RoomDefinition } from '../engine/roomSchema';
+import { NPC, NPCMemory, NPCMood } from "./NPCTypes";
+import { RoomDefinition } from "../engine/roomSchema";
 
 /**
  * Game stage enumeration for tracking player progress
  * Core Logic Preserved: All original stages maintained
  */
-export type GameStage = 
-  | 'splash' 
-  | 'welcome' 
-  | 'nameCapture' 
-  | 'intro' 
-  | 'game' 
-  | 'transition'
-  | 'ending'
-  | 'credits';
+export type GameStage =
+  | "splash"
+  | "welcome"
+  | "nameCapture"
+  | "intro"
+  | "game"
+  | "transition"
+  | "ending"
+  | "credits";
 
 /**
  * Game action types for command processing
  * Core Logic Preserved: All original actions maintained
  */
 export type GameAction =
-  | 'move' | 'look' | 'take' | 'drop' | 'use' | 'examine'
-  | 'talk' | 'listen' | 'smell' | 'taste' | 'touch'
-  | 'open' | 'close' | 'push' | 'pull' | 'turn'
-  | 'sit' | 'stand' | 'jump' | 'climb' | 'swim'
-  | 'coffee' | 'press' | 'wait' | 'save' | 'load'
-  | 'inventory' | 'help' | 'quit' | string;
+  | "move"
+  | "look"
+  | "take"
+  | "drop"
+  | "use"
+  | "examine"
+  | "talk"
+  | "listen"
+  | "smell"
+  | "taste"
+  | "touch"
+  | "open"
+  | "close"
+  | "push"
+  | "pull"
+  | "turn"
+  | "sit"
+  | "stand"
+  | "jump"
+  | "climb"
+  | "swim"
+  | "coffee"
+  | "press"
+  | "wait"
+  | "save"
+  | "load"
+  | "inventory"
+  | "help"
+  | "quit"
+  | string;
 
 /**
  * Direction types for room navigation
  * Includes standard compass directions and game-specific directions
  */
 export type Direction =
-  | 'north' | 'south' | 'east' | 'west'
-  | 'northeast' | 'northwest' | 'southeast' | 'southwest'
-  | 'up' | 'down' | 'in' | 'out'
-  | 'jump' | 'portal' | 'climb' | 'swim'
-  | 'coffee' | 'chair' | 'green' | 'church' 
-  | 'sit' | string;
+  | "north"
+  | "south"
+  | "east"
+  | "west"
+  | "northeast"
+  | "northwest"
+  | "southeast"
+  | "southwest"
+  | "up"
+  | "down"
+  | "in"
+  | "out"
+  | "jump"
+  | "portal"
+  | "climb"
+  | "swim"
+  | "coffee"
+  | "chair"
+  | "green"
+  | "church"
+  | "sit"
+  | string;
 
 /**
  * Item category enumeration for inventory management
  * Core Logic Preserved: All original categories maintained
  */
 export type ItemCategory =
-  | 'consumable' | 'tool' | 'weapon' | 'armor' | 'key'
-  | 'document' | 'container' | 'misc' | 'quest'
-  | 'coffee' | 'special';
+  | "consumable"
+  | "tool"
+  | "weapon"
+  | "armor"
+  | "key"
+  | "document"
+  | "container"
+  | "misc"
+  | "quest"
+  | "coffee"
+  | "special";
 
 /**
  * Enhanced GameState interface with comprehensive typing
@@ -236,7 +284,7 @@ export interface RoomCollection {
 export interface CommandResult {
   readonly success: boolean;
   readonly message: string;
-  readonly type: 'system' | 'action' | 'error' | 'narrative';
+  readonly type: "system" | "action" | "error" | "narrative";
   readonly roomChanged?: boolean;
   readonly inventoryChanged?: boolean;
   readonly flagsChanged?: Record<string, boolean>;
@@ -263,7 +311,7 @@ export interface ParsedCommand {
 export interface TerminalLine {
   readonly id: string;
   readonly text: string;
-  readonly type: 'input' | 'output' | 'system' | 'error' | 'narrative';
+  readonly type: "input" | "output" | "system" | "error" | "narrative";
   readonly timestamp: number;
   readonly playerName?: string;
 }
@@ -325,14 +373,14 @@ export interface SaveMetadata {
  * Core Logic Preserved: All original error types maintained
  */
 export type GameErrorType =
-  | 'ROOM_NOT_FOUND'
-  | 'INVALID_COMMAND'
-  | 'ITEM_NOT_FOUND'
-  | 'NPC_NOT_FOUND'
-  | 'SAVE_FAILED'
-  | 'LOAD_FAILED'
-  | 'PARSE_ERROR'
-  | 'SYSTEM_ERROR';
+  | "ROOM_NOT_FOUND"
+  | "INVALID_COMMAND"
+  | "ITEM_NOT_FOUND"
+  | "NPC_NOT_FOUND"
+  | "SAVE_FAILED"
+  | "LOAD_FAILED"
+  | "PARSE_ERROR"
+  | "SYSTEM_ERROR";
 
 /**
  * Game error interface for error handling

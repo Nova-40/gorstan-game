@@ -17,8 +17,8 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Room schema validation and utility functions
 
-import Ajv, { type ErrorObject } from 'ajv';
-import type { Room } from '../types/Room';
+import Ajv, { type ErrorObject } from "ajv";
+import type { Room } from "../types/Room";
 
 // JSON Schema definition for room validation
 const roomSchema = {
@@ -29,36 +29,51 @@ const roomSchema = {
       type: "string",
       pattern: "^[a-z0-9_]+$",
       minLength: 1,
-      maxLength: 50
+      maxLength: 50,
     },
     title: {
       type: "string",
       minLength: 1,
-      maxLength: 100
+      maxLength: 100,
     },
     description: {
       type: "string",
       minLength: 10,
-      maxLength: 2000
+      maxLength: 2000,
     },
     zone: {
       type: "string",
       enum: [
-        "intro", "gorstan", "london", "newyork", "lattice", "elfhame",
-        "glitch", "maze", "stanton", "stantonharcourt", "multiplezones",
-        "multi", "offgorstan", "offmultiverse", "internal-reset",
-        "reset", "prewelcome", "generic"
-      ]
+        "intro",
+        "gorstan",
+        "london",
+        "newyork",
+        "lattice",
+        "elfhame",
+        "glitch",
+        "maze",
+        "stanton",
+        "stantonharcourt",
+        "multiplezones",
+        "multi",
+        "offgorstan",
+        "offmultiverse",
+        "internal-reset",
+        "reset",
+        "prewelcome",
+        "generic",
+      ],
     },
     exits: {
       type: "object",
       patternProperties: {
-        "^(north|south|east|west|northeast|northwest|southeast|southwest|up|down|enter|exit|portal|back)$": {
-          type: "string",
-          pattern: "^[a-z0-9_]+$"
-        }
+        "^(north|south|east|west|northeast|northwest|southeast|southwest|up|down|enter|exit|portal|back)$":
+          {
+            type: "string",
+            pattern: "^[a-z0-9_]+$",
+          },
       },
-      additionalProperties: false
+      additionalProperties: false,
     },
     items: {
       type: "array",
@@ -71,16 +86,16 @@ const roomSchema = {
           description: { type: "string" },
           takeable: { type: "boolean" },
           hidden: { type: "boolean" },
-          usable: { type: "boolean" }
-        }
-      }
+          usable: { type: "boolean" },
+        },
+      },
     },
     npcs: {
       type: "array",
       items: {
         type: "string",
-        pattern: "^[a-z0-9_]+$"
-      }
+        pattern: "^[a-z0-9_]+$",
+      },
     },
     features: {
       type: "array",
@@ -92,33 +107,33 @@ const roomSchema = {
           name: { type: "string" },
           description: { type: "string" },
           interactable: { type: "boolean" },
-          hidden: { type: "boolean" }
-        }
-      }
+          hidden: { type: "boolean" },
+        },
+      },
     },
     flags: {
       type: "object",
       patternProperties: {
         "^[a-zA-Z_][a-zA-Z0-9_]*$": {
-          type: ["boolean", "string", "number"]
-        }
-      }
+          type: ["boolean", "string", "number"],
+        },
+      },
     },
     requiredFlags: {
       type: "object",
       patternProperties: {
         "^[a-zA-Z_][a-zA-Z0-9_]*$": {
-          type: ["boolean", "string", "number"]
-        }
-      }
+          type: ["boolean", "string", "number"],
+        },
+      },
     },
     image: {
       type: "string",
-      pattern: "^[a-zA-Z0-9_\\-\\.]+\\.(png|jpg|jpeg|gif|webp)$"
+      pattern: "^[a-zA-Z0-9_\\-\\.]+\\.(png|jpg|jpeg|gif|webp)$",
     },
     audio: {
       type: "string",
-      pattern: "^[a-zA-Z0-9_\\-\\.]+\\.(mp3|wav|ogg)$"
+      pattern: "^[a-zA-Z0-9_\\-\\.]+\\.(mp3|wav|ogg)$",
     },
     special: {
       type: "object",
@@ -129,11 +144,11 @@ const roomSchema = {
         savePoint: { type: "boolean" },
         noReturn: { type: "boolean" },
         darkRoom: { type: "boolean" },
-        ambientSound: { type: "string" }
-      }
-    }
+        ambientSound: { type: "string" },
+      },
+    },
   },
-  additionalProperties: false
+  additionalProperties: false,
 };
 
 // Create AJV validator instance
@@ -163,7 +178,7 @@ export const validationStats = {
   validRooms: 0,
   invalidRooms: 0,
   lastValidated: 0,
-  commonErrors: {} as Record<string, number>
+  commonErrors: {} as Record<string, number>,
 };
 
 /**
@@ -172,7 +187,7 @@ export const validationStats = {
 export function validateRoomWithDetails(data: unknown): ValidationResult {
   try {
     const valid = validateRoomSchema(data);
-    
+
     validationStats.totalValidated++;
     validationStats.lastValidated = Date.now();
 
@@ -186,7 +201,7 @@ export function validateRoomWithDetails(data: unknown): ValidationResult {
     if (!validateRoomSchema.errors) {
       return {
         valid: false,
-        errorMessage: "Unknown validation error"
+        errorMessage: "Unknown validation error",
       };
     }
 
@@ -197,47 +212,58 @@ export function validateRoomWithDetails(data: unknown): ValidationResult {
     // Track common errors for debugging
     errors.forEach((err: ErrorObject) => {
       const errorKey = `${err.keyword}:${err.schemaPath}`;
-      validationStats.commonErrors[errorKey] = (validationStats.commonErrors[errorKey] || 0) + 1;
+      validationStats.commonErrors[errorKey] =
+        (validationStats.commonErrors[errorKey] || 0) + 1;
     });
 
     // Generate error message with helpful suggestions
     const errorMessage = errors
       .map((err: ErrorObject) => {
-        const path = err.instancePath || 'root';
-        let message = `${path}: ${err.message}`;
+        const path = err.instancePath || "root";
+        const message = `${path}: ${err.message}`;
 
         // Add specific suggestions based on error type
-        if (err.keyword === 'required') {
-          if (err.params?.missingProperty === 'id') {
+        if (err.keyword === "required") {
+          if (err.params?.missingProperty === "id") {
             suggestions.push("Every room must have a unique 'id' field");
           }
-        } else if (err.keyword === 'pattern') {
-          if (path.includes('id')) {
-            suggestions.push("Room IDs should contain only lowercase letters, numbers, and underscores");
+        } else if (err.keyword === "pattern") {
+          if (path.includes("id")) {
+            suggestions.push(
+              "Room IDs should contain only lowercase letters, numbers, and underscores",
+            );
           }
-        } else if (err.keyword === 'enum') {
-          if (path.includes('zone')) {
-            suggestions.push(`Valid zones are: ${roomSchema.properties.zone.enum.join(', ')}`);
+        } else if (err.keyword === "enum") {
+          if (path.includes("zone")) {
+            suggestions.push(
+              `Valid zones are: ${roomSchema.properties.zone.enum.join(", ")}`,
+            );
           }
-        } else if (err.keyword === 'type') {
-          if (path.includes('exits')) {
-            suggestions.push("Exits should be an object mapping directions to room IDs");
+        } else if (err.keyword === "type") {
+          if (path.includes("exits")) {
+            suggestions.push(
+              "Exits should be an object mapping directions to room IDs",
+            );
           }
         }
 
         return message;
       })
-      .join('; ');
+      .join("; ");
 
     // Additional validation checks for common issues
     const room = data as any;
-    if (data && typeof data === 'object') {
+    if (data && typeof data === "object") {
       if (!room.title && !room.name) {
-        warnings.push("Room has no title - consider adding one for better user experience");
+        warnings.push(
+          "Room has no title - consider adding one for better user experience",
+        );
       }
 
       if (!room.description) {
-        warnings.push("Room has no description - players won't know what they're seeing");
+        warnings.push(
+          "Room has no description - players won't know what they're seeing",
+        );
       }
 
       if (room.exits && Object.keys(room.exits).length === 0) {
@@ -254,13 +280,13 @@ export function validateRoomWithDetails(data: unknown): ValidationResult {
       errors,
       errorMessage,
       warnings: warnings.length > 0 ? warnings : undefined,
-      suggestions: suggestions.length > 0 ? suggestions : undefined
+      suggestions: suggestions.length > 0 ? suggestions : undefined,
     };
   } catch (error) {
-    console.error('[RoomSchema] Error during validation:', error);
+    console.error("[RoomSchema] Error during validation:", error);
     return {
       valid: false,
-      errorMessage: `Validation failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      errorMessage: `Validation failed: ${error instanceof Error ? error.message : "Unknown error"}`,
     };
   }
 }
@@ -272,7 +298,7 @@ export function isValidRoom(data: unknown): data is Room {
   try {
     return validateRoomSchema(data);
   } catch (error) {
-    console.error('[RoomSchema] Error in type guard:', error);
+    console.error("[RoomSchema] Error in type guard:", error);
     return false;
   }
 }

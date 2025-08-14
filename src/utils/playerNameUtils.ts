@@ -17,7 +17,7 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Player name utility functions for NPC dialogue enhancement
 
-import type { LocalGameState } from '../state/gameState';
+import type { LocalGameState } from "../state/gameState";
 
 /**
  * Get the player's name from game state, with fallback to "Player"
@@ -42,18 +42,18 @@ export function formatDialogue(line: string, state: LocalGameState): string {
  * Format dialogue text with additional context variables
  */
 export function formatDialogueWithContext(
-  line: string, 
-  state: LocalGameState, 
-  context: Record<string, string> = {}
+  line: string,
+  state: LocalGameState,
+  context: Record<string, string> = {},
 ): string {
   let formatted = formatDialogue(line, state);
-  
+
   // Replace additional context variables
   Object.entries(context).forEach(([key, value]) => {
-    const pattern = new RegExp(`\\{${key}\\}`, 'g');
+    const pattern = new RegExp(`\\{${key}\\}`, "g");
     formatted = formatted.replace(pattern, value);
   });
-  
+
   return formatted;
 }
 
@@ -68,13 +68,16 @@ export function hasCustomPlayerName(state: LocalGameState): boolean {
 /**
  * Get appropriate greeting based on whether player has custom name
  */
-export function getPersonalizedGreeting(state: LocalGameState, defaultGreeting: string): string {
+export function getPersonalizedGreeting(
+  state: LocalGameState,
+  defaultGreeting: string,
+): string {
   const hasCustomName = hasCustomPlayerName(state);
   const playerName = getPlayerName(state);
-  
+
   if (hasCustomName) {
     return `Hello, ${playerName}! ${defaultGreeting}`;
   }
-  
+
   return defaultGreeting;
 }

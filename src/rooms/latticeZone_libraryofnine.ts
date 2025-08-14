@@ -17,17 +17,9 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Renders room descriptions and image logic.
 
-import { NPC } from '../types/NPCTypes';
+import { NPC } from "../types/NPCTypes";
 
-import { Room } from '../types/Room';
-
-
-
-
-
-
-
-
+import { Room } from "../types/Room";
 
 const libraryofnine: Room = {
   id: "libraryofnine",
@@ -37,7 +29,7 @@ const libraryofnine: Room = {
     "You enter the Library of Nine, a mysterious annex hidden deep within the lattice. The chamber is circular, lined with nine towering shelves, each filled with tomes bound in shimmering crystal.",
     "A faint glow emanates from the floor, tracing intricate patterns that connect each shelf to a central pedestal.",
     "The air is thick with the weight of forbidden knowledge, and the silence is broken only by the occasional whisper of turning pages.",
-    "You sense that each shelf represents a different domain of wisdom, and unlocking their secrets may reveal the library's true purpose."
+    "You sense that each shelf represents a different domain of wisdom, and unlocking their secrets may reveal the library's true purpose.",
   ],
   image: "latticeZone_libraryofnine.png",
   ambientAudio: "library_of_nine_ambience.mp3",
@@ -46,12 +38,12 @@ const libraryofnine: Room = {
     ">> LIBRARY OF NINE - RESTRICTED ANNEX",
     ">> Access: LIMITED",
     ">> Knowledge domains: 9",
-    ">> Tip: Seek the key tomes to unlock the central pedestal."
+    ">> Tip: Seek the key tomes to unlock the central pedestal.",
   ],
 
   exits: {
     south: "latticeZone_latticelibrary",
-    east: "latticeZone_hiddenlibrary"
+    east: "latticeZone_hiddenlibrary",
   },
 
   items: [
@@ -63,25 +55,38 @@ const libraryofnine: Room = {
     "key_tome_6",
     "key_tome_7",
     "key_tome_8",
-    "key_tome_9"
+    "key_tome_9",
   ],
 
   interactables: {
-    "central_pedestal": {
-      description: "A pedestal at the center of the room, covered in runes and awaiting the placement of key tomes.",
+    central_pedestal: {
+      description:
+        "A pedestal at the center of the room, covered in runes and awaiting the placement of key tomes.",
       actions: ["examine", "place_tome", "activate"],
-      requires: ["key_tome_1", "key_tome_2", "key_tome_3", "key_tome_4", "key_tome_5", "key_tome_6", "key_tome_7", "key_tome_8", "key_tome_9"],
+      requires: [
+        "key_tome_1",
+        "key_tome_2",
+        "key_tome_3",
+        "key_tome_4",
+        "key_tome_5",
+        "key_tome_6",
+        "key_tome_7",
+        "key_tome_8",
+        "key_tome_9",
+      ],
     },
-    "shelf_of_origins": {
-      description: "The first shelf, filled with tomes about the beginnings of the lattice and its creators.",
+    shelf_of_origins: {
+      description:
+        "The first shelf, filled with tomes about the beginnings of the lattice and its creators.",
       actions: ["read", "search", "decode"],
       requires: [],
     },
-    "shelf_of_endings": {
-      description: "The ninth shelf, containing prophecies and records of endings.",
+    shelf_of_endings: {
+      description:
+        "The ninth shelf, containing prophecies and records of endings.",
       actions: ["read", "search", "interpret"],
       requires: [],
-    }
+    },
   },
 
   npcs: ["ninekeeper"],
@@ -93,7 +98,7 @@ const libraryofnine: Room = {
       central_pedestal: ["placeTome", "activatePedestal"],
       shelf_of_origins: ["readOrigins", "decodeOrigins"],
       shelf_of_endings: ["readEndings", "interpretEndings"],
-    }
+    },
   },
 
   flags: {
@@ -110,20 +115,16 @@ const libraryofnine: Room = {
       "Decode the Shelf of Origins",
       "Interpret the Shelf of Endings",
       "Meet the Ninekeeper",
-      "Place All Key Tomes on the Pedestal"
-    ]
+      "Place All Key Tomes on the Pedestal",
+    ],
   },
 
   environmental: {
     lighting: "soft_radiant_glow",
     temperature: "cool_and_still",
     airQuality: "charged_with_knowledge",
-    soundscape: [
-      "whispering_pages",
-      "soft_chimes",
-      "rune_hum"
-    ],
-    hazards: ["knowledge_overload", "psychic_feedback"]
+    soundscape: ["whispering_pages", "soft_chimes", "rune_hum"],
+    hazards: ["knowledge_overload", "psychic_feedback"],
   },
 
   security: {
@@ -131,7 +132,7 @@ const libraryofnine: Room = {
     accessRequirements: [],
     alarmTriggers: ["unauthorized_removal"],
     surveillanceActive: true,
-    surveillanceType: "ninekeeper_specter"
+    surveillanceType: "ninekeeper_specter",
   },
 
   metadata: {
@@ -146,37 +147,38 @@ const libraryofnine: Room = {
       "Nine domains of knowledge",
       "Key tome collection",
       "Spectral librarian NPC",
-      "Central puzzle pedestal"
-    ]
+      "Central puzzle pedestal",
+    ],
   },
 
   secrets: {
     hidden_compartment: {
-      description: "A secret compartment beneath the central pedestal, revealed when all tomes are placed.",
+      description:
+        "A secret compartment beneath the central pedestal, revealed when all tomes are placed.",
       requirements: ["allTomesPlaced", "activatePedestal"],
       rewards: ["ancient_scroll", "unique_lore"],
     },
     ninekeeper_memory: {
-      description: "A memory fragment from the Ninekeeper, unlocked by decoding both origins and endings.",
+      description:
+        "A memory fragment from the Ninekeeper, unlocked by decoding both origins and endings.",
       requirements: ["decodeOrigins", "interpretEndings"],
       rewards: ["ninekeeper_story", "special_access"],
-    }
+    },
   },
 
   customActions: {
-    "activate_pedestal": {
-      description: "Activate the central pedestal once all key tomes are placed.",
+    activate_pedestal: {
+      description:
+        "Activate the central pedestal once all key tomes are placed.",
       requirements: ["allTomesPlaced"],
       effects: ["reveal_secret", "summon_ninekeeper"],
     },
-    "decode_origins": {
+    decode_origins: {
       description: "Decode the ancient texts on the Shelf of Origins.",
       requirements: [],
       effects: ["gain_insight", "unlock_secret"],
-    }
-  }
+    },
+  },
 };
 
 export default libraryofnine;
-
-

@@ -14,9 +14,8 @@
   Full licence terms: see EULA.md in the project root.
 */
 
-
-import React from 'react';
-import UnifiedModal from './UnifiedModal';
+import React from "react";
+import UnifiedModal from "./UnifiedModal";
 
 const HelpModal = () => (
   <UnifiedModal>

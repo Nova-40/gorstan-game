@@ -17,7 +17,7 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Game module.
 
-import { useCallback } from 'react';
+import { useCallback } from "react";
 // Custom hook to dynamically load game modules
 export const useModuleLoader = () => {
   // Variable declaration
@@ -25,7 +25,10 @@ export const useModuleLoader = () => {
     const timeout = 3000;
 
     const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error(`Module load timeout: ${modulePath}`)), timeout);
+      setTimeout(
+        () => reject(new Error(`Module load timeout: ${modulePath}`)),
+        timeout,
+      );
     });
 
     // Suppress Vite's warning about dynamic imports

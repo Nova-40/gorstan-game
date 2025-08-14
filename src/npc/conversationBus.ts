@@ -21,12 +21,16 @@
 
 import { ConversationThread, NPCExchange, SpeakerRef } from "../types/dialogue";
 import { LocalGameState } from "../state/gameState";
+import type { GameAction } from "../types/GameTypes";
+import type { Dispatch } from "react";
 import { getNPCMemory, getVoiceForNPC, recordConversation } from "./profiles";
 import { stylize, generateNPCResponse } from "./style";
-import { CO_LOCATED_ONLY, CROSS_ROOM_SPEAKERS, MAX_THREAD_EXCHANGES } from "./registry";
+import {
+  CO_LOCATED_ONLY,
+  CROSS_ROOM_SPEAKERS,
+  MAX_THREAD_EXCHANGES,
+} from "./registry";
 import { getEnhancedNPCResponse } from "../utils/enhancedNPCResponse";
-
-type Dispatch = (action: any) => void;
 
 export interface SendOptions {
   topic?: string;
@@ -36,38 +40,40 @@ export interface SendOptions {
 
 function threadId(from: SpeakerRef, to: SpeakerRef, roomId: string): string {
   const participants = [from.id, to.id].sort();
-  return `thr:${roomId}:${participants.join('-')}`;
+  return `thr:${roomId}:${participants.join("-")}`;
 }
 
 // Global reply guard to prevent infinite loops
 let replying = false;
 
 export function sendNPCMessage(
-  from: SpeakerRef, 
-  to: SpeakerRef, 
+  from: SpeakerRef,
+  to: SpeakerRef,
   rawText: string,
-  state: LocalGameState, 
-  dispatch: Dispatch, 
-  roomId: string, 
-  opts: SendOptions = {}
+  state: LocalGameState,
+  dispatch: Dispatch<GameAction>,
+  roomId: string,
+  opts: SendOptions = {},
 ): void {
   const id = threadId(from, to, roomId);
-  const thread = state.conversations?.[id] ?? {
-    id, 
-    roomId, 
-    participants: [from.id, to.id], 
-    exchanges: [], 
-    lastTs: 0,
-    priority: opts.priority ?? "normal"
-  } as ConversationThread;
+  const thread =
+    state.conversations?.[id] ??
+    ({
+      id,
+      roomId,
+      participants: [from.id, to.id],
+      exchanges: [],
+      lastTs: 0,
+      priority: opts.priority ?? "normal",
+    } as ConversationThread);
 
   const exchange: NPCExchange = {
-    from, 
+    from,
     to,
     text: rawText,
     ts: Date.now(),
     topic: opts.topic,
-    visibleToPlayer: opts.visibleToPlayer ?? (state.overhearNPCBanter ?? true)
+    visibleToPlayer: opts.visibleToPlayer ?? state.overhearNPCBanter ?? true,
   };
 
   thread.exchanges.push(exchange);
@@ -78,13 +84,13 @@ export function sendNPCMessage(
     thread.exchanges = thread.exchanges.slice(-MAX_THREAD_EXCHANGES);
   }
 
-  dispatch({ type: "UPSERT_CONVERSATION", thread });
+  dispatch({ type: "UPSERT_CONVERSATION", payload: thread });
 
   // Show in console if visible to player
   if (exchange.visibleToPlayer && from.kind === "NPC" && to.kind === "NPC") {
-    dispatch({ 
-      type: "ADD_CONSOLE_LINE", 
-      line: `[${from.id} → ${to.id}] ${rawText}` 
+    dispatch({
+      type: "ADD_CONSOLE_LINE",
+      payload: `[${from.id} → ${to.id}] ${rawText}`,
     });
   }
 
@@ -100,29 +106,31 @@ export function sendNPCMessage(
 }
 
 function scheduleNPCReply(
-  from: SpeakerRef, 
-  to: SpeakerRef, 
-  state: LocalGameState, 
-  dispatch: Dispatch, 
-  roomId: string, 
-  topic?: string
+  from: SpeakerRef,
+  to: SpeakerRef,
+  state: LocalGameState,
+  dispatch: Dispatch<GameAction>,
+  roomId: string,
+  topic?: string,
 ): void {
-  if (replying) return;
+  if (replying) {return;}
   replying = true;
 
   const delay = 350 + Math.floor(Math.random() * 400); // Short, natural pause
-  
+
   setTimeout(async () => {
     try {
       // Co-location rule: unless AYLA or explicitly cross-room, require same room
-      const requiresCoLocation = CO_LOCATED_ONLY.includes(from.id as any) && 
-                                 CO_LOCATED_ONLY.includes(to.id as any);
-      const canCrossRooms = CROSS_ROOM_SPEAKERS.includes(from.id as any) || 
-                           CROSS_ROOM_SPEAKERS.includes(to.id as any);
-      
+      const requiresCoLocation =
+        CO_LOCATED_ONLY.includes(from.id as any) &&
+        CO_LOCATED_ONLY.includes(to.id as any);
+      const canCrossRooms =
+        CROSS_ROOM_SPEAKERS.includes(from.id as any) ||
+        CROSS_ROOM_SPEAKERS.includes(to.id as any);
+
       if (requiresCoLocation && !canCrossRooms) {
-        const fromInRoom = state.npcsInRoom?.some(n => n.id === from.id);
-        const toInRoom = state.npcsInRoom?.some(n => n.id === to.id);
+        const fromInRoom = state.npcsInRoom?.some((n) => n.id === from.id);
+        const toInRoom = state.npcsInRoom?.some((n) => n.id === to.id);
         if (!fromInRoom || !toInRoom) {
           return; // Skip reply if not co-located
         }
@@ -131,19 +139,36 @@ function scheduleNPCReply(
       // Generate response using enhanced NPC system or fallback
       let responseText: string;
       const promptFromNPC = buildPromptFromNPC(from.id, topic);
-      
+
       // Try enhanced system first (now async)
       try {
-        const enhancedResponse = await getEnhancedNPCResponse(to.id, promptFromNPC, state);
+        const enhancedResponse = await getEnhancedNPCResponse(
+          to.id,
+          promptFromNPC,
+          state,
+        );
         if (enhancedResponse) {
           responseText = enhancedResponse.text;
         } else {
           // Fallback to style-based generation
-          responseText = generateNPCResponse(from.id, to.id, topic, promptFromNPC);
+          responseText = generateNPCResponse(
+            from.id,
+            to.id,
+            topic,
+            promptFromNPC,
+          );
         }
       } catch (error) {
-        console.warn('Enhanced conversation response failed, using fallback:', error);
-        responseText = generateNPCResponse(from.id, to.id, topic, promptFromNPC);
+        console.warn(
+          "Enhanced conversation response failed, using fallback:",
+          error,
+        );
+        responseText = generateNPCResponse(
+          from.id,
+          to.id,
+          topic,
+          promptFromNPC,
+        );
       }
 
       // Apply voice styling
@@ -152,18 +177,17 @@ function scheduleNPCReply(
 
       // Send the reply
       sendNPCMessage(
-        { kind: "NPC", id: to.id }, 
-        { kind: "NPC", id: from.id }, 
-        styledResponse, 
-        state, 
-        dispatch, 
-        roomId, 
+        { kind: "NPC", id: to.id },
+        { kind: "NPC", id: from.id },
+        styledResponse,
+        state,
+        dispatch,
+        roomId,
         {
-          topic, 
-          visibleToPlayer: state.overhearNPCBanter ?? true
-        }
+          topic,
+          visibleToPlayer: state.overhearNPCBanter ?? true,
+        },
       );
-
     } finally {
       replying = false;
     }
@@ -172,9 +196,9 @@ function scheduleNPCReply(
 
 // Helper functions to create contextual prompts for NPC replies
 function buildPromptFromNPC(fromNpcId: string, topic?: string): string {
-  if (topic === "hint") return `hint about current objective from ${fromNpcId}`;
-  if (topic === "lore") return `lore question from ${fromNpcId}`;
-  if (topic === "quest") return `quest discussion from ${fromNpcId}`;
+  if (topic === "hint") {return `hint about current objective from ${fromNpcId}`;}
+  if (topic === "lore") {return `lore question from ${fromNpcId}`;}
+  if (topic === "quest") {return `quest discussion from ${fromNpcId}`;}
   return `message from ${fromNpcId}`;
 }
 
@@ -185,28 +209,28 @@ export function isThreadAtLimit(thread: ConversationThread): boolean {
 
 // Check cooldown for NPC pair in a room
 export function canStartConversation(
-  npc1: string, 
-  npc2: string, 
-  roomId: string, 
-  state: LocalGameState
+  npc1: string,
+  npc2: string,
+  roomId: string,
+  state: LocalGameState,
 ): boolean {
-  const key = `banter:${roomId}:${[npc1, npc2].sort().join('-')}`;
+  const key = `banter:${roomId}:${[npc1, npc2].sort().join("-")}`;
   const lastBanter = (state as any)._banterLast?.[key] ?? 0;
   const cooldown = 90000; // 90 seconds
-  
+
   return Date.now() - lastBanter > cooldown;
 }
 
 // Record conversation start for cooldown tracking
 export function recordConversationStart(
-  npc1: string, 
-  npc2: string, 
-  roomId: string, 
-  state: LocalGameState
+  npc1: string,
+  npc2: string,
+  roomId: string,
+  state: LocalGameState,
 ): void {
-  const key = `banter:${roomId}:${[npc1, npc2].sort().join('-')}`;
-  (state as any)._banterLast = { 
-    ...(state as any)._banterLast, 
-    [key]: Date.now() 
+  const key = `banter:${roomId}:${[npc1, npc2].sort().join("-")}`;
+  (state as any)._banterLast = {
+    ...(state as any)._banterLast,
+    [key]: Date.now(),
   };
 }

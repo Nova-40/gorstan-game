@@ -16,4 +16,3 @@
 
 // Gorstan and characters (c) Geoff Webster 2025
 // Renders room descriptions and image logic.
-

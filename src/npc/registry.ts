@@ -20,11 +20,11 @@
 
 export const NPC_IDS = {
   AYLA: "ayla",
-  MORTHOS: "morthos", 
+  MORTHOS: "morthos",
   AL: "al",
 } as const;
 
-export type NPCId = typeof NPC_IDS[keyof typeof NPC_IDS];
+export type NPCId = (typeof NPC_IDS)[keyof typeof NPC_IDS];
 
 // NPCs that must be co-located (in same room) to talk unless scripted
 export const CO_LOCATED_ONLY: NPCId[] = [NPC_IDS.MORTHOS, NPC_IDS.AL];
@@ -34,10 +34,10 @@ export const CROSS_ROOM_SPEAKERS: NPCId[] = [NPC_IDS.AYLA];
 
 // Conversation cooldowns per NPC pair (in milliseconds)
 export const CONVERSATION_COOLDOWNS: Record<string, number> = {
-  'morthos-al': 90000,      // 90 seconds
-  'ayla-morthos': 120000,   // 2 minutes
-  'ayla-al': 120000,        // 2 minutes
-  'default': 60000          // 1 minute default
+  "morthos-al": 90000, // 90 seconds
+  "ayla-morthos": 120000, // 2 minutes
+  "ayla-al": 120000, // 2 minutes
+  default: 60000, // 1 minute default
 };
 
 // Maximum exchanges per conversation thread

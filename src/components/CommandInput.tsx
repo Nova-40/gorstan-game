@@ -17,34 +17,43 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Parses and processes player commands.
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo } from "react";
 
 type CommandInputProps = {
   onCommand: (command: string) => void;
   playerName: string;
 };
 
-const CommandInput: React.FC<CommandInputProps> = ({ onCommand, playerName }) => {
-  const [input, setInput] = useState('');
+const CommandInput: React.FC<CommandInputProps> = ({
+  onCommand,
+  playerName,
+}) => {
+  const [input, setInput] = useState("");
 
   // Optimized submit handler with useCallback
-  const handleSubmit = useCallback((e: React.FormEvent) => {
-    e.preventDefault();
-    if (input.trim()) {
-      onCommand(input.trim());
-      setInput('');
-    }
-  }, [input, onCommand]);
+  const handleSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      if (input.trim()) {
+        onCommand(input.trim());
+        setInput("");
+      }
+    },
+    [input, onCommand],
+  );
 
   // Optimized input change handler
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setInput(e.target.value);
-  }, []);
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setInput(e.target.value);
+    },
+    [],
+  );
 
   // Memoized placeholder text
-  const placeholderText = useMemo(() => 
-    `Enter command, ${playerName}`, 
-    [playerName]
+  const placeholderText = useMemo(
+    () => `Enter command, ${playerName}`,
+    [playerName],
   );
 
   return (

@@ -18,16 +18,15 @@
 // Handles NPC logic, memory, or rendering.
 
 export type NPCMood =
-  | 'neutral'
-  | 'friendly'
-  | 'hostile'
-  | 'suspicious'
-  | 'helpful'
-  | 'confused'
-  | 'angry'
-  | 'sad'
-  | 'happy';
-
+  | "neutral"
+  | "friendly"
+  | "hostile"
+  | "suspicious"
+  | "helpful"
+  | "confused"
+  | "angry"
+  | "sad"
+  | "happy";
 
 export interface NPCMemory {
   readonly interactions: number;

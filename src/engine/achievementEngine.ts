@@ -17,7 +17,7 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Achievement tracking and logging system
 
-import { GameAction } from '../types/GameTypes';
+import { GameAction } from "../types/GameTypes";
 
 /**
  * Dispatch function type for achievement operations
@@ -50,24 +50,27 @@ export interface AchievementDefinition {
 /**
  * Log an achievement for the player
  */
-export function logAchievement(achievementId: string, context?: Record<string, any>): void {
+export function logAchievement(
+  achievementId: string,
+  context?: Record<string, any>,
+): void {
   if (globalDispatch) {
     globalDispatch({
-      type: 'ACHIEVEMENT_UNLOCKED',
+      type: "ACHIEVEMENT_UNLOCKED",
       payload: {
         id: achievementId,
         timestamp: Date.now(),
-        context: context || {}
-      }
+        context: context || {},
+      },
     });
-    
+
     // Also log to console
     globalDispatch({
-      type: 'ADD_CONSOLE_LINE',
-      payload: `🏆 Achievement Unlocked: ${achievementId}`
+      type: "ADD_CONSOLE_LINE",
+      payload: `🏆 Achievement Unlocked: ${achievementId}`,
     });
   } else {
-    console.warn('Achievement dispatch not available:', achievementId);
+    console.warn("Achievement dispatch not available:", achievementId);
   }
 }
 
@@ -75,9 +78,9 @@ export function logAchievement(achievementId: string, context?: Record<string, a
  * Check if an achievement has been unlocked
  */
 export function hasAchievement(achievementId: string): boolean {
-  const achievements = localStorage.getItem('achievements');
-  if (!achievements) return false;
-  
+  const achievements = localStorage.getItem("achievements");
+  if (!achievements) {return false;}
+
   try {
     const parsed = JSON.parse(achievements);
     return Array.isArray(parsed) && parsed.includes(achievementId);
@@ -90,9 +93,9 @@ export function hasAchievement(achievementId: string): boolean {
  * Get all unlocked achievements
  */
 export function getUnlockedAchievements(): string[] {
-  const achievements = localStorage.getItem('achievements');
-  if (!achievements) return [];
-  
+  const achievements = localStorage.getItem("achievements");
+  if (!achievements) {return [];}
+
   try {
     const parsed = JSON.parse(achievements);
     return Array.isArray(parsed) ? parsed : [];
@@ -108,6 +111,6 @@ export function saveAchievement(achievementId: string): void {
   const existing = getUnlockedAchievements();
   if (!existing.includes(achievementId)) {
     existing.push(achievementId);
-    localStorage.setItem('achievements', JSON.stringify(existing));
+    localStorage.setItem("achievements", JSON.stringify(existing));
   }
 }

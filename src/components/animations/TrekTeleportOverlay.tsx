@@ -16,7 +16,9 @@
 
 import React, { useEffect } from "react";
 
-const TrekTeleportOverlay: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
+const TrekTeleportOverlay: React.FC<{ onComplete: () => void }> = ({
+  onComplete,
+}) => {
   useEffect(() => {
     const timeout = setTimeout(onComplete, 3000);
     return () => clearTimeout(timeout);

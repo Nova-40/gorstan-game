@@ -17,10 +17,10 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // NPC response generation system
 
-import { NPCPersona, getPersona } from './personas';
-import { ContextSnapshot } from './context';
-import { NPCMemoryState, getMemorySummary } from './memory';
-import { IntentResult } from './intent';
+import { NPCPersona, getPersona } from "./personas";
+import { ContextSnapshot } from "./context";
+import { NPCMemoryState, getMemorySummary } from "./memory";
+import { IntentResult } from "./intent";
 
 export interface ResponseTemplate {
   base: string;
@@ -48,126 +48,181 @@ export function generateNPCReply(
   playerUtterance: string,
   intentResult: IntentResult,
   contextSnapshot: ContextSnapshot,
-  memoryState: NPCMemoryState
+  memoryState: NPCMemoryState,
 ): string {
   const persona = getPersona(npcId);
   const memorySummary = getMemorySummary(npcId);
-  
+
   // Check for forbidden topics first
   if (isForbiddenTopic(intentResult, persona, contextSnapshot)) {
     return generateDeflection(persona, intentResult, contextSnapshot);
   }
-  
+
   // Check for "ask twice" rule
-  const askTwiceOverride = checkAskTwiceRule(playerUtterance, memoryState, persona);
+  const askTwiceOverride = checkAskTwiceRule(
+    playerUtterance,
+    memoryState,
+    persona,
+  );
   if (askTwiceOverride) {
     return askTwiceOverride;
   }
-  
+
   // Get base response template
-  const template = getResponseTemplate(npcId, intentResult.intent, contextSnapshot);
-  
+  const template = getResponseTemplate(
+    npcId,
+    intentResult.intent,
+    contextSnapshot,
+  );
+
   // Apply persona and context modifications
-  let response = applyPersonaToTemplate(template, persona, memorySummary, contextSnapshot);
-  
+  let response = applyPersonaToTemplate(
+    template,
+    persona,
+    memorySummary,
+    contextSnapshot,
+  );
+
   // Add variability and personality touches
-  response = addPersonalityTouches(response, persona, contextSnapshot, memorySummary);
-  
+  response = addPersonalityTouches(
+    response,
+    persona,
+    contextSnapshot,
+    memorySummary,
+  );
+
   // Add memory references if appropriate
   response = addMemoryReferences(response, memorySummary, persona);
-  
+
+  // Humanize Polly specifically with mood-driven quirks
+  if (persona.id === "polly") {
+    response = humanizePolly(
+      response,
+      playerUtterance,
+      contextSnapshot,
+      memorySummary,
+    );
+  }
+
   return response.trim();
 }
 
 /**
  * Check if the topic is forbidden for this NPC
  */
-function isForbiddenTopic(intentResult: IntentResult, persona: NPCPersona, context: ContextSnapshot): boolean {
+function isForbiddenTopic(
+  intentResult: IntentResult,
+  persona: NPCPersona,
+  context: ContextSnapshot,
+): boolean {
   const { intent, entities } = intentResult;
-  
+
   for (const forbiddenTopic of persona.forbidden_topics) {
-    if (forbiddenTopic.includes('puzzle solutions') && intent === 'puzzle_hint') {
+    if (
+      forbiddenTopic.includes("puzzle solutions") &&
+      intent === "puzzle_hint"
+    ) {
       // Allow puzzle hints under time pressure
-      if (context.timers.pollyTakeover?.active && context.timers.pollyTakeover.timeRemaining < 30000) {
+      if (
+        context.timers.pollyTakeover?.active &&
+        context.timers.pollyTakeover.timeRemaining < 30000
+      ) {
         return false;
       }
       return true;
     }
-    
-    if (forbiddenTopic.includes('spoilers') && (intent === 'lore' || intent === 'meta')) {
-      const spoilerEntities = ['polly', 'takeover', 'ending', 'secret'];
-      if (entities.some(entity => spoilerEntities.includes(entity))) {
+
+    if (
+      forbiddenTopic.includes("spoilers") &&
+      (intent === "lore" || intent === "meta")
+    ) {
+      const spoilerEntities = ["polly", "takeover", "ending", "secret"];
+      if (entities.some((entity) => spoilerEntities.includes(entity))) {
         return true;
       }
     }
   }
-  
+
   return false;
 }
 
 /**
  * Generate a deflection response for forbidden topics
  */
-function generateDeflection(persona: NPCPersona, intentResult: IntentResult, context: ContextSnapshot): string {
+function generateDeflection(
+  persona: NPCPersona,
+  intentResult: IntentResult,
+  context: ContextSnapshot,
+): string {
   const deflections = [
     "I can guide, but I won't override your discovery.",
     "Some things are better experienced than explained.",
     "That's something you'll need to figure out yourself.",
     "I'd rather not spoil the surprise.",
-    "Let's focus on what you can do right now."
+    "Let's focus on what you can do right now.",
   ];
-  
+
   // Persona-specific deflections
-  if (persona.id === 'ayla') {
+  if (persona.id === "ayla") {
     const aylaDeflections = [
       "I can't break the rules... I just know where they bend.",
       "Trust me, the journey is better than the shortcut.",
       "Let's think through this step by step instead.",
-      "I believe you can figure this out with a little guidance."
+      "I believe you can figure this out with a little guidance.",
     ];
     deflections.push(...aylaDeflections);
   }
-  
-  if (persona.id === 'wendell') {
+
+  if (persona.id === "wendell") {
     deflections.push(
       "The particulars are... complex.",
       "Some knowledge carries consequences.",
-      "That information is not for me to share."
+      "That information is not for me to share.",
     );
   }
-  
+
   // Add urgency acknowledgment if under time pressure
   let deflection = chooseSynonym(deflections);
-  if (context.timers.pollyTakeover?.active && context.timers.pollyTakeover.timeRemaining < 60000) {
-    deflection += " Though given the time pressure, ask me again if you're really stuck.";
+  if (
+    context.timers.pollyTakeover?.active &&
+    context.timers.pollyTakeover.timeRemaining < 60000
+  ) {
+    deflection +=
+      " Though given the time pressure, ask me again if you're really stuck.";
   }
-  
+
   return deflection;
 }
 
 /**
  * Check for the "ask twice" rule for sensitive information
  */
-function checkAskTwiceRule(utterance: string, memory: NPCMemoryState, persona: NPCPersona): string | null {
-  if (persona.id !== 'ayla') return null; // Only Ayla implements this rule
-  
+function checkAskTwiceRule(
+  utterance: string,
+  memory: NPCMemoryState,
+  persona: NPCPersona,
+): string | null {
+  if (persona.id !== "ayla") {return null;} // Only Ayla implements this rule
+
   const recentConversation = memory.conversationBuffer.slice(-4);
-  const playerMessages = recentConversation.filter(turn => turn.speaker === 'player');
-  
+  const playerMessages = recentConversation.filter(
+    (turn) => turn.speaker === "player",
+  );
+
   // Check if player has asked similar question recently
   const currentQuery = utterance.toLowerCase();
-  const similarPreviousQuery = playerMessages.find(msg => {
+  const similarPreviousQuery = playerMessages.find((msg) => {
     const prevQuery = msg.message.toLowerCase();
     return similarity(currentQuery, prevQuery) > 0.7;
   });
-  
+
   if (similarPreviousQuery) {
     // This is the second ask - provide more direct help
-    if (currentQuery.includes('solution') || currentQuery.includes('answer')) {
+    if (currentQuery.includes("solution") || currentQuery.includes("answer")) {
       return generateDirectSolution(currentQuery, memory);
     }
   }
-  
+
   return null;
 }
 
@@ -176,33 +231,42 @@ function checkAskTwiceRule(utterance: string, memory: NPCMemoryState, persona: N
  */
 function generateDirectSolution(query: string, memory: NPCMemoryState): string {
   // This would contain specific puzzle solutions
-  if (query.includes('coin') || query.includes('schrodinger')) {
+  if (query.includes("coin") || query.includes("schrodinger")) {
     return "Alright, since you asked twice: The Schrödinger coin exists in two states. Pick it up to collapse it into being unusable, or leave it to keep it usable for the extrapolator. The choice affects what you can do in the library.";
   }
-  
-  if (query.includes('blue') && (query.includes('switch') || query.includes('button'))) {
+
+  if (
+    query.includes("blue") &&
+    (query.includes("switch") || query.includes("button"))
+  ) {
     return "The blue switch resets everything to the beginning. Only press it if you're certain you want to start over completely, or if Polly has taken control and it's your only option.";
   }
-  
+
   return "I've given you all the help I can. Sometimes the answer becomes clear when you try different approaches.";
 }
 
 /**
  * Get response template for intent and NPC
  */
-function getResponseTemplate(npcId: string, intent: string, context: ContextSnapshot): ResponseTemplate {
+function getResponseTemplate(
+  npcId: string,
+  intent: string,
+  context: ContextSnapshot,
+): ResponseTemplate {
   // Load NPC-specific templates (simplified for now)
   const templates = getTemplatesForNPC(npcId);
-  
-  return templates[intent] || {
-    base: "I'm not sure how to respond to that.",
-    variants: [
-      "Could you rephrase that?",
-      "I'm not following.",
-      "What do you mean?"
-    ],
-    style_modifiers: {}
-  };
+
+  return (
+    templates[intent] || {
+      base: "I'm not sure how to respond to that.",
+      variants: [
+        "Could you rephrase that?",
+        "I'm not following.",
+        "What do you mean?",
+      ],
+      style_modifiers: {},
+    }
+  );
 }
 
 /**
@@ -217,34 +281,34 @@ function getTemplatesForNPC(npcId: string): Record<string, ResponseTemplate> {
       style_modifiers: {
         warmth_high: "It's wonderful to see you!",
         formality_high: "Good day to you.",
-        humour_high: "Well, look who it is!"
-      }
+        humour_high: "Well, look who it is!",
+      },
     },
     help: {
       base: "I'd be happy to help.",
       variants: [
         "What can I do for you?",
         "How can I assist?",
-        "Let's figure this out together."
+        "Let's figure this out together.",
       ],
       style_modifiers: {
         warmth_high: "Of course! I'm here for you.",
-        caution_high: "I'll help, but be careful about what you choose."
-      }
+        caution_high: "I'll help, but be careful about what you choose.",
+      },
     },
     location: {
       base: "Let me think about where you need to go.",
       variants: [
         "Navigation can be tricky here.",
         "The paths aren't always obvious.",
-        "Where are you trying to reach?"
+        "Where are you trying to reach?",
       ],
       style_modifiers: {
-        caution_high: "Make sure you're prepared before moving on."
-      }
-    }
+        caution_high: "Make sure you're prepared before moving on.",
+      },
+    },
   };
-  
+
   return commonTemplates;
 }
 
@@ -255,30 +319,30 @@ function applyPersonaToTemplate(
   template: ResponseTemplate,
   persona: NPCPersona,
   memorySummary: any,
-  context: ContextSnapshot
+  context: ContextSnapshot,
 ): string {
   let response = template.base;
-  
+
   // Apply style modifiers based on persona tone
   if (persona.tone.warmth > 0.7 && template.style_modifiers.warmth_high) {
     response = template.style_modifiers.warmth_high;
   } else if (persona.tone.warmth < 0.3 && template.style_modifiers.warmth_low) {
     response = template.style_modifiers.warmth_low;
   }
-  
+
   if (persona.tone.formality > 0.7 && template.style_modifiers.formality_high) {
     response = template.style_modifiers.formality_high;
   }
-  
+
   if (persona.tone.caution > 0.7 && template.style_modifiers.caution_high) {
     response = template.style_modifiers.caution_high;
   }
-  
+
   // Sometimes use variants for variety
   if (Math.random() < 0.3 && template.variants.length > 0) {
     response = chooseSynonym(template.variants);
   }
-  
+
   return response;
 }
 
@@ -289,7 +353,7 @@ function addPersonalityTouches(
   response: string,
   persona: NPCPersona,
   context: ContextSnapshot,
-  memorySummary: any
+  memorySummary: any,
 ): string {
   // Add contractions or expand them based on speaking style
   if (persona.speaking_style.use_contractions) {
@@ -297,46 +361,50 @@ function addPersonalityTouches(
   } else {
     response = removeContractions(response);
   }
-  
+
   // Add humour if appropriate
   if (persona.tone.humour > 0.6 && Math.random() < 0.4) {
     response = humourInsert(response, persona);
   }
-  
+
   // Add hedging for cautious personalities
   if (persona.tone.caution > 0.6 && Math.random() < 0.3) {
     response = hedge(response);
   }
-  
+
   // Add fourth-wall awareness for appropriate NPCs
   if (persona.speaking_style.fourth_wall_awareness && Math.random() < 0.1) {
     response = addFourthWallTouch(response, persona);
   }
-  
+
   // Add interruptions/self-correction for natural feel
   if (persona.speaking_style.interruptions && Math.random() < 0.2) {
     response = addSelfCorrection(response);
   }
-  
+
   return response;
 }
 
 /**
  * Add memory references to make responses feel continuous
  */
-function addMemoryReferences(response: string, memorySummary: any, persona: NPCPersona): string {
-  if (memorySummary.relationshipStatus === 'trusted' && Math.random() < 0.3) {
+function addMemoryReferences(
+  response: string,
+  memorySummary: any,
+  persona: NPCPersona,
+): string {
+  if (memorySummary.relationshipStatus === "trusted" && Math.random() < 0.3) {
     const memoryTouches = [
       "As we discussed before,",
       "Remember when you",
       "Like last time,",
-      "You mentioned earlier that"
+      "You mentioned earlier that",
     ];
-    
+
     const touch = chooseSynonym(memoryTouches);
     response = `${touch} ${response.toLowerCase()}`;
   }
-  
+
   return response;
 }
 
@@ -388,13 +456,13 @@ function hedge(text: string): string {
     "I think ",
     "Perhaps ",
     "It seems like ",
-    "I believe "
+    "I believe ",
   ];
-  
+
   if (Math.random() < 0.5) {
     return chooseSynonym(hedges) + text.toLowerCase();
   }
-  
+
   return text;
 }
 
@@ -402,16 +470,24 @@ function hedge(text: string): string {
  * Insert humour appropriate to the persona
  */
 function humourInsert(text: string, persona: NPCPersona): string {
-  if (persona.id === 'dominic') {
-    const sarcasm = [" Bloop.", " How surprising.", " The excitement never ends."];
+  if (persona.id === "dominic") {
+    const sarcasm = [
+      " Bloop.",
+      " How surprising.",
+      " The excitement never ends.",
+    ];
     return text + chooseSynonym(sarcasm);
   }
-  
-  if (persona.id === 'ayla') {
-    const quips = [" Trust me on this one.", " (I've seen this before.)", " - been there!"];
+
+  if (persona.id === "ayla") {
+    const quips = [
+      " Trust me on this one.",
+      " (I've seen this before.)",
+      " - been there!",
+    ];
     return text + chooseSynonym(quips);
   }
-  
+
   return text;
 }
 
@@ -419,15 +495,15 @@ function humourInsert(text: string, persona: NPCPersona): string {
  * Add fourth-wall awareness touches
  */
 function addFourthWallTouch(response: string, persona: NPCPersona): string {
-  if (persona.id === 'ayla') {
+  if (persona.id === "ayla") {
     const touches = [
       " (Don't tell the developer I said that.)",
       " - though I probably shouldn't mention that.",
-      " (The rules say I shouldn't help, but...)"
+      " (The rules say I shouldn't help, but...)",
     ];
     return response + chooseSynonym(touches);
   }
-  
+
   return response;
 }
 
@@ -439,13 +515,13 @@ function addSelfCorrection(text: string): string {
     "Wait—actually, ",
     "Let me rephrase: ",
     "I mean, ",
-    "Or rather, "
+    "Or rather, ",
   ];
-  
+
   if (Math.random() < 0.3) {
     return chooseSynonym(corrections) + text.toLowerCase();
   }
-  
+
   return text;
 }
 
@@ -453,11 +529,79 @@ function addSelfCorrection(text: string): string {
  * Calculate similarity between two strings (simple implementation)
  */
 function similarity(str1: string, str2: string): number {
-  const words1 = str1.split(' ');
-  const words2 = str2.split(' ');
-  
-  const commonWords = words1.filter(word => words2.includes(word));
+  const words1 = str1.split(" ");
+  const words2 = str2.split(" ");
+
+  const commonWords = words1.filter((word) => words2.includes(word));
   const totalWords = new Set([...words1, ...words2]).size;
-  
+
   return commonWords.length / totalWords;
+}
+
+// Polly humanization layer: inject disfluencies, self-disclosure, and subtle contradictions
+function humanizePolly(
+  text: string,
+  playerUtterance: string,
+  context: ContextSnapshot,
+  memorySummary: any,
+): string {
+  let out = text;
+  const mood = memorySummary.currentMood?.label || "neutral";
+  const intensity = memorySummary.currentMood?.intensity ?? 0.3;
+
+  // Disfluencies scale with intensity under anxious/irritated moods
+  const shouldStutter =
+    (mood === "anxious" || mood === "irritated") &&
+    Math.random() < Math.min(0.5, 0.15 + intensity);
+  if (shouldStutter) {
+    out = out.replace(/^(\w)/, (m) => `${m}-${m}`);
+  }
+
+  // Self-disclosure hooks that make Polly feel more like a person
+  const lowerUtter = playerUtterance.toLowerCase();
+  const disclosureCues = [
+    "trust",
+    "feel",
+    "why",
+    "who are you",
+    "are you ok",
+    "okay",
+    "ok",
+  ];
+  if (
+    disclosureCues.some((c) => lowerUtter.includes(c)) &&
+    Math.random() < 0.4
+  ) {
+    const disclosures = [
+      "If I'm honest, I'm not always sure I'm doing the right thing.",
+      "Sometimes I say 'trust me' because I'm afraid you'll walk away.",
+      "I get carried away when time is short.",
+      "It's easier to act confident than to be it.",
+    ];
+    out += " " + disclosures[Math.floor(Math.random() * disclosures.length)];
+  }
+
+  // Micro-contradiction: a human slip when stressed
+  if (
+    context.timers.pollyTakeover?.active &&
+    context.timers.pollyTakeover.timeRemaining < 60000 &&
+    Math.random() < 0.35
+  ) {
+    const slips = [
+      "You are safe with me. I mean—safer than without me.",
+      "Nothing is wrong. It's just—moving. Quickly.",
+      "I'm in control. Mostly. Enough.",
+    ];
+    out = `${out} ${slips[Math.floor(Math.random() * slips.length)]}`;
+  }
+
+  // Warm or cold closers based on relationship/mood
+  const rel = memorySummary.relationshipStatus;
+  if (rel === "friendly" || rel === "trusted") {
+    if (Math.random() < 0.25) {out += " Stay close, please.";}
+  } else if (mood === "cold" && Math.random() < 0.2) {
+    out += " Do not make this harder.";
+  }
+
+  return out;
 }

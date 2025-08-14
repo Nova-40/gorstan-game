@@ -17,8 +17,8 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Controls full multiverse reset logic
 
-import type { LocalGameState } from '../state/gameState';
-import type { NPC } from '../types/NPCTypes';
+import type { LocalGameState } from "../state/gameState";
+import type { NPC } from "../types/NPCTypes";
 
 export interface PlayerSnapshot {
   inventory?: string[];
@@ -36,13 +36,13 @@ export interface PlayerSnapshot {
   sessionId?: string;
   gameVersion?: string;
   playerName?: string;
-  difficulty?: 'easy' | 'normal' | 'hard' | 'nightmare';
+  difficulty?: "easy" | "normal" | "hard" | "nightmare";
 }
 
 export interface ResetOptions {
   preserveAchievements?: boolean;
   preserveFlags?: string[];
-  resetType?: 'soft' | 'hard' | 'new_game_plus' | 'death' | 'checkpoint';
+  resetType?: "soft" | "hard" | "new_game_plus" | "death" | "checkpoint";
   customEntryPoint?: string;
   preserveNPCMemory?: boolean;
   preserveCodex?: boolean;
@@ -65,24 +65,24 @@ export interface ResetTransaction {
 
 // Default entry points for different reset types
 const RESET_ENTRY_POINTS = {
-  soft: 'controlnexus',
-  hard: 'controlnexus', 
-  death: 'introreset',
-  new_game_plus: 'controlnexus'
+  soft: "controlnexus",
+  hard: "controlnexus",
+  death: "introreset",
+  new_game_plus: "controlnexus",
 };
 
 // Default game state template
 const DEFAULT_GAME_STATE: Partial<LocalGameState> = {
-  stage: 'game',
+  stage: "game",
   transition: null,
-  currentRoomId: 'controlnexus',
+  currentRoomId: "controlnexus",
   previousRoomId: undefined,
   history: [],
   flags: {},
   npcsInRoom: [],
   roomVisitCount: {},
   messages: [],
-  inventory: []
+  inventory: [],
 };
 
 // Reset statistics tracking
@@ -90,24 +90,24 @@ const resetStats = {
   totalResets: 0,
   resetsByType: {} as Record<string, number>,
   lastResetTime: 0,
-  resetReasons: [] as string[]
+  resetReasons: [] as string[],
 };
 
 /**
  * Validates that a game state object has required properties
  */
 function validateGameState(state: unknown): state is LocalGameState {
-  if (!state || typeof state !== 'object') return false;
-  
+  if (!state || typeof state !== "object") {return false;}
+
   try {
     const s = state as LocalGameState;
     return !!(
       s.player &&
       s.stage &&
       s.currentRoomId &&
-      typeof s.player.health === 'number' &&
+      typeof s.player.health === "number" &&
       Array.isArray(s.history) &&
-      typeof s.flags === 'object'
+      typeof s.flags === "object"
     );
   } catch {
     return false;
@@ -124,12 +124,12 @@ function createGameStateHash(state: LocalGameState): string {
       name: state.player.name,
       health: state.player.health,
       score: state.player.score,
-      currentRoom: state.player.currentRoom
+      currentRoom: state.player.currentRoom,
     },
     currentRoomId: state.currentRoomId,
-    flagCount: Object.keys(state.flags).length
+    flagCount: Object.keys(state.flags).length,
   };
-  
+
   return btoa(JSON.stringify(hashData)).slice(0, 16);
 }
 
@@ -141,13 +141,13 @@ export function executeReset(
   currentState?: LocalGameState,
 ): LocalGameState {
   const {
-    resetType = 'soft',
+    resetType = "soft",
     preserveAchievements = true,
     preserveFlags = [],
     customEntryPoint,
     preserveNPCMemory = false,
     preserveCodex = true,
-    reasonCode = 'user_initiated'
+    reasonCode = "user_initiated",
   } = options;
 
   try {
@@ -158,16 +158,19 @@ export function executeReset(
           id: `backup_${Date.now()}`,
           state: JSON.parse(JSON.stringify(state)),
           reason,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         };
-        
+
         try {
-          localStorage.setItem(`gorstan_backup_${backup.id}`, JSON.stringify(backup));
+          localStorage.setItem(
+            `gorstan_backup_${backup.id}`,
+            JSON.stringify(backup),
+          );
         } catch (error) {
-          console.warn('[ResetEngine] Could not create backup:', error);
+          console.warn("[ResetEngine] Could not create backup:", error);
         }
       }
-      
+
       createBackup(currentState, reasonCode);
     }
 
@@ -175,8 +178,8 @@ export function executeReset(
     const newState: LocalGameState = {
       ...DEFAULT_GAME_STATE,
       player: {
-        id: 'player',
-        name: currentState?.player?.name || '',
+        id: "player",
+        name: currentState?.player?.name || "",
         health: 100,
         score: 0,
         inventory: [],
@@ -184,12 +187,12 @@ export function executeReset(
         flags: {},
         npcRelationships: {},
         reputation: {},
-        currentRoom: 'controlnexus',
+        currentRoom: "controlnexus",
         visitedRooms: [],
         playTime: 0,
-        lastSave: '',
+        lastSave: "",
         level: 1,
-        experience: 0
+        experience: 0,
       },
       roomMap: currentState?.roomMap || {},
       gameTime: {
@@ -198,56 +201,61 @@ export function executeReset(
         minute: 0,
         startTime: Date.now(),
         currentTime: Date.now(),
-        timeScale: 1
+        timeScale: 1,
       },
       settings: currentState?.settings || {
         soundEnabled: true,
         fullscreen: false,
         cheatMode: false,
-        difficulty: 'normal',
+        difficulty: "normal",
         autoSave: true,
         autoSaveInterval: 300000,
         musicEnabled: true,
         animationsEnabled: true,
         textSpeed: 50,
-        fontSize: 'medium',
-        theme: 'auto',
-        debugMode: false
+        fontSize: "medium",
+        theme: "auto",
+        debugMode: false,
       },
       metadata: {
         resetCount: (currentState?.metadata?.resetCount || 0) + 1,
-        version: '1.0.0',
+        version: "1.0.0",
         lastSaved: null,
         playTime: 0,
         achievements: [],
-        codexEntries: {}
+        codexEntries: {},
       },
-      miniquestState: {}
+      miniquestState: {},
     } as LocalGameState;
 
     // Set entry point
-    const entryPoint = customEntryPoint || RESET_ENTRY_POINTS[resetType as keyof typeof RESET_ENTRY_POINTS] || RESET_ENTRY_POINTS.soft;
+    const entryPoint =
+      customEntryPoint ||
+      RESET_ENTRY_POINTS[resetType as keyof typeof RESET_ENTRY_POINTS] ||
+      RESET_ENTRY_POINTS.soft;
     newState.currentRoomId = entryPoint;
     newState.player.currentRoom = entryPoint;
 
     // Apply reset type specific logic
     switch (resetType) {
-      case 'soft':
+      case "soft":
         handleSoftReset(newState, currentState);
         break;
-      case 'hard':
+      case "hard":
         handleHardReset(newState);
         break;
-      case 'new_game_plus':
+      case "new_game_plus":
         handleNewGamePlusReset(newState, currentState);
         break;
-      case 'death':
+      case "death":
         handleDeathReset(newState, currentState);
         break;
-      case 'checkpoint':
+      case "checkpoint":
         // Checkpoint resets preserve more state
         if (currentState) {
-          newState.player.visitedRooms = [...(currentState.player.visitedRooms || [])];
+          newState.player.visitedRooms = [
+            ...(currentState.player.visitedRooms || []),
+          ];
           newState.roomVisitCount = { ...currentState.roomVisitCount };
         }
         break;
@@ -257,17 +265,21 @@ export function executeReset(
     if (currentState) {
       // Preserve achievements
       if (preserveAchievements && currentState.metadata?.achievements) {
-        newState.metadata.achievements = [...currentState.metadata.achievements];
+        newState.metadata.achievements = [
+          ...currentState.metadata.achievements,
+        ];
       }
 
       // Preserve codex
       if (preserveCodex && currentState.metadata?.codexEntries) {
-        newState.metadata.codexEntries = { ...currentState.metadata.codexEntries };
+        newState.metadata.codexEntries = {
+          ...currentState.metadata.codexEntries,
+        };
       }
 
       // Preserve specific flags
       if (preserveFlags.length > 0) {
-        preserveFlags.forEach(flagName => {
+        preserveFlags.forEach((flagName) => {
           if (currentState.flags?.[flagName] !== undefined) {
             newState.flags[flagName] = currentState.flags[flagName];
           }
@@ -276,7 +288,9 @@ export function executeReset(
 
       // Preserve NPC memory
       if (preserveNPCMemory && currentState.player?.npcRelationships) {
-        newState.player.npcRelationships = { ...currentState.player.npcRelationships };
+        newState.player.npcRelationships = {
+          ...currentState.player.npcRelationships,
+        };
       }
     }
 
@@ -284,26 +298,25 @@ export function executeReset(
     updateResetStats(resetType, reasonCode);
 
     // Log reset for debugging
-  if (import.meta.env.DEV) {
+    if (import.meta.env.DEV) {
       console.log(`[ResetEngine] Executed ${resetType} reset:`, {
         entryPoint,
         preserveAchievements,
         preserveFlags,
-        reasonCode
+        reasonCode,
       });
     }
 
     return newState;
-
   } catch (error) {
-    console.error('[ResetEngine] Error during reset:', error);
-    
+    console.error("[ResetEngine] Error during reset:", error);
+
     // Fallback to minimal safe state
     return {
       ...DEFAULT_GAME_STATE,
       player: {
-        id: 'player',
-        name: '',
+        id: "player",
+        name: "",
         health: 100,
         score: 0,
         inventory: [],
@@ -311,12 +324,12 @@ export function executeReset(
         flags: {},
         npcRelationships: {},
         reputation: {},
-        currentRoom: 'controlnexus',
+        currentRoom: "controlnexus",
         visitedRooms: [],
         playTime: 0,
-        lastSave: '',
+        lastSave: "",
         level: 1,
-        experience: 0
+        experience: 0,
       },
       gameTime: {
         day: 1,
@@ -324,30 +337,30 @@ export function executeReset(
         minute: 0,
         startTime: Date.now(),
         currentTime: Date.now(),
-        timeScale: 1
+        timeScale: 1,
       },
       settings: {
         soundEnabled: true,
         fullscreen: false,
         cheatMode: false,
-        difficulty: 'normal',
+        difficulty: "normal",
         autoSave: true,
         autoSaveInterval: 300000,
         musicEnabled: true,
         animationsEnabled: true,
         textSpeed: 50,
-        fontSize: 'medium',
-        theme: 'auto',
-        debugMode: false
+        fontSize: "medium",
+        theme: "auto",
+        debugMode: false,
       },
       metadata: {
         resetCount: 1,
-        version: '1.0.0',
+        version: "1.0.0",
         lastSaved: null,
         playTime: 0,
         achievements: [],
-        codexEntries: {}
-      }
+        codexEntries: {},
+      },
     } as LocalGameState;
   }
 }
@@ -362,10 +375,16 @@ function handleSoftReset(
   if (currentState) {
     // Preserve player name and some basic progress
     newState.player.name = currentState.player.name;
-    
+
     // Preserve some visited rooms (partial memory)
-    if (currentState.player.visitedRooms && currentState.player.visitedRooms.length > 0) {
-      newState.player.visitedRooms = currentState.player.visitedRooms.slice(0, 3);
+    if (
+      currentState.player.visitedRooms &&
+      currentState.player.visitedRooms.length > 0
+    ) {
+      newState.player.visitedRooms = currentState.player.visitedRooms.slice(
+        0,
+        3,
+      );
     }
 
     // Preserve difficulty setting
@@ -387,7 +406,10 @@ function handleHardReset(newState: LocalGameState): void {
 /**
  * Handles New Game Plus reset - preserves achievements and some progress
  */
-function handleNewGamePlusReset(newState: LocalGameState, currentState?: LocalGameState): void {
+function handleNewGamePlusReset(
+  newState: LocalGameState,
+  currentState?: LocalGameState,
+): void {
   if (currentState) {
     // Preserve all achievements
     if (currentState.metadata?.achievements) {
@@ -396,16 +418,22 @@ function handleNewGamePlusReset(newState: LocalGameState, currentState?: LocalGa
 
     // Preserve codex entries
     if (currentState.metadata?.codexEntries) {
-      newState.metadata.codexEntries = { ...currentState.metadata.codexEntries };
+      newState.metadata.codexEntries = {
+        ...currentState.metadata.codexEntries,
+      };
     }
 
     // Preserve some NPC relationships (reduced)
     if (currentState.player?.npcRelationships) {
-      Object.entries(currentState.player.npcRelationships).forEach(([npc, relationship]) => {
-        if (typeof relationship === 'number') {
-          newState.player.npcRelationships![npc] = Math.floor(relationship * 0.5);
-        }
-      });
+      Object.entries(currentState.player.npcRelationships).forEach(
+        ([npc, relationship]) => {
+          if (typeof relationship === "number") {
+            newState.player.npcRelationships![npc] = Math.floor(
+              relationship * 0.5,
+            );
+          }
+        },
+      );
     }
 
     // Slight score bonus for New Game Plus
@@ -420,14 +448,18 @@ function handleNewGamePlusReset(newState: LocalGameState, currentState?: LocalGa
 /**
  * Handles death reset logic - story-appropriate reset with narrative context
  */
-function handleDeathReset(newState: LocalGameState, currentState?: LocalGameState): void {
+function handleDeathReset(
+  newState: LocalGameState,
+  currentState?: LocalGameState,
+): void {
   // Set specific entry point for death resets
-  newState.currentRoomId = 'introreset';
-  newState.player.currentRoom = 'introreset';
+  newState.currentRoomId = "introreset";
+  newState.player.currentRoom = "introreset";
 
   if (currentState) {
     // Track death count
-    const deathCount = (currentState.player.flags?.deathCount as number || 0) + 1;
+    const deathCount =
+      ((currentState.player.flags?.deathCount as number) || 0) + 1;
     if (!newState.player.flags) {
       newState.player.flags = {};
     }
@@ -437,7 +469,7 @@ function handleDeathReset(newState: LocalGameState, currentState?: LocalGameStat
 
     // Preserve name and some basic flags
     newState.player.name = currentState.player.name;
-    
+
     // Add death-related narrative flags
     newState.flags.remembersLastDeath = true;
     if (deathCount > 1) {
@@ -445,8 +477,13 @@ function handleDeathReset(newState: LocalGameState, currentState?: LocalGameStat
     }
 
     // Preserve some critical story flags
-    const criticalFlags = ['metAyla', 'metMorthos', 'discoveredPortal', 'foundSecretRoom'];
-    criticalFlags.forEach(flag => {
+    const criticalFlags = [
+      "metAyla",
+      "metMorthos",
+      "discoveredPortal",
+      "foundSecretRoom",
+    ];
+    criticalFlags.forEach((flag) => {
       if (currentState.flags?.[flag]) {
         newState.flags[flag] = currentState.flags[flag];
       }
@@ -459,7 +496,8 @@ function handleDeathReset(newState: LocalGameState, currentState?: LocalGameStat
  */
 function updateResetStats(resetType: string, reasonCode: string): void {
   resetStats.totalResets++;
-  resetStats.resetsByType[resetType] = (resetStats.resetsByType[resetType] || 0) + 1;
+  resetStats.resetsByType[resetType] =
+    (resetStats.resetsByType[resetType] || 0) + 1;
   resetStats.lastResetTime = Date.now();
   resetStats.resetReasons.push(`${resetType}:${reasonCode}`);
 
@@ -474,19 +512,22 @@ function updateResetStats(resetType: string, reasonCode: string): void {
  */
 export function createCheckpoint(
   gameState: LocalGameState,
-  checkpointName: string = 'auto'
+  checkpointName: string = "auto",
 ): CheckpointData {
   const checkpoint: CheckpointData = {
     ...JSON.parse(JSON.stringify(gameState)),
     checkpointId: `checkpoint_${Date.now()}`,
     checkpointName,
-    createdAt: Date.now()
+    createdAt: Date.now(),
   };
 
   try {
-    localStorage.setItem(`gorstan_checkpoint_${checkpoint.checkpointId}`, JSON.stringify(checkpoint));
+    localStorage.setItem(
+      `gorstan_checkpoint_${checkpoint.checkpointId}`,
+      JSON.stringify(checkpoint),
+    );
   } catch (error) {
-    console.warn('[ResetEngine] Could not save checkpoint:', error);
+    console.warn("[ResetEngine] Could not save checkpoint:", error);
   }
 
   return checkpoint;
@@ -497,7 +538,9 @@ export function createCheckpoint(
  */
 export function loadCheckpoint(checkpointId: string): LocalGameState | null {
   try {
-    const checkpointData = localStorage.getItem(`gorstan_checkpoint_${checkpointId}`);
+    const checkpointData = localStorage.getItem(
+      `gorstan_checkpoint_${checkpointId}`,
+    );
     if (checkpointData) {
       const checkpoint: CheckpointData = JSON.parse(checkpointData);
       if (validateGameState(checkpoint)) {
@@ -505,9 +548,9 @@ export function loadCheckpoint(checkpointId: string): LocalGameState | null {
       }
     }
   } catch (error) {
-    console.warn('[ResetEngine] Could not load checkpoint:', error);
+    console.warn("[ResetEngine] Could not load checkpoint:", error);
   }
-  
+
   return null;
 }
 
@@ -516,11 +559,11 @@ export function loadCheckpoint(checkpointId: string): LocalGameState | null {
  */
 export function getAvailableCheckpoints(): CheckpointData[] {
   const checkpoints: CheckpointData[] = [];
-  
+
   try {
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (key?.startsWith('gorstan_checkpoint_')) {
+      if (key?.startsWith("gorstan_checkpoint_")) {
         const checkpointData = localStorage.getItem(key);
         if (checkpointData) {
           try {
@@ -535,7 +578,7 @@ export function getAvailableCheckpoints(): CheckpointData[] {
       }
     }
   } catch (error) {
-    console.warn('[ResetEngine] Error loading checkpoints:', error);
+    console.warn("[ResetEngine] Error loading checkpoints:", error);
   }
 
   return checkpoints.sort((a, b) => b.createdAt - a.createdAt);
@@ -544,15 +587,20 @@ export function getAvailableCheckpoints(): CheckpointData[] {
 /**
  * Cleans up old checkpoints and backups
  */
-export function cleanupOldSaves(maxAge: number = 7 * 24 * 60 * 60 * 1000): void {
+export function cleanupOldSaves(
+  maxAge: number = 7 * 24 * 60 * 60 * 1000,
+): void {
   const cutoffTime = Date.now() - maxAge;
-  
+
   try {
     const keysToRemove: string[] = [];
-    
+
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (key?.startsWith('gorstan_checkpoint_') || key?.startsWith('gorstan_backup_')) {
+      if (
+        key?.startsWith("gorstan_checkpoint_") ||
+        key?.startsWith("gorstan_backup_")
+      ) {
         const data = localStorage.getItem(key);
         if (data) {
           try {
@@ -569,13 +617,13 @@ export function cleanupOldSaves(maxAge: number = 7 * 24 * 60 * 60 * 1000): void 
       }
     }
 
-    keysToRemove.forEach(key => localStorage.removeItem(key));
-    
-  if (import.meta.env.DEV) {
+    keysToRemove.forEach((key) => localStorage.removeItem(key));
+
+    if (import.meta.env.DEV) {
       console.log(`[ResetEngine] Cleaned up ${keysToRemove.length} old saves`);
     }
   } catch (error) {
-    console.warn('[ResetEngine] Error during cleanup:', error);
+    console.warn("[ResetEngine] Error during cleanup:", error);
   }
 }
 

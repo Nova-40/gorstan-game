@@ -17,7 +17,7 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Global dispatch utility for actions
 
-import { GameAction } from '../types/GameTypes';
+import { GameAction } from "../types/GameTypes";
 
 /**
  * Dispatch function type
@@ -48,6 +48,6 @@ export function dispatch(action: GameAction): void {
   if (globalDispatch) {
     globalDispatch(action);
   } else {
-    console.warn('Global dispatch not available:', action);
+    console.warn("Global dispatch not available:", action);
   }
 }

@@ -16,7 +16,9 @@
 
 import React, { useEffect, useState } from "react";
 
-const FractalTeleportOverlay: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
+const FractalTeleportOverlay: React.FC<{ onComplete: () => void }> = ({
+  onComplete,
+}) => {
   useEffect(() => {
     const timeout = setTimeout(onComplete, 3000);
     return () => clearTimeout(timeout);

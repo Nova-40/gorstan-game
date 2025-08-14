@@ -14,81 +14,81 @@
   Full licence terms: see EULA.md in the project root.
 */
 
-import { NPC } from '../types/NPCTypes';
+import { NPC } from "../types/NPCTypes";
 
 export const al: NPC = {
-  id: 'al',
-  name: 'Al',
-  portrait: '/images/Al.png',
-  mood: 'neutral',
+  id: "al",
+  name: "Al",
+  portrait: "/images/Al.png",
+  mood: "neutral",
   memory: {
     interactions: 0,
     lastInteraction: 0,
     playerActions: [],
     relationship: 0,
-    knownFacts: []
+    knownFacts: [],
   },
-  currentRoom: 'controlroom'
+  currentRoom: "controlroom",
 } as any;
 
 export const morthos: NPC = {
-  id: 'morthos',
-  name: 'Morthos',
-  portrait: '/images/Morthos.png',
-  mood: 'neutral',
+  id: "morthos",
+  name: "Morthos",
+  portrait: "/images/Morthos.png",
+  mood: "neutral",
   memory: {
     interactions: 0,
     lastInteraction: 0,
     playerActions: [],
     relationship: 0,
-    knownFacts: []
+    knownFacts: [],
   },
-  currentRoom: 'glitchgate'
+  currentRoom: "glitchgate",
 } as any;
 
 export const polly: NPC = {
-  id: 'polly',
-  name: 'Polly',
-  portrait: '/images/npcs/polly.png',
-  mood: 'neutral',
+  id: "polly",
+  name: "Polly",
+  portrait: "/images/npcs/polly.png",
+  mood: "neutral",
   memory: {
     interactions: 0,
     lastInteraction: 0,
     playerActions: [],
     relationship: 0,
-    knownFacts: []
+    knownFacts: [],
   },
-  currentRoom: 'glitchgate'
+  currentRoom: "glitchgate",
 } as any;
 
 export const wendell: NPC = {
-  id: 'mrwendell',
-  name: 'Mr. Wendell',
-  portrait: '/images/npcs/mrwendell.png',
-  mood: 'neutral',
+  id: "mrwendell",
+  name: "Mr. Wendell",
+  portrait: "/images/npcs/mrwendell.png",
+  mood: "neutral",
   memory: {
     interactions: 0,
     lastInteraction: 0,
     playerActions: [],
     relationship: 0,
-    knownFacts: []
+    knownFacts: [],
   },
-  currentRoom: 'stantonhub'
+  currentRoom: "stantonhub",
 } as any;
 
 export const dominic: NPC = {
-  id: 'dominic',
-  name: 'Dominic',
-  portrait: '/images/npcs/dominic.png',
-  mood: 'neutral',
+  id: "dominic",
+  name: "Dominic",
+  portrait: "/images/npcs/dominic.png",
+  mood: "neutral",
   memory: {
     interactions: 0,
     lastInteraction: 0,
     playerActions: [],
     relationship: 0,
-    knownFacts: []
+    knownFacts: [],
   },
-  currentRoom: 'burgerjoint'
+  currentRoom: "burgerjoint",
 } as any;
 
 export const wanderers = [al, morthos, polly, wendell, dominic];

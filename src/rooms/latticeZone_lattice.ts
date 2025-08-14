@@ -17,15 +17,7 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Renders room descriptions and image logic.
 
-import { Room } from '../types/Room';
-
-
-
-
-
-
-
-
+import { Room } from "../types/Room";
 
 const lattice: Room = {
   id: "lattice",
@@ -35,7 +27,7 @@ const lattice: Room = {
     "You are in the Lattice. It is a strange, crystalline structure that seems to hum with power.",
     "The walls and floor are made of interlocking facets, glowing with shifting colors and patterns.",
     "Energy pulses through the latticework, and the air vibrates with a low, resonant tone.",
-    "You sense that this place is both ancient and alive, watching and waiting."
+    "You sense that this place is both ancient and alive, watching and waiting.",
   ],
   image: "latticeZone_lattice.png",
   ambientAudio: "lattice_resonance.mp3",
@@ -45,41 +37,35 @@ const lattice: Room = {
     ">> Energy levels: STABLE",
     ">> Structure: INTACT",
     ">> Warning: Unauthorized manipulation may destabilize the lattice.",
-    ">> Tip: Observe the patterns for clues."
+    ">> Tip: Observe the patterns for clues.",
   ],
 
   exits: {
     north: "latticeZone_latticespire",
-    south: "latticeZone_latticehub"
+    south: "latticeZone_latticehub",
   },
 
-  items: [
-    "crystal_shard",
-    "energy_node",
-    "pattern_fragment"
-  ],
+  items: ["crystal_shard", "energy_node", "pattern_fragment"],
 
   interactables: {
-    "energy_conduit": {
+    energy_conduit: {
       description: "A glowing conduit pulsing with raw energy.",
       actions: ["examine", "redirect", "absorb"],
       requires: [],
     },
-    "facet_panel": {
+    facet_panel: {
       description: "A section of the lattice that seems to respond to touch.",
       actions: ["touch", "analyze", "activate"],
       requires: ["pattern_fragment"],
     },
-    "resonance_node": {
+    resonance_node: {
       description: "A node emitting a deep, harmonic resonance.",
       actions: ["listen", "tune", "synchronize"],
       requires: [],
-    }
+    },
   },
 
-  npcs: [
-    
-  ],
+  npcs: [],
 
   events: {
     onEnter: ["showLatticeIntro", "pulseEnergy"],
@@ -88,7 +74,7 @@ const lattice: Room = {
       energy_conduit: ["redirectEnergy", "riskOverload"],
       facet_panel: ["analyzePattern", "activatePanel"],
       resonance_node: ["tuneResonance", "gainInsight"],
-    }
+    },
   },
 
   flags: {
@@ -104,20 +90,16 @@ const lattice: Room = {
       "Activate the Facet Panel",
       "Meet the Lattice Echo",
       "Tune the Resonance Node",
-      "Collect a Crystal Shard"
-    ]
+      "Collect a Crystal Shard",
+    ],
   },
 
   environmental: {
     lighting: "prismatic_glow",
     temperature: "cool_and_vibrant",
     airQuality: "charged_with_ions",
-    soundscape: [
-      "resonant_hum",
-      "crystal_chimes",
-      "energy_pulses"
-    ],
-    hazards: ["energy_overload", "pattern_disruption"]
+    soundscape: ["resonant_hum", "crystal_chimes", "energy_pulses"],
+    hazards: ["energy_overload", "pattern_disruption"],
   },
 
   security: {
@@ -125,7 +107,7 @@ const lattice: Room = {
     accessRequirements: [],
     alarmTriggers: ["unauthorized_activation"],
     surveillanceActive: true,
-    surveillanceType: "lattice_sensors"
+    surveillanceType: "lattice_sensors",
   },
 
   metadata: {
@@ -140,37 +122,38 @@ const lattice: Room = {
       "Crystalline environment",
       "Energy manipulation",
       "Pattern-based puzzles",
-      "Ancient AI echo"
-    ]
+      "Ancient AI echo",
+    ],
   },
 
   secrets: {
     hidden_chamber: {
-      description: "A concealed chamber revealed by synchronizing the resonance node.",
+      description:
+        "A concealed chamber revealed by synchronizing the resonance node.",
       requirements: ["tune resonance_node", "activate facet_panel"],
       rewards: ["rare_crystal", "lattice_lore"],
     },
     echo_memory: {
-      description: "A memory fragment from the Lattice Echo, unlocked by collecting all pattern fragments.",
+      description:
+        "A memory fragment from the Lattice Echo, unlocked by collecting all pattern fragments.",
       requirements: ["collect pattern_fragment", "talk to lattice_echo"],
       rewards: ["echo_story", "unique_item"],
-    }
+    },
   },
 
   customActions: {
-    "synchronize_patterns": {
-      description: "Attempt to synchronize the lattice patterns for a hidden effect.",
+    synchronize_patterns: {
+      description:
+        "Attempt to synchronize the lattice patterns for a hidden effect.",
       requirements: ["pattern_fragment"],
       effects: ["reveal_secret", "stabilize_energy"],
     },
-    "absorb_energy": {
+    absorb_energy: {
       description: "Absorb energy from the conduit to power a device.",
       requirements: ["energy_node"],
       effects: ["charge_device", "risk_overload"],
-    }
-  }
+    },
+  },
 };
 
 export default lattice;
-
-

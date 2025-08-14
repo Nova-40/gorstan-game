@@ -17,17 +17,9 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Renders room descriptions and image logic.
 
-import { NPC } from '../types/NPCTypes';
+import { NPC } from "../types/NPCTypes";
 
-import { Room } from '../types/Room';
-
-
-
-
-
-
-
-
+import { Room } from "../types/Room";
 
 const ancientvault: Room = {
   id: "ancientvault",
@@ -36,7 +28,7 @@ const ancientvault: Room = {
   description: [
     "You step into the ancient vault, a place of forgotten treasures and lingering mysteries.",
     "The air is thick with the scent of old parchment and rusting metal.",
-    "Dim light glints off piles of relics, and the silence is broken only by the faint creak of ancient hinges."
+    "Dim light glints off piles of relics, and the silence is broken only by the faint creak of ancient hinges.",
   ],
   image: "offgorstanZone_ancientvault.png",
   ambientAudio: "ancient_vault_ambience.mp3",
@@ -44,42 +36,37 @@ const ancientvault: Room = {
   consoleIntro: [
     ">> ANCIENT VAULT - TREASURE CHAMBER",
     ">> Access: RESTRICTED",
-    ">> Tip: Examine relics carefully—some may be more than they appear."
+    ">> Tip: Examine relics carefully—some may be more than they appear.",
   ],
 
   exits: {
     north: "offgorstanZone_ancientsroom",
-    south: "offgorstanZone_multiversehub"
+    south: "offgorstanZone_multiversehub",
   },
 
-  items: [
-    "rusted_key",
-    "ancient_coin",
-    "sealed_scroll",
-    "mysterious_amulet"
-  ],
+  items: ["rusted_key", "ancient_coin", "sealed_scroll", "mysterious_amulet"],
 
   interactables: {
-    "locked_chest": {
+    locked_chest: {
       description: "A heavy chest bound with iron bands and an intricate lock.",
       actions: ["examine", "unlock", "open"],
       requires: ["rusted_key"],
     },
-    "dusty_shelf": {
-      description: "A shelf lined with relics, some covered in dust and cobwebs.",
+    dusty_shelf: {
+      description:
+        "A shelf lined with relics, some covered in dust and cobwebs.",
       actions: ["search", "clean", "inspect"],
       requires: [],
     },
-    "vault_door": {
-      description: "The massive door you entered through, engraved with ancient runes.",
+    vault_door: {
+      description:
+        "The massive door you entered through, engraved with ancient runes.",
       actions: ["examine", "trace", "listen"],
       requires: [],
-    }
+    },
   },
 
-  npcs: [
-    
-  ],
+  npcs: [],
 
   events: {
     onEnter: ["showAncientVaultIntro", "activateVaultRelics"],
@@ -88,7 +75,7 @@ const ancientvault: Room = {
       locked_chest: ["unlockChest", "openChest"],
       dusty_shelf: ["searchShelf", "inspectRelics"],
       vault_door: ["traceRunes", "listenAtDoor"],
-    }
+    },
   },
 
   flags: {
@@ -102,20 +89,16 @@ const ancientvault: Room = {
     optional: [
       "Open the Locked Chest",
       "Meet the Vault Keeper",
-      "Search the Dusty Shelf"
-    ]
+      "Search the Dusty Shelf",
+    ],
   },
 
   environmental: {
     lighting: "dim_and_dusty",
     temperature: "cool_and_stale",
     airQuality: "musty_with_age",
-    soundscape: [
-      "creaking_hinges",
-      "soft_echoes",
-      "rustling_paper"
-    ],
-    hazards: ["traps", "cursed_relics"]
+    soundscape: ["creaking_hinges", "soft_echoes", "rustling_paper"],
+    hazards: ["traps", "cursed_relics"],
   },
 
   security: {
@@ -123,7 +106,7 @@ const ancientvault: Room = {
     accessRequirements: ["rusted_key"],
     alarmTriggers: ["unauthorized_opening"],
     surveillanceActive: true,
-    surveillanceType: "vault_keeper"
+    surveillanceType: "vault_keeper",
   },
 
   metadata: {
@@ -138,32 +121,31 @@ const ancientvault: Room = {
       "Treasure puzzles",
       "Guardian NPC",
       "Locked chest",
-      "Ancient relics"
-    ]
+      "Ancient relics",
+    ],
   },
 
   secrets: {
     hidden_compartment: {
-      description: "A secret compartment inside the locked chest, revealed by careful inspection.",
+      description:
+        "A secret compartment inside the locked chest, revealed by careful inspection.",
       requirements: ["open locked_chest", "inspect chest"],
       rewards: ["rare_artifact", "vault_lore"],
-    }
+    },
   },
 
   customActions: {
-    "unlock_chest": {
+    unlock_chest: {
       description: "Unlock the chest using the rusted key.",
       requirements: ["rusted_key"],
       effects: ["set_chestOpened", "reveal_secret"],
     },
-    "search_shelf": {
+    search_shelf: {
       description: "Search the dusty shelf for hidden relics.",
       requirements: [],
       effects: ["set_shelfSearched", "find_item"],
-    }
-  }
+    },
+  },
 };
 
 export default ancientvault;
-
-

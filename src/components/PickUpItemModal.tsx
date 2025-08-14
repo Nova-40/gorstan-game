@@ -17,9 +17,9 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Game module.
 
-import React, { useState } from 'react';
-import { XCircle, Package, CheckSquare, Square } from 'lucide-react';
-import '../styles/ModalOverlay.css';
+import React, { useState } from "react";
+import { XCircle, Package, CheckSquare, Square } from "lucide-react";
+import "../styles/ModalOverlay.css";
 
 interface PickUpItemModalProps {
   isOpen: boolean;
@@ -28,13 +28,18 @@ interface PickUpItemModalProps {
   onPickUp: (selectedItems: string[]) => void;
 }
 
-const PickUpItemModal: React.FC<PickUpItemModalProps> = ({ isOpen, items, onClose, onPickUp }) => {
+const PickUpItemModal: React.FC<PickUpItemModalProps> = ({
+  isOpen,
+  items,
+  onClose,
+  onPickUp,
+}) => {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
   // Variable declaration
   const toggleItemSelection = (item: string) => {
     setSelectedItems((prev) =>
-      prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item]
+      prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item],
     );
   };
 
@@ -53,7 +58,7 @@ const PickUpItemModal: React.FC<PickUpItemModalProps> = ({ isOpen, items, onClos
     onClose();
   };
 
-  if (!isOpen) return null;
+  if (!isOpen) {return null;}
 
   // JSX return block or main return
   return (
@@ -76,15 +81,15 @@ const PickUpItemModal: React.FC<PickUpItemModalProps> = ({ isOpen, items, onClos
 
           {items.length > 1 && (
             <div className="selection-controls">
-              <button 
-                className="control-button" 
+              <button
+                className="control-button"
                 onClick={selectAll}
                 disabled={selectedItems.length === items.length}
               >
                 Select All
               </button>
-              <button 
-                className="control-button" 
+              <button
+                className="control-button"
                 onClick={selectNone}
                 disabled={selectedItems.length === 0}
               >
@@ -97,9 +102,9 @@ const PickUpItemModal: React.FC<PickUpItemModalProps> = ({ isOpen, items, onClos
             {items.map((item) => {
               const isSelected = selectedItems.includes(item);
               return (
-                <div 
-                  key={item} 
-                  className={`item-option ${isSelected ? 'selected' : ''}`}
+                <div
+                  key={item}
+                  className={`item-option ${isSelected ? "selected" : ""}`}
                   onClick={() => toggleItemSelection(item)}
                 >
                   <div className="checkbox-container">
@@ -120,17 +125,20 @@ const PickUpItemModal: React.FC<PickUpItemModalProps> = ({ isOpen, items, onClos
         <div className="modal-footer">
           <div className="selection-summary">
             {selectedItems.length > 0 ? (
-              <span>{selectedItems.length} of {items.length} items selected</span>
+              <span>
+                {selectedItems.length} of {items.length} items selected
+              </span>
             ) : (
               <span>No items selected</span>
             )}
           </div>
-          <button 
-            className="pickup-button console-button" 
-            onClick={handlePickUp} 
+          <button
+            className="pickup-button console-button"
+            onClick={handlePickUp}
             disabled={selectedItems.length === 0}
           >
-            Pick Up {selectedItems.length > 0 ? `(${selectedItems.length})` : ''}
+            Pick Up{" "}
+            {selectedItems.length > 0 ? `(${selectedItems.length})` : ""}
           </button>
         </div>
       </div>

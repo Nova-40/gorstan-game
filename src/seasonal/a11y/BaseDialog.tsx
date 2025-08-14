@@ -23,11 +23,17 @@ type BaseDialogProps = {
   labelledById?: string; // optional override for aria-labelledby
 };
 
-export default function BaseDialog({ title, children, onClose, labelledById }: BaseDialogProps) {
+export default function BaseDialog({
+  title,
+  children,
+  onClose,
+  labelledById,
+}: BaseDialogProps) {
   const backdropRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const previouslyFocused = useRef<HTMLElement | null>(null);
-  const headingId = labelledById ?? "dialog-title-" + Math.random().toString(36).slice(2);
+  const headingId =
+    labelledById ?? "dialog-title-" + Math.random().toString(36).slice(2);
 
   // Focus management (trap + restore)
   useEffect(() => {
@@ -40,15 +46,17 @@ export default function BaseDialog({ title, children, onClose, labelledById }: B
       } else if (e.key === "Tab") {
         // basic focus trap
         const focusables = panelRef.current?.querySelectorAll<HTMLElement>(
-          'a[href],button,textarea,input,select,[tabindex]:not([tabindex="-1"])'
+          'a[href],button,textarea,input,select,[tabindex]:not([tabindex="-1"])',
         );
-        if (!focusables || focusables.length === 0) return;
+        if (!focusables || focusables.length === 0) {return;}
         const first = focusables[0];
         const last = focusables[focusables.length - 1];
         if (e.shiftKey && document.activeElement === first) {
-          e.preventDefault(); last.focus();
+          e.preventDefault();
+          last.focus();
         } else if (!e.shiftKey && document.activeElement === last) {
-          e.preventDefault(); first.focus();
+          e.preventDefault();
+          first.focus();
         }
       }
     };
@@ -59,9 +67,12 @@ export default function BaseDialog({ title, children, onClose, labelledById }: B
     };
   }, [onClose]);
 
-  const onBackdropClick = useCallback((e: React.MouseEvent) => {
-    if (e.target === backdropRef.current) onClose();
-  }, [onClose]);
+  const onBackdropClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (e.target === backdropRef.current) {onClose();}
+    },
+    [onClose],
+  );
 
   return (
     <div
@@ -80,7 +91,9 @@ export default function BaseDialog({ title, children, onClose, labelledById }: B
         style={{ backdropFilter: "blur(2px)" }}
       >
         <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
-          <h2 id={headingId} className="text-lg font-semibold">{title}</h2>
+          <h2 id={headingId} className="text-lg font-semibold">
+            {title}
+          </h2>
           <button
             onClick={onClose}
             className="rounded px-2 py-1 text-sm hover:bg-white/10 focus:outline-none focus:ring focus:ring-cyan-400"

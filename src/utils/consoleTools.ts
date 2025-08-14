@@ -17,7 +17,7 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Console utility functions for game messaging
 
-import { GameAction } from '../types/GameTypes';
+import { GameAction } from "../types/GameTypes";
 
 /**
  * Dispatch function type for console operations
@@ -37,24 +37,31 @@ export function setConsoleDispatch(dispatch: DispatchFunction): void {
 /**
  * Write a message to the game console (with dispatch parameter)
  */
-export function consoleWriteWithDispatch(dispatch: DispatchFunction, message: string, type: 'info' | 'error' | 'success' = 'info'): void {
+export function consoleWriteWithDispatch(
+  dispatch: DispatchFunction,
+  message: string,
+  type: "info" | "error" | "success" = "info",
+): void {
   dispatch({
-    type: 'ADD_CONSOLE_LINE',
-    payload: message
+    type: "ADD_CONSOLE_LINE",
+    payload: message,
   });
 }
 
 /**
  * Write a message to the game console (using global dispatch)
  */
-export function consoleWrite(message: string, type: 'info' | 'error' | 'success' = 'info'): void {
+export function consoleWrite(
+  message: string,
+  type: "info" | "error" | "success" = "info",
+): void {
   if (globalDispatch) {
     globalDispatch({
-      type: 'ADD_CONSOLE_LINE',
-      payload: message
+      type: "ADD_CONSOLE_LINE",
+      payload: message,
     });
   } else {
-    console.warn('Console dispatch not available:', message);
+    console.warn("Console dispatch not available:", message);
   }
 }
 
@@ -62,26 +69,33 @@ export function consoleWrite(message: string, type: 'info' | 'error' | 'success'
  * Write an error message to the game console
  */
 export function consoleError(message: string): void {
-  consoleWrite(message, 'error');
+  consoleWrite(message, "error");
 }
 
 /**
  * Write a success message to the game console
  */
 export function consoleSuccess(message: string): void {
-  consoleWrite(message, 'success');
+  consoleWrite(message, "success");
 }
 
 /**
  * Push a console message with enhanced formatting (with dispatch parameter)
  */
-export function pushConsoleMessageWithDispatch(dispatch: DispatchFunction, message: string, type: 'info' | 'error' | 'success' = 'info'): void {
+export function pushConsoleMessageWithDispatch(
+  dispatch: DispatchFunction,
+  message: string,
+  type: "info" | "error" | "success" = "info",
+): void {
   consoleWriteWithDispatch(dispatch, message, type);
 }
 
 /**
  * Push a console message with enhanced formatting (using global dispatch)
  */
-export function pushConsoleMessage(message: string, type: 'info' | 'error' | 'success' = 'info'): void {
+export function pushConsoleMessage(
+  message: string,
+  type: "info" | "error" | "success" = "info",
+): void {
   consoleWrite(message, type);
 }

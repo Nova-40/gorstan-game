@@ -17,15 +17,14 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Game module.
 
-import { GameState } from '../state/gameState';
-import { appendToNPCConsole } from '../ui/NPCConsole';
-import { triggerDeath } from '../engine/deathEngine';
-import { logAchievement } from '../engine/achievementEngine';
-import { teleportToRoom } from '../engine/roomRouter';
+import { GameState } from "../state/gameState";
+import { appendToNPCConsole } from "../ui/NPCConsole";
+import { triggerDeath } from "../engine/deathEngine";
+import { logAchievement } from "../engine/achievementEngine";
+import { teleportToRoom } from "../engine/roomRouter";
 
 // Variable declaration
-const correctAnswers = ['B', 'D'];
-
+const correctAnswers = ["B", "D"];
 
 // --- Function: triggerZSpecPuzzle ---
 export function triggerZSpecPuzzle(gameState: GameState) {
@@ -41,17 +40,20 @@ export function triggerZSpecPuzzle(gameState: GameState) {
   appendToNPCConsole("Librarian", "B: a = 2, b = 4");
   appendToNPCConsole("Librarian", "C: a = 6, b = 0");
   appendToNPCConsole("Librarian", "D: a = 1, b = 5");
-  appendToNPCConsole("Librarian", "Type your answer as a comma-separated list (e.g., 'B,D'):");
+  appendToNPCConsole(
+    "Librarian",
+    "Type your answer as a comma-separated list (e.g., 'B,D'):",
+  );
 }
-
 
 // --- Function: handleZSpecAnswer ---
 export function handleZSpecAnswer(gameState: GameState, answer: string) {
-// Variable declaration
-  const response = answer.toUpperCase().replace(/\s+/g, '').split(',');
+  // Variable declaration
+  const response = answer.toUpperCase().replace(/\s+/g, "").split(",");
 
-// Variable declaration
-  const correct = response.includes('B') && response.includes('D') && response.length === 2;
+  // Variable declaration
+  const correct =
+    response.includes("B") && response.includes("D") && response.length === 2;
 
   if (correct) {
     appendToNPCConsole("Librarian", "That is... acceptable. You may pass.");
@@ -65,13 +67,15 @@ export function handleZSpecAnswer(gameState: GameState, answer: string) {
       appendToNPCConsole("Librarian", "Incorrect. You are not ready.");
       teleportToRoom("maze_deadend");
     } else {
-      appendToNPCConsole("Librarian", "Incorrect again. You’ve had your second chance.");
+      appendToNPCConsole(
+        "Librarian",
+        "Incorrect again. You’ve had your second chance.",
+      );
       triggerDeath("Z-Spec Puzzle Failure");
       teleportToRoom("crossing");
     }
   }
 }
-
 
 // --- Function: decrementRetryCountdown ---
 export function decrementRetryCountdown(gameState: GameState) {

@@ -15,40 +15,25 @@
 */
 
 // Gorstan and characters (c) Geoff Webster 2025
-// Game module.
-
-import React, { useEffect } from 'react';
-
-
-
-
-
-
-
-
-
-
-
-
+import React, { useEffect } from "react";
 
 type SplashScreenProps = {
   onComplete: () => void;
 };
 
-
 const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
-// React effect hook
+  // React effect hook
   useEffect(() => {
-// Variable declaration
+    // Variable declaration
     const timer = setTimeout(() => {
       onComplete();
-    }, 4000); 
+    }, 4000);
 
-// JSX return block or main return
+    // JSX return block or main return
     return () => clearTimeout(timer);
   }, [onComplete]);
 
-// JSX return block or main return
+  // JSX return block or main return
   return (
     <div className="fixed inset-0 bg-black flex flex-col items-center justify-center z-50">
       {}
@@ -57,7 +42,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
         <h1
           className="text-6xl md:text-8xl font-bold mb-4 animate-pulse"
           style={{
-            color: '#00ff00',
+            color: "#00ff00",
             textShadow: `
               0 0 5px #00ff00,
               0 0 10px #00ff00,
@@ -65,7 +50,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
               0 0 20px #00ff00,
               0 0 35px #00ff00,
               0 0 40px #00ff00
-            `
+            `,
           }}
         >
           GORSTAN
@@ -75,12 +60,12 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
         <p
           className="text-2xl md:text-3xl font-light tracking-wide"
           style={{
-            color: '#00ffff',
+            color: "#00ffff",
             textShadow: `
               0 0 5px #00ffff,
               0 0 10px #00ffff,
               0 0 15px #00ffff
-            `
+            `,
           }}
         >
           The Game Beta 2
@@ -95,20 +80,22 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
               rgba(0, 255, 0, 0.1) 50%,
               transparent 60%
             )`,
-            animation: 'scanLine 3s linear infinite'
+            animation: "scanLine 3s linear infinite",
           }}
         />
       </div>
 
       {}
-      <style dangerouslySetInnerHTML={{
-        __html: `
-          @keyframes scanLine {
-            0% { transform: translateY(-100vh); }
-            100% { transform: translateY(100vh); }
-          }
-        `
-      }} />
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+      @keyframes scanLine {
+        0% { transform: translateY(-100vh); }
+        100% { transform: translateY(100vh); }
+      }
+    `,
+        }}
+      />
     </div>
   );
 };

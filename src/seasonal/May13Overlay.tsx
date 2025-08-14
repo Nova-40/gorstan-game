@@ -32,9 +32,12 @@ export default function May13Overlay({ onClose }: Props) {
             aria-hidden
             className="absolute left-1/2 top-6 h-24 w-24 -translate-x-1/2 rounded-full"
             style={{
-              background: "radial-gradient(circle at 60% 40%, #ffd1dc, #f08080 70%, #b24b4b)",
+              background:
+                "radial-gradient(circle at 60% 40%, #ffd1dc, #f08080 70%, #b24b4b)",
               boxShadow: "0 8px 24px rgba(240,128,128,0.35)",
-              animation: reduce ? undefined : "floaty 3.2s ease-in-out infinite"
+              animation: reduce
+                ? undefined
+                : "floaty 3.2s ease-in-out infinite",
             }}
           />
           <div
@@ -47,11 +50,12 @@ export default function May13Overlay({ onClose }: Props) {
             aria-hidden
             className="absolute left-1/2 top-0 -translate-x-1/2"
             style={{
-              width: 0, height: 0,
+              width: 0,
+              height: 0,
               borderLeft: "12px solid transparent",
               borderRight: "12px solid transparent",
               borderBottom: "20px solid #ffd84d",
-              filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.3))"
+              filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.3))",
             }}
           />
         </div>

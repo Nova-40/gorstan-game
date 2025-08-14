@@ -18,9 +18,9 @@
 // Add to setupFilesAfterEnv in jest.config.js
 
 // Mock window.matchMedia
-Object.defineProperty(window, 'matchMedia', {
+Object.defineProperty(window, "matchMedia", {
   writable: true,
-  value: jest.fn().mockImplementation(query => ({
+  value: jest.fn().mockImplementation((query) => ({
     matches: false,
     media: query,
     onchange: null,
@@ -33,7 +33,7 @@ Object.defineProperty(window, 'matchMedia', {
 });
 
 // Mock other DOM APIs if needed
-Object.defineProperty(global, 'performance', {
+Object.defineProperty(global, "performance", {
   writable: true,
   value: {
     now: jest.fn(() => Date.now()),

@@ -26,7 +26,7 @@ export function playSound(filename: string): void {
   try {
     const audio = new Audio(`/audio/${filename}.mp3`);
     audio.volume = 0.5;
-    audio.play().catch(err => {
+    audio.play().catch((err) => {
       console.warn(`Sound ${filename} could not be played:`, err);
     });
   } catch (error) {
@@ -39,13 +39,13 @@ export function playSound(filename: string): void {
  */
 export function playClickSound(): void {
   try {
-    const audio = new Audio('/audio/click.wav');
+    const audio = new Audio("/audio/click.wav");
     audio.volume = 0.5;
-    audio.play().catch(err => {
-      console.warn('Click sound blocked:', err);
+    audio.play().catch((err) => {
+      console.warn("Click sound blocked:", err);
     });
   } catch (error) {
-    console.warn('Error playing click sound:', error);
+    console.warn("Error playing click sound:", error);
   }
 }
 
@@ -54,14 +54,14 @@ export function playClickSound(): void {
  */
 export function playAmbientAudio(enabled: boolean = true): void {
   if (!ambientAudio) {
-    ambientAudio = new Audio('/audio/ambient.mp3');
+    ambientAudio = new Audio("/audio/ambient.mp3");
     ambientAudio.loop = true;
   }
-  
+
   if (enabled && ambientAudio) {
     ambientAudio.volume = 0.3;
     ambientAudio.play().catch((err: any) => {
-      console.warn('Ambient audio blocked:', err);
+      console.warn("Ambient audio blocked:", err);
     });
   }
 }
@@ -89,15 +89,15 @@ export function stopAmbientAudio(): void {
  * Play zone-specific audio
  */
 export function playZoneAudio(src: string): void {
-  if (!src) return;
+  if (!src) {return;}
   try {
     const audio = new Audio(src);
     audio.volume = 0.5;
     audio.play().catch((err: any) => {
-      console.warn('Zone audio blocked:', err);
+      console.warn("Zone audio blocked:", err);
     });
   } catch (error) {
-    console.warn('Error playing zone audio:', error);
+    console.warn("Error playing zone audio:", error);
   }
 }
 
@@ -115,7 +115,7 @@ export function setAudioVolume(volume: number): void {
  * Check if audio is supported
  */
 export function isAudioSupported(): boolean {
-  return typeof Audio !== 'undefined';
+  return typeof Audio !== "undefined";
 }
 
 export default {
@@ -125,5 +125,5 @@ export default {
   stopAmbientAudio,
   playZoneAudio,
   setAudioVolume,
-  isAudioSupported
+  isAudioSupported,
 };

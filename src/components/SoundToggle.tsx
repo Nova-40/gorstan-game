@@ -17,14 +17,17 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Sound toggle component
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 interface SoundToggleProps {
   soundEnabled: boolean;
   setSoundEnabled: (enabled: boolean) => void;
 }
 
-const SoundToggle: React.FC<SoundToggleProps> = ({ soundEnabled, setSoundEnabled }) => {
+const SoundToggle: React.FC<SoundToggleProps> = ({
+  soundEnabled,
+  setSoundEnabled,
+}) => {
   const [hovered, setHovered] = useState(false);
 
   const toggleSound = async () => {
@@ -32,10 +35,10 @@ const SoundToggle: React.FC<SoundToggleProps> = ({ soundEnabled, setSoundEnabled
     setSoundEnabled(newState);
 
     try {
-      const { playAmbientAudio } = await import('../utils/soundUtils');
+      const { playAmbientAudio } = await import("../utils/soundUtils");
       playAmbientAudio(newState);
     } catch (error) {
-      console.warn('Sound utils not available:', error);
+      console.warn("Sound utils not available:", error);
     }
   };
 
@@ -46,18 +49,19 @@ const SoundToggle: React.FC<SoundToggleProps> = ({ soundEnabled, setSoundEnabled
       onMouseLeave={() => setHovered(false)}
       className={`
         px-3 py-2 rounded-lg border transition-all duration-200
-        ${soundEnabled 
-          ? 'bg-green-600 border-green-500 text-white' 
-          : 'bg-gray-600 border-gray-500 text-gray-300'
+        ${
+          soundEnabled
+            ? "bg-green-600 border-green-500 text-white"
+            : "bg-gray-600 border-gray-500 text-gray-300"
         }
-        ${hovered ? 'shadow-lg transform scale-105' : ''}
+        ${hovered ? "shadow-lg transform scale-105" : ""}
         hover:border-opacity-80
       `}
-      title={soundEnabled ? 'Turn sound off' : 'Turn sound on'}
+      title={soundEnabled ? "Turn sound off" : "Turn sound on"}
     >
-      {soundEnabled ? '🔊' : '🔇'}
+      {soundEnabled ? "🔊" : "🔇"}
       <span className="ml-2 text-sm">
-        {soundEnabled ? 'Sound On' : 'Sound Off'}
+        {soundEnabled ? "Sound On" : "Sound Off"}
       </span>
     </button>
   );

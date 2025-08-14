@@ -17,54 +17,56 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Game module.
 
-import { FlagMap } from '../state/flagRegistry';
-
-
-
-import { useFlags } from './useFlags';
-
-
-
-
-
-
-
-
-
+import { FlagMap } from "../state/flagRegistry";
+import { useFlags } from "./useFlags";
+import type { LocalGameState } from "../state/gameState";
+import type { GameAction } from "../types/GameTypes";
+import type { Dispatch } from "react";
+import type { Room } from "../types/Room";
 
 export const useLibrarianLogic = (
-  state: any,
-  dispatch: React.Dispatch<any>,
-  room: any,
-  loadModule: (path: string) => Promise<any>
+  state: LocalGameState,
+  dispatch: Dispatch<GameAction>,
+  room: Room | undefined,
+  loadModule: (path: string) => Promise<unknown>,
 ) => {
   const { hasFlag, clearFlag } = useFlags();
 
-// Variable declaration
+  // Variable declaration
   const handleLibrarian = () => {
     if (hasFlag(FlagMap.npc.pendingLibrarianCommand)) {
-      loadModule('../engine/librarianController').then(({ handleLibrarianInteraction }) => {
-        handleLibrarianInteraction(state, dispatch);
+      loadModule("../engine/librarianController").then((mod) => {
+        const { handleLibrarianInteraction } =
+          (mod as typeof import("../engine/librarianController")) || {};
+        if (typeof handleLibrarianInteraction === "function") {
+          // Use empty command here; the full command path is handled elsewhere
+          handleLibrarianInteraction("", state, dispatch);
+        }
         clearFlag(FlagMap.npc.pendingLibrarianCommand);
       });
     }
   };
 
-// Variable declaration
+  // Variable declaration
   const spawnLibrarianIfFlagged = () => {
     if (hasFlag(FlagMap.npc.forceLibrarianSpawn) && room) {
-      loadModule('../engine/librarianController').then(({ spawnLibrarian }) => {
-        spawnLibrarian(room, state, dispatch);
-        console.log('[DEBUG] Librarian forcibly spawned.');
+      loadModule("../engine/librarianController").then((mod) => {
+        const { spawnLibrarian } = mod as any as {
+          spawnLibrarian?: (
+            room: Room,
+            state: LocalGameState,
+            dispatch: Dispatch<GameAction>,
+          ) => void;
+        };
+        spawnLibrarian?.(room, state, dispatch);
+        console.log("[DEBUG] Librarian forcibly spawned.");
         clearFlag(FlagMap.npc.forceLibrarianSpawn);
       });
     }
   };
 
-  
-
   return {
     handleLibrarian,
-    spawnLibrarianIfFlagged
+    spawnLibrarianIfFlagged,
   };
 };

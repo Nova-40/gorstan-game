@@ -54,9 +54,11 @@ export function isEasterWindow(d: Date): boolean {
   const y = d.getFullYear();
   const easter = easterSunday(y);
   const start = addDays(easter, -2); // Good Friday
-  const end = addDays(easter, 1);    // Easter Monday
-  return d >= new Date(start.getFullYear(), start.getMonth(), start.getDate())
-      && d <= new Date(end.getFullYear(), end.getMonth(), end.getDate());
+  const end = addDays(easter, 1); // Easter Monday
+  return (
+    d >= new Date(start.getFullYear(), start.getMonth(), start.getDate()) &&
+    d <= new Date(end.getFullYear(), end.getMonth(), end.getDate())
+  );
 }
 
 export function isMay13(d: Date): boolean {

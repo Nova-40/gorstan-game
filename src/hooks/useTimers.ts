@@ -17,16 +17,7 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Game module.
 
-import { useCallback, useRef, useEffect } from 'react';
-
-
-
-
-
-
-
-
-
+import { useCallback, useRef, useEffect } from "react";
 
 interface TimerConfig {
   id: string;
@@ -45,49 +36,43 @@ interface TimerInstance {
   callback: () => void;
 }
 
-
 export const useTimers = () => {
-// Variable declaration
+  // Variable declaration
   const timersRef = useRef<Map<string, TimerInstance>>(new Map());
 
-  
-// Variable declaration
+  // Variable declaration
   const setTimer = useCallback((config: TimerConfig) => {
     const { id, callback, delay, repeat = false, immediate = false } = config;
 
-    
     clearTimer(id);
 
-    
     if (immediate) {
       callback();
-      if (!repeat) return; 
+      if (!repeat) {return;}
     }
 
-// Variable declaration
+    // Variable declaration
     const startTime = Date.now();
 
-// Variable declaration
+    // Variable declaration
     const timerCallback = () => {
       callback();
 
       if (repeat) {
-        
-// Variable declaration
+        // Variable declaration
         const newTimerId = window.setTimeout(timerCallback, delay);
-// Variable declaration
+        // Variable declaration
         const timer = timersRef.current.get(id);
         if (timer) {
           timer.timerId = newTimerId;
           timer.startTime = Date.now();
         }
       } else {
-        
         timersRef.current.delete(id);
       }
     };
 
-// Variable declaration
+    // Variable declaration
     const timerId = window.setTimeout(timerCallback, delay);
 
     const timerInstance: TimerInstance = {
@@ -96,16 +81,15 @@ export const useTimers = () => {
       startTime,
       delay,
       repeat,
-      callback
+      callback,
     };
 
     timersRef.current.set(id, timerInstance);
   }, []);
 
-  
-// Variable declaration
+  // Variable declaration
   const clearTimer = useCallback((id: string) => {
-// Variable declaration
+    // Variable declaration
     const timer = timersRef.current.get(id);
     if (timer) {
       window.clearTimeout(timer.timerId);
@@ -113,99 +97,99 @@ export const useTimers = () => {
     }
   }, []);
 
-  
-// Variable declaration
+  // Variable declaration
   const clearAllTimers = useCallback(() => {
-    timersRef.current.forEach(timer => {
+    timersRef.current.forEach((timer) => {
       window.clearTimeout(timer.timerId);
     });
     timersRef.current.clear();
   }, []);
 
-  
-// Variable declaration
+  // Variable declaration
   const hasTimer = useCallback((id: string): boolean => {
     return timersRef.current.has(id);
   }, []);
 
-  
-// Variable declaration
+  // Variable declaration
   const getRemainingTime = useCallback((id: string): number => {
-// Variable declaration
+    // Variable declaration
     const timer = timersRef.current.get(id);
-    if (!timer) return 0;
+    if (!timer) {return 0;}
 
-// Variable declaration
+    // Variable declaration
     const elapsed = Date.now() - timer.startTime;
-// Variable declaration
+    // Variable declaration
     const remaining = Math.max(0, timer.delay - elapsed);
     return remaining;
   }, []);
 
-  
-// Variable declaration
+  // Variable declaration
   const getActiveTimers = useCallback((): string[] => {
     return Array.from(timersRef.current.keys());
   }, []);
 
-  
-// Variable declaration
+  // Variable declaration
   const getTimerStats = useCallback(() => {
-// Variable declaration
+    // Variable declaration
     const timers = Array.from(timersRef.current.values());
     return {
       total: timers.length,
-      repeating: timers.filter(t => t.repeat).length,
-      oneTime: timers.filter(t => !t.repeat).length,
-      timers: timers.map(t => ({
+      repeating: timers.filter((t) => t.repeat).length,
+      oneTime: timers.filter((t) => !t.repeat).length,
+      timers: timers.map((t) => ({
         id: t.id,
         delay: t.delay,
         repeat: t.repeat,
         remaining: getRemainingTime(t.id),
-        startTime: t.startTime
-      }))
+        startTime: t.startTime,
+      })),
     };
   }, [getRemainingTime]);
 
-  
-// Variable declaration
-  const delay = useCallback((ms: number): Promise<void> => {
-    return new Promise(resolve => {
-// Variable declaration
-      const id = `delay_${Date.now()}_${Math.random()}`;
+  // Variable declaration
+  const delay = useCallback(
+    (ms: number): Promise<void> => {
+      return new Promise((resolve) => {
+        // Variable declaration
+        const id = `delay_${Date.now()}_${Math.random()}`;
+        setTimer({
+          id,
+          callback: resolve,
+          delay: ms,
+        });
+      });
+    },
+    [setTimer],
+  );
+
+  // Variable declaration
+  const debounce = useCallback(
+    (id: string, callback: () => void, delay: number) => {
       setTimer({
         id,
-        callback: resolve,
-        delay: ms
+        callback,
+        delay,
       });
-    });
-  }, [setTimer]);
+    },
+    [setTimer],
+  );
 
-  
-// Variable declaration
-  const debounce = useCallback((id: string, callback: () => void, delay: number) => {
-    setTimer({
-      id,
-      callback,
-      delay
-    });
-  }, [setTimer]);
+  // Variable declaration
+  const setInterval = useCallback(
+    (id: string, callback: () => void, delay: number) => {
+      setTimer({
+        id,
+        callback,
+        delay,
+        repeat: true,
+      });
+    },
+    [setTimer],
+  );
 
-  
-// Variable declaration
-  const setInterval = useCallback((id: string, callback: () => void, delay: number) => {
-    setTimer({
-      id,
-      callback,
-      delay,
-      repeat: true
-    });
-  }, [setTimer]);
-
-  
-// React effect hook
+  // React effect hook
   useEffect(() => {
-// JSX return block or main return
+    // JSX return block or main return
     return () => {
       clearAllTimers();
     };
@@ -221,18 +205,17 @@ export const useTimers = () => {
     getTimerStats,
     delay,
     debounce,
-    setInterval
+    setInterval,
   };
 };
 
-
 export const TIMER_IDS = {
-  NPC_ACTIONS: 'npc_actions',
-  ROOM_TRANSITION: 'room_transition',
-  AUDIO_FADE: 'audio_fade',
-  COMMAND_DELAY: 'command_delay',
-  AUTO_SAVE: 'auto_save',
-  TYPEWRITER: 'typewriter_effect',
-  DEBOUNCE_INPUT: 'debounce_input',
-  SYSTEM_CHECK: 'system_check'
+  NPC_ACTIONS: "npc_actions",
+  ROOM_TRANSITION: "room_transition",
+  AUDIO_FADE: "audio_fade",
+  COMMAND_DELAY: "command_delay",
+  AUTO_SAVE: "auto_save",
+  TYPEWRITER: "typewriter_effect",
+  DEBOUNCE_INPUT: "debounce_input",
+  SYSTEM_CHECK: "system_check",
 } as const;

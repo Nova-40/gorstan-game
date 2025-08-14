@@ -17,40 +17,33 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Game module.
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 
-import { motion, AnimatePresence } from 'framer-motion';
-
-
-
-
-
-
-
-
-
+import { motion, AnimatePresence } from "framer-motion";
 
 interface SipTransitionProps {
   onComplete: () => void;
 }
 
 const SipTransition: React.FC<SipTransitionProps> = ({ onComplete }) => {
-  const [phase, setPhase] = useState<'sipping' | 'warmth' | 'ripple' | 'dissolve'>('sipping');
+  const [phase, setPhase] = useState<
+    "sipping" | "warmth" | "ripple" | "dissolve"
+  >("sipping");
 
-// React effect hook
+  // React effect hook
   useEffect(() => {
-// Variable declaration
+    // Variable declaration
     const timers = [
-      setTimeout(() => setPhase('warmth'), 600),
-      setTimeout(() => setPhase('ripple'), 1400),
-      setTimeout(() => setPhase('dissolve'), 2200),
+      setTimeout(() => setPhase("warmth"), 600),
+      setTimeout(() => setPhase("ripple"), 1400),
+      setTimeout(() => setPhase("dissolve"), 2200),
       setTimeout(() => onComplete(), 3200),
     ];
-// JSX return block or main return
+    // JSX return block or main return
     return () => timers.forEach(clearTimeout);
   }, [onComplete]);
 
-// JSX return block or main return
+  // JSX return block or main return
   return (
     <AnimatePresence>
       <motion.div
@@ -59,24 +52,24 @@ const SipTransition: React.FC<SipTransitionProps> = ({ onComplete }) => {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         style={{
-          background: 'linear-gradient(135deg, #2c1810, #8b4513, #d2691e)',
+          background: "linear-gradient(135deg, #2c1810, #8b4513, #d2691e)",
         }}
       >
         {}
-        {phase === 'sipping' && (
+        {phase === "sipping" && (
           <div className="absolute inset-0">
             {[...Array(8)].map((_, i) => (
               <motion.div
                 key={i}
                 className="absolute w-1 h-8 bg-white opacity-30 rounded-full"
                 initial={{
-                  x: '50%',
-                  y: '60%',
+                  x: "50%",
+                  y: "60%",
                   scaleY: 0,
                   opacity: 0,
                 }}
                 animate={{
-                  y: ['60%', '30%', '10%'],
+                  y: ["60%", "30%", "10%"],
                   scaleY: [0, 1, 0],
                   opacity: [0, 0.6, 0],
                   x: `${50 + (i - 4) * 3}%`,
@@ -84,10 +77,10 @@ const SipTransition: React.FC<SipTransitionProps> = ({ onComplete }) => {
                 transition={{
                   duration: 2,
                   delay: i * 0.1,
-                  ease: 'easeOut',
+                  ease: "easeOut",
                 }}
                 style={{
-                  filter: 'blur(1px)',
+                  filter: "blur(1px)",
                 }}
               />
             ))}
@@ -95,50 +88,59 @@ const SipTransition: React.FC<SipTransitionProps> = ({ onComplete }) => {
         )}
 
         {}
-        {(phase === 'warmth' || phase === 'ripple' || phase === 'dissolve') && (
+        {(phase === "warmth" || phase === "ripple" || phase === "dissolve") && (
           <motion.div
             className="absolute inset-0"
             initial={{ scale: 0, opacity: 0 }}
             animate={{
-              scale: phase === 'warmth' ? [0, 1.5] : [1.5, 3],
-              opacity: phase === 'warmth' ? [0, 0.8] : [0.8, 0.4],
+              scale: phase === "warmth" ? [0, 1.5] : [1.5, 3],
+              opacity: phase === "warmth" ? [0, 0.8] : [0.8, 0.4],
             }}
             transition={{ duration: 0.8 }}
             style={{
-              background: 'radial-gradient(circle, #ffcc80 0%, #ff8a65 20%, #d2691e 40%, transparent 70%)',
-              transformOrigin: 'center 60%',
+              background:
+                "radial-gradient(circle, #ffcc80 0%, #ff8a65 20%, #d2691e 40%, transparent 70%)",
+              transformOrigin: "center 60%",
             }}
           />
         )}
 
         {}
-        {(phase === 'ripple' || phase === 'dissolve') && (
+        {(phase === "ripple" || phase === "dissolve") && (
           <div className="absolute inset-0">
             {[...Array(5)].map((_, i) => (
               <motion.div
                 key={i}
                 className="absolute border-2 border-orange-300 rounded-full"
                 initial={{
-                  width: '20px',
-                  height: '20px',
-                  x: 'calc(50% - 10px)',
-                  y: 'calc(60% - 10px)',
+                  width: "20px",
+                  height: "20px",
+                  x: "calc(50% - 10px)",
+                  y: "calc(60% - 10px)",
                   opacity: 0,
                 }}
                 animate={{
-                  width: ['20px', '400px', '800px'],
-                  height: ['20px', '400px', '800px'],
-                  x: ['calc(50% - 10px)', 'calc(50% - 200px)', 'calc(50% - 400px)'],
-                  y: ['calc(60% - 10px)', 'calc(60% - 200px)', 'calc(60% - 400px)'],
+                  width: ["20px", "400px", "800px"],
+                  height: ["20px", "400px", "800px"],
+                  x: [
+                    "calc(50% - 10px)",
+                    "calc(50% - 200px)",
+                    "calc(50% - 400px)",
+                  ],
+                  y: [
+                    "calc(60% - 10px)",
+                    "calc(60% - 200px)",
+                    "calc(60% - 400px)",
+                  ],
                   opacity: [0, 0.6, 0],
                 }}
                 transition={{
                   duration: 1.5,
                   delay: i * 0.2,
-                  ease: 'easeOut',
+                  ease: "easeOut",
                 }}
                 style={{
-                  borderWidth: '2px',
+                  borderWidth: "2px",
                   borderColor: `rgba(255, 204, 128, ${0.8 - i * 0.15})`,
                 }}
               />
@@ -147,16 +149,17 @@ const SipTransition: React.FC<SipTransitionProps> = ({ onComplete }) => {
         )}
 
         {}
-        {phase === 'dissolve' && (
+        {phase === "dissolve" && (
           <motion.div
             className="absolute inset-0"
             initial={{ opacity: 0 }}
             animate={{ opacity: [0, 1, 0] }}
             transition={{ duration: 1 }}
             style={{
-              background: 'linear-gradient(45deg, transparent 0%, #ffcc80 25%, #ff8a65 50%, #d2691e 75%, transparent 100%)',
-              backgroundSize: '100px 100px',
-              animation: 'dissolve 1s ease-in-out',
+              background:
+                "linear-gradient(45deg, transparent 0%, #ffcc80 25%, #ff8a65 50%, #d2691e 75%, transparent 100%)",
+              backgroundSize: "100px 100px",
+              animation: "dissolve 1s ease-in-out",
             }}
           />
         )}
@@ -169,40 +172,40 @@ const SipTransition: React.FC<SipTransitionProps> = ({ onComplete }) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.6 }}
           >
-            {phase === 'sipping' && (
+            {phase === "sipping" && (
               <motion.span
                 className="text-2xl text-amber-100"
-                style={{ textShadow: '0 0 10px #ffcc80' }}
+                style={{ textShadow: "0 0 10px #ffcc80" }}
               >
                 ☕ Taking a sip...
               </motion.span>
             )}
-            {phase === 'warmth' && (
+            {phase === "warmth" && (
               <motion.span
                 className="text-3xl text-orange-200"
                 animate={{ scale: [1, 1.05, 1] }}
                 transition={{ duration: 0.8, repeat: 2 }}
-                style={{ textShadow: '0 0 15px #ff8a65' }}
+                style={{ textShadow: "0 0 15px #ff8a65" }}
               >
                 ◉ Warmth floods your chest ◉
               </motion.span>
             )}
-            {phase === 'ripple' && (
+            {phase === "ripple" && (
               <motion.span
                 className="text-4xl text-yellow-200"
                 animate={{ opacity: [0.8, 1, 0.8] }}
                 transition={{ duration: 0.5, repeat: Infinity }}
-                style={{ textShadow: '0 0 20px #ffcc80' }}
+                style={{ textShadow: "0 0 20px #ffcc80" }}
               >
                 ∿ Reality ripples outward ∿
               </motion.span>
             )}
-            {phase === 'dissolve' && (
+            {phase === "dissolve" && (
               <motion.span
                 className="text-2xl text-white"
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                style={{ textShadow: '0 0 10px #ffffff' }}
+                style={{ textShadow: "0 0 10px #ffffff" }}
               >
                 ◈ The universe blurs and shifts ◈
               </motion.span>
@@ -211,7 +214,7 @@ const SipTransition: React.FC<SipTransitionProps> = ({ onComplete }) => {
         </div>
 
         {}
-        {(phase === 'warmth' || phase === 'ripple') && (
+        {(phase === "warmth" || phase === "ripple") && (
           <div className="absolute inset-0">
             {[...Array(15)].map((_, i) => (
               <motion.div
@@ -219,7 +222,7 @@ const SipTransition: React.FC<SipTransitionProps> = ({ onComplete }) => {
                 className="absolute w-1 h-1 bg-amber-400 rounded-full"
                 initial={{
                   x: `${50 + (Math.random() - 0.5) * 20}%`,
-                  y: '60%',
+                  y: "60%",
                   scale: 0,
                 }}
                 animate={{
@@ -231,10 +234,10 @@ const SipTransition: React.FC<SipTransitionProps> = ({ onComplete }) => {
                 transition={{
                   duration: 1.5,
                   delay: i * 0.05,
-                  ease: 'easeOut',
+                  ease: "easeOut",
                 }}
                 style={{
-                  boxShadow: '0 0 8px #ffcc80',
+                  boxShadow: "0 0 8px #ffcc80",
                 }}
               />
             ))}

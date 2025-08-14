@@ -17,17 +17,9 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Renders room descriptions and image logic.
 
-import { NPC } from '../types/NPCTypes';
+import { NPC } from "../types/NPCTypes";
 
-import { Room } from '../types/Room';
-
-
-
-
-
-
-
-
+import { Room } from "../types/Room";
 
 const echochamber: Room = {
   id: "echochamber",
@@ -36,7 +28,7 @@ const echochamber: Room = {
   description: [
     "You enter the Echo Chamber, a vast domed space where every sound is magnified and repeated endlessly.",
     "The walls are smooth and curved, designed to reflect even the faintest whisper.",
-    "A strange resonance fills the air, making it difficult to distinguish your own thoughts from the echoes."
+    "A strange resonance fills the air, making it difficult to distinguish your own thoughts from the echoes.",
   ],
   image: "offgorstanZone_echochamber.png",
   ambientAudio: "echo_chamber_ambience.mp3",
@@ -44,35 +36,32 @@ const echochamber: Room = {
   consoleIntro: [
     ">> ECHO CHAMBER - RESONANCE NODE",
     ">> Acoustics: EXTREME",
-    ">> Tip: Listen carefully—some echoes may reveal hidden messages."
+    ">> Tip: Listen carefully—some echoes may reveal hidden messages.",
   ],
 
   exits: {
     north: "offgorstanZone_memoryvault",
-    south: "offgorstanZone_voidatrium"
+    south: "offgorstanZone_voidatrium",
   },
 
-  items: [
-    "resonant_crystal",
-    "echo_scroll"
-  ],
+  items: ["resonant_crystal", "echo_scroll"],
 
   interactables: {
-    "resonance_wall": {
-      description: "A section of wall that vibrates with every sound, amplifying echoes.",
+    resonance_wall: {
+      description:
+        "A section of wall that vibrates with every sound, amplifying echoes.",
       actions: ["listen", "touch", "mark"],
       requires: [],
     },
-    "central_dais": {
-      description: "A raised platform at the center, where echoes converge and intensify.",
+    central_dais: {
+      description:
+        "A raised platform at the center, where echoes converge and intensify.",
       actions: ["stand", "speak", "observe"],
       requires: [],
-    }
+    },
   },
 
-  npcs: [
-    
-  ],
+  npcs: [],
 
   events: {
     onEnter: ["showEchoChamberIntro", "activateResonance"],
@@ -80,7 +69,7 @@ const echochamber: Room = {
     onInteract: {
       resonance_wall: ["listenToWall", "markWall"],
       central_dais: ["standOnDais", "speakOnDais"],
-    }
+    },
   },
 
   flags: {
@@ -94,19 +83,16 @@ const echochamber: Room = {
     optional: [
       "Mark the Resonance Wall",
       "Meet the Echo Savant",
-      "Stand on the Central Dais"
-    ]
+      "Stand on the Central Dais",
+    ],
   },
 
   environmental: {
     lighting: "soft_reflected_glow",
     temperature: "cool_and_resonant",
     airQuality: "vibrant_with_sound",
-    soundscape: [
-      "endless_echoes",
-      "whispered_words"
-    ],
-    hazards: ["disorientation", "auditory_overload"]
+    soundscape: ["endless_echoes", "whispered_words"],
+    hazards: ["disorientation", "auditory_overload"],
   },
 
   security: {
@@ -128,32 +114,31 @@ const echochamber: Room = {
       "Echo-based puzzles",
       "Acoustic illusions",
       "Echo Savant NPC",
-      "Central dais"
-    ]
+      "Central dais",
+    ],
   },
 
   secrets: {
     hidden_message: {
-      description: "A secret message revealed by standing on the dais and speaking the correct phrase.",
+      description:
+        "A secret message revealed by standing on the dais and speaking the correct phrase.",
       requirements: ["stand central_dais", "speak phrase"],
       rewards: ["echo_lore", "resonant_hint"],
-    }
+    },
   },
 
   customActions: {
-    "mark_resonance_wall": {
+    mark_resonance_wall: {
       description: "Mark the resonance wall to track your presence.",
       requirements: [],
       effects: ["set_wallMarked", "reduce_disorientation"],
     },
-    "stand_on_dais": {
+    stand_on_dais: {
       description: "Stand on the central dais to focus the echoes.",
       requirements: [],
       effects: ["gain_hint", "unlock_secret"],
-    }
-  }
+    },
+  },
 };
 
 export default echochamber;
-
-

@@ -17,14 +17,14 @@
 // src/celebrate/gen/build-christian.ts
 // Christian holiday date generation
 
-import { Span, daySpan, multiDaySpan } from './util';
+import { Span, daySpan, multiDaySpan } from "./util";
 
 /**
  * Christmas - Fixed December 25
  */
 export function christmas(years: number[]): Span[] {
-  return years.map(year => 
-    daySpan(new Date(year, 11, 25), `Christmas ${year}`)
+  return years.map((year) =>
+    daySpan(new Date(year, 11, 25), `Christmas ${year}`),
   );
 }
 
@@ -32,7 +32,7 @@ export function christmas(years: number[]): Span[] {
  * Easter - Computed using Anonymous Gregorian algorithm
  */
 export function easter(years: number[]): Span[] {
-  return years.map(year => {
+  return years.map((year) => {
     const easterDate = computeEaster(year);
     // Easter window: Good Friday to Easter Monday (4 days)
     const goodFriday = new Date(easterDate);
@@ -59,11 +59,11 @@ function computeEaster(year: number): Date {
   const m = Math.floor((a + 11 * h + 22 * l) / 451);
   const month = Math.floor((h + l - 7 * m + 114) / 31);
   const day = ((h + l - 7 * m + 114) % 31) + 1;
-  
+
   return new Date(year, month - 1, day);
 }
 
 export const buildChristian = {
   christmas,
-  easter
+  easter,
 };

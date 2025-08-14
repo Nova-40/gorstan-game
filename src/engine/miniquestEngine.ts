@@ -17,28 +17,17 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Core game engine module.
 
-
-import type { GameState } from '../types/GameTypes';
-import type { Miniquest, MiniquestState, MiniquestResult, MiniquestProgress } from '../types/GameTypes';
-
-
-
-
-
-
-
-
-
-
-
-
-
+import type { GameState } from "../types/GameTypes";
+import type {
+  Miniquest,
+  MiniquestState,
+  MiniquestResult,
+  MiniquestProgress,
+} from "../types/GameTypes";
 
 type GameStateWithMiniquests = GameState & {
   miniquestState?: MiniquestState;
 };
-
-
 
 class MiniquestEngine {
   private static instance: MiniquestEngine;
@@ -51,20 +40,24 @@ class MiniquestEngine {
     return MiniquestEngine.instance;
   }
 
-  
-  public registerRoomQuests(roomId: string, quests: readonly Miniquest[]): void {
+  public registerRoomQuests(
+    roomId: string,
+    quests: readonly Miniquest[],
+  ): void {
     this.roomQuests.set(roomId, [...quests]);
   }
 
-  
-  public getAvailableQuests(roomId: string, gameState: GameStateWithMiniquests): Miniquest[] {
-// Variable declaration
+  public getAvailableQuests(
+    roomId: string,
+    gameState: GameStateWithMiniquests,
+  ): Miniquest[] {
+    // Variable declaration
     const roomQuests = this.roomQuests.get(roomId) || [];
-// Variable declaration
+    // Variable declaration
     const miniquestState = gameState.miniquestState || {};
-// Variable declaration
+    // Variable declaration
     const roomState = miniquestState[roomId];
-// Variable declaration
+    // Variable declaration
     const completedQuests = roomState?.completedQuests || [];
 
     return roomQuests.filter((quest: Miniquest) => {
@@ -73,56 +66,54 @@ class MiniquestEngine {
       }
       if (quest.requiredItems) {
         const hasAllItems = quest.requiredItems.every((item: string) =>
-          gameState.player.inventory.includes(item)
+          gameState.player.inventory.includes(item),
         );
-        if (!hasAllItems) return false;
+        if (!hasAllItems) {return false;}
       }
       if (quest.requiredConditions) {
-        const meetsConditions = quest.requiredConditions.every((condition: string) => {
-          return gameState.flags[condition] === true;
-        });
-        if (!meetsConditions) return false;
+        const meetsConditions = quest.requiredConditions.every(
+          (condition: string) => {
+            return gameState.flags[condition] === true;
+          },
+        );
+        if (!meetsConditions) {return false;}
       }
       return true;
     });
   }
 
-  
   public attemptQuest(
     questId: string,
     roomId: string,
     gameState: GameStateWithMiniquests,
-    triggerAction?: string
+    triggerAction?: string,
   ): MiniquestResult {
-// Variable declaration
+    // Variable declaration
     const quest = this.findQuest(questId, roomId);
     if (!quest) {
       return {
         success: false,
-        message: `Quest ${questId} not found in ${roomId}.`
+        message: `Quest ${questId} not found in ${roomId}.`,
       };
     }
 
-    
-// Variable declaration
+    // Variable declaration
     const availableQuests = this.getAvailableQuests(roomId, gameState);
-    if (!availableQuests.find(q => q.id === quest.id)) {
+    if (!availableQuests.find((q) => q.id === quest.id)) {
       return {
         success: false,
-        message: "You cannot attempt this quest right now."
+        message: "You cannot attempt this quest right now.",
       };
     }
 
-    
     if (quest.triggerAction && triggerAction !== quest.triggerAction) {
       return {
         success: false,
-        message: quest.triggerText || `Try: ${quest.triggerAction}`
+        message: quest.triggerText || `Try: ${quest.triggerAction}`,
       };
     }
 
-    
-// Variable declaration
+    // Variable declaration
     const success = this.calculateSuccess(quest, gameState);
 
     if (success) {
@@ -132,28 +123,28 @@ class MiniquestEngine {
     }
   }
 
-  
-  private completeQuest(quest: Miniquest, roomId: string, gameState: GameStateWithMiniquests): MiniquestResult {
-    
-    const { applyScoreForEvent } = require('../state/scoreEffects');
+  private completeQuest(
+    quest: Miniquest,
+    roomId: string,
+    gameState: GameStateWithMiniquests,
+  ): MiniquestResult {
+    const { applyScoreForEvent } = require("../state/scoreEffects");
 
-    
     switch (quest.type) {
-      case 'puzzle':
-        applyScoreForEvent('solve.puzzle.simple');
+      case "puzzle":
+        applyScoreForEvent("solve.puzzle.simple");
         break;
-      case 'exploration':
-        applyScoreForEvent('discover.location');
+      case "exploration":
+        applyScoreForEvent("discover.location");
         break;
-      case 'social':
-        applyScoreForEvent('conversation.meaningful');
+      case "social":
+        applyScoreForEvent("conversation.meaningful");
         break;
       default:
-        applyScoreForEvent('miniquest.completed');
+        applyScoreForEvent("miniquest.completed");
     }
 
-    
-    const { recordMiniquestCompletion } = require('../logic/codexTracker');
+    const { recordMiniquestCompletion } = require("../logic/codexTracker");
     recordMiniquestCompletion(quest.id, quest.title, roomId);
 
     return {
@@ -161,12 +152,15 @@ class MiniquestEngine {
       message: `🎯 Miniquest completed: ${quest.title}!`,
       scoreAwarded: quest.rewardPoints,
       flagsSet: [quest.flagOnCompletion],
-      completed: true
+      completed: true,
     };
   }
 
-  
-  private failQuest(quest: Miniquest, roomId: string, gameState: GameStateWithMiniquests): MiniquestResult {
+  private failQuest(
+    quest: Miniquest,
+    roomId: string,
+    gameState: GameStateWithMiniquests,
+  ): MiniquestResult {
     let message = `You attempt "${quest.title}" but don't succeed this time.`;
 
     if (quest.hint) {
@@ -176,38 +170,50 @@ class MiniquestEngine {
     return {
       success: false,
       message,
-      completed: false
+      completed: false,
     };
   }
 
-  
-  private calculateSuccess(quest: Miniquest, gameState: GameStateWithMiniquests): boolean {
-    let baseChance = 0.7; 
+  private calculateSuccess(
+    quest: Miniquest,
+    gameState: GameStateWithMiniquests,
+  ): boolean {
+    let baseChance = 0.7;
 
-    
-    switch (quest.difficulty as 'trivial' | 'easy' | 'medium' | 'hard' | undefined) {
-      case 'trivial': baseChance = 0.95; break;
-      case 'easy': baseChance = 0.85; break;
-      case 'medium': baseChance = 0.7; break;
-      case 'hard': baseChance = 0.5; break;
+    switch (
+      quest.difficulty as "trivial" | "easy" | "medium" | "hard" | undefined
+    ) {
+      case "trivial":
+        baseChance = 0.95;
+        break;
+      case "easy":
+        baseChance = 0.85;
+        break;
+      case "medium":
+        baseChance = 0.7;
+        break;
+      case "hard":
+        baseChance = 0.5;
+        break;
     }
 
-    
     switch (quest.type) {
-      case 'dynamic':
-        baseChance += 0.1; 
+      case "dynamic":
+        baseChance += 0.1;
         break;
-      case 'puzzle':
-        
-// Variable declaration
+      case "puzzle":
+        // Variable declaration
         const playerTraits = gameState.player.traits || [];
-        if (playerTraits.includes('analytical') || playerTraits.includes('scholar')) {
+        if (
+          playerTraits.includes("analytical") ||
+          playerTraits.includes("scholar")
+        ) {
           baseChance += 0.15;
         }
         break;
-      case 'social':
-        if (gameState.player.inventory.includes('dominic')) {
-          baseChance += 0.1; 
+      case "social":
+        if (gameState.player.inventory.includes("dominic")) {
+          baseChance += 0.1;
         }
         break;
     }
@@ -215,38 +221,42 @@ class MiniquestEngine {
     return Math.random() < baseChance;
   }
 
-  
   private findQuest(questId: string, roomId: string): Miniquest | undefined {
-// Variable declaration
+    // Variable declaration
     const roomQuests = this.roomQuests.get(roomId) || [];
-    return roomQuests.find((q: Miniquest) => q.id === questId || q.title.toLowerCase().includes(questId.toLowerCase()));
+    return roomQuests.find(
+      (q: Miniquest) =>
+        q.id === questId ||
+        q.title.toLowerCase().includes(questId.toLowerCase()),
+    );
   }
 
-  
-  public listRoomQuests(roomId: string, gameState: GameStateWithMiniquests): string[] {
-// Variable declaration
+  public listRoomQuests(
+    roomId: string,
+    gameState: GameStateWithMiniquests,
+  ): string[] {
+    // Variable declaration
     const roomQuests = this.roomQuests.get(roomId) || [];
-// Variable declaration
+    // Variable declaration
     const miniquestState = gameState.miniquestState || {};
-// Variable declaration
+    // Variable declaration
     const roomState = miniquestState[roomId];
-// Variable declaration
+    // Variable declaration
     const completedQuests = roomState?.completedQuests || [];
-// Variable declaration
+    // Variable declaration
     const availableQuests = this.getAvailableQuests(roomId, gameState);
 
     if (roomQuests.length === 0) {
       return ["No miniquests available in this area."];
     }
 
-    const messages: string[] = [
-      "🎯 **Miniquests in this area:**",
-      ""
-    ];
+    const messages: string[] = ["🎯 **Miniquests in this area:**", ""];
 
     roomQuests.forEach((quest: Miniquest) => {
       const isCompleted = completedQuests.includes(quest.id);
-      const isAvailable = availableQuests.find((q: Miniquest) => q.id === quest.id);
+      const isAvailable = availableQuests.find(
+        (q: Miniquest) => q.id === quest.id,
+      );
       let status = "🔒 LOCKED";
       if (isCompleted && !quest.repeatable) {
         status = "✅ COMPLETED";
@@ -255,21 +265,31 @@ class MiniquestEngine {
       } else if (isAvailable) {
         status = "🆕 AVAILABLE";
       }
-      const difficultyIconMap: Record<'trivial' | 'easy' | 'medium' | 'hard', string> = {
-        'trivial': '⭐',
-        'easy': '⭐⭐',
-        'medium': '⭐⭐⭐',
-        'hard': '⭐⭐⭐⭐'
+      const difficultyIconMap: Record<
+        "trivial" | "easy" | "medium" | "hard",
+        string
+      > = {
+        trivial: "⭐",
+        easy: "⭐⭐",
+        medium: "⭐⭐⭐",
+        hard: "⭐⭐⭐⭐",
       };
-      const difficultyIcon = difficultyIconMap[(quest.difficulty as 'trivial' | 'easy' | 'medium' | 'hard') || 'easy'];
-      messages.push(`• ${quest.title} [${quest.type.toUpperCase()}] ${difficultyIcon} - ${status}`);
+      const difficultyIcon =
+        difficultyIconMap[
+          (quest.difficulty as "trivial" | "easy" | "medium" | "hard") || "easy"
+        ];
+      messages.push(
+        `• ${quest.title} [${quest.type.toUpperCase()}] ${difficultyIcon} - ${status}`,
+      );
       messages.push(`  ${quest.description}`);
       if (quest.requiredItems && quest.requiredItems.length > 0) {
         const hasItems = quest.requiredItems.every((item: string) =>
-          gameState.player.inventory.includes(item)
+          gameState.player.inventory.includes(item),
         );
-        const itemStatus = hasItems ? '✅' : '❌';
-        messages.push(`  Required items: ${quest.requiredItems.join(', ')} ${itemStatus}`);
+        const itemStatus = hasItems ? "✅" : "❌";
+        messages.push(
+          `  Required items: ${quest.requiredItems.join(", ")} ${itemStatus}`,
+        );
       }
       messages.push("");
     });
@@ -277,43 +297,43 @@ class MiniquestEngine {
     return messages;
   }
 
-  
   public initializeState(): MiniquestState {
     return {};
   }
 
-  
   public updateStateAfterCompletion(
     gameState: GameStateWithMiniquests,
     roomId: string,
-    questId: string
+    questId: string,
   ): Partial<GameStateWithMiniquests> {
-// Variable declaration
+    // Variable declaration
     const currentState = gameState.miniquestState || {};
-// Variable declaration
+    // Variable declaration
     const roomState = currentState[roomId] || {
       availableQuests: [],
       completedQuests: [],
       activeQuests: [],
-      questProgress: {}
+      questProgress: {},
     };
 
-// Variable declaration
+    // Variable declaration
     const newRoomState = {
       ...roomState,
       completedQuests: [...roomState.completedQuests, questId],
-      activeQuests: roomState.activeQuests.filter((id: string) => id !== questId)
+      activeQuests: roomState.activeQuests.filter(
+        (id: string) => id !== questId,
+      ),
     };
 
     return {
       miniquestState: {
         ...currentState,
-        [roomId]: newRoomState
+        [roomId]: newRoomState,
       },
       flags: {
         ...gameState.flags,
-        [`miniquest_${questId}_completed`]: true
-      }
+        [`miniquest_${questId}_completed`]: true,
+      },
     };
   }
 }

@@ -17,17 +17,9 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Renders room descriptions and image logic.
 
-import { NPC } from '../types/NPCTypes';
+import { NPC } from "../types/NPCTypes";
 
-import { Room } from '../types/Room';
-
-
-
-
-
-
-
-
+import { Room } from "../types/Room";
 
 const windingpath: Room = {
   id: "windingpath",
@@ -36,7 +28,7 @@ const windingpath: Room = {
   description: [
     "You find yourself on a winding path that twists and turns unpredictably.",
     "The ground is uneven, and the air is filled with the sound of distant footsteps.",
-    "Shadows flicker along the walls, and every turn looks much like the last."
+    "Shadows flicker along the walls, and every turn looks much like the last.",
   ],
   image: "mazeZone_windingpath.png",
   ambientAudio: "winding_path_ambience.mp3",
@@ -44,35 +36,32 @@ const windingpath: Room = {
   consoleIntro: [
     ">> WINDING PATH - MAZE SEGMENT",
     ">> Orientation: UNCERTAIN",
-    ">> Tip: Pay attention to subtle changes in the path."
+    ">> Tip: Pay attention to subtle changes in the path.",
   ],
 
   exits: {
     north: "mazeZone_secrettunnel",
-    south: "mazeZone_labyrinthbend"
+    south: "mazeZone_labyrinthbend",
   },
 
-  items: [
-    "worn_shoe",
-    "path_marker"
-  ],
+  items: ["worn_shoe", "path_marker"],
 
   interactables: {
-    "uneven_ground": {
-      description: "The ground here is rough and uneven, making each step uncertain.",
+    uneven_ground: {
+      description:
+        "The ground here is rough and uneven, making each step uncertain.",
       actions: ["examine", "steady", "search"],
       requires: [],
     },
-    "shadow_wall": {
-      description: "A wall where shadows seem to move independently of any light source.",
+    shadow_wall: {
+      description:
+        "A wall where shadows seem to move independently of any light source.",
       actions: ["observe", "touch", "mark"],
       requires: [],
-    }
+    },
   },
 
-  npcs: [
-    
-  ],
+  npcs: [],
 
   events: {
     onEnter: ["showWindingPathIntro", "checkForGuide"],
@@ -80,7 +69,7 @@ const windingpath: Room = {
     onInteract: {
       uneven_ground: ["steadyStep", "searchGround"],
       shadow_wall: ["observeShadows", "markWall"],
-    }
+    },
   },
 
   flags: {
@@ -94,19 +83,16 @@ const windingpath: Room = {
     optional: [
       "Mark the Shadow Wall",
       "Meet the Wandering Guide",
-      "Search the Uneven Ground"
-    ]
+      "Search the Uneven Ground",
+    ],
   },
 
   environmental: {
     lighting: "flickering_shadows",
     temperature: "cool_and_drafty",
     airQuality: "musty_and_stale",
-    soundscape: [
-      "distant_footsteps",
-      "soft_breezes"
-    ],
-    hazards: ["tripping", "disorientation"]
+    soundscape: ["distant_footsteps", "soft_breezes"],
+    hazards: ["tripping", "disorientation"],
   },
 
   security: {
@@ -128,8 +114,8 @@ const windingpath: Room = {
       "Winding maze path",
       "Environmental hazards",
       "Cryptic NPC",
-      "Shadow-based clues"
-    ]
+      "Shadow-based clues",
+    ],
   },
 
   secrets: {
@@ -137,23 +123,21 @@ const windingpath: Room = {
       description: "A small niche in the shadow wall, revealed by marking it.",
       requirements: ["mark shadow_wall"],
       rewards: ["hidden_item", "maze_lore"],
-    }
+    },
   },
 
   customActions: {
-    "mark_shadow_wall": {
+    mark_shadow_wall: {
       description: "Mark the shadow wall to track your progress.",
       requirements: ["path_marker"],
       effects: ["set_wallMarked", "reduce_disorientation"],
     },
-    "steady_on_ground": {
+    steady_on_ground: {
       description: "Steady yourself on the uneven ground.",
       requirements: [],
       effects: ["reduce_tripping", "gain_confidence"],
-    }
-  }
+    },
+  },
 };
 
 export default windingpath;
-
-

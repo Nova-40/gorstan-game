@@ -17,8 +17,8 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Game module.
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Star,
   Target,
@@ -37,14 +37,14 @@ import {
   Gift,
   ArrowRight,
   Award,
-  Lightbulb
-} from 'lucide-react';
+  Lightbulb,
+} from "lucide-react";
 
 export interface MiniquestData {
   id: string;
   title: string;
   description: string;
-  type: 'dynamic' | 'structured' | 'puzzle' | 'social' | 'exploration';
+  type: "dynamic" | "structured" | "puzzle" | "social" | "exploration";
   rewardPoints: number;
   flagOnCompletion: string;
   requiredItems?: string[];
@@ -54,7 +54,7 @@ export interface MiniquestData {
   hint?: string;
   repeatable?: boolean;
   timeLimit?: number;
-  difficulty?: 'trivial' | 'easy' | 'medium' | 'hard';
+  difficulty?: "trivial" | "easy" | "medium" | "hard";
 }
 
 export interface MiniquestProgress {
@@ -88,31 +88,33 @@ const MiniquestInterface: React.FC<MiniquestInterfaceProps> = ({
   playerInventory,
   totalScore = 0,
   completedCount = 0,
-  availableCount = 0
+  availableCount = 0,
 }) => {
-  const [selectedQuest, setSelectedQuest] = useState<MiniquestData | null>(null);
-  const [filter, setFilter] = useState<'all' | 'available' | 'completed' | 'locked'>('all');
+  const [selectedQuest, setSelectedQuest] = useState<MiniquestData | null>(
+    null,
+  );
+  const [filter, setFilter] = useState<
+    "all" | "available" | "completed" | "locked"
+  >("all");
 
-  
-// React effect hook
+  // React effect hook
   useEffect(() => {
     if (!isOpen) {
       setSelectedQuest(null);
     }
   }, [isOpen]);
 
-  
-// Variable declaration
+  // Variable declaration
   const filteredQuests = useMemo(() => {
-    return miniquests.filter(quest => {
-// Variable declaration
+    return miniquests.filter((quest) => {
+      // Variable declaration
       const questProgress = progress[quest.id];
       switch (filter) {
-        case 'available':
+        case "available":
           return questProgress?.available && !questProgress?.completed;
-        case 'completed':
+        case "completed":
           return questProgress?.completed;
-        case 'locked':
+        case "locked":
           return questProgress?.locked || !questProgress?.available;
         default:
           return true;
@@ -120,63 +122,67 @@ const MiniquestInterface: React.FC<MiniquestInterfaceProps> = ({
     });
   }, [miniquests, progress, filter]);
 
-  
-// Variable declaration
+  // Variable declaration
   const hasRequiredItems = useCallback(
     (quest: MiniquestData) => {
-      if (!quest.requiredItems) return true;
-      return quest.requiredItems.every(item => playerInventory.includes(item));
+      if (!quest.requiredItems) {return true;}
+      return quest.requiredItems.every((item) =>
+        playerInventory.includes(item),
+      );
     },
-    [playerInventory]
+    [playerInventory],
   );
 
-  
-// Variable declaration
+  // Variable declaration
   const getQuestStatusInfo = useCallback(
     (quest: MiniquestData) => {
-// Variable declaration
+      // Variable declaration
       const questProgress = progress[quest.id];
 
       if (questProgress?.completed) {
         return {
-          status: quest.repeatable ? 'repeatable' : 'completed',
-          color: quest.repeatable ? 'text-cyan-400' : 'text-green-400',
-          icon: quest.repeatable ? <RotateCcw className="w-4 h-4" /> : <CheckCircle className="w-4 h-4" />,
-          label: quest.repeatable ? 'REPEATABLE' : 'COMPLETED'
+          status: quest.repeatable ? "repeatable" : "completed",
+          color: quest.repeatable ? "text-cyan-400" : "text-green-400",
+          icon: quest.repeatable ? (
+            <RotateCcw className="w-4 h-4" />
+          ) : (
+            <CheckCircle className="w-4 h-4" />
+          ),
+          label: quest.repeatable ? "REPEATABLE" : "COMPLETED",
         };
       }
 
       if (questProgress?.available && hasRequiredItems(quest)) {
         return {
-          status: 'available',
-          color: 'text-blue-400',
+          status: "available",
+          color: "text-blue-400",
           icon: <Target className="w-4 h-4" />,
-          label: 'AVAILABLE'
+          label: "AVAILABLE",
         };
       }
 
       if (!hasRequiredItems(quest)) {
         return {
-          status: 'needs_items',
-          color: 'text-orange-400',
+          status: "needs_items",
+          color: "text-orange-400",
           icon: <Gift className="w-4 h-4" />,
-          label: 'NEEDS ITEMS'
+          label: "NEEDS ITEMS",
         };
       }
 
       return {
-        status: 'locked',
-        color: 'text-gray-400',
+        status: "locked",
+        color: "text-gray-400",
         icon: <X className="w-4 h-4" />,
-        label: 'LOCKED'
+        label: "LOCKED",
       };
     },
-    [progress, hasRequiredItems]
+    [progress, hasRequiredItems],
   );
 
-  if (!isOpen) return null;
+  if (!isOpen) {return null;}
 
-// JSX return block or main return
+  // JSX return block or main return
   return (
     <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <motion.div
@@ -226,18 +232,34 @@ const MiniquestInterface: React.FC<MiniquestInterfaceProps> = ({
           {}
           <div className="flex space-x-2 mt-4">
             {[
-              { key: 'all', label: 'All', icon: <Target className="w-4 h-4" /> },
-              { key: 'available', label: 'Available', icon: <Zap className="w-4 h-4" /> },
-              { key: 'completed', label: 'Completed', icon: <CheckCircle className="w-4 h-4" /> },
-              { key: 'locked', label: 'Locked', icon: <X className="w-4 h-4" /> }
-            ].map(tab => (
+              {
+                key: "all",
+                label: "All",
+                icon: <Target className="w-4 h-4" />,
+              },
+              {
+                key: "available",
+                label: "Available",
+                icon: <Zap className="w-4 h-4" />,
+              },
+              {
+                key: "completed",
+                label: "Completed",
+                icon: <CheckCircle className="w-4 h-4" />,
+              },
+              {
+                key: "locked",
+                label: "Locked",
+                icon: <X className="w-4 h-4" />,
+              },
+            ].map((tab) => (
               <button
                 key={tab.key}
                 onClick={() => setFilter(tab.key as any)}
                 className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all ${
                   filter === tab.key
-                    ? 'bg-white/20 text-white'
-                    : 'bg-white/10 text-indigo-200 hover:bg-white/15'
+                    ? "bg-white/20 text-white"
+                    : "bg-white/10 text-indigo-200 hover:bg-white/15"
                 }`}
               >
                 {tab.icon}
@@ -254,18 +276,22 @@ const MiniquestInterface: React.FC<MiniquestInterfaceProps> = ({
             {filteredQuests.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-center">
                 <Search className="w-16 h-16 text-gray-500 mb-4" />
-                <h3 className="text-xl font-semibold text-gray-400 mb-2">No Quests Found</h3>
-                <p className="text-gray-500">Try changing the filter or explore the area more.</p>
+                <h3 className="text-xl font-semibold text-gray-400 mb-2">
+                  No Quests Found
+                </h3>
+                <p className="text-gray-500">
+                  Try changing the filter or explore the area more.
+                </p>
               </div>
             ) : (
               <div className="space-y-4">
-                {filteredQuests.map(quest => {
-// Variable declaration
+                {filteredQuests.map((quest) => {
+                  // Variable declaration
                   const statusInfo = getQuestStatusInfo(quest);
-// Variable declaration
+                  // Variable declaration
                   const isSelected = selectedQuest?.id === quest.id;
 
-// JSX return block or main return
+                  // JSX return block or main return
                   return (
                     <motion.div
                       key={quest.id}
@@ -273,8 +299,8 @@ const MiniquestInterface: React.FC<MiniquestInterfaceProps> = ({
                       whileTap={{ scale: 0.98 }}
                       className={`bg-gray-800 rounded-lg border transition-all cursor-pointer ${
                         isSelected
-                          ? 'border-indigo-500 shadow-lg shadow-indigo-500/20'
-                          : 'border-gray-700 hover:border-gray-600'
+                          ? "border-indigo-500 shadow-lg shadow-indigo-500/20"
+                          : "border-gray-700 hover:border-gray-600"
                       }`}
                       onClick={() => setSelectedQuest(quest)}
                     >
@@ -282,10 +308,18 @@ const MiniquestInterface: React.FC<MiniquestInterfaceProps> = ({
                         {}
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex items-start space-x-3">
-                            <div className={`p-2 rounded-lg bg-gradient-to-r ${statusInfo.color}`}>{statusInfo.icon}</div>
+                            <div
+                              className={`p-2 rounded-lg bg-gradient-to-r ${statusInfo.color}`}
+                            >
+                              {statusInfo.icon}
+                            </div>
                             <div className="flex-1">
-                              <h3 className="text-lg font-semibold text-white">{quest.title}</h3>
-                              <p className="text-gray-300 text-sm mb-3">{quest.description}</p>
+                              <h3 className="text-lg font-semibold text-white">
+                                {quest.title}
+                              </h3>
+                              <p className="text-gray-300 text-sm mb-3">
+                                {quest.description}
+                              </p>
                             </div>
                           </div>
                         </div>

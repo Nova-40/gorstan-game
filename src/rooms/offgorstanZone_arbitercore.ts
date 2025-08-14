@@ -17,17 +17,9 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Renders room descriptions and image logic.
 
-import { NPC } from '../types/NPCTypes';
+import { NPC } from "../types/NPCTypes";
 
-import { Room } from '../types/Room';
-
-
-
-
-
-
-
-
+import { Room } from "../types/Room";
 
 const arbitercore: Room = {
   id: "arbitercore",
@@ -37,7 +29,7 @@ const arbitercore: Room = {
     "You stand within the Arbiter Core, the enigmatic heart of judgment and balance for all realities.",
     "Pulsing energy conduits arc overhead, casting shifting shadows across the obsidian floor.",
     "Glyphs of law and chaos spiral along the walls, and a central core pulses with the power to rewrite fate.",
-    "The air vibrates with the tension of decisions yet to be made."
+    "The air vibrates with the tension of decisions yet to be made.",
   ],
   image: "offgorstanZone_arbitercore.png",
   ambientAudio: "arbiter_core_ambience.mp3",
@@ -45,59 +37,57 @@ const arbitercore: Room = {
   consoleIntro: [
     ">> ARBITER CORE - JUDGMENT CHAMBER",
     ">> Access: RESTRICTED",
-    ">> Tip: The core responds to those who seek balance between order and chaos."
+    ">> Tip: The core responds to those who seek balance between order and chaos.",
   ],
 
   exits: {
     north: "offgorstanZone_multiversehub",
-    south: "offgorstanZone_voidatrium"
+    south: "offgorstanZone_voidatrium",
   },
 
-  items: [
-    "core_fragment",
-    "judgment_token",
-    "balance_crystal"
-  ],
+  items: ["core_fragment", "judgment_token", "balance_crystal"],
 
   traps: [
     {
-      id: 'judgment_field',
-      type: 'damage',
-      severity: 'major', // Reduced from 'fatal'
-      description: 'The Arbiter Core judges you harshly! Reality-altering energy strikes you as the universe weighs your actions!',
-      trigger: 'enter',
+      id: "judgment_field",
+      type: "damage",
+      severity: "major", // Reduced from 'fatal'
+      description:
+        "The Arbiter Core judges you harshly! Reality-altering energy strikes you as the universe weighs your actions!",
+      trigger: "enter",
       effect: {
         damage: 35, // Reduced from 90 to 35 - severe but survivable
-        flagsSet: ['judged_by_arbiter']
+        flagsSet: ["judged_by_arbiter"],
       },
       triggered: false,
       disarmable: true,
-      disarmSkill: 'judgment_token',
+      disarmSkill: "judgment_token",
       hidden: false,
-    }
+    },
   ],
 
   interactables: {
-    "central_core": {
-      description: "A massive, pulsing core at the center of the chamber, radiating both order and chaos.",
+    central_core: {
+      description:
+        "A massive, pulsing core at the center of the chamber, radiating both order and chaos.",
       actions: ["examine", "activate", "attune"],
       requires: ["judgment_token"],
     },
-    "law_glyphs": {
-      description: "Glyphs representing the laws of reality, glowing with a steady blue light.",
+    law_glyphs: {
+      description:
+        "Glyphs representing the laws of reality, glowing with a steady blue light.",
       actions: ["study", "trace", "decode"],
       requires: [],
     },
-    "chaos_glyphs": {
-      description: "Glyphs representing chaos, flickering with unpredictable energy.",
+    chaos_glyphs: {
+      description:
+        "Glyphs representing chaos, flickering with unpredictable energy.",
       actions: ["observe", "touch", "interpret"],
       requires: [],
-    }
+    },
   },
 
-  npcs: [
-    
-  ],
+  npcs: [],
 
   events: {
     onEnter: ["showArbiterCoreIntro", "activateCoreGlyphs"],
@@ -106,7 +96,7 @@ const arbitercore: Room = {
       central_core: ["activateCore", "attuneToBalance"],
       law_glyphs: ["decodeLawGlyphs", "traceLawGlyphs"],
       chaos_glyphs: ["interpretChaosGlyphs", "touchChaosGlyphs"],
-    }
+    },
   },
 
   flags: {
@@ -121,20 +111,16 @@ const arbitercore: Room = {
     optional: [
       "Decode the Law Glyphs",
       "Interpret the Chaos Glyphs",
-      "Meet the Arbiter"
-    ]
+      "Meet the Arbiter",
+    ],
   },
 
   environmental: {
     lighting: "pulsing_energy",
     temperature: "cool_and_electric",
     airQuality: "charged_with_tension",
-    soundscape: [
-      "humming_core",
-      "crackling_energy",
-      "echoing_glyphs"
-    ],
-    hazards: ["energy_surge", "fate_shift"]
+    soundscape: ["humming_core", "crackling_energy", "echoing_glyphs"],
+    hazards: ["energy_surge", "fate_shift"],
   },
 
   security: {
@@ -142,7 +128,7 @@ const arbitercore: Room = {
     accessRequirements: ["judgment_token"],
     alarmTriggers: ["unauthorized_activation"],
     surveillanceActive: true,
-    surveillanceType: "arbiter_entity"
+    surveillanceType: "arbiter_entity",
   },
 
   metadata: {
@@ -157,37 +143,36 @@ const arbitercore: Room = {
       "Judgment and balance puzzles",
       "Central core activation",
       "Law and chaos glyphs",
-      "Arbiter NPC"
-    ]
+      "Arbiter NPC",
+    ],
   },
 
   secrets: {
     hidden_conduit: {
-      description: "A secret conduit revealed by attuning to both law and chaos glyphs.",
+      description:
+        "A secret conduit revealed by attuning to both law and chaos glyphs.",
       requirements: ["decode law_glyphs", "interpret chaos_glyphs"],
       rewards: ["balance_artifact", "arbiter_lore"],
-    }
+    },
   },
 
   customActions: {
-    "attune_core": {
+    attune_core: {
       description: "Attune yourself to the Arbiter Core's balance.",
       requirements: ["judgment_token"],
       effects: ["set_coreActivated", "unlock_secret"],
     },
-    "decode_law": {
+    decode_law: {
       description: "Decode the law glyphs to understand the rules of reality.",
       requirements: [],
       effects: ["set_lawDecoded", "gain_insight"],
     },
-    "interpret_chaos": {
+    interpret_chaos: {
       description: "Interpret the chaos glyphs to glimpse possible futures.",
       requirements: [],
       effects: ["set_chaosInterpreted", "gain_foresight"],
-    }
-  }
+    },
+  },
 };
 
 export default arbitercore;
-
-

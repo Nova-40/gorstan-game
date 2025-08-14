@@ -17,8 +17,8 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Game module.
 
-import React from 'react';
-import { XCircle, Settings, ArrowLeft, Zap, Wrench } from 'lucide-react';
+import React from "react";
+import { XCircle, Settings, ArrowLeft, Zap, Wrench } from "lucide-react";
 
 interface UseItemModalProps {
   inventory: string[];
@@ -27,25 +27,32 @@ interface UseItemModalProps {
   onUse: (item: string, target?: string) => void;
 }
 
-export const UseItemModal: React.FC<UseItemModalProps> = ({ inventory, environmentItems, onClose, onUse }) => {
+export const UseItemModal: React.FC<UseItemModalProps> = ({
+  inventory,
+  environmentItems,
+  onClose,
+  onUse,
+}) => {
   const [selectedItem, setSelectedItem] = React.useState<string | null>(null);
-  const [mode, setMode] = React.useState<'choose' | 'standalone' | 'withItem' | 'withEnv'>('choose');
+  const [mode, setMode] = React.useState<
+    "choose" | "standalone" | "withItem" | "withEnv"
+  >("choose");
 
   // Variable declaration
-  const otherItems = inventory.filter(i => i !== selectedItem);
+  const otherItems = inventory.filter((i) => i !== selectedItem);
 
   // React effect hook
   React.useEffect(() => {
     // Variable declaration
-    const handler = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
-    window.addEventListener('keydown', handler);
+    const handler = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", handler);
     // JSX return block or main return
-    return () => window.removeEventListener('keydown', handler);
+    return () => window.removeEventListener("keydown", handler);
   }, [onClose]);
 
   const resetToChoose = () => {
     setSelectedItem(null);
-    setMode('choose');
+    setMode("choose");
   };
 
   // JSX return block or main return
@@ -65,12 +72,14 @@ export const UseItemModal: React.FC<UseItemModalProps> = ({ inventory, environme
         <div className="modal-content">
           {!selectedItem ? (
             <div className="item-selection">
-              <p className="instruction-text">Select an item from your inventory to use:</p>
+              <p className="instruction-text">
+                Select an item from your inventory to use:
+              </p>
               {inventory.length > 0 ? (
                 <div className="item-grid">
-                  {inventory.map(item => (
-                    <button 
-                      key={item} 
+                  {inventory.map((item) => (
+                    <button
+                      key={item}
                       className="item-button"
                       onClick={() => setSelectedItem(item)}
                     >
@@ -83,11 +92,13 @@ export const UseItemModal: React.FC<UseItemModalProps> = ({ inventory, environme
                 <div className="empty-state">
                   <Settings className="empty-icon" />
                   <p>Your inventory is empty.</p>
-                  <small>You need to pick up items before you can use them</small>
+                  <small>
+                    You need to pick up items before you can use them
+                  </small>
                 </div>
               )}
             </div>
-          ) : mode === 'choose' ? (
+          ) : mode === "choose" ? (
             <div className="usage-selection">
               <div className="selected-item">
                 <div className="item-display">
@@ -99,11 +110,13 @@ export const UseItemModal: React.FC<UseItemModalProps> = ({ inventory, environme
                   Choose Different Item
                 </button>
               </div>
-              
-              <p className="instruction-text">How would you like to use <strong>{selectedItem}</strong>?</p>
-              
+
+              <p className="instruction-text">
+                How would you like to use <strong>{selectedItem}</strong>?
+              </p>
+
               <div className="usage-options">
-                <button 
+                <button
                   className="usage-button standalone"
                   onClick={() => onUse(selectedItem)}
                 >
@@ -113,49 +126,65 @@ export const UseItemModal: React.FC<UseItemModalProps> = ({ inventory, environme
                     <small>Activate or use the item directly</small>
                   </div>
                 </button>
-                
-                <button 
+
+                <button
                   className="usage-button with-item"
-                  onClick={() => setMode('withItem')}
+                  onClick={() => setMode("withItem")}
                   disabled={otherItems.length === 0}
                 >
                   <Settings className="option-icon" />
                   <div className="option-content">
                     <span className="option-title">Use with another item</span>
-                    <small>{otherItems.length > 0 ? `Combine with one of ${otherItems.length} items` : 'No other items available'}</small>
+                    <small>
+                      {otherItems.length > 0
+                        ? `Combine with one of ${otherItems.length} items`
+                        : "No other items available"}
+                    </small>
                   </div>
                 </button>
-                
-                <button 
+
+                <button
                   className="usage-button with-env"
-                  onClick={() => setMode('withEnv')}
+                  onClick={() => setMode("withEnv")}
                   disabled={environmentItems.length === 0}
                 >
                   <Wrench className="option-icon" />
                   <div className="option-content">
                     <span className="option-title">Use with environment</span>
-                    <small>{environmentItems.length > 0 ? `Use with one of ${environmentItems.length} objects` : 'No environmental objects available'}</small>
+                    <small>
+                      {environmentItems.length > 0
+                        ? `Use with one of ${environmentItems.length} objects`
+                        : "No environmental objects available"}
+                    </small>
                   </div>
                 </button>
               </div>
             </div>
-          ) : mode === 'withItem' ? (
+          ) : mode === "withItem" ? (
             <div className="target-selection">
               <div className="selected-item">
-                <span>Using: <strong>{selectedItem}</strong></span>
-                <button className="back-button" onClick={() => setMode('choose')}>
+                <span>
+                  Using: <strong>{selectedItem}</strong>
+                </span>
+                <button
+                  className="back-button"
+                  onClick={() => setMode("choose")}
+                >
                   <ArrowLeft size={16} />
                   Back
                 </button>
               </div>
-              
-              <p className="instruction-text">Choose another item to combine with <strong>{selectedItem}</strong>:</p>
-              
+
+              <p className="instruction-text">
+                Choose another item to combine with{" "}
+                <strong>{selectedItem}</strong>:
+              </p>
+
               {otherItems.length > 0 ? (
                 <div className="target-grid">
-                  {otherItems.map(item => (
-                    <button 
-                      key={item} 
+                  {otherItems.map((item) => (
+                    <button
+                      key={item}
                       className="target-button"
                       onClick={() => onUse(selectedItem, item)}
                     >
@@ -174,20 +203,28 @@ export const UseItemModal: React.FC<UseItemModalProps> = ({ inventory, environme
           ) : (
             <div className="target-selection">
               <div className="selected-item">
-                <span>Using: <strong>{selectedItem}</strong></span>
-                <button className="back-button" onClick={() => setMode('choose')}>
+                <span>
+                  Using: <strong>{selectedItem}</strong>
+                </span>
+                <button
+                  className="back-button"
+                  onClick={() => setMode("choose")}
+                >
                   <ArrowLeft size={16} />
                   Back
                 </button>
               </div>
-              
-              <p className="instruction-text">Choose an environmental object to use <strong>{selectedItem}</strong> with:</p>
-              
+
+              <p className="instruction-text">
+                Choose an environmental object to use{" "}
+                <strong>{selectedItem}</strong> with:
+              </p>
+
               {environmentItems.length > 0 ? (
                 <div className="target-grid">
-                  {environmentItems.map(env => (
-                    <button 
-                      key={env} 
+                  {environmentItems.map((env) => (
+                    <button
+                      key={env}
                       className="target-button environmental"
                       onClick={() => onUse(selectedItem, env)}
                     >
@@ -199,7 +236,10 @@ export const UseItemModal: React.FC<UseItemModalProps> = ({ inventory, environme
               ) : (
                 <div className="empty-state">
                   <Wrench className="empty-icon" />
-                  <p>There are no environmental objects you can use this item with.</p>
+                  <p>
+                    There are no environmental objects you can use this item
+                    with.
+                  </p>
                 </div>
               )}
             </div>

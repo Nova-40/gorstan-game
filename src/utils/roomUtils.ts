@@ -16,12 +16,12 @@
 
 // src/utils/roomUtils.ts
 // Utility to get the zone for a given roomId
-import roomRegistry from '../rooms/roomRegistry';
+import roomRegistry from "../rooms/roomRegistry";
 
 /**
  * Returns the zone string for a given roomId, or empty string if not found.
  */
 export function getZoneForRoom(roomId: string): string {
   const room = roomRegistry[roomId as keyof typeof roomRegistry];
-  return room && typeof room.zone === 'string' ? room.zone : '';
+  return room && typeof room.zone === "string" ? room.zone : "";
 }

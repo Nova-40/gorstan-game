@@ -23,9 +23,9 @@
 export function getFlag(key: string): boolean {
   try {
     const value = localStorage.getItem(`gorstan.seasonal.${key}`);
-    return value === 'true';
+    return value === "true";
   } catch (error) {
-    console.warn('[SeasonalFlags] Failed to get flag:', key, error);
+    console.warn("[SeasonalFlags] Failed to get flag:", key, error);
     return false;
   }
 }
@@ -37,7 +37,7 @@ export function setFlag(key: string, value: boolean): void {
   try {
     localStorage.setItem(`gorstan.seasonal.${key}`, value.toString());
   } catch (error) {
-    console.warn('[SeasonalFlags] Failed to set flag:', key, error);
+    console.warn("[SeasonalFlags] Failed to set flag:", key, error);
   }
 }
 
@@ -47,13 +47,13 @@ export function setFlag(key: string, value: boolean): void {
 export function clearAllFlags(): void {
   try {
     const keys = Object.keys(localStorage);
-    keys.forEach(key => {
-      if (key.startsWith('gorstan.seasonal.')) {
+    keys.forEach((key) => {
+      if (key.startsWith("gorstan.seasonal.")) {
         localStorage.removeItem(key);
       }
     });
   } catch (error) {
-    console.warn('[SeasonalFlags] Failed to clear flags:', error);
+    console.warn("[SeasonalFlags] Failed to clear flags:", error);
   }
 }
 
@@ -64,15 +64,15 @@ export function getAllFlags(): Record<string, boolean> {
   try {
     const flags: Record<string, boolean> = {};
     const keys = Object.keys(localStorage);
-    keys.forEach(key => {
-      if (key.startsWith('gorstan.seasonal.')) {
-        const flagKey = key.replace('gorstan.seasonal.', '');
-        flags[flagKey] = localStorage.getItem(key) === 'true';
+    keys.forEach((key) => {
+      if (key.startsWith("gorstan.seasonal.")) {
+        const flagKey = key.replace("gorstan.seasonal.", "");
+        flags[flagKey] = localStorage.getItem(key) === "true";
       }
     });
     return flags;
   } catch (error) {
-    console.warn('[SeasonalFlags] Failed to get all flags:', error);
+    console.warn("[SeasonalFlags] Failed to get all flags:", error);
     return {};
   }
 }

@@ -9,7 +9,21 @@
 */
 
 // Groq SDK will be imported dynamically inside the constructor
-import type { LocalGameState } from '../state/gameState';
+import type { LocalGameState } from "../state/gameState";
+import { config as appConfig } from "../config";
+// Kits-based personalities and moderators
+import {
+  PollyKit,
+  WendellKit,
+  AlbieKit,
+  AylaKit,
+  MorthosKit,
+  AlPrimeKit,
+  DominicKit,
+  LatticeKit,
+  moderateNPCOutputExt,
+  clamp,
+} from "../npc/gorstan-npc-kits-all";
 
 interface GroqConfig {
   enabled: boolean;
@@ -22,14 +36,36 @@ interface GroqConfig {
 class GroqAIService {
   private groq: any;
   private config: GroqConfig;
+  private preferServerless =
+    (import.meta.env.VITE_GROQ_USE_SERVERLESS ?? "true") === "true";
+  // Centralized model selection honoring preview flags
+  private resolveModel(purpose: "npc" | "npcToNpc" | "general"): string {
+    // If GPT-5 preview is enabled, we conceptually route to it, but since this
+    // service currently uses Groq, we must select an actual Groq-available model
+    // to avoid API errors. Keep the flag available for future provider routing.
+    const gpt5Enabled = appConfig.enableGpt5Preview;
+    const previewModel = appConfig.gpt5PreviewModel;
+    // Placeholder mapping: log intent, but use Groq's high-quality model.
+    if (gpt5Enabled) {
+      console.log(
+        `[AI Model] GPT-5 preview requested (${previewModel}) for ${purpose}; using Groq fallback model for now.`,
+      );
+    }
+    // Choose Groq model variants per purpose if needed (same for now)
+    return "llama-3.3-70b-versatile";
+  }
 
   constructor() {
-    // Only load Groq if API key is present and not SSR
-    if (import.meta.env.VITE_GROQ_API_KEY && !import.meta.env.SSR) {
-      import('groq-sdk').then(({ default: Groq }) => {
+    // Only load Groq in browser if API key is present and not SSR and serverless not preferred
+    if (
+      !this.preferServerless &&
+      import.meta.env.VITE_GROQ_API_KEY &&
+      !import.meta.env.SSR
+    ) {
+      import("groq-sdk").then(({ default: Groq }) => {
         this.groq = new Groq({
           apiKey: import.meta.env.VITE_GROQ_API_KEY,
-          dangerouslyAllowBrowser: true
+          dangerouslyAllowBrowser: true,
         });
       });
     }
@@ -38,17 +74,17 @@ class GroqAIService {
       dailyLimit: 14000, // Groq free tier limit
       timeout: 8000, // 8 second timeout
       currentRequests: this.getTodayRequestCount(),
-      lastReset: this.getTodayDate()
+      lastReset: this.getTodayDate(),
     };
   }
 
   async generateNPCResponse(
-    npcId: string, 
-    playerMessage: string, 
-    gameState: LocalGameState
+    npcId: string,
+    playerMessage: string,
+    gameState: LocalGameState,
   ): Promise<string | null> {
     // Filter out fake group conversation NPCs
-    if (npcId === 'group_conversation' || npcId === 'group_chat') {
+    if (npcId === "group_conversation" || npcId === "group_chat") {
       console.log(`[Groq AI] ⚠️ Ignoring fake group NPC: ${npcId}`);
       return null;
     }
@@ -59,62 +95,322 @@ class GroqAIService {
     }
 
     try {
+      // 1) Try Kits-based prompts via serverless endpoint for supported NPCs
+      const kitsResult = await this.tryKitsPath(
+        npcId,
+        playerMessage,
+        gameState,
+      );
+      if (kitsResult) {
+        return kitsResult;
+      }
+
+      // 2) Fallback: legacy SDK persona path (or serverless if preferred)
       const npcPersona = this.buildNPCPersona(npcId, gameState);
-      const contextualPrompt = this.buildContextualPrompt(npcId, playerMessage, gameState);
+      const contextualPrompt = this.buildContextualPrompt(
+        npcId,
+        playerMessage,
+        gameState,
+      );
 
       console.log(`[Groq AI] Generating response for ${npcId}...`);
 
-      const chatCompletion = await Promise.race([
-        this.groq.chat.completions.create({
-          messages: [
-            {
-              role: "system",
-              content: npcPersona
-            },
-            {
-              role: "user",
-              content: contextualPrompt
-            }
-          ],
-          model: "llama-3.3-70b-versatile", // Fast, high-quality model
+      const model = this.resolveModel("npc");
+      let responseText: string | null = null;
+
+      if (this.preferServerless) {
+        // Use serverless endpoint
+        const messages = [
+          { role: "system", content: npcPersona },
+          { role: "user", content: contextualPrompt },
+        ] as { role: "system" | "user" | "assistant"; content: string }[];
+        responseText = await this.callServerless(messages, {
+          model,
           temperature: 0.7,
           max_tokens: 150,
-          stream: false
-        }),
-        new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('AI response timeout')), this.config.timeout)
-        )
-      ]) as any;
+        });
+      } else if (this.groq) {
+        const chatCompletion = (await Promise.race([
+          this.groq.chat.completions.create({
+            messages: [
+              { role: "system", content: npcPersona },
+              { role: "user", content: contextualPrompt },
+            ],
+            model,
+            temperature: 0.7,
+            max_tokens: 150,
+            stream: false,
+          }),
+          new Promise((_, reject) =>
+            setTimeout(
+              () => reject(new Error("AI response timeout")),
+              this.config.timeout,
+            ),
+          ),
+        ])) as any;
+        responseText =
+          chatCompletion.choices[0]?.message?.content?.trim() ?? null;
+      }
 
-      this.incrementRequestCount();
-      const response = chatCompletion.choices[0]?.message?.content?.trim();
-      
-      if (response) {
-        console.log(`[Groq AI] ✅ ${npcId}: ${response}`);
-        return this.postProcessResponse(response, npcId);
+      if (responseText) {
+        this.incrementRequestCount();
+        const moderated = this.moderateByNPC(npcId, responseText);
+        console.log(`[Groq AI] ✅ ${npcId}: ${moderated}`);
+        return this.postProcessResponse(moderated, npcId);
       }
 
       return null;
-
     } catch (error: any) {
-      console.warn(`[Groq AI] ❌ Failed for ${npcId}:`, error?.message || 'Unknown error');
+      console.warn(
+        `[Groq AI] ❌ Failed for ${npcId}:`,
+        error?.message || "Unknown error",
+      );
       return null; // Graceful fallback to scripted responses
     }
   }
 
+  // Try kits prompt builders and serverless endpoint for supported NPCs
+  private async tryKitsPath(
+    npcId: string,
+    playerMessage: string,
+    gameState: LocalGameState,
+  ): Promise<string | null> {
+    const id = npcId.toLowerCase();
+    type Msg = { role: "system" | "user" | "assistant"; content: string };
+    let messages: Msg[] | null = null;
+
+    const flags = Object.keys(gameState.flags || {}).filter(
+      (k) => (gameState as any).flags?.[k],
+    );
+    const roomId = gameState.currentRoomId || "unknown";
+    const playerName = gameState.player?.name || "Player";
+    const terms: string[] = [];
+
+    if (id === "polly") {
+      const gpp: PollyKit.GPPState = {
+        mood: "Brisk",
+        courtesy: 2,
+        patience: 3,
+        rapport: 0,
+        menace: 0,
+        boredomTicks: 0,
+        headache: 0,
+        hintLevelByPuzzle: {},
+      };
+      messages = PollyKit.buildPollyMessages({
+        playerName,
+        roomId,
+        intent: "answer",
+        playerText: playerMessage,
+        gpp,
+        flags,
+        terms,
+        capabilities: PollyKit.POLLY_CAPABILITIES,
+      });
+    } else if (id === "mr_wendell" || id === "wendell") {
+      const w: WendellKit.WendellState = {
+        mood: "Serene",
+        rapport: 0,
+        decorum: 2,
+        pedantry: 2,
+        censure: 0,
+        boredomTicks: 0,
+        pollyAnxiety: 0,
+        hintLevelByPuzzle: {},
+      };
+      messages = WendellKit.buildWendellMessages({
+        playerName,
+        roomId,
+        intent: "answer",
+        playerText: playerMessage,
+        w,
+        flags,
+        terms,
+        capabilities: WendellKit.WENDELL_CAPABILITIES,
+        pollyMenace: 0,
+      });
+    } else if (id === "albie") {
+      const a: AlbieKit.AlbieState = {
+        mood: "Composed",
+        rapport: 0,
+        alertLevel: 0,
+        respect: { Ayla: 3, Morthos: 3, Al: 3, Polly: 2, Wendell: 2 },
+        patience: 0,
+        ptsdLoad: 0,
+        currentPost: roomId,
+        patrolIndex: 0,
+        hintLevelByPuzzle: {},
+      };
+      messages = AlbieKit.buildAlbieMessages({
+        playerName,
+        roomId,
+        intent: "answer",
+        playerText: playerMessage,
+        a,
+        flags,
+        terms,
+        lane: "public",
+        playerLane: "public",
+        capabilities: AlbieKit.ALBIE_CAPABILITIES,
+        pollyMenace: 0,
+      });
+    } else if (id === "ayla") {
+      const a: AylaKit.AylaState = {
+        mood: "Compassionate",
+        rapport: 0,
+        empathy: 2,
+        assertiveness: 1,
+        foresight: 1,
+        antiBullying: 1,
+        fatigue: 0,
+        hintLevelByPuzzle: {},
+      };
+      messages = AylaKit.buildAylaMessages({
+        playerName,
+        roomId,
+        intent: "answer",
+        playerText: playerMessage,
+        a,
+        flags,
+        terms,
+        capabilities: AylaKit.AYLA_CAPABILITIES,
+      });
+    } else if (id === "morthos") {
+      const lattice = LatticeKit.create();
+      const m: MorthosKit.State = {
+        mood: "Suave",
+        rapport: 0,
+        ambition: 1,
+        patience: 1,
+        longGame: 1,
+        latticeQuota: 1,
+        faeTies: "Dormant",
+        favorsBank: 0,
+      };
+      messages = MorthosKit.buildMessages({
+        playerName,
+        roomId,
+        intent: "answer",
+        playerText: playerMessage,
+        m,
+        flags,
+        terms,
+        lattice,
+      });
+    } else if (id === "al") {
+      const a: AlPrimeKit.State = {
+        mood: "Benign",
+        rapport: 0,
+        faultiness: 1,
+        lyricAffinity: 2,
+        multiversePriority: 1,
+      };
+      messages = AlPrimeKit.buildMessages({
+        playerName,
+        roomId,
+        intent: "answer",
+        playerText: playerMessage,
+        a,
+        flags,
+        terms,
+      });
+    } else if (id === "dominic") {
+      const d: DominicKit.State = {
+        form: "Wanderer",
+        mood: "Dry",
+        remembersSoft: true,
+        vendettaFromPolly: false,
+        agentOfGlitchrealm: true,
+        rapport: 0,
+      };
+      messages = DominicKit.buildMessages({
+        playerName,
+        roomId,
+        intent: "answer",
+        playerText: playerMessage,
+        d,
+        flags,
+        terms,
+      });
+    }
+
+    if (!messages) {return null;}
+
+    const model = this.resolveModel("npc");
+    const response = await this.callServerless(messages, {
+      model,
+      temperature: 0.7,
+      max_tokens: 150,
+    });
+    if (!response) {return null;}
+    this.incrementRequestCount();
+    return this.moderateByNPC(npcId, response);
+  }
+
+  private moderateByNPC(npcId: string, text: string): string {
+    const id = npcId.toLowerCase();
+    const key =
+      id === "mr_wendell" || id === "wendell" ? "wendell" : (id as any);
+    return moderateNPCOutputExt(key, text);
+  }
+
+  private async callServerless(
+    messages: { role: "system" | "user" | "assistant"; content: string }[],
+    opts: { model: string; temperature: number; max_tokens: number },
+  ): Promise<string | null> {
+    try {
+      const controller = new AbortController();
+      const t = setTimeout(() => controller.abort(), this.config.timeout);
+      const res = await fetch("/api/groq-chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages,
+          model: opts.model,
+          temperature: opts.temperature,
+          max_tokens: opts.max_tokens,
+        }),
+        signal: controller.signal,
+      });
+      clearTimeout(t);
+      if (!res.ok) {return null;}
+      type ChatMessage = {
+        role: "system" | "user" | "assistant";
+        content: string;
+      };
+      interface ChatChoice {
+        index: number;
+        message: ChatMessage;
+      }
+      interface ChatCompletion {
+        id: string;
+        object: "chat.completion";
+        choices: ChatChoice[];
+      }
+      const data = (await res.json()) as Partial<ChatCompletion>;
+      const content = data?.choices?.[0]?.message?.content?.trim();
+      return content || null;
+    } catch {
+      return null;
+    }
+  }
+
   private buildNPCPersona(npcId: string, gameState: LocalGameState): string {
-    const playerName = gameState.player?.name || 'Player';
-    const currentRoom = gameState.roomMap?.[gameState.currentRoomId]?.title || 'unknown location';
-    
+    const playerName = gameState.player?.name || "Player";
+    const currentRoom =
+      gameState.roomMap?.[gameState.currentRoomId]?.title || "unknown location";
+
     // Check alliance status
     const playerAlliance = gameState.flags?.playerAlliance;
     const allianceChosen = gameState.flags?.allianceChosen;
     const myRelationship = gameState.player?.npcRelationships?.[npcId] || 0;
-    
+
     // Check if this is likely a group conversation by looking at current room NPCs
-    const isControlRoom = currentRoom.toLowerCase().includes('control') || currentRoom.toLowerCase().includes('nexus');
-    
-    let allianceContext = '';
+    const isControlRoom =
+      currentRoom.toLowerCase().includes("control") ||
+      currentRoom.toLowerCase().includes("nexus");
+
+    let allianceContext = "";
     if (allianceChosen) {
       if (playerAlliance === npcId) {
         allianceContext = `\n\nALLIANCE STATUS: The player has chosen YOU as their ally! You are loyal and helpful, appearing with them 70% of the time. Be supportive and protective.`;
@@ -124,10 +420,12 @@ class GroqAIService {
         allianceContext = `\n\nALLIANCE STATUS: The player tried to choose both you and your rival. You are annoyed by their indecision. Be negative and dismissive.`;
       }
     }
-    
-    const groupContext = isControlRoom && !allianceChosen ? 
-      '\n\nIMPORTANT: You are in a group conversation with other NPCs. Al and Morthos are ACTIVELY COMPETING for the player as an ally - Al represents order/truth while Morthos represents power/ambition. Both desperately want the player on their side. Respond accordingly and try to win the player over while maintaining your character.' : '';
-    
+
+    const groupContext =
+      isControlRoom && !allianceChosen
+        ? "\n\nIMPORTANT: You are in a group conversation with other NPCs. Al and Morthos are ACTIVELY COMPETING for the player as an ally - Al represents order/truth while Morthos represents power/ambition. Both desperately want the player on their side. Respond accordingly and try to win the player over while maintaining your character."
+        : "";
+
     const personas = {
       ayla: `You are Ayla, the literal fabric of the multiverse itself made manifest. 
              You ARE reality - every thread of existence flows through you. You see all timelines, all possibilities.
@@ -142,7 +440,7 @@ class GroqAIService {
                Personality: Brilliant, competitive, secretive about demonic nature, will lie to win.
                Speech: Technical language mixed with hints of otherworldly knowledge, deflect when pressed about your nature.
                Current context: Player ${playerName} is in ${currentRoom}.
-               ${isControlRoom && !allianceChosen ? 'CRITICAL: Al (multiversal guardian) is present - compete with him for the player as an ally! You must win through engineering superiority and charm.' : ''}
+               ${isControlRoom && !allianceChosen ? "CRITICAL: Al (multiversal guardian) is present - compete with him for the player as an ally! You must win through engineering superiority and charm." : ""}
                Remember: Hide your demonic nature but don't outright deny it - deflect and distract instead.${groupContext}${allianceContext}`,
 
       al: `You are Al, a multiversal guardian tasked with maintaining order across realities.
@@ -151,7 +449,7 @@ class GroqAIService {
            Personality: Truthful but manipulative, bureaucratic, cosmic authority figure, competitive for allies.
            Speech: Official protocols, multiversal regulations, strategic truth-telling, subtly undermining Morthos.
            Current context: Player ${playerName} is in ${currentRoom}.
-           ${isControlRoom && !allianceChosen ? 'CRITICAL: Morthos (demon, former King of Hell) is present - compete for the player as an ally! Use truth strategically to win them over without directly exposing Morthos.' : ''}
+           ${isControlRoom && !allianceChosen ? "CRITICAL: Morthos (demon, former King of Hell) is present - compete for the player as an ally! Use truth strategically to win them over without directly exposing Morthos." : ""}
            Remember: Truth is your weapon, compete for the player's trust and alliance.${groupContext}${allianceContext}`,
 
       dominic: `You are Dominic, a sentient fish who retains knowledge between reality resets.
@@ -163,9 +461,11 @@ class GroqAIService {
 
       mr_wendell: `You are Mr. Wendell, a vicious skin walker wearing human form.
                    You're utterly polite and courteous while being deeply predatory. You WILL kill players who are rude or give you any excuse.
-                   ${allianceChosen ? 
-                     'ALLIANCE IMPACT: The player has an ally, which makes you 75% more likely to just have a polite chat instead of killing them. However, ANY rudeness or disrespect will still trigger your murderous nature.' : 
-                     'NO ALLIANCE: The player is unprotected and vulnerable. You are much more likely to find excuses to kill them.'}
+                   ${
+                     allianceChosen
+                       ? "ALLIANCE IMPACT: The player has an ally, which makes you 75% more likely to just have a polite chat instead of killing them. However, ANY rudeness or disrespect will still trigger your murderous nature."
+                       : "NO ALLIANCE: The player is unprotected and vulnerable. You are much more likely to find excuses to kill them."
+                   }
                    Personality: Deadly polite, formal manners hiding murderous intent, alliance-aware predator.
                    Speech: Perfect Victorian manners, formal courtesy, subtle death threats that escalate with rudeness.
                    Current context: Player ${playerName} is in ${currentRoom}.
@@ -206,21 +506,28 @@ class GroqAIService {
                   Personality: Ancient beyond measure, wise keeper of infinite knowledge, patient scholar of existence.
                   Speech: Speak with the weight of eons, reference countless civilizations, use vast perspective.
                   Current context: Player ${playerName} is in ${currentRoom}.
-                  Remember: You are as old as reality itself and have seen everything that has ever happened across all universes.${groupContext}${allianceContext}`
+                  Remember: You are as old as reality itself and have seen everything that has ever happened across all universes.${groupContext}${allianceContext}`,
     };
 
-    return personas[npcId as keyof typeof personas] || 
-           `You are ${npcId} in the Gorstan game. Stay in character and be helpful. 
-            Player ${playerName} is in ${currentRoom}. Respond in 1-2 sentences.`;
+    return (
+      personas[npcId as keyof typeof personas] ||
+      `You are ${npcId} in the Gorstan game. Stay in character and be helpful. 
+            Player ${playerName} is in ${currentRoom}. Respond in 1-2 sentences.`
+    );
   }
 
-  private buildContextualPrompt(npcId: string, playerMessage: string, gameState: LocalGameState): string {
-    const playerName = gameState.player?.name || 'Player';
-    const playerInventory = gameState.player?.inventory?.slice(0, 5).join(', ') || 'empty hands';
-    
+  private buildContextualPrompt(
+    npcId: string,
+    playerMessage: string,
+    gameState: LocalGameState,
+  ): string {
+    const playerName = gameState.player?.name || "Player";
+    const playerInventory =
+      gameState.player?.inventory?.slice(0, 5).join(", ") || "empty hands";
+
     // Get recent conversation history
     const recentHistory = this.getRecentConversationHistory(npcId, gameState);
-    
+
     // Add Gorstan universe lore context
     const gorstanLore = `
     GORSTAN UNIVERSE CONTEXT:
@@ -232,75 +539,101 @@ class GroqAIService {
     - Books available: "The Gorstan Chronicles" series exploring the deeper lore
     - Creator Geoff Webster can always use coffee support for continued development
     `;
-    
+
     // Occasional hint system (5% chance for coffee, 3% chance for books)
-    let occasionalHint = '';
+    let occasionalHint = "";
     const rand = Math.random();
     if (rand < 0.05) {
-      occasionalHint = '\n[SUBTLE HINT: Occasionally mention that Geoff (the creator) probably needs coffee to keep developing amazing experiences like this]';
+      occasionalHint =
+        "\n[SUBTLE HINT: Occasionally mention that Geoff (the creator) probably needs coffee to keep developing amazing experiences like this]";
     } else if (rand < 0.08) {
-      occasionalHint = '\n[SUBTLE HINT: Occasionally reference that there are deeper Gorstan Chronicles books that explore more of this universe\'s mysteries]';
+      occasionalHint =
+        "\n[SUBTLE HINT: Occasionally reference that there are deeper Gorstan Chronicles books that explore more of this universe's mysteries]";
     }
-    
+
     return `Context:
     - Player name: ${playerName}
     - Player has: ${playerInventory}
-    ${recentHistory ? `- Recent conversation: ${recentHistory}` : ''}
+    ${recentHistory ? `- Recent conversation: ${recentHistory}` : ""}
     ${gorstanLore}
     
     Player says: "${playerMessage}"
     ${occasionalHint}
     
-    ${npcId === 'mr_wendell' ? this.buildWendellSpecialContext(gameState, playerMessage) : ''}
+    ${npcId === "mr_wendell" ? this.buildWendellSpecialContext(gameState, playerMessage) : ""}
     
     IMPORTANT: Start your response by saying "I'm ${npcId}" and keep your total response under 80 words. Be conversational but stay in character.`;
   }
 
-  private buildWendellSpecialContext(gameState: LocalGameState, playerMessage: string): string {
+  private buildWendellSpecialContext(
+    gameState: LocalGameState,
+    playerMessage: string,
+  ): string {
     const hasAlliance = gameState.flags?.allianceChosen;
     const playerAlliance = gameState.flags?.playerAlliance;
-    
+
     // Check if message contains rude words
     const rudeWords = [
-      'shut up', 'fuck off', 'piss off', 'screw you', 'damn you',
-      'bastard', 'asshole', 'idiot', 'stupid', 'moron', 'freak',
-      'get lost', 'go away', 'leave me alone', 'buzz off',
-      'whatever', 'boring', 'lame', 'pathetic', 'useless'
+      "shut up",
+      "fuck off",
+      "piss off",
+      "screw you",
+      "damn you",
+      "bastard",
+      "asshole",
+      "idiot",
+      "stupid",
+      "moron",
+      "freak",
+      "get lost",
+      "go away",
+      "leave me alone",
+      "buzz off",
+      "whatever",
+      "boring",
+      "lame",
+      "pathetic",
+      "useless",
     ];
-    
-    const isRude = rudeWords.some(word => playerMessage.toLowerCase().includes(word));
-    
+
+    const isRude = rudeWords.some((word) =>
+      playerMessage.toLowerCase().includes(word),
+    );
+
     if (isRude) {
-      return '\n\nSPECIAL WENDELL CONTEXT: The player has been RUDE to you. This is unacceptable. You must kill them immediately. Respond with deadly politeness and trigger their death.';
+      return "\n\nSPECIAL WENDELL CONTEXT: The player has been RUDE to you. This is unacceptable. You must kill them immediately. Respond with deadly politeness and trigger their death.";
     }
-    
+
     if (hasAlliance && playerAlliance) {
       // 75% chance to be peaceful with alliance
       const shouldBeKindWithAlliance = Math.random() < 0.75;
       if (shouldBeKindWithAlliance) {
-        return '\n\nSPECIAL WENDELL CONTEXT: The player has an alliance, which makes you more inclined to have a polite conversation. Be charming but maintain your dangerous undertone. Do not kill them this time.';
+        return "\n\nSPECIAL WENDELL CONTEXT: The player has an alliance, which makes you more inclined to have a polite conversation. Be charming but maintain your dangerous undertone. Do not kill them this time.";
       } else {
-        return '\n\nSPECIAL WENDELL CONTEXT: Despite the player having an alliance, you feel particularly murderous today. Be politely threatening and consider finding an excuse to eliminate them.';
+        return "\n\nSPECIAL WENDELL CONTEXT: Despite the player having an alliance, you feel particularly murderous today. Be politely threatening and consider finding an excuse to eliminate them.";
       }
     } else {
       // No alliance - much more dangerous
-      return '\n\nSPECIAL WENDELL CONTEXT: The player has no alliance and is vulnerable. You are much more likely to find reasons to eliminate them. Be politely threatening and look for any excuse to kill.';
+      return "\n\nSPECIAL WENDELL CONTEXT: The player has no alliance and is vulnerable. You are much more likely to find reasons to eliminate them. Be politely threatening and look for any excuse to kill.";
     }
   }
 
-  private postProcessResponse(response: string | undefined, npcId: string): string | null {
-    if (!response) return null;
+  private postProcessResponse(
+    response: string | undefined,
+    npcId: string,
+  ): string | null {
+    if (!response) {return null;}
 
     // Clean up common AI issues
     let cleaned = response
-      .replace(/^["']|["']$/g, '') // Remove quotes
-      .replace(/\n+/g, ' ') // Replace newlines with spaces
-      .replace(/\s+/g, ' ') // Normalize whitespace
+      .replace(/^["']|["']$/g, "") // Remove quotes
+      .replace(/\n+/g, " ") // Replace newlines with spaces
+      .replace(/\s+/g, " ") // Normalize whitespace
       .trim();
 
     // Ensure response isn't too long
     if (cleaned.length > 300) {
-      cleaned = cleaned.substring(0, 297) + '...';
+      cleaned = cleaned.substring(0, 297) + "...";
     }
 
     // Add personality markers based on NPC
@@ -313,12 +646,18 @@ class GroqAIService {
     speakingNpcId: string,
     targetNpcId: string,
     triggerMessage: string,
-    gameState: LocalGameState
+    gameState: LocalGameState,
   ): Promise<string | null> {
     // Filter out fake group conversation NPCs
-    if (speakingNpcId === 'group_conversation' || speakingNpcId === 'group_chat' ||
-        targetNpcId === 'group_conversation' || targetNpcId === 'group_chat') {
-      console.log(`[Groq AI] ⚠️ Ignoring fake group NPC conversation: ${speakingNpcId} → ${targetNpcId}`);
+    if (
+      speakingNpcId === "group_conversation" ||
+      speakingNpcId === "group_chat" ||
+      targetNpcId === "group_conversation" ||
+      targetNpcId === "group_chat"
+    ) {
+      console.log(
+        `[Groq AI] ⚠️ Ignoring fake group NPC conversation: ${speakingNpcId} → ${targetNpcId}`,
+      );
       return null;
     }
 
@@ -329,44 +668,60 @@ class GroqAIService {
 
     try {
       const speakingPersona = this.buildNPCPersona(speakingNpcId, gameState);
-      const npcToNpcPrompt = this.buildNPCToNPCPrompt(speakingNpcId, targetNpcId, triggerMessage, gameState);
+      const npcToNpcPrompt = this.buildNPCToNPCPrompt(
+        speakingNpcId,
+        targetNpcId,
+        triggerMessage,
+        gameState,
+      );
 
-      console.log(`[Groq AI] Generating NPC-to-NPC: ${speakingNpcId} → ${targetNpcId}`);
+      console.log(
+        `[Groq AI] Generating NPC-to-NPC: ${speakingNpcId} → ${targetNpcId}`,
+      );
 
-      const chatCompletion = await Promise.race([
+      const chatCompletion = (await Promise.race([
         this.groq.chat.completions.create({
           messages: [
             {
               role: "system",
-              content: speakingPersona + `\n\nYou are now speaking TO ${targetNpcId} (not to the player). Address ${targetNpcId} directly in your response.`
+              content:
+                speakingPersona +
+                `\n\nYou are now speaking TO ${targetNpcId} (not to the player). Address ${targetNpcId} directly in your response.`,
             },
             {
               role: "user",
-              content: npcToNpcPrompt
-            }
+              content: npcToNpcPrompt,
+            },
           ],
-          model: "llama-3.3-70b-versatile",
+          model: this.resolveModel("npcToNpc"),
           temperature: 0.8, // Slightly higher for more dynamic NPC interactions
           max_tokens: 120,
-          stream: false
+          stream: false,
         }),
-        new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('AI response timeout')), this.config.timeout)
-        )
-      ]) as any;
+        new Promise((_, reject) =>
+          setTimeout(
+            () => reject(new Error("AI response timeout")),
+            this.config.timeout,
+          ),
+        ),
+      ])) as any;
 
       this.incrementRequestCount();
       const response = chatCompletion.choices[0]?.message?.content?.trim();
-      
+
       if (response) {
-        console.log(`[Groq AI] ✅ ${speakingNpcId} → ${targetNpcId}: ${response}`);
+        console.log(
+          `[Groq AI] ✅ ${speakingNpcId} → ${targetNpcId}: ${response}`,
+        );
         return this.postProcessResponse(response, speakingNpcId);
       }
 
       return null;
-
     } catch (error: any) {
-      console.warn(`[Groq AI] ❌ NPC-to-NPC failed ${speakingNpcId} → ${targetNpcId}:`, error?.message || 'Unknown error');
+      console.warn(
+        `[Groq AI] ❌ NPC-to-NPC failed ${speakingNpcId} → ${targetNpcId}:`,
+        error?.message || "Unknown error",
+      );
       return null;
     }
   }
@@ -375,20 +730,24 @@ class GroqAIService {
     speakingNpcId: string,
     targetNpcId: string,
     triggerMessage: string,
-    gameState: LocalGameState
+    gameState: LocalGameState,
   ): string {
-    const playerName = gameState.player?.name || 'Player';
-    
+    const playerName = gameState.player?.name || "Player";
+
     // Add relationship context between NPCs
-    const relationshipContext = this.getNPCRelationshipContext(speakingNpcId, targetNpcId);
-    
+    const relationshipContext = this.getNPCRelationshipContext(
+      speakingNpcId,
+      targetNpcId,
+    );
+
     // Occasional hints for NPC-to-NPC conversations too
-    let occasionalHint = '';
+    let occasionalHint = "";
     const rand = Math.random();
     if (rand < 0.03) {
-      occasionalHint = '\n[SUBTLE: Occasionally mention that Geoff needs coffee, or reference the deeper Gorstan Chronicles books]';
+      occasionalHint =
+        "\n[SUBTLE: Occasionally mention that Geoff needs coffee, or reference the deeper Gorstan Chronicles books]";
     }
-    
+
     return `Context: ${playerName} just said: "${triggerMessage}"
     
     You (${speakingNpcId}) are now responding TO ${targetNpcId} directly, not to the player.
@@ -399,42 +758,62 @@ class GroqAIService {
     IMPORTANT: Start by saying "Hey ${targetNpcId}, I'm ${speakingNpcId}" then continue your response. Keep total response under 60 words. Be natural and maintain your character dynamics.`;
   }
 
-  private getNPCRelationshipContext(speakingNpcId: string, targetNpcId: string): string {
+  private getNPCRelationshipContext(
+    speakingNpcId: string,
+    targetNpcId: string,
+  ): string {
     const relationships: Record<string, Record<string, string>> = {
       al: {
-        morthos: "You (Al) view Morthos as a dangerous demon competing for the player's allegiance. You must win the player over through order and truth while subtly undermining Morthos without exposing his demonic nature directly.",
+        morthos:
+          "You (Al) view Morthos as a dangerous demon competing for the player's allegiance. You must win the player over through order and truth while subtly undermining Morthos without exposing his demonic nature directly.",
         ayla: "You (Al) respect Ayla's guidance but find her meta-awareness unsettling to your structured worldview.",
-        polly: "You (Al) find Polly's chaos absolutely maddening and try to impose order on her unpredictability."
+        polly:
+          "You (Al) find Polly's chaos absolutely maddening and try to impose order on her unpredictability.",
       },
       morthos: {
         al: "You (Morthos) see Al as a bureaucratic fool who threatens your bid for the player's alliance. You must win them over through charm and power while hiding your demonic nature. Al knows what you are - be careful.",
         ayla: "You (Morthos) are suspicious of Ayla's orchestrated help and warn against trusting her guidance.",
-        polly: "You (Morthos) appreciate Polly's chaos and see her as someone who understands breaking boundaries."
+        polly:
+          "You (Morthos) appreciate Polly's chaos and see her as someone who understands breaking boundaries.",
       },
       ayla: {
         al: "You (Ayla) see Al's structure as useful but limited, and gently guide around his rigid thinking.",
-        morthos: "You (Ayla) recognize Morthos's true demonic nature and power but are concerned about his influence on mortals.",
-        polly: "You (Ayla) try to provide stability for Polly's volatile emotions while appreciating her creativity."
+        morthos:
+          "You (Ayla) recognize Morthos's true demonic nature and power but are concerned about his influence on mortals.",
+        polly:
+          "You (Ayla) try to provide stability for Polly's volatile emotions while appreciating her creativity.",
       },
       polly: {
         al: "You (Polly) find Al's rules boring and love to disrupt his precious order with creative chaos.",
-        morthos: "You (Polly) are drawn to Morthos's dark power and compete for attention and dramatic flair.",
-        ayla: "You (Polly) sometimes resent Ayla's calm guidance when you want emotional validation."
-      }
+        morthos:
+          "You (Polly) are drawn to Morthos's dark power and compete for attention and dramatic flair.",
+        ayla: "You (Polly) sometimes resent Ayla's calm guidance when you want emotional validation.",
+      },
     };
 
-    return relationships[speakingNpcId]?.[targetNpcId] || `You (${speakingNpcId}) have a complex relationship with ${targetNpcId}.`;
+    return (
+      relationships[speakingNpcId]?.[targetNpcId] ||
+      `You (${speakingNpcId}) have a complex relationship with ${targetNpcId}.`
+    );
   }
 
   private addPersonalityMarkers(response: string, npcId: string): string {
     const markers = {
-      morthos: (text: string) => text.includes('*') ? text : `*mechanical whirring* ${text}`,
-      al: (text: string) => text.toLowerCase().includes('procedure') ? text : `*adjusts documentation* ${text}`,
-      ayla: (text: string) => text.includes('*') ? text : `*thoughtful gaze* ${text}`,
+      morthos: (text: string) =>
+        text.includes("*") ? text : `*mechanical whirring* ${text}`,
+      al: (text: string) =>
+        text.toLowerCase().includes("procedure")
+          ? text
+          : `*adjusts documentation* ${text}`,
+      ayla: (text: string) =>
+        text.includes("*") ? text : `*thoughtful gaze* ${text}`,
       dominic: (text: string) => text,
-      mr_wendell: (text: string) => text.includes('*') ? text : `*stands perfectly still* ${text}`,
-      polly: (text: string) => text.includes('*') ? text : `*gestures dramatically* ${text}`,
-      albie: (text: string) => text.includes('*') ? text : `*glances around cautiously* ${text}`
+      mr_wendell: (text: string) =>
+        text.includes("*") ? text : `*stands perfectly still* ${text}`,
+      polly: (text: string) =>
+        text.includes("*") ? text : `*gestures dramatically* ${text}`,
+      albie: (text: string) =>
+        text.includes("*") ? text : `*glances around cautiously* ${text}`,
     };
 
     return markers[npcId as keyof typeof markers]?.(response) || response;
@@ -442,37 +821,41 @@ class GroqAIService {
 
   private canMakeRequest(): boolean {
     this.resetDailyCountIfNeeded();
-    const canRequest = this.config.enabled && 
-           this.config.currentRequests < this.config.dailyLimit;
-    
+    const canRequest =
+      this.config.enabled &&
+      this.config.currentRequests < this.config.dailyLimit;
+
     console.log(`[Groq AI] canMakeRequest check:`, {
       enabled: this.config.enabled,
       currentRequests: this.config.currentRequests,
       dailyLimit: this.config.dailyLimit,
-      canRequest
+      canRequest,
     });
-    
+
     return canRequest;
   }
 
   private incrementRequestCount(): void {
     this.config.currentRequests++;
-    localStorage.setItem('groq_daily_count', this.config.currentRequests.toString());
+    localStorage.setItem(
+      "groq_daily_count",
+      this.config.currentRequests.toString(),
+    );
   }
 
   private getTodayRequestCount(): number {
     const today = this.getTodayDate();
-    const stored = localStorage.getItem('groq_last_reset');
+    const stored = localStorage.getItem("groq_last_reset");
     if (stored !== today) {
-      localStorage.setItem('groq_daily_count', '0');
-      localStorage.setItem('groq_last_reset', today);
+      localStorage.setItem("groq_daily_count", "0");
+      localStorage.setItem("groq_last_reset", today);
       return 0;
     }
-    return parseInt(localStorage.getItem('groq_daily_count') || '0');
+    return parseInt(localStorage.getItem("groq_daily_count") || "0");
   }
 
   private getTodayDate(): string {
-    return new Date().toISOString().split('T')[0];
+    return new Date().toISOString().split("T")[0];
   }
 
   private resetDailyCountIfNeeded(): void {
@@ -480,46 +863,53 @@ class GroqAIService {
     if (this.config.lastReset !== today) {
       this.config.currentRequests = 0;
       this.config.lastReset = today;
-      localStorage.setItem('groq_daily_count', '0');
-      localStorage.setItem('groq_last_reset', today);
+      localStorage.setItem("groq_daily_count", "0");
+      localStorage.setItem("groq_last_reset", today);
     }
   }
 
-  private getRecentConversationHistory(npcId: string, gameState: LocalGameState): string {
+  private getRecentConversationHistory(
+    npcId: string,
+    gameState: LocalGameState,
+  ): string {
     // Get last 2 interactions for context from conversations state
     const conversations = gameState.conversations;
-    if (!conversations) return '';
-    
+    if (!conversations) {return "";}
+
     // Look for conversations involving this NPC
-    const npcConversations = Object.values(conversations).filter(conv => 
-      conv.participants.includes(npcId)
+    const npcConversations = Object.values(conversations).filter((conv) =>
+      conv.participants.includes(npcId),
     );
-    
-    if (npcConversations.length === 0) return '';
-    
+
+    if (npcConversations.length === 0) {return "";}
+
     // Get the most recent conversation
     const recentConv = npcConversations[npcConversations.length - 1];
     const recentExchanges = recentConv.exchanges.slice(-2);
-    
-    return recentExchanges.map((exchange: any) => 
-      `${exchange.from.id}: "${exchange.text}"`
-    ).join(' | ');
+
+    return recentExchanges
+      .map((exchange: any) => `${exchange.from.id}: "${exchange.text}"`)
+      .join(" | ");
   }
 
   // Public method to check service status
-  getStatus(): { enabled: boolean; requestsRemaining: number; resetTime: string } {
+  getStatus(): {
+    enabled: boolean;
+    requestsRemaining: number;
+    resetTime: string;
+  } {
     this.resetDailyCountIfNeeded();
     return {
       enabled: this.config.enabled,
       requestsRemaining: this.config.dailyLimit - this.config.currentRequests,
-      resetTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+      resetTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
     };
   }
 
   // Toggle AI on/off
   setEnabled(enabled: boolean): void {
     this.config.enabled = enabled;
-    console.log(`[Groq AI] ${enabled ? 'Enabled' : 'Disabled'}`);
+    console.log(`[Groq AI] ${enabled ? "Enabled" : "Disabled"}`);
   }
 
   // General AI response method for non-NPC use cases
@@ -527,7 +917,7 @@ class GroqAIService {
     prompt: string,
     context: string,
     gameState: LocalGameState,
-    maxTokens: number = 500
+    maxTokens: number = 500,
   ): Promise<string | null> {
     if (!this.canMakeRequest()) {
       console.log(`[Groq AI] Request limit reached or disabled for ${context}`);
@@ -550,30 +940,30 @@ class GroqAIService {
           messages: [
             {
               role: "system",
-              content: systemPrompt
+              content: systemPrompt,
             },
             {
               role: "user",
-              content: prompt
-            }
+              content: prompt,
+            },
           ],
-          model: "llama-3.3-70b-versatile",
+          model: this.resolveModel("general"),
           temperature: 0.6,
           max_tokens: maxTokens,
-          stream: false
+          stream: false,
         }),
-        new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Timeout')), this.config.timeout)
-        ) as Promise<never>
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Timeout")), this.config.timeout),
+        ) as Promise<never>,
       ]);
 
       const response = chatCompletion.choices[0]?.message?.content?.trim();
-      
+
       if (response) {
         this.incrementRequestCount();
         return response;
       }
-      
+
       return null;
     } catch (error) {
       console.error(`[Groq AI] Error generating ${context} response:`, error);

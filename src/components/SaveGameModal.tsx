@@ -17,8 +17,8 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Save game modal component
 
-import React, { useState } from 'react';
-import { Save, Download, Trash2, Calendar, Clock } from 'lucide-react';
+import React, { useState } from "react";
+import { Save, Download, Trash2, Calendar, Clock } from "lucide-react";
 
 interface SaveSlot {
   id: string;
@@ -45,12 +45,12 @@ const SaveGameModal: React.FC<SaveGameModalProps> = ({
   onSave,
   onLoad,
   onDelete,
-  saveSlots
+  saveSlots,
 }) => {
-  const [newSaveName, setNewSaveName] = useState('');
+  const [newSaveName, setNewSaveName] = useState("");
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
 
-  if (!isOpen) return null;
+  if (!isOpen) {return null;}
 
   const formatTimestamp = (timestamp: number) => {
     const date = new Date(timestamp);
@@ -67,15 +67,15 @@ const SaveGameModal: React.FC<SaveGameModalProps> = ({
     if (newSaveName.trim()) {
       const slotId = `save_${Date.now()}`;
       onSave(slotId, newSaveName.trim());
-      setNewSaveName('');
+      setNewSaveName("");
     }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && newSaveName.trim()) {
+    if (e.key === "Enter" && newSaveName.trim()) {
       handleSave();
     }
-    if (e.key === 'Escape') {
+    if (e.key === "Escape") {
       onClose();
     }
   };
@@ -88,7 +88,9 @@ const SaveGameModal: React.FC<SaveGameModalProps> = ({
             <Save className="modal-icon" />
             Save & Load Game
           </h2>
-          <button className="modal-close" onClick={onClose}>×</button>
+          <button className="modal-close" onClick={onClose}>
+            ×
+          </button>
         </div>
 
         <div className="modal-body">
@@ -128,7 +130,7 @@ const SaveGameModal: React.FC<SaveGameModalProps> = ({
                 {saveSlots.map((slot) => (
                   <div
                     key={slot.id}
-                    className={`save-slot ${selectedSlot === slot.id ? 'selected' : ''}`}
+                    className={`save-slot ${selectedSlot === slot.id ? "selected" : ""}`}
                     onClick={() => setSelectedSlot(slot.id)}
                   >
                     <div className="save-info">

@@ -17,17 +17,9 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Renders room descriptions and image logic.
 
-import { NPC } from '../types/NPCTypes';
+import { NPC } from "../types/NPCTypes";
 
-import { Room } from '../types/Room';
-
-
-
-
-
-
-
-
+import { Room } from "../types/Room";
 
 const ancientslibrary: Room = {
   id: "ancientslibrary",
@@ -37,7 +29,7 @@ const ancientslibrary: Room = {
     "You stand within the Ancients' Library, the true repository of all knowledge from all nine universes and all six iterations.",
     "Towering shelves spiral into infinity, each filled with tomes, scrolls, and crystalline data-cores inscribed with secrets lost to time.",
     "The air hums with the resonance of wisdom, and the architecture shifts subtly as if responding to your thoughts.",
-    "A central dais glows with the light of convergence, where the boundaries of reality and possibility blur."
+    "A central dais glows with the light of convergence, where the boundaries of reality and possibility blur.",
   ],
   image: "offgorstanZone_ancientslibrary.png",
   ambientAudio: "ancients_library_ambience.mp3",
@@ -46,13 +38,13 @@ const ancientslibrary: Room = {
     ">> ANCIENTS' LIBRARY - OMNIVERSAL ARCHIVE",
     ">> Access: UNRESTRICTED (with proper attunement)",
     ">> Knowledge Domains: ALL",
-    ">> Tip: Seek the Codex of Iterations to unlock the deepest truths."
+    ">> Tip: Seek the Codex of Iterations to unlock the deepest truths.",
   ],
 
   exits: {
     south: "offgorstanZone_timelesshall",
     east: "offgorstanZone_voidatrium",
-    west: "offgorstanZone_memoryvault"
+    west: "offgorstanZone_memoryvault",
   },
 
   items: [
@@ -60,25 +52,28 @@ const ancientslibrary: Room = {
     "universal_index",
     "infinite_scroll",
     "crystal_datacore",
-    "ancient_quill"
+    "ancient_quill",
   ],
 
   interactables: {
-    "central_dais": {
-      description: "A luminous dais at the heart of the library, pulsing with the energy of all realities.",
+    central_dais: {
+      description:
+        "A luminous dais at the heart of the library, pulsing with the energy of all realities.",
       actions: ["examine", "activate", "attune"],
       requires: ["codex_of_iterations"],
     },
-    "infinite_shelves": {
-      description: "Shelves that spiral endlessly, each containing knowledge from a different universe and iteration.",
+    infinite_shelves: {
+      description:
+        "Shelves that spiral endlessly, each containing knowledge from a different universe and iteration.",
       actions: ["search", "read", "catalogue"],
       requires: [],
     },
-    "knowledge_conduit": {
-      description: "A crystalline conduit that allows direct access to the library's archives.",
+    knowledge_conduit: {
+      description:
+        "A crystalline conduit that allows direct access to the library's archives.",
       actions: ["interface", "download", "query"],
       requires: ["universal_index"],
-    }
+    },
   },
 
   npcs: ["omniscient_curator"],
@@ -90,7 +85,7 @@ const ancientslibrary: Room = {
       central_dais: ["activateDais", "attuneToLibrary"],
       infinite_shelves: ["searchShelves", "readTome"],
       knowledge_conduit: ["interfaceConduit", "downloadKnowledge"],
-    }
+    },
   },
 
   flags: {
@@ -107,20 +102,16 @@ const ancientslibrary: Room = {
       "Find the Codex of Iterations",
       "Meet the Omniscient Curator",
       "Access the Knowledge Conduit",
-      "Catalogue a Tome from Each Universe"
-    ]
+      "Catalogue a Tome from Each Universe",
+    ],
   },
 
   environmental: {
     lighting: "soft_omniversal_glow",
     temperature: "timeless_and_stable",
     airQuality: "charged_with_knowledge",
-    soundscape: [
-      "whispered_voices",
-      "turning_pages",
-      "resonant_chimes"
-    ],
-    hazards: ["knowledge_overload", "temporal_displacement"]
+    soundscape: ["whispered_voices", "turning_pages", "resonant_chimes"],
+    hazards: ["knowledge_overload", "temporal_displacement"],
   },
 
   security: {
@@ -128,7 +119,7 @@ const ancientslibrary: Room = {
     accessRequirements: ["attunement", "codex_of_iterations"],
     alarmTriggers: ["unauthorized_access"],
     surveillanceActive: true,
-    surveillanceType: "omniscient_curator"
+    surveillanceType: "omniscient_curator",
   },
 
   metadata: {
@@ -143,37 +134,37 @@ const ancientslibrary: Room = {
       "Omniversal knowledge",
       "Infinite shelves",
       "Central dais puzzle",
-      "Omniscient NPC"
-    ]
+      "Omniscient NPC",
+    ],
   },
 
   secrets: {
     hidden_chamber: {
-      description: "A secret chamber accessible only by attuning the dais with the Codex of Iterations.",
+      description:
+        "A secret chamber accessible only by attuning the dais with the Codex of Iterations.",
       requirements: ["activate central_dais", "attune codex_of_iterations"],
       rewards: ["ultimate_truth", "ancient_artifact"],
     },
     curator_memory: {
-      description: "A memory fragment from the Omniscient Curator, unlocked by accessing the knowledge conduit.",
+      description:
+        "A memory fragment from the Omniscient Curator, unlocked by accessing the knowledge conduit.",
       requirements: ["interface knowledge_conduit"],
       rewards: ["curator_story", "unique_insight"],
-    }
+    },
   },
 
   customActions: {
-    "attune_library": {
+    attune_library: {
       description: "Attune yourself to the library's omniversal resonance.",
       requirements: ["codex_of_iterations"],
       effects: ["unlock_hidden_chamber", "gain_omniversal_vision"],
     },
-    "catalogue_tome": {
+    catalogue_tome: {
       description: "Catalogue a tome from a specific universe and iteration.",
       requirements: [],
       effects: ["record_knowledge", "gain_insight"],
-    }
-  }
+    },
+  },
 };
 
 export default ancientslibrary;
-
-

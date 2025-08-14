@@ -17,11 +17,12 @@
 // src/ui/OverlayPortal.tsx
 // Overlay portal component for rendering modals/overlays - Gorstan Game Beta 1
 
-import React, { useEffect, useState } from 'react';
-import { subscribeToOverlay } from './overlayBus';
+import React, { useEffect, useState } from "react";
+import { subscribeToOverlay } from "./overlayBus";
 
 export function OverlayPortal() {
-  const [currentOverlay, setCurrentOverlay] = useState<React.ReactElement | null>(null);
+  const [currentOverlay, setCurrentOverlay] =
+    useState<React.ReactElement | null>(null);
 
   useEffect(() => {
     const unsubscribe = subscribeToOverlay((overlay) => {
@@ -31,7 +32,7 @@ export function OverlayPortal() {
     return unsubscribe;
   }, []);
 
-  if (!currentOverlay) return null;
+  if (!currentOverlay) {return null;}
 
   return currentOverlay;
 }

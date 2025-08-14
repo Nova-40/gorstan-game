@@ -17,17 +17,9 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Renders room descriptions and image logic.
 
-import { NPC } from '../types/NPCTypes';
+import { NPC } from "../types/NPCTypes";
 
-import { Room } from '../types/Room';
-
-
-
-
-
-
-
-
+import { Room } from "../types/Room";
 
 const stillamazeroom: Room = {
   id: "stillamazeroom",
@@ -36,7 +28,7 @@ const stillamazeroom: Room = {
   description: [
     "You are in yet another room of the maze. The sameness is almost dizzying.",
     "The walls are blank and cold, and the air is heavy with silence.",
-    "You wonder if you've been here before, or if this is just another trick of the maze."
+    "You wonder if you've been here before, or if this is just another trick of the maze.",
   ],
   image: "mazeZone_stillamazeroom.png",
   ambientAudio: "maze_ambience.mp3",
@@ -44,35 +36,30 @@ const stillamazeroom: Room = {
   consoleIntro: [
     ">> MAZE ROOM - REPETITION",
     ">> Orientation: UNCERTAIN",
-    ">> Tip: Look for subtle differences to find your way."
+    ">> Tip: Look for subtle differences to find your way.",
   ],
 
   exits: {
     north: "mazeZone_anothermazeroom",
-    south: "mazeZone_mazehub"
+    south: "mazeZone_mazehub",
   },
 
-  items: [
-    "chalk_piece",
-    "maze_map_fragment"
-  ],
+  items: ["chalk_piece", "maze_map_fragment"],
 
   interactables: {
-    "wall": {
+    wall: {
       description: "A blank wall, indistinguishable from the others.",
       actions: ["examine", "mark", "knock"],
       requires: [],
     },
-    "floor": {
+    floor: {
       description: "Smooth stone, worn by many footsteps.",
       actions: ["examine", "search", "listen"],
       requires: [],
-    }
+    },
   },
 
-  npcs: [
-    
-  ],
+  npcs: [],
 
   events: {
     onEnter: ["showStillMazeRoomIntro", "checkForTraveler"],
@@ -80,7 +67,7 @@ const stillamazeroom: Room = {
     onInteract: {
       wall: ["markWall", "listenForEcho"],
       floor: ["searchFloor", "listenForSteps"],
-    }
+    },
   },
 
   flags: {
@@ -94,19 +81,16 @@ const stillamazeroom: Room = {
     optional: [
       "Mark the Wall",
       "Meet the Wandering Traveler",
-      "Find a Maze Map Fragment"
-    ]
+      "Find a Maze Map Fragment",
+    ],
   },
 
   environmental: {
     lighting: "dim_and_flat",
     temperature: "cool_and_stale",
     airQuality: "still_and_dry",
-    soundscape: [
-      "distant_echoes",
-      "soft_footsteps"
-    ],
-    hazards: ["disorientation"]
+    soundscape: ["distant_echoes", "soft_footsteps"],
+    hazards: ["disorientation"],
   },
 
   security: {
@@ -128,27 +112,26 @@ const stillamazeroom: Room = {
       "Maze navigation",
       "Marking system",
       "Wandering NPC",
-      "Simple interactables"
-    ]
+      "Simple interactables",
+    ],
   },
 
   secrets: {
     hidden_passage: {
-      description: "A hidden passage revealed by marking the correct wall and listening for echoes.",
+      description:
+        "A hidden passage revealed by marking the correct wall and listening for echoes.",
       requirements: ["mark wall", "listen for echo"],
       rewards: ["shortcut_access", "maze_lore"],
-    }
+    },
   },
 
   customActions: {
-    "mark_wall": {
+    mark_wall: {
       description: "Mark the wall to keep track of your path.",
       requirements: ["chalk_piece"],
       effects: ["set_wallMarked", "reduce_disorientation"],
-    }
-  }
+    },
+  },
 };
 
 export default stillamazeroom;
-
-

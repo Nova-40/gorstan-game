@@ -17,7 +17,7 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // NPC console utility functions
 
-import { GameAction } from '../types/GameTypes';
+import { GameAction } from "../types/GameTypes";
 
 /**
  * Dispatch function type for console operations
@@ -40,11 +40,11 @@ export function setNPCConsoleDispatch(dispatch: DispatchFunction): void {
 export function appendToNPCConsole(npcName: string, message: string): void {
   if (globalDispatch) {
     globalDispatch({
-      type: 'ADD_CONSOLE_LINE',
-      payload: `${npcName}: ${message}`
+      type: "ADD_CONSOLE_LINE",
+      payload: `${npcName}: ${message}`,
     });
   } else {
-    console.warn('NPC Console dispatch not available:', npcName, message);
+    console.warn("NPC Console dispatch not available:", npcName, message);
   }
 }
 

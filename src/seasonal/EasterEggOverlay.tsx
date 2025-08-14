@@ -39,7 +39,9 @@ export default function EasterEggOverlay({ onClose }: Props) {
             background:
               "radial-gradient(circle at 50% 30%, #ffe08a, #ffb347 60%, #d98c2e 100%)",
             borderRadius: "50% 50% 45% 45% / 60% 60% 40% 40%",
-            animation: reduce ? undefined : "egg-bounce 1.6s ease-in-out infinite"
+            animation: reduce
+              ? undefined
+              : "egg-bounce 1.6s ease-in-out infinite",
           }}
         />
         <p className="text-sm opacity-90">

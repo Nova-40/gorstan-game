@@ -21,53 +21,61 @@
 import { LocalGameState } from "../state/gameState";
 import { ConversationThread } from "../types/dialogue";
 
-export function conversationsReducer(state: LocalGameState, action: any): LocalGameState {
+export function conversationsReducer(
+  state: LocalGameState,
+  action: any,
+): LocalGameState {
   switch (action.type) {
     case "UPSERT_CONVERSATION": {
-      const thread = action.thread as ConversationThread;
-      return { 
-        ...state, 
-        conversations: { 
-          ...state.conversations, 
-          [thread.id]: thread 
-        } 
+      const thread =
+        (action.payload as ConversationThread) ??
+        (action.thread as ConversationThread);
+      return {
+        ...state,
+        conversations: {
+          ...state.conversations,
+          [thread.id]: thread,
+        },
       };
     }
-    
+
     case "SET_OVERHEAR": {
-      return { 
-        ...state, 
-        overhearNPCBanter: !!action.payload 
+      return {
+        ...state,
+        overhearNPCBanter: !!action.payload,
       };
     }
-    
+
     case "CLEAR_CONVERSATION": {
-      const { threadId } = action;
+      const threadId =
+        (action.payload as any)?.threadId ?? (action as any).threadId;
       const newConversations = { ...state.conversations };
       delete newConversations[threadId];
       return {
         ...state,
-        conversations: newConversations
+        conversations: newConversations,
       };
     }
-    
+
     case "MUTE_CONVERSATION": {
-      const { threadId, muted } = action;
+      const threadId =
+        (action.payload as any)?.threadId ?? (action as any).threadId;
+      const muted = (action.payload as any)?.muted ?? (action as any).muted;
       const thread = state.conversations[threadId];
-      if (!thread) return state;
-      
+      if (!thread) {return state;}
+
       return {
         ...state,
         conversations: {
           ...state.conversations,
           [threadId]: {
             ...thread,
-            mutedForPlayer: muted
-          }
-        }
+            mutedForPlayer: muted,
+          },
+        },
       };
     }
-    
+
     default:
       return state;
   }

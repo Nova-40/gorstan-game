@@ -17,18 +17,18 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Room navigation and teleportation utilities
 
-import { pushConsoleMessage } from '../utils/consoleTools';
+import { pushConsoleMessage } from "../utils/consoleTools";
 
 /**
  * Teleport player to a specified room
  * @param roomId - The ID of the room to teleport to
  */
 export function teleportToRoom(roomId: string): void {
-  pushConsoleMessage(`Teleporting to ${roomId}...`, 'info');
-  
+  pushConsoleMessage(`Teleporting to ${roomId}...`, "info");
+
   // This would typically dispatch a room change action
   // For now, we'll use console message as placeholder
-  pushConsoleMessage(`You find yourself in: ${roomId}`, 'success');
+  pushConsoleMessage(`You find yourself in: ${roomId}`, "success");
 }
 
 /**
@@ -36,18 +36,21 @@ export function teleportToRoom(roomId: string): void {
  * @param roomId - The ID of the room to navigate to
  * @param transitionType - Type of transition effect
  */
-export function navigateToRoom(roomId: string, transitionType: 'instant' | 'fade' | 'slide' = 'instant'): void {
+export function navigateToRoom(
+  roomId: string,
+  transitionType: "instant" | "fade" | "slide" = "instant",
+): void {
   switch (transitionType) {
-    case 'fade':
-      pushConsoleMessage('The world fades to black...', 'info');
+    case "fade":
+      pushConsoleMessage("The world fades to black...", "info");
       break;
-    case 'slide':
-      pushConsoleMessage('Reality shifts around you...', 'info');
+    case "slide":
+      pushConsoleMessage("Reality shifts around you...", "info");
       break;
     default:
       break;
   }
-  
+
   teleportToRoom(roomId);
 }
 
@@ -58,5 +61,5 @@ export function navigateToRoom(roomId: string, transitionType: 'instant' | 'fade
  */
 export function isValidRoom(roomId: string): boolean {
   // Basic validation - room IDs should be non-empty strings
-  return typeof roomId === 'string' && roomId.length > 0;
+  return typeof roomId === "string" && roomId.length > 0;
 }

@@ -17,61 +17,61 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Core game engine module.
 
-import { ITEMS } from './items';
+import { ITEMS } from "./items";
 
 // Function for getting item definition from actual item registry
 function getItemDefinition(itemId: string): InventoryItem | null {
-  const item = ITEMS.find(i => i.id === itemId);
+  const item = ITEMS.find((i) => i.id === itemId);
   if (!item) {
     console.warn(`[Inventory] Item not found in registry: ${itemId}`);
     return null;
   }
-  
+
   // Map item categories from items.ts to inventory categories
   const categoryMap: Record<string, ItemCategory> = {
-    'functional': 'tool',
-    'valuable': 'artifact', 
-    'consumable': 'consumable',
-    'key': 'key',
-    'document': 'document',
-    'misc': 'misc'
+    functional: "tool",
+    valuable: "artifact",
+    consumable: "consumable",
+    key: "key",
+    document: "document",
+    misc: "misc",
   };
-  
+
   const rarityMap: Record<string, ItemRarity> = {
-    'common': 'common',
-    'uncommon': 'uncommon', 
-    'rare': 'rare',
-    'epic': 'epic',
-    'legendary': 'legendary'
+    common: "common",
+    uncommon: "uncommon",
+    rare: "rare",
+    epic: "epic",
+    legendary: "legendary",
   };
-  
+
   return {
     id: item.id,
     name: item.name,
     stackable: item.stackable ?? true,
-    category: categoryMap[item.category || 'misc'] || 'misc',
-    rarity: rarityMap[item.rarity || 'common'] || 'common'
+    category: categoryMap[item.category || "misc"] || "misc",
+    rarity: rarityMap[item.rarity || "common"] || "common",
   };
 }
 
 // Function for getting category from item registry
 function getCategoryForItem(itemId: string): ItemCategory {
-  const item = ITEMS.find(i => i.id === itemId);
+  const item = ITEMS.find((i) => i.id === itemId);
   if (!item) {
-    return 'misc';
+    return "misc";
   }
-  
+
   // Map item categories from items.ts to inventory categories
   const categoryMap: Record<string, ItemCategory> = {
-    'functional': 'tool',
-    'valuable': 'artifact',
-    'consumable': 'consumable', 
-    'key': 'key',
-    'document': 'document',
-    'misc': 'misc'
+    functional: "tool",
+    valuable: "artifact",
+    consumable: "consumable",
+    key: "key",
+    document: "document",
+    misc: "misc",
   };
-  
-  return categoryMap[item.category || 'misc'] || 'misc';
+
+  return categoryMap[item.category || "misc"] || "misc";
 }
 
 export interface InventoryItem {
@@ -89,7 +89,7 @@ export interface InventoryItem {
 }
 
 export interface ItemEffect {
-  type: 'heal' | 'boost' | 'unlock' | 'transform' | 'quest' | 'special';
+  type: "heal" | "boost" | "unlock" | "transform" | "quest" | "special";
   value?: number;
   duration?: number;
   description?: string;
@@ -104,7 +104,7 @@ export interface InventoryState {
 }
 
 export interface InventoryOperation {
-  type: 'add' | 'remove' | 'use' | 'move' | 'stack';
+  type: "add" | "remove" | "use" | "move" | "stack";
   item: string | InventoryItem;
   quantity?: number;
   target?: string;
@@ -121,124 +121,128 @@ export interface InventoryContext {
   allowOverflow?: boolean;
 }
 
-export type ItemCategory = 'tool' | 'consumable' | 'key' | 'document' | 'artifact' | 'misc';
-export type ItemRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'unique';
-
+export type ItemCategory =
+  | "tool"
+  | "consumable"
+  | "key"
+  | "document"
+  | "artifact"
+  | "misc";
+export type ItemRarity =
+  | "common"
+  | "uncommon"
+  | "rare"
+  | "epic"
+  | "legendary"
+  | "unique";
 
 let inventory: InventoryItem[] = [];
 
-
-const ITEM_DATABASE: Record<string, Omit<InventoryItem, 'id'>> = {
+const ITEM_DATABASE: Record<string, Omit<InventoryItem, "id">> = {
   coffee: {
-    name: 'Coffee',
-    description: 'A steaming cup of coffee. Provides energy and alertness.',
-    category: 'consumable',
+    name: "Coffee",
+    description: "A steaming cup of coffee. Provides energy and alertness.",
+    category: "consumable",
     stackable: true,
     weight: 0.5,
     value: 5,
-    rarity: 'common',
+    rarity: "common",
     effects: [
-      { type: 'boost', value: 1, duration: 300000, description: 'Increased alertness' }
-    ]
+      {
+        type: "boost",
+        value: 1,
+        duration: 300000,
+        description: "Increased alertness",
+      },
+    ],
   },
 
   runbag: {
-    name: 'Run Bag',
-    description: 'A practical bag that increases your carrying capacity.',
-    category: 'tool',
+    name: "Run Bag",
+    description: "A practical bag that increases your carrying capacity.",
+    category: "tool",
     stackable: false,
     weight: 2,
     value: 50,
-    rarity: 'uncommon',
-    effects: [
-      { type: 'special', description: 'Increases inventory capacity' }
-    ]
+    rarity: "uncommon",
+    effects: [{ type: "special", description: "Increases inventory capacity" }],
   },
 
   key: {
-    name: 'Ancient Key',
-    description: 'An ornate key that pulses with mysterious energy.',
-    category: 'key',
+    name: "Ancient Key",
+    description: "An ornate key that pulses with mysterious energy.",
+    category: "key",
     stackable: false,
     weight: 0.2,
     value: 100,
-    rarity: 'rare',
-    effects: [
-      { type: 'unlock', description: 'Opens locked passages' }
-    ]
+    rarity: "rare",
+    effects: [{ type: "unlock", description: "Opens locked passages" }],
   },
 
   map: {
-    name: 'Detailed Map',
-    description: 'A map of the local area with cryptic markings.',
-    category: 'document',
+    name: "Detailed Map",
+    description: "A map of the local area with cryptic markings.",
+    category: "document",
     stackable: false,
     weight: 0.1,
     value: 25,
-    rarity: 'common'
+    rarity: "common",
   },
 
   constitution_scroll: {
-    name: 'Constitution Scroll',
-    description: 'An ancient document containing fundamental truths.',
-    category: 'document',
+    name: "Constitution Scroll",
+    description: "An ancient document containing fundamental truths.",
+    category: "document",
     stackable: false,
     weight: 0.3,
     value: 500,
-    rarity: 'legendary',
-    effects: [
-      { type: 'quest', description: 'Reveals cosmic truths' }
-    ]
+    rarity: "legendary",
+    effects: [{ type: "quest", description: "Reveals cosmic truths" }],
   },
 
   polly_gift: {
-    name: 'Polly\'s Gift',
-    description: 'A small token of forgiveness and friendship.',
-    category: 'artifact',
+    name: "Polly's Gift",
+    description: "A small token of forgiveness and friendship.",
+    category: "artifact",
     stackable: false,
     weight: 0.1,
     value: 1000,
-    rarity: 'unique',
-    effects: [
-      { type: 'special', description: 'Symbol of redemption' }
-    ]
+    rarity: "unique",
+    effects: [{ type: "special", description: "Symbol of redemption" }],
   },
 
   temporal_device: {
-    name: 'Temporal Device',
-    description: 'A device that seems to exist in multiple timelines simultaneously.',
-    category: 'artifact',
+    name: "Temporal Device",
+    description:
+      "A device that seems to exist in multiple timelines simultaneously.",
+    category: "artifact",
     stackable: false,
     weight: 1.5,
     value: 2000,
-    rarity: 'legendary',
-    effects: [
-      { type: 'special', description: 'Manipulates time flow' }
-    ]
-  }
+    rarity: "legendary",
+    effects: [{ type: "special", description: "Manipulates time flow" }],
+  },
 };
-
-
 
 // --- Function: addItem ---
 export function addItem(
   item: string | InventoryItem,
   context?: InventoryContext,
-  quantity: number = 1
+  quantity: number = 1,
 ): InventoryOperation {
   try {
     const inventory = context?.inventory || [];
     const capacity = context?.capacity || 10;
-    
+
     // Get item object
-    const itemObj = typeof item === 'string' ? getItemDefinition(item) : item;
+    const itemObj = typeof item === "string" ? getItemDefinition(item) : item;
 
     if (!itemObj) {
       return {
-        type: 'add',
+        type: "add",
         item,
         success: false,
-        message: `Unknown item: ${typeof item === 'string' ? item : item.id}`
+        message: `Unknown item: ${typeof item === "string" ? item : item.id}`,
       };
     }
 
@@ -246,114 +250,119 @@ export function addItem(
     if (!context?.allowOverflow) {
       if (inventory.length >= capacity && !canStackItem(itemObj.id)) {
         return {
-          type: 'add',
+          type: "add",
           item: itemObj,
           success: false,
-          message: `Inventory full! (${inventory.length}/${capacity})`
+          message: `Inventory full! (${inventory.length}/${capacity})`,
         };
       }
     }
 
     // Handle stackable items
     if (itemObj.stackable) {
-      const existingItem = inventory.find((invItem: InventoryItem) => invItem.id === itemObj.id);
+      const existingItem = inventory.find(
+        (invItem: InventoryItem) => invItem.id === itemObj.id,
+      );
       if (existingItem) {
         existingItem.quantity = (existingItem.quantity || 1) + quantity;
         return {
-          type: 'add',
+          type: "add",
           item: itemObj,
           quantity,
           success: true,
-          message: `Added ${quantity}x ${itemObj.name} (total: ${existingItem.quantity})`
+          message: `Added ${quantity}x ${itemObj.name} (total: ${existingItem.quantity})`,
         };
       }
     }
 
-    
     const newItem: InventoryItem = {
       ...itemObj,
-      quantity: itemObj.stackable ? quantity : 1
+      quantity: itemObj.stackable ? quantity : 1,
     };
 
-    
-    if (!itemObj.stackable && inventory.some(i => i.id === itemObj.id)) {
+    if (!itemObj.stackable && inventory.some((i) => i.id === itemObj.id)) {
       return {
-        type: 'add',
+        type: "add",
         item: itemObj,
         success: false,
-        message: `You already have ${itemObj.name}`
+        message: `You already have ${itemObj.name}`,
       };
     }
 
     inventory.push(newItem);
 
     return {
-      type: 'add',
+      type: "add",
       item: newItem,
       quantity,
       success: true,
-      message: `Added ${itemObj.name} to inventory`
+      message: `Added ${itemObj.name} to inventory`,
     };
-
   } catch (error) {
-    console.error('[Inventory] Error adding item:', error);
+    console.error("[Inventory] Error adding item:", error);
     return {
-      type: 'add',
+      type: "add",
       item,
       success: false,
-      message: 'Error adding item to inventory'
+      message: "Error adding item to inventory",
     };
   }
 }
-
-
 
 // --- Function: hasItem ---
 export function hasItem(item: string, minQuantity: number = 1): boolean {
   try {
-    const inventoryItem = inventory.find((invItem: InventoryItem) => invItem.id === item);
-    if (!inventoryItem) return false;
+    const inventoryItem = inventory.find(
+      (invItem: InventoryItem) => invItem.id === item,
+    );
+    if (!inventoryItem) {return false;}
 
     const quantity = inventoryItem.quantity || 1;
     return quantity >= minQuantity;
   } catch (error) {
-    console.error('[Inventory] Error checking item:', error);
+    console.error("[Inventory] Error checking item:", error);
     return false;
   }
 }
 
-
-
 // --- Function: getInventory ---
 export function getInventory(
   category?: ItemCategory,
-  sortBy?: 'name' | 'category' | 'rarity' | 'value' | 'weight'
+  sortBy?: "name" | "category" | "rarity" | "value" | "weight",
 ): InventoryItem[] {
   try {
     let result = [...inventory];
 
-    
     if (category) {
-      result = result.filter(item => item.category === category);
+      result = result.filter((item) => item.category === category);
     }
 
-    
     if (sortBy) {
       result.sort((a, b) => {
         switch (sortBy) {
-          case 'name':
+          case "name":
             return a.name.localeCompare(b.name);
-          case 'category':
-// JSX return block or main return
-            return (a.category || 'misc').localeCompare(b.category || 'misc');
-          case 'rarity':
-            const rarityOrder: ItemRarity[] = ['common', 'uncommon', 'rare', 'epic', 'legendary', 'unique'];
-            return rarityOrder.indexOf(a.rarity || 'common') - rarityOrder.indexOf(b.rarity || 'common');
-          case 'value':
-// JSX return block or main return
+          case "category":
+            // JSX return block or main return
+            return (a.category || "misc").localeCompare(b.category || "misc");
+          case "rarity":
+            const rarityOrder: ItemRarity[] = [
+              "common",
+              "uncommon",
+              "rare",
+              "epic",
+              "legendary",
+              "unique",
+            ];
+            return (
+              rarityOrder.indexOf(a.rarity || "common") -
+              rarityOrder.indexOf(b.rarity || "common")
+            );
+          case "value":
+            // JSX return block or main return
             return (b.value || 0) - (a.value || 0);
-          case 'weight':
-// JSX return block or main return
+          case "weight":
+            // JSX return block or main return
             return (a.weight || 0) - (b.weight || 0);
           default:
             return 0;
@@ -363,23 +372,26 @@ export function getInventory(
 
     return result;
   } catch (error) {
-    console.error('[Inventory] Error getting inventory:', error);
+    console.error("[Inventory] Error getting inventory:", error);
     return [];
   }
 }
 
-
-
 // --- Function: removeItem ---
-export function removeItem(item: string, quantity: number = 1): InventoryOperation {
+export function removeItem(
+  item: string,
+  quantity: number = 1,
+): InventoryOperation {
   try {
-    const itemIndex = inventory.findIndex((invItem: InventoryItem) => invItem.id === item);
+    const itemIndex = inventory.findIndex(
+      (invItem: InventoryItem) => invItem.id === item,
+    );
     if (itemIndex === -1) {
       return {
-        type: 'remove',
+        type: "remove",
         item,
         success: false,
-        message: `You don't have ${item}`
+        message: `You don't have ${item}`,
       };
     }
 
@@ -388,93 +400,94 @@ export function removeItem(item: string, quantity: number = 1): InventoryOperati
       // Reduce quantity
       inventoryItem.quantity = (inventoryItem.quantity || 1) - quantity;
       return {
-        type: 'remove',
+        type: "remove",
         item: inventoryItem,
         quantity,
         success: true,
-        message: `Removed ${quantity}x ${inventoryItem.name} (${inventoryItem.quantity} remaining)`
+        message: `Removed ${quantity}x ${inventoryItem.name} (${inventoryItem.quantity} remaining)`,
       };
     } else {
       // Remove item completely
       inventory.splice(itemIndex, 1);
       return {
-        type: 'remove',
+        type: "remove",
         item: inventoryItem,
         quantity: inventoryItem.quantity || 1,
         success: true,
-        message: `Removed ${inventoryItem.name} from inventory`
+        message: `Removed ${inventoryItem.name} from inventory`,
       };
     }
   } catch (error) {
-    console.error('[Inventory] Error removing item:', error);
+    console.error("[Inventory] Error removing item:", error);
     return {
-      type: 'remove',
+      type: "remove",
       item,
       success: false,
-      message: 'Error removing item from inventory'
+      message: "Error removing item from inventory",
     };
   }
 }
-
-
 
 // --- Function: clearInventory ---
 export function clearInventory(category?: ItemCategory): void {
   try {
     if (category) {
-      inventory = inventory.filter(item => item.category !== category);
+      inventory = inventory.filter((item) => item.category !== category);
     } else {
       inventory = [];
     }
   } catch (error) {
-    console.error('[Inventory] Error clearing inventory:', error);
+    console.error("[Inventory] Error clearing inventory:", error);
   }
 }
 
-
-
 // --- Function: useItem ---
-export function useItem(itemId: string, context?: InventoryContext): InventoryOperation {
+export function useItem(
+  itemId: string,
+  context?: InventoryContext,
+): InventoryOperation {
   try {
-    const item = inventory.find((invItem: InventoryItem) => invItem.id === itemId);
+    const item = inventory.find(
+      (invItem: InventoryItem) => invItem.id === itemId,
+    );
     if (!item) {
       return {
-        type: 'use',
+        type: "use",
         item: itemId,
         success: false,
-        message: `You don't have ${itemId}`
+        message: `You don't have ${itemId}`,
       };
     }
 
     // Apply item effects
-    let effectMessages = '';
+    let effectMessages = "";
     if (item.effects && item.effects.length > 0) {
       // Process each effect on the item
-      const processedEffects = item.effects.map(effect => {
+      const processedEffects = item.effects.map((effect) => {
         switch (effect.type) {
-          case 'heal':
+          case "heal":
             return `You feel refreshed (+${effect.value || 10} health)`;
-          case 'boost':
+          case "boost":
             return `You feel empowered! (+${effect.value || 5} boost for ${effect.duration || 30}s)`;
-          case 'unlock':
+          case "unlock":
             return `You unlock something new!`;
-          case 'transform':
+          case "transform":
             return `The ${itemId} transforms into something else!`;
-          case 'quest':
+          case "quest":
             return `Quest progress updated`;
-          case 'special':
-            return effect.description || 'Something magical happens!';
+          case "special":
+            return effect.description || "Something magical happens!";
           default:
-            return effect.description || 'You use the item';
+            return effect.description || "You use the item";
         }
       });
-      effectMessages = processedEffects.join(', ');
+      effectMessages = processedEffects.join(", ");
     } else {
-      effectMessages = 'You use the item';
+      effectMessages = "You use the item";
     }
 
     // Remove consumable items after use
-    if (item.category === 'consumable') {
+    if (item.category === "consumable") {
       const removeResult = removeItem(itemId, 1);
       if (!removeResult.success) {
         return removeResult;
@@ -482,59 +495,61 @@ export function useItem(itemId: string, context?: InventoryContext): InventoryOp
     }
 
     return {
-      type: 'use',
+      type: "use",
       item,
       success: true,
-      message: `Used ${item.name}${effectMessages ? `: ${effectMessages}` : ''}`
+      message: `Used ${item.name}${effectMessages ? `: ${effectMessages}` : ""}`,
     };
   } catch (error) {
-    console.error('[Inventory] Error using item:', error);
+    console.error("[Inventory] Error using item:", error);
     return {
-      type: 'use',
+      type: "use",
       item: itemId,
       success: false,
-      message: 'Error using item'
+      message: "Error using item",
     };
   }
 }
-
-
 
 // --- Function: getInventoryState ---
 export function getInventoryState(context?: InventoryContext): InventoryState {
   try {
     const inventory = context?.inventory || [];
     const capacity = context?.capacity || 10;
-    const weight = inventory.reduce((total, item) => total + (item.weight || 1) * (item.quantity || 1), 0);
-    
-    const categories = inventory.reduce((counts, item) => {
-      const category = getCategoryForItem(item.id);
-      if (category) {
-        counts[category] = (counts[category] || 0) + (item.quantity || 1);
-      }
-      return counts;
-    }, {} as Record<ItemCategory, number>);
+    const weight = inventory.reduce(
+      (total, item) => total + (item.weight || 1) * (item.quantity || 1),
+      0,
+    );
+
+    const categories = inventory.reduce(
+      (counts, item) => {
+        const category = getCategoryForItem(item.id);
+        if (category) {
+          counts[category] = (counts[category] || 0) + (item.quantity || 1);
+        }
+        return counts;
+      },
+      {} as Record<ItemCategory, number>,
+    );
 
     return {
       items: [...inventory],
       capacity,
       weight,
-      maxWeight: 100, 
-      categories
+      maxWeight: 100,
+      categories,
     };
   } catch (error) {
-    console.error('[Inventory] Error getting inventory state:', error);
+    console.error("[Inventory] Error getting inventory state:", error);
     return {
       items: [],
       capacity: 5,
       weight: 0,
       maxWeight: 100,
-      categories: {} as Record<ItemCategory, number>
+      categories: {} as Record<ItemCategory, number>,
     };
   }
 }
-
-
 
 // --- Function: findItems ---
 export function findItems(criteria: {
@@ -546,8 +561,11 @@ export function findItems(criteria: {
   maxWeight?: number;
 }): InventoryItem[] {
   try {
-    return inventory.filter(item => {
-      if (criteria.name && !item.name.toLowerCase().includes(criteria.name.toLowerCase())) {
+    return inventory.filter((item) => {
+      if (
+        criteria.name &&
+        !item.name.toLowerCase().includes(criteria.name.toLowerCase())
+      ) {
         return false;
       }
       if (criteria.category && item.category !== criteria.category) {
@@ -556,7 +574,10 @@ export function findItems(criteria: {
       if (criteria.rarity && item.rarity !== criteria.rarity) {
         return false;
       }
-      if (criteria.hasEffect && !item.effects?.some(e => e.type === criteria.hasEffect)) {
+      if (
+        criteria.hasEffect &&
+        !item.effects?.some((e) => e.type === criteria.hasEffect)
+      ) {
         return false;
       }
       if (criteria.minValue && (item.value || 0) < criteria.minValue) {
@@ -568,88 +589,89 @@ export function findItems(criteria: {
       return true;
     });
   } catch (error) {
-    console.error('[Inventory] Error finding items:', error);
+    console.error("[Inventory] Error finding items:", error);
     return [];
   }
 }
 
-
-
 // --- Function: getItemValue ---
 export function getItemValue(itemIds?: string[]): number {
   try {
-    const items = itemIds ? inventory.filter(item => itemIds.includes(item.id)) : inventory;
-    return items.reduce((total: number, item: InventoryItem) =>
-      total + ((item.value || 0) * (item.quantity || 1)), 0
+    const items = itemIds
+      ? inventory.filter((item) => itemIds.includes(item.id))
+      : inventory;
+    return items.reduce(
+      (total: number, item: InventoryItem) =>
+        total + (item.value || 0) * (item.quantity || 1),
+      0,
     );
   } catch (error) {
-    console.error('[Inventory] Error calculating item value:', error);
+    console.error("[Inventory] Error calculating item value:", error);
     return 0;
   }
 }
 
-
-
 // --- Function: createItemFromId ---
 function createItemFromId(itemId: string): InventoryItem | null {
   const itemData = getItemDefinition(itemId);
-  if (!itemData) return null;
+  if (!itemData) {return null;}
 
   return {
     ...itemData,
-    id: itemId
+    id: itemId,
   };
 }
 
-
 // --- Function: canStackItem ---
 function canStackItem(itemId: string): boolean {
-  const existingItem = inventory.find(item => item.id === itemId);
+  const existingItem = inventory.find((item) => item.id === itemId);
   return Boolean(existingItem?.stackable);
 }
 
-
 // --- Function: applyItemEffect ---
-function applyItemEffect(effect: ItemEffect, context?: InventoryContext): string | null {
-  
-  
+function applyItemEffect(
+  effect: ItemEffect,
+  context?: InventoryContext,
+): string | null {
   switch (effect.type) {
-    case 'heal':
+    case "heal":
       return `Restored ${effect.value} health`;
-    case 'boost':
+    case "boost":
       return `${effect.description} for ${effect.duration}ms`;
-    case 'unlock':
-      return 'New areas may be accessible';
+    case "unlock":
+      return "New areas may be accessible";
     default:
       return effect.description || null;
   }
 }
 
-
-
 // --- Function: setInventoryFromStringArray ---
 export function setInventoryFromStringArray(items: string[]): void {
   try {
     inventory = [];
-    items.forEach(itemId => {
+    items.forEach((itemId) => {
       const result = addItem(itemId);
       if (!result.success) {
         console.warn(`[Inventory] Failed to add legacy item: ${itemId}`);
       }
     });
   } catch (error) {
-    console.error('[Inventory] Error setting inventory from string array:', error);
+    console.error(
+      "[Inventory] Error setting inventory from string array:",
+      error,
+    );
   }
 }
-
-
 
 // --- Function: getInventoryAsStringArray ---
 export function getInventoryAsStringArray(): string[] {
   try {
-    return inventory.map(item => item.id);
+    return inventory.map((item) => item.id);
   } catch (error) {
-    console.error('[Inventory] Error getting inventory as string array:', error);
+    console.error(
+      "[Inventory] Error getting inventory as string array:",
+      error,
+    );
     return [];
   }
 }
@@ -666,7 +688,7 @@ const InventoryEngine = {
   setInventoryFromStringArray,
   createItemFromId,
   canStackItem,
-  applyItemEffect
+  applyItemEffect,
 };
 
 export default InventoryEngine;

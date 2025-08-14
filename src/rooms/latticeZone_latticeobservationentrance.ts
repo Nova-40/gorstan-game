@@ -17,17 +17,9 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Renders room descriptions and image logic.
 
-import { NPC } from '../types/NPCTypes';
+import { NPC } from "../types/NPCTypes";
 
-import { Room } from '../types/Room';
-
-
-
-
-
-
-
-
+import { Room } from "../types/Room";
 
 const latticeobservationentrance: Room = {
   id: "latticeobservationentrance",
@@ -36,7 +28,7 @@ const latticeobservationentrance: Room = {
   description: [
     "You stand at the entrance to the Lattice Observation Deck, where crystalline corridors stretch ahead, shimmering with refracted light.",
     "The air hums with a quiet energy, and translucent panels display shifting patterns and data streams.",
-    "A sense of anticipation fills the space, as if the lattice itself is aware of your presence."
+    "A sense of anticipation fills the space, as if the lattice itself is aware of your presence.",
   ],
   image: "offmultiverseZone_controlnexusreturned.png",
   ambientAudio: "lattice_entrance_ambience.mp3",
@@ -45,41 +37,38 @@ const latticeobservationentrance: Room = {
     ">> LATTICE OBSERVATION ENTRANCE - ACCESS POINT",
     ">> Observation deck status: SECURE",
     ">> Energy readings: NOMINAL",
-    ">> Tip: Proceed to the deck for a panoramic view of the lattice structure."
+    ">> Tip: Proceed to the deck for a panoramic view of the lattice structure.",
   ],
 
   exits: {
     north: "latticeZone_latticeobservationdeck",
-    south: "latticeZone_latticehub"
+    south: "latticeZone_latticehub",
   },
 
-  items: [
-    "observation_pass",
-    "crystal_badge",
-    "data_tablet"
-  ],
+  items: ["observation_pass", "crystal_badge", "data_tablet"],
 
   interactables: {
-    "security_panel": {
-      description: "A crystalline panel with access controls for the observation deck.",
+    security_panel: {
+      description:
+        "A crystalline panel with access controls for the observation deck.",
       actions: ["examine", "scan_pass", "override"],
       requires: ["observation_pass"],
     },
-    "info_display": {
-      description: "A floating display showing real-time data about the lattice.",
+    info_display: {
+      description:
+        "A floating display showing real-time data about the lattice.",
       actions: ["read", "analyze", "download"],
       requires: [],
     },
-    "energy_node": {
-      description: "A small node pulsing with lattice energy, powering the entrance systems.",
+    energy_node: {
+      description:
+        "A small node pulsing with lattice energy, powering the entrance systems.",
       actions: ["examine", "stabilize", "absorb"],
       requires: [],
-    }
+    },
   },
 
-  npcs: [
-    
-  ],
+  npcs: [],
 
   events: {
     onEnter: ["showEntranceIntro", "activateDisplays"],
@@ -88,7 +77,7 @@ const latticeobservationentrance: Room = {
       security_panel: ["scanPass", "attemptOverride"],
       info_display: ["analyzeData", "downloadInfo"],
       energy_node: ["stabilizeNode", "absorbEnergy"],
-    }
+    },
   },
 
   flags: {
@@ -104,20 +93,16 @@ const latticeobservationentrance: Room = {
       "Scan Your Observation Pass",
       "Download Data from the Info Display",
       "Stabilize the Entrance Energy Node",
-      "Speak with the Observation Attendant"
-    ]
+      "Speak with the Observation Attendant",
+    ],
   },
 
   environmental: {
     lighting: "soft_crystalline_glow",
     temperature: "cool_and_even",
     airQuality: "ionized_and_clean",
-    soundscape: [
-      "soft_hum",
-      "data_streams",
-      "crystal_resonance"
-    ],
-    hazards: ["energy_fluctuations"]
+    soundscape: ["soft_hum", "data_streams", "crystal_resonance"],
+    hazards: ["energy_fluctuations"],
   },
 
   security: {
@@ -125,7 +110,7 @@ const latticeobservationentrance: Room = {
     accessRequirements: ["observation_pass"],
     alarmTriggers: ["unauthorized_override"],
     surveillanceActive: true,
-    surveillanceType: "lattice_security"
+    surveillanceType: "lattice_security",
   },
 
   metadata: {
@@ -140,8 +125,8 @@ const latticeobservationentrance: Room = {
       "Observation deck access",
       "Security and data systems",
       "Holographic attendant NPC",
-      "Energy node interaction"
-    ]
+      "Energy node interaction",
+    ],
   },
 
   secrets: {
@@ -151,26 +136,26 @@ const latticeobservationentrance: Room = {
       rewards: ["maintenance_access", "hidden_lore"],
     },
     attendant_memory: {
-      description: "A memory fragment from the attendant, unlocked by repeated interactions.",
+      description:
+        "A memory fragment from the attendant, unlocked by repeated interactions.",
       requirements: ["talk to observation_attendant", "download info_display"],
       rewards: ["attendant_story", "unique_item"],
-    }
+    },
   },
 
   customActions: {
-    "override_security": {
-      description: "Attempt to override the security panel for alternate access.",
+    override_security: {
+      description:
+        "Attempt to override the security panel for alternate access.",
       requirements: ["data_tablet"],
       effects: ["bypass_security", "trigger_alarm"],
     },
-    "analyze_energy": {
+    analyze_energy: {
       description: "Analyze the energy node for fluctuations.",
       requirements: [],
       effects: ["stabilize_node", "gain_insight"],
-    }
-  }
+    },
+  },
 };
 
 export default latticeobservationentrance;
-
-

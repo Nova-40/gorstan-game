@@ -17,40 +17,33 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Game module.
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 
-import { motion, AnimatePresence } from 'framer-motion';
-
-
-
-
-
-
-
-
-
+import { motion, AnimatePresence } from "framer-motion";
 
 interface WaitTransitionProps {
   onComplete: () => void;
 }
 
 const WaitTransition: React.FC<WaitTransitionProps> = ({ onComplete }) => {
-  const [phase, setPhase] = useState<'tension' | 'approaching' | 'impact' | 'reset'>('tension');
+  const [phase, setPhase] = useState<
+    "tension" | "approaching" | "impact" | "reset"
+  >("tension");
 
-// React effect hook
+  // React effect hook
   useEffect(() => {
-// Variable declaration
+    // Variable declaration
     const timers = [
-      setTimeout(() => setPhase('approaching'), 800),
-      setTimeout(() => setPhase('impact'), 2500),
-      setTimeout(() => setPhase('reset'), 3200),
+      setTimeout(() => setPhase("approaching"), 800),
+      setTimeout(() => setPhase("impact"), 2500),
+      setTimeout(() => setPhase("reset"), 3200),
       setTimeout(() => onComplete(), 4200),
     ];
-// JSX return block or main return
+    // JSX return block or main return
     return () => timers.forEach(clearTimeout);
   }, [onComplete]);
 
-// JSX return block or main return
+  // JSX return block or main return
   return (
     <AnimatePresence>
       <motion.div
@@ -59,24 +52,28 @@ const WaitTransition: React.FC<WaitTransitionProps> = ({ onComplete }) => {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         style={{
-          background: phase === 'reset' ? '#000000' : 'linear-gradient(180deg, #1a1a1a, #000000)',
+          background:
+            phase === "reset"
+              ? "#000000"
+              : "linear-gradient(180deg, #1a1a1a, #000000)",
         }}
       >
         {}
-        {phase === 'tension' && (
+        {phase === "tension" && (
           <motion.div
             className="absolute inset-0"
             initial={{ opacity: 0 }}
             animate={{ opacity: [0, 0.3, 0] }}
             transition={{ duration: 0.8, repeat: Infinity }}
             style={{
-              background: 'radial-gradient(circle at 80% 20%, #330000 0%, transparent 50%)',
+              background:
+                "radial-gradient(circle at 80% 20%, #330000 0%, transparent 50%)",
             }}
           />
         )}
 
         {}
-        {phase === 'approaching' && (
+        {phase === "approaching" && (
           <>
             {}
             <motion.div
@@ -85,7 +82,8 @@ const WaitTransition: React.FC<WaitTransitionProps> = ({ onComplete }) => {
               animate={{ opacity: [0, 0.6, 0.8] }}
               transition={{ duration: 1.7 }}
               style={{
-                background: 'radial-gradient(ellipse at 80% 50%, #660000 0%, #330000 40%, transparent 70%)',
+                background:
+                  "radial-gradient(ellipse at 80% 50%, #660000 0%, #330000 40%, transparent 70%)",
               }}
             />
 
@@ -96,14 +94,15 @@ const WaitTransition: React.FC<WaitTransitionProps> = ({ onComplete }) => {
               animate={{ opacity: [0, 1, 1], scale: [0.5, 1.2, 1.5] }}
               transition={{ duration: 1.7 }}
               style={{
-                background: 'conic-gradient(from 45deg at 85% 50%, transparent 40%, #ffff9955 50%, transparent 60%)',
+                background:
+                  "conic-gradient(from 45deg at 85% 50%, transparent 40%, #ffff9955 50%, transparent 60%)",
               }}
             />
           </>
         )}
 
         {}
-        {phase === 'impact' && (
+        {phase === "impact" && (
           <>
             {}
             <motion.div
@@ -112,7 +111,7 @@ const WaitTransition: React.FC<WaitTransitionProps> = ({ onComplete }) => {
               animate={{ opacity: [0, 1, 0] }}
               transition={{ duration: 0.3 }}
               style={{
-                background: '#ffffff',
+                background: "#ffffff",
               }}
             />
 
@@ -123,15 +122,16 @@ const WaitTransition: React.FC<WaitTransitionProps> = ({ onComplete }) => {
               animate={{ scale: [0, 1.5, 2], opacity: [0, 1, 0.8] }}
               transition={{ duration: 0.7, delay: 0.1 }}
               style={{
-                background: 'radial-gradient(circle, #990000 0%, #660000 30%, #330000 60%, transparent 100%)',
-                transformOrigin: '85% 50%',
+                background:
+                  "radial-gradient(circle, #990000 0%, #660000 30%, #330000 60%, transparent 100%)",
+                transformOrigin: "85% 50%",
               }}
             />
           </>
         )}
 
         {}
-        {phase === 'reset' && (
+        {phase === "reset" && (
           <motion.div
             className="absolute inset-0 flex items-center justify-center"
             initial={{ opacity: 0 }}
@@ -148,7 +148,7 @@ const WaitTransition: React.FC<WaitTransitionProps> = ({ onComplete }) => {
               </motion.div>
               <motion.div
                 initial={{ width: 0 }}
-                animate={{ width: '200px' }}
+                animate={{ width: "200px" }}
                 transition={{ duration: 0.8, delay: 0.2 }}
                 className="h-1 bg-green-400 mx-auto mb-2"
               />
@@ -164,36 +164,36 @@ const WaitTransition: React.FC<WaitTransitionProps> = ({ onComplete }) => {
           <motion.div
             className="text-center font-mono"
             initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: phase === 'reset' ? 0 : 1, y: 0 }}
+            animate={{ opacity: phase === "reset" ? 0 : 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.6 }}
           >
-            {phase === 'tension' && (
+            {phase === "tension" && (
               <motion.div
                 className="text-2xl text-red-300"
                 animate={{ opacity: [0.7, 1, 0.7] }}
                 transition={{ duration: 1, repeat: Infinity }}
-                style={{ textShadow: '0 0 10px #ff6666' }}
+                style={{ textShadow: "0 0 10px #ff6666" }}
               >
                 ⏳ You hesitate...
               </motion.div>
             )}
-            {phase === 'approaching' && (
+            {phase === "approaching" && (
               <motion.div
                 className="text-3xl text-red-200"
                 animate={{ scale: [1, 1.1, 1] }}
                 transition={{ duration: 0.5, repeat: Infinity }}
-                style={{ textShadow: '0 0 15px #ff4444' }}
+                style={{ textShadow: "0 0 15px #ff4444" }}
               >
                 🚛 Too late! Lorry approaching!
               </motion.div>
             )}
-            {phase === 'impact' && (
+            {phase === "impact" && (
               <motion.div
                 className="text-4xl text-white"
                 initial={{ scale: 0 }}
                 animate={{ scale: [0, 1.5, 1] }}
                 transition={{ duration: 0.4 }}
-                style={{ textShadow: '0 0 20px #ffffff' }}
+                style={{ textShadow: "0 0 20px #ffffff" }}
               >
                 💥 IMPACT!
               </motion.div>
@@ -202,24 +202,24 @@ const WaitTransition: React.FC<WaitTransitionProps> = ({ onComplete }) => {
         </div>
 
         {}
-        {phase === 'approaching' && (
+        {phase === "approaching" && (
           <div className="absolute inset-0">
             {[...Array(4)].map((_, i) => (
               <motion.div
                 key={i}
                 className="absolute border-2 border-red-400 opacity-40"
                 initial={{
-                  width: '10px',
-                  height: '10px',
-                  x: '85%',
-                  y: '50%',
-                  borderRadius: '50%',
+                  width: "10px",
+                  height: "10px",
+                  x: "85%",
+                  y: "50%",
+                  borderRadius: "50%",
                 }}
                 animate={{
-                  width: ['10px', '100px', '200px'],
-                  height: ['10px', '100px', '200px'],
-                  x: ['85%', '75%', '60%'],
-                  y: ['50%', '45%', '40%'],
+                  width: ["10px", "100px", "200px"],
+                  height: ["10px", "100px", "200px"],
+                  x: ["85%", "75%", "60%"],
+                  y: ["50%", "45%", "40%"],
                   opacity: [0.4, 0.2, 0],
                 }}
                 transition={{

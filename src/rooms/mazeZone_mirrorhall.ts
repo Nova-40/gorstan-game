@@ -17,17 +17,9 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Renders room descriptions and image logic.
 
-import { NPC } from '../types/NPCTypes';
+import { NPC } from "../types/NPCTypes";
 
-import { Room } from '../types/Room';
-
-
-
-
-
-
-
-
+import { Room } from "../types/Room";
 
 const mirrorhall: Room = {
   id: "mirrorhall",
@@ -36,7 +28,7 @@ const mirrorhall: Room = {
   description: [
     "You step into a hall of mirrors that stretches endlessly in all directions.",
     "Each reflection seems to show a slightly different version of yourself, some familiar, others unsettlingly alien.",
-    "The air is cool and silent, broken only by the faint sound of your own footsteps echoing from every direction."
+    "The air is cool and silent, broken only by the faint sound of your own footsteps echoing from every direction.",
   ],
   image: "mazeZone_mirrorhall.png",
   ambientAudio: "mirror_hall_ambience.mp3",
@@ -44,36 +36,32 @@ const mirrorhall: Room = {
   consoleIntro: [
     ">> MIRROR HALL - REFLECTIVE PASSAGE",
     ">> Orientation: DISTORTED",
-    ">> Tip: Not all reflections are what they seem. Look for the one that moves differently."
+    ">> Tip: Not all reflections are what they seem. Look for the one that moves differently.",
   ],
 
   exits: {
     east: "mazeZone_labyrinthbend",
     west: "mazeZone_pollysbay",
-    south: "mazeZone_mazeecho"
+    south: "mazeZone_mazeecho",
   },
 
-  items: [
-    "mirror_fragment",
-    "reflection_note"
-  ],
+  items: ["mirror_fragment", "reflection_note"],
 
   interactables: {
-    "main_mirror": {
-      description: "A large mirror at the end of the hall, its surface rippling as if alive.",
+    main_mirror: {
+      description:
+        "A large mirror at the end of the hall, its surface rippling as if alive.",
       actions: ["examine", "touch", "step_through"],
       requires: [],
     },
-    "distorted_reflection": {
+    distorted_reflection: {
       description: "A reflection that doesn't quite match your movements.",
       actions: ["observe", "mimic", "question"],
       requires: [],
-    }
+    },
   },
 
-  npcs: [
-    
-  ],
+  npcs: [],
 
   events: {
     onEnter: ["showMirrorHallIntro", "activateReflections"],
@@ -81,7 +69,7 @@ const mirrorhall: Room = {
     onInteract: {
       main_mirror: ["touchMirror", "stepThroughMirror"],
       distorted_reflection: ["observeReflection", "mimicReflection"],
-    }
+    },
   },
 
   flags: {
@@ -95,19 +83,16 @@ const mirrorhall: Room = {
     optional: [
       "Mimic the Distorted Reflection",
       "Meet the Mirror Shade",
-      "Step Through the Main Mirror"
-    ]
+      "Step Through the Main Mirror",
+    ],
   },
 
   environmental: {
     lighting: "shifting_reflections",
     temperature: "cool_and_silent",
     airQuality: "crisp_and_clear",
-    soundscape: [
-      "echoing_footsteps",
-      "soft_whispers"
-    ],
-    hazards: ["disorientation", "illusory_paths"]
+    soundscape: ["echoing_footsteps", "soft_whispers"],
+    hazards: ["disorientation", "illusory_paths"],
   },
 
   security: {
@@ -129,32 +114,31 @@ const mirrorhall: Room = {
       "Mirror puzzles",
       "Reflection-based clues",
       "Mysterious NPC",
-      "Illusory exits"
-    ]
+      "Illusory exits",
+    ],
   },
 
   secrets: {
     hidden_passage: {
-      description: "A hidden passage revealed by stepping through the main mirror after mimicking the distorted reflection.",
+      description:
+        "A hidden passage revealed by stepping through the main mirror after mimicking the distorted reflection.",
       requirements: ["mimic distorted_reflection", "step_through main_mirror"],
       rewards: ["shortcut_access", "mirror_lore"],
-    }
+    },
   },
 
   customActions: {
-    "mimic_reflection": {
+    mimic_reflection: {
       description: "Mimic the movements of the distorted reflection.",
       requirements: [],
       effects: ["set_reflectionMimicked", "reveal_hint"],
     },
-    "step_through_mirror": {
+    step_through_mirror: {
       description: "Step through the main mirror to discover a hidden path.",
       requirements: [],
       effects: ["set_mirrorTouched", "unlock_secret"],
-    }
-  }
+    },
+  },
 };
 
 export default mirrorhall;
-
-

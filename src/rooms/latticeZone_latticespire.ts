@@ -17,17 +17,9 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Renders room descriptions and image logic.
 
-import { NPC } from '../types/NPCTypes';
+import { NPC } from "../types/NPCTypes";
 
-import { Room } from '../types/Room';
-
-
-
-
-
-
-
-
+import { Room } from "../types/Room";
 
 const latticespire: Room = {
   id: "latticespire",
@@ -37,7 +29,7 @@ const latticespire: Room = {
     "You stand within the Lattice Spire, a towering crystalline structure that rises above the rest of the lattice.",
     "The walls are composed of interlocking crystal facets, each pulsing with energy and shifting patterns of light.",
     "A spiral ramp winds upward, offering a dizzying view of the lattice network below.",
-    "At the summit, a control node glows with immense power, humming with the resonance of the entire zone."
+    "At the summit, a control node glows with immense power, humming with the resonance of the entire zone.",
   ],
   image: "latticeZone_hub.png",
   ambientAudio: "spire_resonance.mp3",
@@ -46,42 +38,38 @@ const latticespire: Room = {
     ">> LATTICE SPIRE - CONTROL NODE",
     ">> Elevation: MAXIMUM",
     ">> Energy flow: PEAK",
-    ">> Tip: The control node may unlock new pathways or reveal hidden secrets."
+    ">> Tip: The control node may unlock new pathways or reveal hidden secrets.",
   ],
 
   exits: {
     down: "latticeZone_lattice",
-    south: "latticeZone_latticehub"
+    south: "latticeZone_latticehub",
   },
 
-  items: [
-    "spire_key",
-    "crystal_fragment",
-    "energy_map",
-    "control_rune"
-  ],
+  items: ["spire_key", "crystal_fragment", "energy_map", "control_rune"],
 
   interactables: {
-    "control_node": {
-      description: "A glowing node at the summit, pulsing with the energy of the entire lattice.",
+    control_node: {
+      description:
+        "A glowing node at the summit, pulsing with the energy of the entire lattice.",
       actions: ["examine", "activate", "synchronize"],
       requires: ["spire_key"],
     },
-    "spiral_ramp": {
-      description: "A winding ramp that leads up and down the spire, offering panoramic views.",
+    spiral_ramp: {
+      description:
+        "A winding ramp that leads up and down the spire, offering panoramic views.",
       actions: ["ascend", "descend", "observe"],
       requires: [],
     },
-    "facet_window": {
-      description: "A transparent facet offering a breathtaking view of the lattice expanse.",
+    facet_window: {
+      description:
+        "A transparent facet offering a breathtaking view of the lattice expanse.",
       actions: ["look", "analyze", "search_for_patterns"],
       requires: [],
-    }
+    },
   },
 
-  npcs: [
-    
-  ],
+  npcs: [],
 
   events: {
     onEnter: ["showSpireIntro", "activateControlNode"],
@@ -90,7 +78,7 @@ const latticespire: Room = {
       control_node: ["activateNode", "synchronizeLattice"],
       spiral_ramp: ["ascendRamp", "descendRamp"],
       facet_window: ["analyzeView", "searchPatterns"],
-    }
+    },
   },
 
   flags: {
@@ -106,20 +94,16 @@ const latticespire: Room = {
       "Activate the Control Node",
       "Meet the Spire Guardian",
       "Analyze Patterns from the Facet Window",
-      "Ascend to the Summit"
-    ]
+      "Ascend to the Summit",
+    ],
   },
 
   environmental: {
     lighting: "brilliant_crystal_light",
     temperature: "cool_and_energized",
     airQuality: "ionized_and_clear",
-    soundscape: [
-      "deep_resonance",
-      "crystal_hum",
-      "energy_pulses"
-    ],
-    hazards: ["energy_surge", "vertigo"]
+    soundscape: ["deep_resonance", "crystal_hum", "energy_pulses"],
+    hazards: ["energy_surge", "vertigo"],
   },
 
   security: {
@@ -127,7 +111,7 @@ const latticespire: Room = {
     accessRequirements: ["spire_key"],
     alarmTriggers: ["unauthorized_activation"],
     surveillanceActive: true,
-    surveillanceType: "spire_sensors"
+    surveillanceType: "spire_sensors",
   },
 
   metadata: {
@@ -142,37 +126,38 @@ const latticespire: Room = {
       "Vertical exploration",
       "Control node activation",
       "Guardian NPC",
-      "Panoramic lattice views"
-    ]
+      "Panoramic lattice views",
+    ],
   },
 
   secrets: {
     hidden_chamber: {
-      description: "A concealed chamber accessible by synchronizing the control node.",
+      description:
+        "A concealed chamber accessible by synchronizing the control node.",
       requirements: ["activate control_node", "analyze facet_window"],
       rewards: ["rare_artifact", "lattice_secret"],
     },
     guardian_memory: {
-      description: "A memory fragment from the Spire Guardian, unlocked by dialogue.",
+      description:
+        "A memory fragment from the Spire Guardian, unlocked by dialogue.",
       requirements: ["talk to spire_guardian", "activate control_node"],
       rewards: ["guardian_story", "unique_item"],
-    }
+    },
   },
 
   customActions: {
-    "synchronize_lattice": {
-      description: "Synchronize the spire's energy with the rest of the lattice.",
+    synchronize_lattice: {
+      description:
+        "Synchronize the spire's energy with the rest of the lattice.",
       requirements: ["control_rune"],
       effects: ["stabilize_lattice", "reveal_hidden_path"],
     },
-    "observe_patterns": {
+    observe_patterns: {
       description: "Observe and analyze energy patterns from the facet window.",
       requirements: [],
       effects: ["find_secret", "gain_insight"],
-    }
-  }
+    },
+  },
 };
 
 export default latticespire;
-
-

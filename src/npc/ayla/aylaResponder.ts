@@ -17,25 +17,28 @@
 // src/npc/ayla/aylaResponder.ts
 // Enhanced Ayla responder with book lore integration and CTAs - Gorstan Game Beta 1
 
-import type { GameState } from '../../state/gameState';
-import { getAylaEdgeCaseResponse } from '../../utils/aylaBrain';
-import { bookLoreService } from '../../services/bookLore';
-import { bookStoreService } from '../../services/bookStore';
-import { applyAylaPersonality, getAylaCTAIntroduction } from './personality';
-import { aylaService } from '../../services/AylaService';
+import type { GameState } from "../../state/gameState";
+import { getAylaEdgeCaseResponse } from "../../utils/aylaBrain";
+import { bookLoreService } from "../../services/bookLore";
+import { bookStoreService } from "../../services/bookStore";
+import { applyAylaPersonality, getAylaCTAIntroduction } from "./personality";
+import { aylaService } from "../../services/AylaService";
 
 /**
  * Enhanced Ayla response with advanced intent matching and conversational memory
  */
-export function getEnhancedAylaResponse(input: string, state: GameState): string {
+export function getEnhancedAylaResponse(
+  input: string,
+  state: GameState,
+): string {
   // Use the new enhanced Ayla service for primary responses
   const enhancedResponse = aylaService.getResponse(input, state);
-  
+
   // If enhanced service returns a good response, use it
   if (enhancedResponse && !enhancedResponse.includes("I'm not sure")) {
     return enhancedResponse;
   }
-  
+
   // Fall back to legacy system for backward compatibility
   const legacyResponse = getLegacyAylaResponse(input, state);
   return legacyResponse;
@@ -47,17 +50,17 @@ export function getEnhancedAylaResponse(input: string, state: GameState): string
 function getLegacyAylaResponse(input: string, state: GameState): string {
   // First check for edge cases from existing system
   const edgeResponse = getAylaEdgeCaseResponse(input, state);
-  if (edgeResponse) return edgeResponse;
+  if (edgeResponse) {return edgeResponse;}
 
   // Check for book-related queries
   const bookResponse = handleBookQuery(input);
   if (bookResponse) {
     // Record this as a book discussion
     bookStoreService.recordBookDiscussion();
-    
+
     // Maybe show a CTA after the book response
     const ctaResponse = maybeAddCTA();
-    return bookResponse + (ctaResponse ? '\n\n' + ctaResponse : '');
+    return bookResponse + (ctaResponse ? "\n\n" + ctaResponse : "");
   }
 
   // Core Ayla logic (existing fallbacks)
@@ -69,14 +72,14 @@ function getLegacyAylaResponse(input: string, state: GameState): string {
  */
 function handleBookQuery(input: string): string | null {
   const query = input.toLowerCase().trim();
-  
+
   // Book mention patterns
   const bookPatterns = [
     /(?:have you read|what do you think of|thoughts on|opinion on) (.+)/,
     /(?:do you know|familiar with) (.+)/,
     /(?:read|book|novel|author) (.+)/,
     /(.+) (?:book|novel|story|author)/,
-    /what about (.+)/
+    /what about (.+)/,
   ];
 
   for (const pattern of bookPatterns) {
@@ -84,26 +87,27 @@ function handleBookQuery(input: string): string | null {
     if (match) {
       const bookQuery = match[1];
       const response = bookLoreService.getAylaResponse(bookQuery);
-      
+
       if (response) {
-        return applyAylaPersonality(
-          response.response,
-          'book-discussion',
-          { allowCheekyAside: true }
-        );
+        return applyAylaPersonality(response.response, "book-discussion", {
+          allowCheekyAside: true,
+        });
       }
     }
   }
 
   // General literature queries
-  if (query.includes('book') || query.includes('read') || query.includes('literature') || query.includes('author')) {
+  if (
+    query.includes("book") ||
+    query.includes("read") ||
+    query.includes("literature") ||
+    query.includes("author")
+  ) {
     const response = bookLoreService.getAylaResponse(query);
     if (response) {
-      return applyAylaPersonality(
-        response.response,
-        'book-discussion',
-        { allowCheekyAside: true }
-      );
+      return applyAylaPersonality(response.response, "book-discussion", {
+        allowCheekyAside: true,
+      });
     }
 
     // Fallback for unrecognized book queries
@@ -118,18 +122,18 @@ function handleBookQuery(input: string): string | null {
  */
 function maybeAddCTA(): string | null {
   const ctaResult = bookStoreService.shouldShowCTA();
-  if (!ctaResult) return null;
+  if (!ctaResult) {return null;}
 
   const { cta } = ctaResult;
-  
+
   // Record that we're showing this CTA
-  bookStoreService.recordCTAInteraction(cta.id, 'shown');
+  bookStoreService.recordCTAInteraction(cta.id, "shown");
 
   // Create the CTA message with Ayla's personality
   const intro = getAylaCTAIntroduction();
   const ctaMessage = `${intro} ${cta.content.message}`;
-  
-  return applyAylaPersonality(ctaMessage, 'cta');
+
+  return applyAylaPersonality(ctaMessage, "cta");
 }
 
 /**
@@ -141,11 +145,11 @@ function getGenericBookResponse(): string {
     "Literature is a vast ocean. What particular waters would you like to explore?",
     "Books are wonderful conversation starters. What's caught your reading interest lately?",
     "I enjoy literary discussions. Is there a particular book or author you'd like to chat about?",
-    "Reading opens so many doors. What literary adventures have you been on recently?"
+    "Reading opens so many doors. What literary adventures have you been on recently?",
   ];
 
   const response = responses[Math.floor(Math.random() * responses.length)];
-  return applyAylaPersonality(response, 'book-discussion');
+  return applyAylaPersonality(response, "book-discussion");
 }
 
 /**
@@ -153,21 +157,21 @@ function getGenericBookResponse(): string {
  */
 function getCoreAylaResponse(input: string, state: GameState): string {
   const key = input.toLowerCase().trim();
-  
+
   // Core personality responses
-  if (key.includes('who are you')) {
+  if (key.includes("who are you")) {
     return "I'm Ayla. I am the Lattice. I also enjoy a good book discussion.";
   }
-  
-  if (key.includes('what do you know')) {
-    return 'Most things. Literature, multiverse theory, the importance of tea. I prioritise relevance, not volume.';
+
+  if (key.includes("what do you know")) {
+    return "Most things. Literature, multiverse theory, the importance of tea. I prioritise relevance, not volume.";
   }
-  
-  if (key.includes('what should i do')) {
-    return 'Remain curious. Stay mobile. Avoid Polly. Perhaps read something engaging.';
+
+  if (key.includes("what should i do")) {
+    return "Remain curious. Stay mobile. Avoid Polly. Perhaps read something engaging.";
   }
-  
-  if (key.includes('help')) {
+
+  if (key.includes("help")) {
     return "I'm here to assist. Feel free to ask about books, the game, or the nature of reality itself.";
   }
 
@@ -180,16 +184,21 @@ function getCoreAylaResponse(input: string, state: GameState): string {
     "Interesting perspective. I don't have insight on that particular topic, but I'm always ready for other questions.",
     "Sometimes the best conversations start with unexpected questions, even when I can't immediately answer them.",
     "I exist to help, but that's beyond my current understanding. What else can I assist with?",
-    "Your curiosity is admirable, even when it leads to areas I can't illuminate. Keep asking!"
+    "Your curiosity is admirable, even when it leads to areas I can't illuminate. Keep asking!",
   ];
-  
-  return contextualFallbacks[Math.floor(Math.random() * contextualFallbacks.length)];
+
+  return contextualFallbacks[
+    Math.floor(Math.random() * contextualFallbacks.length)
+  ];
 }
 
 /**
  * Get CTA interaction handler for UI
  */
-export function handleCTAInteraction(ctaId: string, action: 'clicked' | 'dismissed' | 'snoozed'): void {
+export function handleCTAInteraction(
+  ctaId: string,
+  action: "clicked" | "dismissed" | "snoozed",
+): void {
   bookStoreService.recordCTAInteraction(ctaId, action);
 }
 
@@ -199,7 +208,7 @@ export function handleCTAInteraction(ctaId: string, action: 'clicked' | 'dismiss
 export function getCTAState() {
   return {
     stats: bookStoreService.getStats(),
-    snoozeStatus: bookStoreService.getSnoozeStatus()
+    snoozeStatus: bookStoreService.getSnoozeStatus(),
   };
 }
 

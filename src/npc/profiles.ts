@@ -38,7 +38,7 @@ const memStore: Record<string, NPCMemory> = {};
 export function initMemory(): NPCMemory {
   return {
     facts: {},
-    conversationHistory: []
+    conversationHistory: [],
   };
 }
 
@@ -53,42 +53,42 @@ export function updateNPCMemory(id: string, updates: Partial<NPCMemory>): void {
 
 export function getVoiceForNPC(id: string): Voice {
   switch (id) {
-    case "ayla":    
-      return { 
-        formality: 1, 
-        humor: 1, 
-        terseness: 1, 
-        tics: ["…", "*nods thoughtfully*", "*smiles knowingly*"] 
+    case "ayla":
+      return {
+        formality: 1,
+        humor: 1,
+        terseness: 1,
+        tics: ["…", "*nods thoughtfully*", "*smiles knowingly*"],
       };
-    case "morthos": 
-      return { 
-        formality: 0, 
-        humor: 2, 
-        terseness: 1, 
-        tics: ["*clank*", "*adjusts mechanical parts*", "*whirrs softly*"] 
+    case "morthos":
+      return {
+        formality: 0,
+        humor: 2,
+        terseness: 1,
+        tics: ["*clank*", "*adjusts mechanical parts*", "*whirrs softly*"],
       };
-    case "al":      
-      return { 
-        formality: 2, 
-        humor: 0, 
-        terseness: 2, 
-        tics: ["Ahem.", "*adjusts spectacles*", "*clears throat*"] 
+    case "al":
+      return {
+        formality: 2,
+        humor: 0,
+        terseness: 2,
+        tics: ["Ahem.", "*adjusts spectacles*", "*clears throat*"],
       };
-    default:        
-      return { 
-        formality: 1, 
-        humor: 0, 
-        terseness: 1 
+    default:
+      return {
+        formality: 1,
+        humor: 0,
+        terseness: 1,
       };
   }
 }
 
 // Record conversation in NPC memory
 export function recordConversation(
-  npcId: string, 
-  withWhom: string, 
-  topic: string, 
-  summary: string
+  npcId: string,
+  withWhom: string,
+  topic: string,
+  summary: string,
 ): void {
   const memory = getNPCMemory(npcId);
   memory.lastSpokeTo = withWhom;
@@ -96,9 +96,9 @@ export function recordConversation(
     with: withWhom,
     topic,
     timestamp: Date.now(),
-    summary
+    summary,
   });
-  
+
   // Keep only last 20 conversations
   if (memory.conversationHistory.length > 20) {
     memory.conversationHistory = memory.conversationHistory.slice(-20);

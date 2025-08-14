@@ -35,7 +35,7 @@ export interface RoomOccupancy {
 }
 
 export interface NPCPresenceUpdate {
-  type: 'npc_entered' | 'npc_left' | 'npc_moving' | 'npc_stopped';
+  type: "npc_entered" | "npc_left" | "npc_moving" | "npc_stopped";
   npcId: string;
   roomId: string;
   previousRoom?: string;
@@ -56,7 +56,7 @@ export class NPCPresenceProvider {
   private isActive = false;
 
   constructor() {
-    console.log('[NPCPresence] Initialized presence provider');
+    console.log("[NPCPresence] Initialized presence provider");
   }
 
   /**
@@ -64,12 +64,12 @@ export class NPCPresenceProvider {
    */
   start(): void {
     if (this.isActive) {
-      console.warn('[NPCPresence] Already active');
+      console.warn("[NPCPresence] Already active");
       return;
     }
 
     this.isActive = true;
-    console.log('[NPCPresence] Started presence tracking');
+    console.log("[NPCPresence] Started presence tracking");
   }
 
   /**
@@ -81,7 +81,7 @@ export class NPCPresenceProvider {
     }
 
     this.isActive = false;
-    console.log('[NPCPresence] Stopped presence tracking');
+    console.log("[NPCPresence] Stopped presence tracking");
   }
 
   /**
@@ -89,7 +89,7 @@ export class NPCPresenceProvider {
    */
   registerNPC(npcId: string, initialRoom: string): void {
     if (!this.isActive) {
-      console.warn('[NPCPresence] Cannot register NPC while inactive');
+      console.warn("[NPCPresence] Cannot register NPC while inactive");
       return;
     }
 
@@ -103,7 +103,7 @@ export class NPCPresenceProvider {
       npcId,
       currentRoom: initialRoom,
       lastMoveTime: Date.now(),
-      isMoving: false
+      isMoving: false,
     };
 
     this.npcStates.set(npcId, state);
@@ -155,14 +155,16 @@ export class NPCPresenceProvider {
     state.targetRoom = toRoom;
 
     this.emitUpdate({
-      type: 'npc_moving',
+      type: "npc_moving",
       npcId,
       roomId: toRoom,
       previousRoom: fromRoom,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
 
-    console.log(`[NPCPresence] Started move: ${npcId} from ${fromRoom} to ${toRoom}`);
+    console.log(
+      `[NPCPresence] Started move: ${npcId} from ${fromRoom} to ${toRoom}`,
+    );
     return true;
   }
 
@@ -196,21 +198,23 @@ export class NPCPresenceProvider {
     state.targetRoom = undefined;
 
     this.emitUpdate({
-      type: 'npc_entered',
+      type: "npc_entered",
       npcId,
       roomId: toRoom,
       previousRoom: fromRoom,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
 
     this.emitUpdate({
-      type: 'npc_left',
+      type: "npc_left",
       npcId,
       roomId: fromRoom,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
 
-    console.log(`[NPCPresence] Completed move: ${npcId} from ${fromRoom} to ${toRoom}`);
+    console.log(
+      `[NPCPresence] Completed move: ${npcId} from ${fromRoom} to ${toRoom}`,
+    );
     return true;
   }
 
@@ -228,10 +232,10 @@ export class NPCPresenceProvider {
     state.targetRoom = undefined;
 
     this.emitUpdate({
-      type: 'npc_stopped',
+      type: "npc_stopped",
       npcId,
       roomId: state.currentRoom,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
 
     console.log(`[NPCPresence] Cancelled move for ${npcId}`);
@@ -259,12 +263,12 @@ export class NPCPresenceProvider {
   getRoomOccupancy(roomId: string): RoomOccupancy {
     const npcSet = this.roomOccupancy.get(roomId) || new Set();
     const capacity = this.roomCapacities.get(roomId);
-    
+
     return {
       roomId,
       npcIds: Array.from(npcSet),
       capacity,
-      isFull: capacity ? npcSet.size >= capacity : false
+      isFull: capacity ? npcSet.size >= capacity : false,
     };
   }
 
@@ -281,7 +285,7 @@ export class NPCPresenceProvider {
    */
   isRoomFull(roomId: string): boolean {
     const capacity = this.roomCapacities.get(roomId);
-    if (!capacity) return false;
+    if (!capacity) {return false;}
 
     const occupancy = this.roomOccupancy.get(roomId) || new Set();
     return occupancy.size >= capacity;
@@ -292,11 +296,11 @@ export class NPCPresenceProvider {
    */
   getAllRoomOccupancy(): Map<string, RoomOccupancy> {
     const result = new Map<string, RoomOccupancy>();
-    
+
     // Include all rooms that have capacity set or NPCs present
     const allRooms = new Set([
       ...this.roomCapacities.keys(),
-      ...this.roomOccupancy.keys()
+      ...this.roomOccupancy.keys(),
     ]);
 
     for (const roomId of allRooms) {
@@ -334,21 +338,23 @@ export class NPCPresenceProvider {
     this.npcStates.clear();
     this.roomOccupancy.clear();
     this.roomCapacities.clear();
-    console.log('[NPCPresence] Cleared all presence data');
+    console.log("[NPCPresence] Cleared all presence data");
   }
 
   /**
    * Get system statistics
    */
   getStats() {
-    const movingNPCs = Array.from(this.npcStates.values()).filter(s => s.isMoving).length;
-    
+    const movingNPCs = Array.from(this.npcStates.values()).filter(
+      (s) => s.isMoving,
+    ).length;
+
     return {
       isActive: this.isActive,
       totalNPCs: this.npcStates.size,
       movingNPCs,
       totalRooms: this.roomOccupancy.size,
-      listeners: this.listeners.size
+      listeners: this.listeners.size,
     };
   }
 
@@ -376,7 +382,7 @@ export class NPCPresenceProvider {
       try {
         listener(update);
       } catch (error) {
-        console.error('[NPCPresence] Listener error:', error);
+        console.error("[NPCPresence] Listener error:", error);
       }
     }
   }

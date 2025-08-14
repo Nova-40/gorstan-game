@@ -17,21 +17,13 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Game module.
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
-import { getItemById } from '../engine/items';
+import { getItemById } from "../engine/items";
 
-import { Room } from '../types/Room';
+import { Room } from "../types/Room";
 
-import { X, Package, Check } from 'lucide-react';
-
-
-
-
-
-
-
-
+import { X, Package, Check } from "lucide-react";
 
 interface PickupSelectionModalProps {
   isOpen: boolean;
@@ -46,29 +38,29 @@ const PickupSelectionModal: React.FC<PickupSelectionModalProps> = ({
   onClose,
   availableItems,
   onPickupSelected,
-  roomTitle = 'Current Room'
+  roomTitle = "Current Room",
 }) => {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
-  if (!isOpen) return null;
+  if (!isOpen) {return null;}
 
-// Variable declaration
+  // Variable declaration
   const handleItemToggle = (itemId: string) => {
-    setSelectedItems(prev =>
+    setSelectedItems((prev) =>
       prev.includes(itemId)
-        ? prev.filter(id => id !== itemId)
-        : [...prev, itemId]
+        ? prev.filter((id) => id !== itemId)
+        : [...prev, itemId],
     );
   };
 
-// Variable declaration
+  // Variable declaration
   const handleSelectAll = () => {
     setSelectedItems(
-      selectedItems.length === availableItems.length ? [] : [...availableItems]
+      selectedItems.length === availableItems.length ? [] : [...availableItems],
     );
   };
 
-// Variable declaration
+  // Variable declaration
   const handleTakeSelected = () => {
     if (selectedItems.length > 0) {
       onPickupSelected(selectedItems);
@@ -77,30 +69,30 @@ const PickupSelectionModal: React.FC<PickupSelectionModalProps> = ({
     }
   };
 
-// Variable declaration
+  // Variable declaration
   const getItemDisplayName = (itemId: string): string => {
-// Variable declaration
+    // Variable declaration
     const itemData = getItemById(itemId);
     if (itemData) {
       return itemData.name;
     }
-    
+
     return itemId
-      .replace(/_/g, ' ')
-      .replace(/([a-z])([A-Z])/g, '$1 $2')
-      .split(' ')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
+      .replace(/_/g, " ")
+      .replace(/([a-z])([A-Z])/g, "$1 $2")
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
   };
 
-// Variable declaration
+  // Variable declaration
   const getItemDescription = (itemId: string): string => {
-// Variable declaration
+    // Variable declaration
     const itemData = getItemById(itemId);
-    return itemData?.description || 'An item you can pick up.';
+    return itemData?.description || "An item you can pick up.";
   };
 
-// JSX return block or main return
+  // JSX return block or main return
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] flex flex-col">
@@ -135,60 +127,73 @@ const PickupSelectionModal: React.FC<PickupSelectionModalProps> = ({
               {}
               <div className="flex items-center justify-between pb-4 border-b">
                 <span className="text-sm font-medium text-gray-700">
-                  {availableItems.length} item{availableItems.length !== 1 ? 's' : ''} available
+                  {availableItems.length} item
+                  {availableItems.length !== 1 ? "s" : ""} available
                 </span>
                 <button
                   onClick={handleSelectAll}
                   className="text-sm text-blue-600 hover:text-blue-800 font-medium"
                 >
-                  {selectedItems.length === availableItems.length ? 'Deselect All' : 'Select All'}
+                  {selectedItems.length === availableItems.length
+                    ? "Deselect All"
+                    : "Select All"}
                 </button>
               </div>
 
               {}
               <div className="space-y-3">
                 {availableItems.map((itemId) => {
-// Variable declaration
+                  // Variable declaration
                   const isSelected = selectedItems.includes(itemId);
-// Variable declaration
+                  // Variable declaration
                   const displayName = getItemDisplayName(itemId);
-// Variable declaration
+                  // Variable declaration
                   const description = getItemDescription(itemId);
 
-// JSX return block or main return
+                  // JSX return block or main return
                   return (
                     <div
                       key={itemId}
                       className={`
                         border rounded-lg p-4 cursor-pointer transition-all duration-200
-                        ${isSelected
-                          ? 'border-blue-500 bg-blue-50 shadow-md'
-                          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                        ${
+                          isSelected
+                            ? "border-blue-500 bg-blue-50 shadow-md"
+                            : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
                         }
                       `}
                       onClick={() => handleItemToggle(itemId)}
                     >
                       <div className="flex items-start gap-3">
-                        <div className={`
+                        <div
+                          className={`
                           w-5 h-5 rounded border-2 flex items-center justify-center mt-1 flex-shrink-0
-                          ${isSelected
-                            ? 'border-blue-500 bg-blue-500'
-                            : 'border-gray-300'
+                          ${
+                            isSelected
+                              ? "border-blue-500 bg-blue-500"
+                              : "border-gray-300"
                           }
-                        `}>
-                          {isSelected && <Check size={12} className="text-white" />}
+                        `}
+                        >
+                          {isSelected && (
+                            <Check size={12} className="text-white" />
+                          )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className={`
+                          <h3
+                            className={`
                             font-medium text-sm
-                            ${isSelected ? 'text-blue-900' : 'text-gray-800'}
-                          `}>
+                            ${isSelected ? "text-blue-900" : "text-gray-800"}
+                          `}
+                          >
                             {displayName}
                           </h3>
-                          <p className={`
+                          <p
+                            className={`
                             text-xs mt-1 leading-relaxed
-                            ${isSelected ? 'text-blue-700' : 'text-gray-600'}
-                          `}>
+                            ${isSelected ? "text-blue-700" : "text-gray-600"}
+                          `}
+                          >
                             {description}
                           </p>
                           <p className="text-xs text-gray-400 mt-1 font-mono">
@@ -207,7 +212,8 @@ const PickupSelectionModal: React.FC<PickupSelectionModalProps> = ({
         {}
         <div className="flex items-center justify-between p-6 border-t bg-gray-50">
           <div className="text-sm text-gray-600">
-            {selectedItems.length} of {availableItems.length} item{selectedItems.length !== 1 ? 's' : ''} selected
+            {selectedItems.length} of {availableItems.length} item
+            {selectedItems.length !== 1 ? "s" : ""} selected
           </div>
           <div className="flex gap-3">
             <button
@@ -221,9 +227,10 @@ const PickupSelectionModal: React.FC<PickupSelectionModalProps> = ({
               disabled={selectedItems.length === 0}
               className={`
                 px-6 py-2 rounded-lg font-medium transition-all duration-200
-                ${selectedItems.length > 0
-                  ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                ${
+                  selectedItems.length > 0
+                    ? "bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
                 }
               `}
             >

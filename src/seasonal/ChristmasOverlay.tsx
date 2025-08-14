@@ -45,7 +45,9 @@ export default function ChristmasOverlay({ onClose }: Props) {
               borderRadius: "50%",
               background: "white",
               opacity: 0.9,
-              animation: reduce ? undefined : `flake ${6 + Math.random() * 5}s linear ${Math.random()}s infinite`
+              animation: reduce
+                ? undefined
+                : `flake ${6 + Math.random() * 5}s linear ${Math.random()}s infinite`,
             }}
           />
         ))}
@@ -68,7 +70,9 @@ export default function ChristmasOverlay({ onClose }: Props) {
                 style={{
                   background: i % 2 ? "#ff4d4f" : "#52ffa8",
                   filter: "drop-shadow(0 0 4px rgba(255,255,255,0.6))",
-                  animation: reduce ? undefined : `twinkle ${1.5 + (i % 3) * 0.2}s ease-in-out ${i * 0.07}s infinite alternate`
+                  animation: reduce
+                    ? undefined
+                    : `twinkle ${1.5 + (i % 3) * 0.2}s ease-in-out ${i * 0.07}s infinite alternate`,
                 }}
               />
             ))}

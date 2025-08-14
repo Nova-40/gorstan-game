@@ -17,7 +17,7 @@
 // Gorstan and characters (c) Geoff Webster 2025
 // Game module.
 
-type QuestState = 'active' | 'completed' | 'failed';
+type QuestState = "active" | "completed" | "failed";
 
 interface MiniquestRecord {
   [questId: string]: QuestState;
@@ -26,18 +26,19 @@ interface MiniquestRecord {
 let quests: MiniquestRecord = {};
 
 export const startQuest = (id: string) => {
-  quests[id] = 'active';
+  quests[id] = "active";
 };
 
 export const completeQuest = (id: string) => {
-  if (quests[id]) quests[id] = 'completed';
+  if (quests[id]) {quests[id] = "completed";}
 };
 
 export const failQuest = (id: string) => {
-  if (quests[id]) quests[id] = 'failed';
+  if (quests[id]) {quests[id] = "failed";}
 };
 
-export const getQuestStatus = (id: string): QuestState | undefined => quests[id];
+export const getQuestStatus = (id: string): QuestState | undefined =>
+  quests[id];
 
 export const resetQuests = () => {
   quests = {};

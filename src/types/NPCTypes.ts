@@ -18,15 +18,15 @@
 // Handles NPC logic, memory, or rendering.
 
 export type NPCMood =
-  | 'neutral'
-  | 'friendly'
-  | 'hostile'
-  | 'suspicious'
-  | 'helpful'
-  | 'confused'
-  | 'angry'
-  | 'sad'
-  | 'happy';
+  | "neutral"
+  | "friendly"
+  | "hostile"
+  | "suspicious"
+  | "helpful"
+  | "confused"
+  | "angry"
+  | "sad"
+  | "happy";
 
 export interface NPCMemory {
   readonly interactions: number;
@@ -85,7 +85,10 @@ export interface NPC {
     requirements: Record<string, string[]>;
   };
   currentRoom?: string;
-  shouldBeVisible?: (state: any, room: any) => boolean;
+  shouldBeVisible?: (
+    state: import("../state/gameState").LocalGameState,
+    room: import("./Room").Room,
+  ) => boolean;
   shouldWander?: boolean;
   canWander?: boolean;
   questOnly?: boolean;
@@ -117,7 +120,7 @@ export interface NPCState {
 export interface Interaction {
   type: string;
   topic?: string;
-  value?: any;
+  value?: unknown;
 }
 
 export interface ResponsePrediction {
@@ -131,6 +134,6 @@ export interface ConversationGoal {
 }
 
 export interface RelationshipTrend {
-  trend: 'improving' | 'declining' | 'stable';
+  trend: "improving" | "declining" | "stable";
   rate: number;
 }

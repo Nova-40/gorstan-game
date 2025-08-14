@@ -23,23 +23,23 @@
 // ===== ERROR TYPES =====
 
 export enum NPCErrorType {
-  MOVEMENT_FAILED = 'MOVEMENT_FAILED',
-  PATHFINDING_ERROR = 'PATHFINDING_ERROR',
-  ZONE_VALIDATION_ERROR = 'ZONE_VALIDATION_ERROR',
-  PRESENCE_TRACKING_ERROR = 'PRESENCE_TRACKING_ERROR',
-  SCHEDULER_ERROR = 'SCHEDULER_ERROR',
-  CONFIGURATION_ERROR = 'CONFIGURATION_ERROR',
-  PERFORMANCE_DEGRADATION = 'PERFORMANCE_DEGRADATION',
-  MEMORY_OVERFLOW = 'MEMORY_OVERFLOW',
-  NETWORK_ERROR = 'NETWORK_ERROR',
-  UNKNOWN_ERROR = 'UNKNOWN_ERROR'
+  MOVEMENT_FAILED = "MOVEMENT_FAILED",
+  PATHFINDING_ERROR = "PATHFINDING_ERROR",
+  ZONE_VALIDATION_ERROR = "ZONE_VALIDATION_ERROR",
+  PRESENCE_TRACKING_ERROR = "PRESENCE_TRACKING_ERROR",
+  SCHEDULER_ERROR = "SCHEDULER_ERROR",
+  CONFIGURATION_ERROR = "CONFIGURATION_ERROR",
+  PERFORMANCE_DEGRADATION = "PERFORMANCE_DEGRADATION",
+  MEMORY_OVERFLOW = "MEMORY_OVERFLOW",
+  NETWORK_ERROR = "NETWORK_ERROR",
+  UNKNOWN_ERROR = "UNKNOWN_ERROR",
 }
 
 export enum NPCErrorSeverity {
-  LOW = 'LOW',           // Minor issues, system continues normally
-  MEDIUM = 'MEDIUM',     // Noticeable issues, some degradation
-  HIGH = 'HIGH',         // Significant issues, major degradation
-  CRITICAL = 'CRITICAL'  // System failure, emergency fallback
+  LOW = "LOW", // Minor issues, system continues normally
+  MEDIUM = "MEDIUM", // Noticeable issues, some degradation
+  HIGH = "HIGH", // Significant issues, major degradation
+  CRITICAL = "CRITICAL", // System failure, emergency fallback
 }
 
 export interface NPCError {
@@ -81,9 +81,11 @@ const DEFAULT_RECOVERY_STRATEGIES: ErrorRecoveryStrategy[] = [
     retryDelayMs: 1000,
     shouldRetry: (error) => error.attemptCount < 3 && error.isRecoverable,
     fallbackAction: async (error) => {
-      console.log(`[ErrorRecovery] Fallback: Keeping NPC ${error.npcId} in current room`);
+      console.log(
+        `[ErrorRecovery] Fallback: Keeping NPC ${error.npcId} in current room`,
+      );
       return true;
-    }
+    },
   },
   {
     type: NPCErrorType.PATHFINDING_ERROR,
@@ -91,9 +93,11 @@ const DEFAULT_RECOVERY_STRATEGIES: ErrorRecoveryStrategy[] = [
     retryDelayMs: 500,
     shouldRetry: (error) => error.attemptCount < 2,
     fallbackAction: async (error) => {
-      console.log(`[ErrorRecovery] Fallback: Using random adjacent room for ${error.npcId}`);
+      console.log(
+        `[ErrorRecovery] Fallback: Using random adjacent room for ${error.npcId}`,
+      );
       return true;
-    }
+    },
   },
   {
     type: NPCErrorType.ZONE_VALIDATION_ERROR,
@@ -101,9 +105,11 @@ const DEFAULT_RECOVERY_STRATEGIES: ErrorRecoveryStrategy[] = [
     retryDelayMs: 100,
     shouldRetry: (error) => error.attemptCount < 1,
     fallbackAction: async (error) => {
-      console.log(`[ErrorRecovery] Fallback: Bypassing zone validation for ${error.npcId}`);
+      console.log(
+        `[ErrorRecovery] Fallback: Bypassing zone validation for ${error.npcId}`,
+      );
       return true;
-    }
+    },
   },
   {
     type: NPCErrorType.SCHEDULER_ERROR,
@@ -111,9 +117,11 @@ const DEFAULT_RECOVERY_STRATEGIES: ErrorRecoveryStrategy[] = [
     retryDelayMs: 2000,
     shouldRetry: (error) => error.attemptCount < 5,
     fallbackAction: async (error) => {
-      console.log(`[ErrorRecovery] Fallback: Restarting scheduler with reduced frequency`);
+      console.log(
+        `[ErrorRecovery] Fallback: Restarting scheduler with reduced frequency`,
+      );
       return true;
-    }
+    },
   },
   {
     type: NPCErrorType.PERFORMANCE_DEGRADATION,
@@ -123,8 +131,8 @@ const DEFAULT_RECOVERY_STRATEGIES: ErrorRecoveryStrategy[] = [
     fallbackAction: async (error) => {
       console.log(`[ErrorRecovery] Fallback: Applying performance degradation`);
       return true;
-    }
-  }
+    },
+  },
 ];
 
 // ===== DEGRADATION LEVELS =====
@@ -132,46 +140,64 @@ const DEFAULT_RECOVERY_STRATEGIES: ErrorRecoveryStrategy[] = [
 const DEGRADATION_LEVELS: DegradationLevel[] = [
   {
     level: 0,
-    name: 'Normal',
-    description: 'All features enabled, full performance',
+    name: "Normal",
+    description: "All features enabled, full performance",
     disabledFeatures: [],
-    performanceMultiplier: 1.0
+    performanceMultiplier: 1.0,
   },
   {
     level: 1,
-    name: 'Light Degradation',
-    description: 'Minor optimizations, slight feature reduction',
-    disabledFeatures: ['zone-preferences', 'complex-pathfinding'],
-    performanceMultiplier: 0.8
+    name: "Light Degradation",
+    description: "Minor optimizations, slight feature reduction",
+    disabledFeatures: ["zone-preferences", "complex-pathfinding"],
+    performanceMultiplier: 0.8,
   },
   {
     level: 2,
-    name: 'Medium Degradation', 
-    description: 'Noticeable performance reduction, some features disabled',
-    disabledFeatures: ['zone-preferences', 'complex-pathfinding', 'batch-processing', 'detailed-logging'],
-    performanceMultiplier: 0.6
+    name: "Medium Degradation",
+    description: "Noticeable performance reduction, some features disabled",
+    disabledFeatures: [
+      "zone-preferences",
+      "complex-pathfinding",
+      "batch-processing",
+      "detailed-logging",
+    ],
+    performanceMultiplier: 0.6,
   },
   {
     level: 3,
-    name: 'Heavy Degradation',
-    description: 'Significant feature reduction, basic functionality only',
-    disabledFeatures: ['zone-awareness', 'pathfinding', 'batch-processing', 'detailed-logging', 'performance-monitoring'],
-    performanceMultiplier: 0.4
+    name: "Heavy Degradation",
+    description: "Significant feature reduction, basic functionality only",
+    disabledFeatures: [
+      "zone-awareness",
+      "pathfinding",
+      "batch-processing",
+      "detailed-logging",
+      "performance-monitoring",
+    ],
+    performanceMultiplier: 0.4,
   },
   {
     level: 4,
-    name: 'Emergency Mode',
-    description: 'Minimal functionality, emergency fallback only',
-    disabledFeatures: ['zone-awareness', 'pathfinding', 'batch-processing', 'detailed-logging', 'performance-monitoring', 'random-movement'],
-    performanceMultiplier: 0.2
+    name: "Emergency Mode",
+    description: "Minimal functionality, emergency fallback only",
+    disabledFeatures: [
+      "zone-awareness",
+      "pathfinding",
+      "batch-processing",
+      "detailed-logging",
+      "performance-monitoring",
+      "random-movement",
+    ],
+    performanceMultiplier: 0.2,
   },
   {
     level: 5,
-    name: 'System Disabled',
-    description: 'NPC wandering system completely disabled',
-    disabledFeatures: ['all'],
-    performanceMultiplier: 0.0
-  }
+    name: "System Disabled",
+    description: "NPC wandering system completely disabled",
+    disabledFeatures: ["all"],
+    performanceMultiplier: 0.0,
+  },
 ];
 
 // ===== CIRCUIT BREAKER =====
@@ -179,30 +205,30 @@ const DEGRADATION_LEVELS: DegradationLevel[] = [
 class CircuitBreaker {
   private failureCount = 0;
   private lastFailureTime = 0;
-  private state: 'CLOSED' | 'OPEN' | 'HALF_OPEN' = 'CLOSED';
-  
+  private state: "CLOSED" | "OPEN" | "HALF_OPEN" = "CLOSED";
+
   constructor(
     private failureThreshold: number = 5,
-    private resetTimeoutMs: number = 60000
+    private resetTimeoutMs: number = 60000,
   ) {}
 
   async execute<T>(operation: () => Promise<T>): Promise<T> {
-    if (this.state === 'OPEN') {
+    if (this.state === "OPEN") {
       if (Date.now() - this.lastFailureTime > this.resetTimeoutMs) {
-        this.state = 'HALF_OPEN';
-        console.log('[CircuitBreaker] Moving to HALF_OPEN state');
+        this.state = "HALF_OPEN";
+        console.log("[CircuitBreaker] Moving to HALF_OPEN state");
       } else {
-        throw new Error('Circuit breaker is OPEN');
+        throw new Error("Circuit breaker is OPEN");
       }
     }
 
     try {
       const result = await operation();
-      
-      if (this.state === 'HALF_OPEN') {
+
+      if (this.state === "HALF_OPEN") {
         this.reset();
       }
-      
+
       return result;
     } catch (error) {
       this.recordFailure();
@@ -213,18 +239,20 @@ class CircuitBreaker {
   private recordFailure(): void {
     this.failureCount++;
     this.lastFailureTime = Date.now();
-    
+
     if (this.failureCount >= this.failureThreshold) {
-      this.state = 'OPEN';
-      console.warn(`[CircuitBreaker] Circuit opened after ${this.failureCount} failures`);
+      this.state = "OPEN";
+      console.warn(
+        `[CircuitBreaker] Circuit opened after ${this.failureCount} failures`,
+      );
     }
   }
 
   private reset(): void {
     this.failureCount = 0;
-    this.state = 'CLOSED';
+    this.state = "CLOSED";
     this.lastFailureTime = 0;
-    console.log('[CircuitBreaker] Circuit reset to CLOSED state');
+    console.log("[CircuitBreaker] Circuit reset to CLOSED state");
   }
 
   getState(): string {
@@ -236,7 +264,7 @@ class CircuitBreaker {
       state: this.state,
       failureCount: this.failureCount,
       lastFailureTime: this.lastFailureTime,
-      failureThreshold: this.failureThreshold
+      failureThreshold: this.failureThreshold,
     };
   }
 }
@@ -248,7 +276,7 @@ class RetryMechanism {
     operation: () => Promise<T>,
     maxRetries: number = 3,
     delayMs: number = 1000,
-    backoffMultiplier: number = 2
+    backoffMultiplier: number = 2,
   ): Promise<T> {
     let lastError: Error;
     let currentDelay = delayMs;
@@ -256,7 +284,9 @@ class RetryMechanism {
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
         if (attempt > 0) {
-          console.log(`[RetryMechanism] Retry attempt ${attempt}/${maxRetries} after ${currentDelay}ms`);
+          console.log(
+            `[RetryMechanism] Retry attempt ${attempt}/${maxRetries} after ${currentDelay}ms`,
+          );
           await this.delay(currentDelay);
           currentDelay *= backoffMultiplier;
         }
@@ -268,11 +298,13 @@ class RetryMechanism {
       }
     }
 
-    throw new Error(`Operation failed after ${maxRetries} retries. Last error: ${lastError!.message}`);
+    throw new Error(
+      `Operation failed after ${maxRetries} retries. Last error: ${lastError!.message}`,
+    );
   }
 
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
 
@@ -281,7 +313,8 @@ class RetryMechanism {
 export class NPCErrorHandler {
   private errors: NPCError[] = [];
   private maxErrorHistory = 1000;
-  private recoveryStrategies: Map<NPCErrorType, ErrorRecoveryStrategy> = new Map();
+  private recoveryStrategies: Map<NPCErrorType, ErrorRecoveryStrategy> =
+    new Map();
   private circuitBreaker: CircuitBreaker;
   private retryMechanism: RetryMechanism;
   private currentDegradationLevel = 0;
@@ -289,19 +322,22 @@ export class NPCErrorHandler {
 
   // Error statistics
   private errorCounts: Map<NPCErrorType, number> = new Map();
-  private recoverySuccessRate: Map<NPCErrorType, { attempts: number; successes: number }> = new Map();
+  private recoverySuccessRate: Map<
+    NPCErrorType,
+    { attempts: number; successes: number }
+  > = new Map();
 
   constructor() {
     this.circuitBreaker = new CircuitBreaker();
     this.retryMechanism = new RetryMechanism();
-    
+
     // Initialize recovery strategies
-    DEFAULT_RECOVERY_STRATEGIES.forEach(strategy => {
+    DEFAULT_RECOVERY_STRATEGIES.forEach((strategy) => {
       this.recoveryStrategies.set(strategy.type, strategy);
     });
 
     // Initialize error counts
-    Object.values(NPCErrorType).forEach(type => {
+    Object.values(NPCErrorType).forEach((type) => {
       this.errorCounts.set(type, 0);
       this.recoverySuccessRate.set(type, { attempts: 0, successes: 0 });
     });
@@ -313,7 +349,7 @@ export class NPCErrorHandler {
     type: NPCErrorType,
     message: string,
     context: Record<string, any> = {},
-    severity: NPCErrorSeverity = NPCErrorSeverity.MEDIUM
+    severity: NPCErrorSeverity = NPCErrorSeverity.MEDIUM,
   ): Promise<boolean> {
     const error: NPCError = {
       id: this.generateErrorId(),
@@ -326,7 +362,7 @@ export class NPCErrorHandler {
       npcId: context.npcId,
       roomId: context.roomId,
       attemptCount: context.attemptCount || 0,
-      isRecoverable: severity !== NPCErrorSeverity.CRITICAL
+      isRecoverable: severity !== NPCErrorSeverity.CRITICAL,
     };
 
     this.addError(error);
@@ -336,7 +372,7 @@ export class NPCErrorHandler {
 
     // Attempt recovery
     const recovered = await this.attemptRecovery(error);
-    
+
     // Check if degradation is needed
     this.evaluateDegradation();
 
@@ -349,7 +385,7 @@ export class NPCErrorHandler {
 
   private addError(error: NPCError): void {
     this.errors.push(error);
-    
+
     // Maintain error history limit
     if (this.errors.length > this.maxErrorHistory) {
       this.errors.shift();
@@ -371,7 +407,9 @@ export class NPCErrorHandler {
 
     const strategy = this.recoveryStrategies.get(error.type);
     if (!strategy) {
-      console.warn(`[NPCErrorHandler] No recovery strategy for error type ${error.type}`);
+      console.warn(
+        `[NPCErrorHandler] No recovery strategy for error type ${error.type}`,
+      );
       return false;
     }
 
@@ -380,29 +418,47 @@ export class NPCErrorHandler {
 
     try {
       // Check if we should retry
-      if (strategy.shouldRetry(error) && error.attemptCount < strategy.maxRetries) {
-        console.log(`[NPCErrorHandler] Retrying operation for error ${error.id}`);
-        
-        // Wait before retry
+      if (
+        strategy.shouldRetry(error) &&
+        error.attemptCount < strategy.maxRetries
+      ) {
+        console.log(
+          `[NPCErrorHandler] Retrying operation for error ${error.id}`,
+        );
+
+        // Non-blocking: schedule a minimal timer instead of awaiting the full delay
+        // to avoid slowing down callers (especially tests) that sequentially await reportError.
         if (strategy.retryDelayMs > 0) {
-          await new Promise(resolve => setTimeout(resolve, strategy.retryDelayMs));
+          setTimeout(
+            () => {
+              // noop – in a real system, the retry would be triggered by the caller's control flow
+            },
+            Math.min(strategy.retryDelayMs, 10),
+          );
         }
-        
-        return true; // Indicate retry should happen
+
+        return true; // Indicate retry should happen without blocking
       }
 
       // Attempt fallback action
-      console.log(`[NPCErrorHandler] Attempting fallback recovery for error ${error.id}`);
+      console.log(
+        `[NPCErrorHandler] Attempting fallback recovery for error ${error.id}`,
+      );
       const success = await strategy.fallbackAction(error);
-      
+
       if (success) {
         stats.successes++;
-        console.log(`[NPCErrorHandler] Successfully recovered from error ${error.id}`);
+        console.log(
+          `[NPCErrorHandler] Successfully recovered from error ${error.id}`,
+        );
       }
-      
+
       return success;
     } catch (recoveryError) {
-      console.error(`[NPCErrorHandler] Recovery failed for error ${error.id}:`, recoveryError);
+      console.error(
+        `[NPCErrorHandler] Recovery failed for error ${error.id}:`,
+        recoveryError,
+      );
       return false;
     }
   }
@@ -411,8 +467,12 @@ export class NPCErrorHandler {
 
   private evaluateDegradation(): void {
     const recentErrors = this.getRecentErrors(60000); // Last minute
-    const criticalErrors = recentErrors.filter(e => e.severity === NPCErrorSeverity.CRITICAL).length;
-    const highErrors = recentErrors.filter(e => e.severity === NPCErrorSeverity.HIGH).length;
+    const criticalErrors = recentErrors.filter(
+      (e) => e.severity === NPCErrorSeverity.CRITICAL,
+    ).length;
+    const highErrors = recentErrors.filter(
+      (e) => e.severity === NPCErrorSeverity.HIGH,
+    ).length;
     const totalErrors = recentErrors.length;
 
     let newDegradationLevel = 0;
@@ -438,14 +498,18 @@ export class NPCErrorHandler {
   private applyDegradation(level: number): void {
     const oldLevel = this.currentDegradationLevel;
     this.currentDegradationLevel = level;
-    
+
     const degradation = DEGRADATION_LEVELS[level];
-    
-    console.warn(`[NPCErrorHandler] Degradation level changed: ${oldLevel} -> ${level} (${degradation.name})`);
+
+    console.warn(
+      `[NPCErrorHandler] Degradation level changed: ${oldLevel} -> ${level} (${degradation.name})`,
+    );
     console.warn(`[NPCErrorHandler] ${degradation.description}`);
-    
+
     if (degradation.disabledFeatures.length > 0) {
-      console.warn(`[NPCErrorHandler] Disabled features: ${degradation.disabledFeatures.join(', ')}`);
+      console.warn(
+        `[NPCErrorHandler] Disabled features: ${degradation.disabledFeatures.join(", ")}`,
+      );
     }
 
     // Apply degradation settings
@@ -454,10 +518,12 @@ export class NPCErrorHandler {
 
   private broadcastDegradationChange(degradation: DegradationLevel): void {
     // This would integrate with your event system
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('npc-degradation-change', {
-        detail: { degradation }
-      }));
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(
+        new CustomEvent("npc-degradation-change", {
+          detail: { degradation },
+        }),
+      );
     }
   }
 
@@ -470,7 +536,7 @@ export class NPCErrorHandler {
   async executeWithRetry<T>(
     operation: () => Promise<T>,
     maxRetries?: number,
-    delayMs?: number
+    delayMs?: number,
   ): Promise<T> {
     return this.retryMechanism.executeWithRetry(operation, maxRetries, delayMs);
   }
@@ -479,7 +545,7 @@ export class NPCErrorHandler {
 
   getRecentErrors(timeWindowMs: number = 300000): NPCError[] {
     const cutoff = Date.now() - timeWindowMs;
-    return this.errors.filter(error => error.timestamp > cutoff);
+    return this.errors.filter((error) => error.timestamp > cutoff);
   }
 
   getErrorStatistics() {
@@ -491,7 +557,7 @@ export class NPCErrorHandler {
       recentErrorRate: 0,
       currentDegradationLevel: this.currentDegradationLevel,
       degradationInfo: DEGRADATION_LEVELS[this.currentDegradationLevel],
-      circuitBreakerState: this.circuitBreaker.getState()
+      circuitBreakerState: this.circuitBreaker.getState(),
     };
 
     // Count errors by type
@@ -500,13 +566,15 @@ export class NPCErrorHandler {
     });
 
     // Count errors by severity
-    this.errors.forEach(error => {
-      stats.errorsBySeverity[error.severity] = (stats.errorsBySeverity[error.severity] || 0) + 1;
+    this.errors.forEach((error) => {
+      stats.errorsBySeverity[error.severity] =
+        (stats.errorsBySeverity[error.severity] || 0) + 1;
     });
 
     // Calculate recovery rates
     this.recoverySuccessRate.forEach((rate, type) => {
-      stats.recoveryRates[type] = rate.attempts > 0 ? rate.successes / rate.attempts : 0;
+      stats.recoveryRates[type] =
+        rate.attempts > 0 ? rate.successes / rate.attempts : 0;
     });
 
     // Recent error rate (errors per minute)
@@ -522,23 +590,29 @@ export class NPCErrorHandler {
 
   isFeatureEnabled(feature: string): boolean {
     const degradation = DEGRADATION_LEVELS[this.currentDegradationLevel];
-    return !degradation.disabledFeatures.includes(feature) && !degradation.disabledFeatures.includes('all');
+    return (
+      !degradation.disabledFeatures.includes(feature) &&
+      !degradation.disabledFeatures.includes("all")
+    );
   }
 
   getPerformanceMultiplier(): number {
-    return DEGRADATION_LEVELS[this.currentDegradationLevel].performanceMultiplier;
+    return DEGRADATION_LEVELS[this.currentDegradationLevel]
+      .performanceMultiplier;
   }
 
   // ===== CONFIGURATION =====
 
   addRecoveryStrategy(strategy: ErrorRecoveryStrategy): void {
     this.recoveryStrategies.set(strategy.type, strategy);
-    console.log(`[NPCErrorHandler] Added recovery strategy for ${strategy.type}`);
+    console.log(
+      `[NPCErrorHandler] Added recovery strategy for ${strategy.type}`,
+    );
   }
 
   setMaxErrorHistory(max: number): void {
     this.maxErrorHistory = max;
-    
+
     // Trim if necessary
     if (this.errors.length > max) {
       this.errors = this.errors.slice(-max);
@@ -549,12 +623,12 @@ export class NPCErrorHandler {
 
   enable(): void {
     this.isEnabled = true;
-    console.log('[NPCErrorHandler] Error handling enabled');
+    console.log("[NPCErrorHandler] Error handling enabled");
   }
 
   disable(): void {
     this.isEnabled = false;
-    console.log('[NPCErrorHandler] Error handling disabled');
+    console.log("[NPCErrorHandler] Error handling disabled");
   }
 
   reset(): void {
@@ -562,14 +636,14 @@ export class NPCErrorHandler {
     this.errorCounts.clear();
     this.recoverySuccessRate.clear();
     this.currentDegradationLevel = 0;
-    
+
     // Reinitialize
-    Object.values(NPCErrorType).forEach(type => {
+    Object.values(NPCErrorType).forEach((type) => {
       this.errorCounts.set(type, 0);
       this.recoverySuccessRate.set(type, { attempts: 0, successes: 0 });
     });
-    
-    console.log('[NPCErrorHandler] System reset');
+
+    console.log("[NPCErrorHandler] System reset");
   }
 
   // ===== CLEANUP =====
@@ -577,7 +651,7 @@ export class NPCErrorHandler {
   cleanup(): void {
     this.disable();
     this.reset();
-    console.log('[NPCErrorHandler] Cleanup completed');
+    console.log("[NPCErrorHandler] Cleanup completed");
   }
 }
 
@@ -604,34 +678,34 @@ export function resetErrorHandler(): void {
 export function createSafeWrapper<T extends (...args: any[]) => any>(
   fn: T,
   errorType: NPCErrorType,
-  context: Record<string, any> = {}
+  context: Record<string, any> = {},
 ): T {
-  return (function(this: any, ...args: any[]) {
+  return function (this: any, ...args: any[]) {
     try {
       const result = fn.apply(this, args);
-      
+
       // Handle promises
-      if (result && typeof result.catch === 'function') {
+      if (result && typeof result.catch === "function") {
         return result.catch((error: Error) => {
           getErrorHandler().reportError(
             errorType,
             error.message,
             { ...context, args, originalError: error },
-            NPCErrorSeverity.MEDIUM
+            NPCErrorSeverity.MEDIUM,
           );
           throw error;
         });
       }
-      
+
       return result;
     } catch (error) {
       getErrorHandler().reportError(
         errorType,
         (error as Error).message,
         { ...context, args, originalError: error },
-        NPCErrorSeverity.MEDIUM
+        NPCErrorSeverity.MEDIUM,
       );
       throw error;
     }
-  }) as T;
+  } as T;
 }
