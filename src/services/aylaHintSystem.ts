@@ -10,6 +10,7 @@ import { groqAI } from "./groqAI";
 import type { LocalGameState } from "../state/gameState";
 import type { Room } from "../types/Room";
 import { formatInteractable, formatExits } from '../utils/roomAffordances';
+import { FLAGS } from "../config/flags";
 
 export interface AylaHintContext {
   currentRoom: Room;
@@ -632,6 +633,20 @@ Respond with just the hint text, in Ayla's voice with appropriate cosmic imagery
       currentRoom.npcsInRoom.length > 0 &&
       recentCommands.some((cmd) => cmd.includes("talk to"))
     );
+  }
+
+  /**
+   * DEV-ONLY: Adjust hint cadence and escalation logic for Tier-3 puzzles
+   */
+  public provideHint(puzzleTier: number, inactivityTime: number) {
+    if (FLAGS.DEV_ONLY && FLAGS.ENABLE_HINT_CADENCE_ADJUSTMENTS) {
+      if (puzzleTier === 3 && inactivityTime > 30) {
+        console.log("DEV-ONLY: Delivering escalated hint for Tier-3 puzzle.");
+      }
+    }
+
+    // Existing hint logic
+    console.log(`Providing hint for Tier-${puzzleTier} puzzle after ${inactivityTime} seconds.`);
   }
 }
 
