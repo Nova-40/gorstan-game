@@ -1,0 +1,7 @@
+Metric,Target,Result
+First Choice Time (≤60s),60s,PENDING
+First Success Time (≤3m),180s,PENDING
+Stuck Time Reduction (≥30%),30%,PENDING
+Teleport Latency (<200ms),200ms,PENDING
+NPC Loops (0),0,PENDING
+Rage Quits (<5%),5%,PENDING
