@@ -25,6 +25,7 @@ import SessionGoalBanner from './components/SessionGoalBanner';
 import QuestLog from './components/QuestLog';
 import QuickMap from './components/QuickMap';
 import { playSFX } from './utils/sfxManager';
+import AylaResponseIndicator from "./components/AylaResponseIndicator";
 
 import React from "react";
 import './styles/animations.css';
@@ -53,8 +54,12 @@ const App: React.FC = () => {
   // JSX return block or main return
   return (
     <GameStateProvider>
-      <CelebrationController>
+      <div className="game-container">
+        <AylaResponseIndicator />
         <AppCore />
+        <CelebrationController>
+          <div>Celebration content goes here</div>
+        </CelebrationController>
         {process.env.NODE_ENV === 'development' && <DebugOverlay />}
         <TooltipSystem />
         <SessionGoalBanner />
@@ -65,7 +70,7 @@ const App: React.FC = () => {
         <button onClick={() => handleAction('teleport')}>Test Teleport SFX</button>
         <div className="fade-in">This fades in!</div>
         <div className="slide-in">This slides in!</div>
-      </CelebrationController>
+      </div>
     </GameStateProvider>
   );
 };

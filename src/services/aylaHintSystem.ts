@@ -35,6 +35,35 @@ export class AylaHintSystem {
   private unifiedAIEnabled: boolean = true; // Integration with unified AI system
   private invalidBurst: number = 0;
   private idleTimer: NodeJS.Timeout | null = null;
+  private responseMode: "short" | "long" = "short"; // Default to short mode
+  private debounceTimeout: NodeJS.Timeout | null = null;
+
+  /**
+   * Toggle between short and long response modes
+   */
+  public toggleResponseMode(): void {
+    this.responseMode = this.responseMode === "short" ? "long" : "short";
+  }
+
+  /**
+   * Generate a response based on the current mode
+   */
+  private generateResponse(hint: string, context: AylaHintContext): string {
+    if (this.responseMode === "short") {
+      return hint.split(".")[0]; // Return the first sentence for short mode
+    }
+    return hint; // Return the full hint for long mode
+  }
+
+  /**
+   * Debounce player input to prevent rapid requests
+   */
+  private debounceInput(callback: () => void, delay: number = 500): void {
+    if (this.debounceTimeout) {
+      clearTimeout(this.debounceTimeout);
+    }
+    this.debounceTimeout = setTimeout(callback, delay);
+  }
 
   /**
    * Analyze if Ayla should offer guidance
@@ -43,30 +72,55 @@ export class AylaHintSystem {
   async shouldAylaInterrupt(
     context: AylaHintContext,
   ): Promise<AylaHintResponse | null> {
-    // Don't interrupt too frequently
-    if (Date.now() - this.lastHintTime < this.hintCooldown) {
-      return null;
-    }
+    // Show "thinking" indicator during debounce
+    console.log("Ayla is thinking...");
 
-    // Check if player appears stuck
-    const stuckIndicators = this.analyzeStuckState(context);
-    if (!stuckIndicators.isStuck) {
-      return null;
-    }
+    return new Promise((resolve) => {
+      this.debounceInput(async () => {
+        // Don't interrupt too frequently
+        if (Date.now() - this.lastHintTime < this.hintCooldown) {
+          resolve(null);
+          return;
+        }
 
-    try {
-      // Use AI to generate contextual hint with enhanced miniquest awareness
-      const aiHint = await this.generateAIHint(context, stuckIndicators);
-      if (aiHint) {
-        this.lastHintTime = Date.now();
-        return aiHint;
-      }
-    } catch (error) {
-      console.warn("[Ayla Hints] AI failed, using scripted fallback:", error);
-    }
+        // Check if player appears stuck
+        const stuckIndicators = this.analyzeStuckState(context);
+        if (!stuckIndicators.isStuck) {
+          resolve(null);
+          return;
+        }
 
-    // Fallback to scripted hints
-    return this.generateScriptedHint(context, stuckIndicators);
+        // Check for NPC relay moments
+        if (this.detectNPCRelay(context)) {
+          resolve({
+            shouldInterrupt: true,
+            hintText: "*Ayla whispers* Perhaps speaking with the NPCs here could shed light on your path.",
+            urgency: "medium",
+            hintType: "interaction",
+            followUp: "Try 'talk to [NPC name]' to engage with them.",
+          });
+          return;
+        }
+
+        try {
+          // Use AI to generate contextual hint with enhanced miniquest awareness
+          const aiHint = await this.generateAIHint(context, stuckIndicators);
+          if (aiHint) {
+            this.lastHintTime = Date.now();
+            aiHint.hintText = this.generateResponse(aiHint.hintText, context);
+            resolve(aiHint);
+            return;
+          }
+        } catch (error) {
+          console.warn("[Ayla Hints] AI failed, using scripted fallback:", error);
+        }
+
+        // Fallback to scripted hints
+        const fallbackHint = this.generateScriptedHint(context, stuckIndicators);
+        fallbackHint.hintText = this.generateResponse(fallbackHint.hintText, context);
+        resolve(fallbackHint);
+      });
+    });
   }
 
   /**
@@ -567,6 +621,17 @@ Respond with just the hint text, in Ayla's voice with appropriate cosmic imagery
       urgency: 'low',
       hintType: 'safety',
     };
+  }
+
+  /**
+   * Detect if NPC interactions are relevant for Ayla's hints
+   */
+  private detectNPCRelay(context: AylaHintContext): boolean {
+    const { currentRoom, recentCommands } = context;
+    return (
+      currentRoom.npcsInRoom.length > 0 &&
+      recentCommands.some((cmd) => cmd.includes("talk to"))
+    );
   }
 }
 

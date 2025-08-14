@@ -103,6 +103,7 @@ export interface Player {
   visitedRooms?: string[];
   playTime?: number;
   lastSave?: string;
+  recentTopics?: string[]; // New property to track recent NPC conversation topics
 }
 
 export interface PlayerState extends Player {
@@ -420,6 +421,7 @@ export const GameUtils = {
         lastSaved: null,
       },
       roomMap: {},
+      currentObjective: null,
     };
   },
 
@@ -499,6 +501,7 @@ export interface GameState {
   roomMap: Record<string, Room>;
 
   roomFlags?: Record<string, string | number | boolean | null>;
+  currentObjective: string | null;
 }
 
 export interface GameFlags {

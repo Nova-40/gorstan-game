@@ -89,7 +89,7 @@ import silentStanton from "../rooms/stantonZone_silentStanton";
 import stantonharcourt from "../rooms/stantonZone_stantonharcourt";
 import villagegreen from "../rooms/stantonZone_villagegreen";
 
-import { roomRegistry } from "../services/rooms";
+import { roomRegistry } from "../data/roomRegistry";
 
 export const roomRegistry: Record<string, Room> = {
   [elfhame.id]: elfhame,
