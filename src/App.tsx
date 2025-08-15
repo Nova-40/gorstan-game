@@ -1,81 +1,114 @@
-/*
-  Gorstan – Copyright © 2025 Geoff Webster. All Rights Reserved.
-  
-  You may play Gorstan for free for personal entertainment only.
-  You may NOT copy, redistribute, modify, or sell the game, its code, 
-  artwork, storyline, or any other part without written permission.
-  
-  Gorstan includes third-party libraries and assets:
-    - React © Meta Platforms, Inc. – MIT Licence
-    - Lucide Icons © Lucide Contributors – ISC Licence
-    - Flaticon icons © Flaticon.com – Free Licence with attribution
-    - Other packages under their respective licences (see package.json)
+import React, { useEffect, useState } from 'react';
+import RoomObjectivePanel from './components/RoomObjectivePanel';
+import { RoomObjectivesManager } from './rooms/RoomObjectives';
+import { TeleportSystem } from './engine/teleportSystem';
+import { GameStateManager } from './engine/GameStateManager';
+import TrapBadge from './components/TrapBadge';
+import { armTrap, getRoomTraps } from './engine/trapSystem';
+import { go, goBack, getCurrent } from './engine/roomRouter';
+import { useAylaHint } from './services/aylaHintSystem';
 
-  Full licence terms: see EULA.md in the project root.
-*/
+const objectivesManager = new RoomObjectivesManager();
+objectivesManager.addObjective('control-room', {
+  id: '1',
+  description: 'Activate the main console.',
+  isCompleted: false,
+});
+objectivesManager.addObjective('control-room', {
+  id: '2',
+  description: 'Find the access key.',
+  isCompleted: false,
+});
 
-// Gorstan and characters (c) Geoff Webster 2025
-// Game module.
+const teleportSystem = TeleportSystem.getInstance();
+const gameStateManager = GameStateManager.getInstance();
 
-import AppCore from "./components/AppCore";
-import { CelebrationController } from "./celebrate";
-import DebugOverlay from './components/DebugOverlay';
-import TooltipSystem from './components/TooltipSystem';
-import SessionGoalBanner from './components/SessionGoalBanner';
-import QuestLog from './components/QuestLog';
-import QuickMap from './components/QuickMap';
-import { playSFX } from './utils/sfxManager';
-import AylaResponseIndicator from "./components/AylaResponseIndicator";
-import DevOverlay from "./devtools/DevOverlay";
-import AccessibilitySettingsPanel from "./components/AccessibilitySettingsPanel";
-
-import React from "react";
-import './styles/animations.css';
-
-import { GameStateProvider } from "./state/gameState";
+// Arm some traps for testing
+armTrap('trap-1', 'room:maze', 'A hidden spike trap!', true);
+armTrap('trap-2', 'room:maze', 'A tripwire alarm.', false);
 
 const App: React.FC = () => {
-  const rooms = [
-    { id: 'room1', title: 'Starting Area', unlocked: true },
-    { id: 'room2', title: 'Control Room', unlocked: false },
-    { id: 'room3', title: 'Puzzle Chamber', unlocked: true },
-  ];
+  const [playerStuck, setPlayerStuck] = useState(false);
+  const objectives = objectivesManager.getObjectives('control-room');
+  const traps = getRoomTraps('room:maze');
 
-  const currentRoomId = 'room1';
+  const hint = useAylaHint(playerStuck, () => 'Try exploring the maze for hidden clues.');
 
-  const handleAction = (action: string) => {
-    if (action === 'success') {
-      playSFX('success');
-    } else if (action === 'failure') {
-      playSFX('failure');
-    } else if (action === 'teleport') {
-      playSFX('teleport');
+  const handleTeleport = (roomId: string) => {
+    teleportSystem.teleportTo(roomId);
+  };
+
+  const handleRoomChange = (roomId: string) => {
+    gameStateManager.updateCurrentRoom(roomId);
+    console.log(`Player moved to ${roomId}`);
+  };
+
+  const handleGameEvent = (event: string) => {
+    if (event === 'teleport:maze') {
+      teleportSystem.teleportTo('room:maze');
     }
   };
 
-  // JSX return block or main return
+  const handleNavigation = (roomId: string) => {
+    go(roomId);
+    console.log(`Current room: ${getCurrent()}`);
+  };
+
+  const handleGoBack = () => {
+    goBack();
+    console.log(`Current room after going back: ${getCurrent()}`);
+  };
+
+  useEffect(() => {
+    // Simulate an in-game event triggering teleportation
+    setTimeout(() => handleGameEvent('teleport:maze'), 3000);
+  }, []);
+
+  useEffect(() => {
+    // Simulate player getting stuck after 10 seconds
+    const timer = setTimeout(() => setPlayerStuck(true), 10000);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
-    <GameStateProvider>
-      <div className="game-container">
-        <AylaResponseIndicator />
-        <AppCore />
-        <CelebrationController>
-          <div>Celebration content goes here</div>
-        </CelebrationController>
-        {process.env.NODE_ENV === 'development' && <DebugOverlay />}
-        <TooltipSystem />
-        <SessionGoalBanner />
-        <QuestLog />
-        <QuickMap rooms={rooms} currentRoomId={currentRoomId} />
-        <button onClick={() => handleAction('success')}>Test Success SFX</button>
-        <button onClick={() => handleAction('failure')}>Test Failure SFX</button>
-        <button onClick={() => handleAction('teleport')}>Test Teleport SFX</button>
-        <div className="fade-in">This fades in!</div>
-        <div className="slide-in">This slides in!</div>
-        <AccessibilitySettingsPanel />
-        {process.env.DEV_ONLY && <DevOverlay />}
+    <div className="App">
+      <h1>Welcome to Gorstan Game</h1>
+      {hint && <div className="p-2 bg-yellow-300 text-black rounded-md">{hint}</div>}
+      <RoomObjectivePanel objectives={objectives} />
+      <div>
+        <button
+          onClick={() => handleTeleport('room:hub')}
+          className="bg-blue-500 text-white p-2 rounded"
+        >
+          Teleport to Hub
+        </button>
       </div>
-    </GameStateProvider>
+      <div>
+        <button
+          onClick={() => handleRoomChange('room:maze')}
+          className="bg-green-500 text-white p-2 rounded"
+        >
+          Move to Maze
+        </button>
+      </div>
+      <div>
+        <TrapBadge traps={traps} />
+      </div>
+      <div>
+        <button
+          onClick={() => handleNavigation('room:maze')}
+          className="bg-blue-500 text-white p-2 rounded"
+        >
+          Go to Maze
+        </button>
+        <button
+          onClick={handleGoBack}
+          className="bg-gray-500 text-white p-2 rounded ml-2"
+        >
+          Go Back
+        </button>
+      </div>
+    </div>
   );
 };
 
